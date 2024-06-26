@@ -1,0 +1,7 @@
+{
+  "name": "app.eduprime.chat",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
