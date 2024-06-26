@@ -96,7 +96,7 @@ Você pode publicar os componentes para um registry local ou apenas manter no re
 No diretório do projeto principal EduPrime, adicione o módulo como submódulo Git:
 
 ```bash
-cd myERPApp
+cd app
 git submodule add https://github.com/seu-usuario/class-registration.git src/modules/class-registration
 git submodule init
 git submodule update

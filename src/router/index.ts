@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import type { RouteRecordRaw } from 'vue-router'
+import { routes as dynamicRoutes } from 'virtual:routes'
 
-const routes: Array<RouteRecordRaw> = [
+const staticRoutes: Array<RouteRecordRaw> = [
   {
     path: '',
     redirect: '/dashboard/Home',
@@ -47,7 +48,9 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import ('../views/NotificationsPage.vue'),
   },
 ]
+const routes = [...staticRoutes, ...dynamicRoutes]
 
+console.log('All Routes:', routes)
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
