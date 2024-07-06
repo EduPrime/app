@@ -24,6 +24,7 @@
     "@ionic/core": "^8.2.2",
     "@ionic/vue": "^8.2.2",
     "@ionic/vue-router": "^8.2.2",
+    "@zitadel/vue": "^1.0.4",
     "axios": "^1.7.2",
     "ionicons": "^7.4.0",
     "moment": "^2.30.1",

@@ -7,5 +7,5 @@ const routes = [
     component: RegisterTeacher,
   },
 ]
-console.log('Teacher Registration Routes:', routes)
+
 export default routes

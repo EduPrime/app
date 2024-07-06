@@ -1,4 +1,4 @@
-import { createApp } from 'vue'
+import {createApp} from 'vue'
 import {
   IonApp,
   IonContent,
@@ -34,9 +34,10 @@ import '@ionic/vue/css/display.css'
 
 /* Theme variables */
 import './theme/variables.css'
+import {oidcAuth} from "@/services/authService";
 
 // Dynamically import modules
-const modules = import.meta.glob('./modules/*/index.ts', { eager: true })
+const modules = import.meta.glob('./modules/*/index.ts', {eager: true})
 
 const app = createApp(App)
   .use(IonicVue)
@@ -61,6 +62,12 @@ for (const path in modules) {
   }
 }
 
-router.isReady().then(() => {
-  app.mount('#app')
+oidcAuth.startup().then((ok) => {
+  if(ok){
+    router.isReady().then(() => {
+      app.mount('#app')
+    })
+  } else {
+    console.error('Startup was not ok')
+  }
 })

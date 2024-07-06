@@ -1,16 +1,32 @@
-import { createRouter, createWebHistory } from '@ionic/vue-router'
-import type { RouteRecordRaw } from 'vue-router'
-import { routes as dynamicRoutes } from 'virtual:routes'
+import {createRouter, createWebHistory} from '@ionic/vue-router'
+import type {RouteRecordRaw} from 'vue-router'
+import {routes as dynamicRoutes} from 'virtual:routes'
+import {oidcAuth} from "@/services/authService.ts";
 
 const staticRoutes: Array<RouteRecordRaw> = [
   {
-    path: '',
-    redirect: '/dashboard/Home',
+    path: '/',
+    component: () => import ('../views/HomePage.vue')
+  },
+  {
+    path: '/login',
+    component: () => import ('../views/LoginPage.vue')
+  },
+  {
+    path: '/userInfo',
+    name: 'UserInfo',
+    component: () => import('../views/UserInfoPage.vue'),
+  },
+  {
+    path: '/callback',
+    name: 'Callback',
+    component: () => import('../views/AuthCallback.vue'),
   },
   {
     path: '/dashboard/:id',
-    component: () => import ('../views/HomePage.vue'),
+    component: () => import ('../views/HomePage.vue')
   },
+  // {path: '/tenant-selection', component: TenantSelection, meta: { requiresAuth: true }},
   {
     path: '/Booking',
     component: () => import ('../views/CalendarPage.vue'),
@@ -50,10 +66,21 @@ const staticRoutes: Array<RouteRecordRaw> = [
 ]
 const routes = [...staticRoutes, ...dynamicRoutes]
 
-console.log('All Routes:', routes)
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
+
+router.beforeEach(async (to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    if (oidcAuth.isAuthenticated) {
+      next();
+    } else {
+      await oidcAuth.signIn();
+    }
+  } else {
+    next();
+  }
+});
 
 export default router
