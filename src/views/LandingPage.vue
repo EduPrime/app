@@ -6,7 +6,7 @@
           <ion-menu-button color="primary" />
           <ion-back-button default-href="/" />
         </ion-buttons>
-        <ion-title>Home Page</ion-title>
+        <ion-title>Landing Page</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -14,46 +14,29 @@
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">
-            Home Page
+            Landing Page
           </ion-title>
         </ion-toolbar>
       </ion-header>
 
-      <ul class="claims">
-        <li v-for="c in claims" :key="c.key">
-          <strong>{{ c.key }}</strong>: {{ c.value }}
-        </li>
-      </ul>
+      <div id="container">
+        <strong class="capitalize">Landing page</strong>
+        <p class="ion-padding">
+          Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+        </p>
+      </div>
 
-      <ion-button @click="logout">Logout</ion-button>
+      <ion-button @click="login">Login</ion-button>
     </ion-content>
   </ion-page>
 </template>
-
 <script setup>
-import { ref, computed } from 'vue'
-import { IonBackButton, IonButton, IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/vue'
-import zitadelAuth from "@/services/authService";
+import zitadelAuth from '../services/authService.ts';
 
-const logout = async () => {
-  await zitadelAuth.oidcAuth.signOut();
+const login = async () => {
+  await zitadelAuth.oidcAuth.signIn();
 };
-
-const user = ref(null);
-
-const claims = computed(() => {
-  if (user.value) {
-    return Object.keys(user.value).map(key => ({
-      key,
-      value: user.value[key]
-    }));
-  }
-  return [];
-});
-
-user.value = zitadelAuth.oidcAuth.userProfile;
 </script>
-
 <style scoped>
 #container {
   text-align: center;

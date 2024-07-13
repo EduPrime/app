@@ -3,6 +3,7 @@ import {
   IonApp,
   IonContent,
   IonIcon,
+  IonicVue,
   IonImg,
   IonItem,
   IonList,
@@ -11,7 +12,6 @@ import {
   IonSearchbar,
   IonSplitPane,
   IonText,
-  IonicVue,
 } from '@ionic/vue'
 import App from './App.vue'
 import router from './router'
@@ -34,7 +34,7 @@ import '@ionic/vue/css/display.css'
 
 /* Theme variables */
 import './theme/variables.css'
-import {oidcAuth} from "@/services/authService";
+import zitadelAuth from "@/services/authService";
 
 // Dynamically import modules
 const modules = import.meta.glob('./modules/*/index.ts', {eager: true})
@@ -62,12 +62,18 @@ for (const path in modules) {
   }
 }
 
-oidcAuth.startup().then((ok) => {
-  if(ok){
-    router.isReady().then(() => {
-      app.mount('#app')
-    })
-  } else {
-    console.error('Startup was not ok')
+declare module 'vue' {
+  interface ComponentCustomProperties {
+    $zitadel: typeof zitadelAuth
   }
+}
+
+zitadelAuth.oidcAuth.startup().then(() => {
+
+  router.isReady().then(() => {
+    app.use(router)
+    app.config.globalProperties.$zitadel = zitadelAuth
+    app.mount('#app')
+  })
+
 })

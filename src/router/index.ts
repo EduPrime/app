@@ -1,26 +1,22 @@
 import {createRouter, createWebHistory} from '@ionic/vue-router'
 import type {RouteRecordRaw} from 'vue-router'
 import {routes as dynamicRoutes} from 'virtual:routes'
-import {oidcAuth} from "@/services/authService.ts";
+import zitadelAuth from "@/services/authService";
 
 const staticRoutes: Array<RouteRecordRaw> = [
   {
-    path: '/',
+    path: '/home',
     component: () => import ('../views/HomePage.vue')
   },
   {
-    path: '/login',
-    component: () => import ('../views/LoginPage.vue')
+    path: '/',
+    component: () => import ('../views/LandingPage.vue')
   },
+  
   {
     path: '/userInfo',
     name: 'UserInfo',
     component: () => import('../views/UserInfoPage.vue'),
-  },
-  {
-    path: '/callback',
-    name: 'Callback',
-    component: () => import('../views/AuthCallback.vue'),
   },
   {
     path: '/dashboard/:id',
@@ -71,16 +67,6 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach(async (to, from, next) => {
-  if (to.matched.some(record => record.meta.requiresAuth)) {
-    if (oidcAuth.isAuthenticated) {
-      next();
-    } else {
-      await oidcAuth.signIn();
-    }
-  } else {
-    next();
-  }
-});
+zitadelAuth.oidcAuth.useRouter(router)
 
 export default router
