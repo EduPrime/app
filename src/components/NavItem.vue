@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import { ref, watch } from 'vue'
 import { IonAccordion, IonAccordionGroup, IonIcon, IonItem, IonLabel } from '@ionic/vue'
+import { useRoute, useRouter } from 'vue-router'
 
 interface MenuItem {
   name: string
@@ -12,14 +14,30 @@ interface MenuItem {
 const props = defineProps<{
   item: MenuItem
 }>()
-console.info(props.item)
+
+const route = useRoute()
+const router = useRouter()
+const isDisabled = ref(false)
+
+watch(
+  () => route.path,
+  (newPath) => {
+    isDisabled.value = newPath === props.item.url
+  },
+  { immediate: true },
+)
+
+function handleClick() {
+  isDisabled.value = true
+  router.push(props.item.url)
+}
 </script>
 
 <template>
   <div>
     <ion-accordion-group v-if="item.children && item.children.length" multiple>
       <ion-accordion>
-        <ion-item slot="header" button lines="none">
+        <ion-item slot="header" button lines="none" :disabled="isDisabled" @click="handleClick">
           <ion-icon slot="start" :color="item.color" :icon="item.icon" />
           <ion-label>{{ item.name }}</ion-label>
         </ion-item>
@@ -28,7 +46,7 @@ console.info(props.item)
         </div>
       </ion-accordion>
     </ion-accordion-group>
-    <ion-item v-else button lines="none" :router-link="item.url">
+    <ion-item v-else button lines="none" :router-link="item.url" :disabled="isDisabled" @click="handleClick">
       <ion-icon slot="start" :color="item.color" :icon="item.icon" />
       <ion-label>{{ item.name }}</ion-label>
     </ion-item>

@@ -25,6 +25,7 @@
     "@ionic/vue": "^8.2.5",
     "@ionic/vue-router": "^8.2.5",
     "axios": "^1.7.2",
+    "echarts": "^5.5.1",
     "ionicons": "^7.4.0",
     "moment": "^2.30.1",
     "swiper": "^11.1.5",

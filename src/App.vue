@@ -210,7 +210,6 @@ dynamicTabs.forEach((tab) => {
 
 tabs.value.push(...dynamicTabs)
 tabs.value.sort((a, b) => a.order - b.order)
-
 // Inicializar a aba selecionada com base na rota atual ao carregar a página
 onMounted(() => {
   updateSelectedTab(route.path)
@@ -237,7 +236,8 @@ watch(route, (newRoute) => {
               </ion-item>
               <ion-item
                 v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button"
-                :class="selectedTab === index ? 'selected' : ''" @click="selectTab(index)"
+                :class="selectedTab === index ? 'selected' : ''"
+                :router-link="tab.children[0].url" @click="selectTab(index)"
               >
                 <ion-icon :icon="tab.icon" color="dark" />
               </ion-item>
