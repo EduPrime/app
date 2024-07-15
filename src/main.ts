@@ -1,16 +1,23 @@
 import { createApp } from 'vue'
 import {
   IonApp,
+  IonButton,
   IonContent,
+  IonHeader,
   IonIcon,
   IonImg,
+  IonInput,
   IonItem,
+  IonLabel,
   IonList,
   IonMenu,
+  IonPage,
   IonRouterOutlet,
   IonSearchbar,
   IonSplitPane,
   IonText,
+  IonTitle,
+  IonToolbar,
   IonicVue,
 } from '@ionic/vue'
 import App from './App.vue'
@@ -46,6 +53,7 @@ app.component('ion-app', IonApp)
 app.component('ion-content', IonContent)
 app.component('ion-icon', IonIcon)
 app.component('ion-item', IonItem)
+app.component('ion-label', IonLabel)
 app.component('ion-list', IonList)
 app.component('ion-menu', IonMenu)
 app.component('ion-router-outlet', IonRouterOutlet)
@@ -53,6 +61,12 @@ app.component('ion-split-pane', IonSplitPane)
 app.component('ion-text', IonText)
 app.component('ion-searchbar', IonSearchbar)
 app.component('ion-img', IonImg)
+app.component('ion-header', IonHeader)
+app.component('ion-page', IonPage)
+app.component('ion-button', IonButton)
+app.component('ion-title', IonTitle)
+app.component('ion-toolbar', IonToolbar)
+app.component('ion-input', IonInput)
 
 for (const path in modules) {
   const module: any = modules[path]
