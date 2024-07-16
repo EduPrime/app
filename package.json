@@ -14,7 +14,7 @@
     "lint:fix": "eslint --config ./eslint.config.js . --fix"
   },
   "dependencies": {
-    "@antfu/eslint-config": "^2.22.2",
+    "@antfu/eslint-config": "^2.22.3",
     "@capacitor/app": "^6.0.0",
     "@capacitor/assets": "^3.0.5",
     "@capacitor/core": "^6.1.0",

@@ -25,6 +25,7 @@ import {
 } from '@ionic/vue'
 import App from './App.vue'
 import router from './router'
+import ContentLayout from './components/theme/ContentLayout.vue'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
@@ -73,6 +74,7 @@ app.component('ion-input', IonInput)
 app.component('ion-back-button', IonBackButton)
 app.component('ion-buttons', IonButtons)
 app.component('ion-menu-button', IonMenuButton)
+app.component('content-layout', ContentLayout)
 
 for (const path in modules) {
   const module: any = modules[path]

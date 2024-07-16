@@ -202,7 +202,6 @@ function updateSelectedTab(path: string) {
   })
 }
 
-// Ordenar os módulos e as rotas internas com base na propriedade 'order'
 dynamicTabs.sort((a, b) => a.order - b.order)
 dynamicTabs.forEach((tab) => {
   tab.children.sort((a: { order: number }, b: { order: number }) => a.order - b.order)
@@ -210,12 +209,11 @@ dynamicTabs.forEach((tab) => {
 
 tabs.value.push(...dynamicTabs)
 tabs.value.sort((a, b) => a.order - b.order)
-// Inicializar a aba selecionada com base na rota atual ao carregar a página
+
 onMounted(() => {
   updateSelectedTab(route.path)
 })
 
-// Watch the route and update the selected tab
 watch(route, (newRoute) => {
   updateSelectedTab(newRoute.path)
 })

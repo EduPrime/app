@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { IonBackButton, IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonList, IonMenuButton, IonPage, IonRow, IonTitle, IonToolbar } from '@ionic/vue'
+import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonGrid, IonIcon, IonList, IonRow } from '@ionic/vue'
 import { onMounted, ref } from 'vue'
 import { addIcons } from 'ionicons'
 import { pencil, trash } from 'ionicons/icons'
+import ContentLayout from '@/components/theme/ContentLayout.vue'
 
 // Registrar os ícones
 addIcons({
@@ -47,92 +48,65 @@ function deleteInstitution(institution: any) {
 </script>
 
 <template>
-  <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-menu-button color="primary" />
-        </ion-buttons>
-        <ion-title>Dashboard</ion-title>
-      </ion-toolbar>
-    </ion-header>
+  <content-layout>
+    <template #default>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" size-md="6" size-lg="3">
+            <ion-card color="primary">
+              <ion-card-header>
+                <ion-card-title>Escolas</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <h1 class="ion-text-xxl">
+                  {{ schoolCount }}
+                </h1>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
 
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">
-            Dashboard
-          </ion-title>
-        </ion-toolbar>
-      </ion-header>
+          <ion-col size="12" size-md="6" size-lg="3">
+            <ion-card color="secondary">
+              <ion-card-header>
+                <ion-card-title>Turmas</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <h1 class="ion-text-xxl">
+                  {{ classCount }}
+                </h1>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
 
-      <div id="container">
-        <ion-grid>
-          <ion-row>
-            <ion-col size="12" size-md="6" size-lg="3">
-              <ion-card color="primary">
-                <ion-card-header>
-                  <ion-card-title>Escolas</ion-card-title>
-                </ion-card-header>
-                <ion-card-content>
-                  <h1 class="ion-text-xxl">
-                    {{ schoolCount }}
-                  </h1>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
+          <ion-col size="12" size-md="6" size-lg="3">
+            <ion-card color="tertiary">
+              <ion-card-header>
+                <ion-card-title>Séries</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <h1 class="ion-text-xxl">
+                  {{ seriesCount }}
+                </h1>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
 
-            <ion-col size="12" size-md="6" size-lg="3">
-              <ion-card color="secondary">
-                <ion-card-header>
-                  <ion-card-title>Turmas</ion-card-title>
-                </ion-card-header>
-                <ion-card-content>
-                  <h1 class="ion-text-xxl">
-                    {{ classCount }}
-                  </h1>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
-
-            <ion-col size="12" size-md="6" size-lg="3">
-              <ion-card color="tertiary">
-                <ion-card-header>
-                  <ion-card-title>Séries</ion-card-title>
-                </ion-card-header>
-                <ion-card-content>
-                  <h1 class="ion-text-xxl">
-                    {{ seriesCount }}
-                  </h1>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
-
-            <ion-col size="12" size-md="6" size-lg="3">
-              <ion-card color="success">
-                <ion-card-header>
-                  <ion-card-title>Docentes</ion-card-title>
-                </ion-card-header>
-                <ion-card-content>
-                  <h1 class="ion-text-xxl">
-                    {{ teacherCount }}
-                  </h1>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </div>
+          <ion-col size="12" size-md="6" size-lg="3">
+            <ion-card color="success">
+              <ion-card-header>
+                <ion-card-title>Docentes</ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <h1 class="ion-text-xxl">
+                  {{ teacherCount }}
+                </h1>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
 
       <ion-list>
-        <ion-item>
-          <ion-input placeholder="Search..." clear-input />
-        </ion-item>
-
-        <ion-button expand="block" color="primary" class="create-button">
-          Create Institution
-        </ion-button>
-
         <ion-card v-for="institution in institutions" :key="institution.id">
           <ion-card-header class="card-header">
             <div class="card-title-container">
@@ -158,27 +132,27 @@ function deleteInstitution(institution: any) {
           </ion-card-content>
         </ion-card>
       </ion-list>
-    </ion-content>
-  </ion-page>
+    </template>
+  </content-layout>
 </template>
 
-  <style scoped>
-  #create-button {
-    margin: 16px;
-  }
+<style scoped>
+#create-button {
+  margin: 16px;
+}
 
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .card-title-container {
-    display: flex;
-    align-items: center;
-  }
+.card-title-container {
+  display: flex;
+  align-items: center;
+}
 
-  .card-title-container ion-buttons {
-    margin-left: 8px;
-  }
-  </style>
+.card-title-container ion-buttons {
+  margin-left: 8px;
+}
+</style>
