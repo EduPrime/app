@@ -2,6 +2,7 @@
 import { IonBackButton, IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/vue'
 import * as echarts from 'echarts'
 import { nextTick, onMounted, ref } from 'vue'
+import ContentLayout from '@/components/theme/ContentLayout.vue'
 
 const chartsInitialized = ref(false)
 
@@ -136,36 +137,16 @@ onMounted(async () => {
 </script>
 
 <template>
-  <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-menu-button color="primary" />
-          <ion-back-button default-href="/" />
-        </ion-buttons>
-        <ion-title>Home Page</ion-title>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">
-            Home Page
-          </ion-title>
-        </ion-toolbar>
-      </ion-header>
-
-      <div id="container">
-        <strong class="capitalize">Dashboard Home page</strong>
-        <p class="ion-padding" />
-        <div id="students-chart" class="chart" />
-        <div id="performance-chart" class="chart" />
-        <div id="attendance-chart" class="chart" />
-        <div id="financial-chart" class="chart" />
-      </div>
-    </ion-content>
-  </ion-page>
+  <content-layout>
+    <div id="container">
+      <strong class="capitalize">Dashboard Home page</strong>
+      <p class="ion-padding" />
+      <div id="students-chart" class="chart" />
+      <div id="performance-chart" class="chart" />
+      <div id="attendance-chart" class="chart" />
+      <div id="financial-chart" class="chart" />
+    </div>
+  </content-layout>
 </template>
 
 <style scoped>
