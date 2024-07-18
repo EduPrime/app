@@ -47,13 +47,9 @@ watch(() => route.meta.name, updateTitle)
         </ion-toolbar>
       </ion-header>
 
-      <ion-grid fixed>
-        <ion-row>
-          <ion-col size="12">
-            <slot />
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+      <div id="main-content">
+        <slot />
+      </div>
     </ion-content>
   </ion-page>
 </template>
