@@ -2,6 +2,7 @@
 import { business, school } from 'ionicons/icons'
 import RegisterInstitution from './views/RegisterInstitution.vue'
 import DashboardInstitution from './views/DashboardInstitution.vue'
+import DashboardSchools from './views/DashboardSchools.vue'
 
 const routes = [
   {
@@ -31,7 +32,7 @@ const routes = [
   {
     path: '/Institutions/schools',
     name: 'InstitutionListInstitutions',
-    component: RegisterInstitution,
+    component: DashboardSchools,
     meta: {
       moduleName: 'Institutions',
       moduleIcon: school,
