@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { IonSelect, IonSelectOption } from '@ionic/vue'
+import { IonBackButton, IonSelect, IonSelectOption } from '@ionic/vue'
 
 const form = ref({
   cnpj: '',
@@ -40,6 +40,12 @@ function registerInstitution() {
 
 <template>
   <content-layout>
+    <template #header-buttons>
+      <ion-buttons slot="start">
+        <ion-back-button default-href="/" />
+      </ion-buttons>
+    </template>
+
     <ion-item>
       <ion-label position="stacked">
         CNPJ
