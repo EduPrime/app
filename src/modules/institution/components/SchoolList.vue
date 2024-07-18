@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineEmits, defineProps, ref } from 'vue'
 import { pencil, trash } from 'ionicons/icons'
 
 interface School {
