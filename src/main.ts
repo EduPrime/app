@@ -1,20 +1,31 @@
 import { createApp } from 'vue'
 import {
   IonApp,
+  IonBackButton,
+  IonButton,
+  IonButtons,
   IonContent,
+  IonHeader,
   IonIcon,
   IonImg,
+  IonInput,
   IonItem,
+  IonLabel,
   IonList,
   IonMenu,
+  IonMenuButton,
+  IonPage,
   IonRouterOutlet,
   IonSearchbar,
   IonSplitPane,
   IonText,
+  IonTitle,
+  IonToolbar,
   IonicVue,
 } from '@ionic/vue'
 import App from './App.vue'
 import router from './router'
+import ContentLayout from './components/theme/ContentLayout.vue'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
@@ -46,6 +57,7 @@ app.component('ion-app', IonApp)
 app.component('ion-content', IonContent)
 app.component('ion-icon', IonIcon)
 app.component('ion-item', IonItem)
+app.component('ion-label', IonLabel)
 app.component('ion-list', IonList)
 app.component('ion-menu', IonMenu)
 app.component('ion-router-outlet', IonRouterOutlet)
@@ -53,6 +65,16 @@ app.component('ion-split-pane', IonSplitPane)
 app.component('ion-text', IonText)
 app.component('ion-searchbar', IonSearchbar)
 app.component('ion-img', IonImg)
+app.component('ion-header', IonHeader)
+app.component('ion-page', IonPage)
+app.component('ion-button', IonButton)
+app.component('ion-title', IonTitle)
+app.component('ion-toolbar', IonToolbar)
+app.component('ion-input', IonInput)
+app.component('ion-back-button', IonBackButton)
+app.component('ion-buttons', IonButtons)
+app.component('ion-menu-button', IonMenuButton)
+app.component('content-layout', ContentLayout)
 
 for (const path in modules) {
   const module: any = modules[path]

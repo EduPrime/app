@@ -1,5 +1,5 @@
 import type { App } from 'vue'
-import RegisterTeacher from './pages/RegisterTeacher.vue'
+import RegisterTeacher from './views/RegisterTeacher.vue'
 import TeacherService from './services/TeacherService'
 import routes from './routes'
 
