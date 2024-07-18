@@ -4,18 +4,29 @@ import {
   IonBackButton,
   IonButton,
   IonButtons,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
+  IonCol,
   IonContent,
+  IonGrid,
   IonHeader,
   IonIcon,
   IonImg,
   IonInput,
   IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
   IonLabel,
   IonList,
   IonMenu,
   IonMenuButton,
   IonPage,
   IonRouterOutlet,
+  IonRow,
   IonSearchbar,
   IonSplitPane,
   IonText,
@@ -74,6 +85,17 @@ app.component('ion-input', IonInput)
 app.component('ion-back-button', IonBackButton)
 app.component('ion-buttons', IonButtons)
 app.component('ion-menu-button', IonMenuButton)
+app.component('ion-grid', IonGrid)
+app.component('ion-row', IonRow)
+app.component('ion-col', IonCol)
+app.component('ion-item-sliding', IonItemSliding)
+app.component('ion-item-option', IonItemOption)
+app.component('ion-item-options', IonItemOptions)
+app.component('ion-card', IonCard)
+app.component('ion-card-header', IonCardHeader)
+app.component('ion-card-title', IonCardTitle)
+app.component('ion-card-content', IonCardContent)
+app.component('ion-card-subtitle', IonCardSubtitle)
 app.component('content-layout', ContentLayout)
 
 for (const path in modules) {
