@@ -1,24 +1,27 @@
 # EduPrime OpenSource
 
-EduPrime é um ERP modular para escolas, desenvolvido usando Ionic Framework 8 com Vue 3. Cada módulo (por exemplo, cadastro de alunos, cadastro de escolas, cadastro de professores) é gerenciado de forma independente usando Bit e submódulos Git.
+EduPrime é um ERP modular para escolas, desenvolvido usando Ionic Framework 8 com Vue 3. Cada módulo (por exemplo, cadastro de alunos, cadastro de escolas, cadastro de professores) é gerenciado de forma independente usando submódulos Git.
 
 ## Estrutura do Projeto
 
 A estrutura do projeto é organizada da seguinte forma:
 
 ```
-myERPApp/
+EduPrime/
 ├── src/
 │   ├── components/
 │   ├── modules/
 │   │   ├── student-registration/
 │   │   ├── school-registration/
 │   │   └── teacher-registration/
+│   │       ├── views/
+│   │       ├── services/
+│   │       ├── index.ts
+│   │       └── routes.ts
 │   ├── views/
 │   ├── App.vue
 │   └── main.ts
 ├── public/
-├── bit.json
 ├── package.json
 └── ionic.config.json
 ```
@@ -31,29 +34,27 @@ Crie um novo repositório para o módulo que você deseja adicionar. Por exemplo
 
 1. Vá ao GitHub ou qualquer outro serviço de hospedagem de código e crie um novo repositório chamado `class-registration`.
 
-### 2. Inicializar o Bit no Novo Repositório
+### 2. Estruturar o Módulo
 
-Clone o repositório e inicialize um workspace do Bit:
-
-```bash
-git clone https://github.com/seu-usuario/class-registration.git
-cd class-registration
-bit init
-```
-
-### 3. Criar o Componente do Módulo
-
-Crie o componente usando o Bit. Por exemplo:
+No novo repositório, crie a estrutura necessária:
 
 ```bash
-bit create component modules/class-registration
+mkdir -p src/modules/class-registration/views
+mkdir -p src/modules/class-registration/services
+touch src/modules/class-registration/index.ts
+touch src/modules/class-registration/routes.ts
 ```
 
-### 4. Desenvolver o Componente
+### 3. Desenvolver o Módulo
 
-Edite o componente `ClassRegistration.vue` dentro do seu workspace Bit:
+Edite os arquivos conforme necessário.
+
+#### `ClassRegistration.vue`
+
+Este é o componente de visualização principal para o módulo, onde você definirá a interface do usuário.
 
 ```vue
+<!-- src/modules/class-registration/views/ClassRegistration.vue -->
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue'
 
@@ -78,77 +79,64 @@ defineProps({})
 </style>
 ```
 
-### 5. Adicionar e Tag Components
+#### `index.ts`
 
-Adicione e faça o tag dos componentes:
+Este arquivo é usado para exportar os componentes ou serviços que você deseja disponibilizar a partir deste módulo.
 
-```bash
-bit add src/components/ClassRegistration.vue
-bit tag --all
+```typescript
+// src/modules/class-registration/index.ts
+export { default as ClassRegistration } from './views/ClassRegistration.vue'
 ```
 
-### 6. Publicar Componentes (Opcional)
+#### `routes.ts`
 
-Você pode publicar os componentes para um registry local ou apenas manter no repositório Git.
+Neste arquivo, você define as rotas específicas para o módulo, incluindo propriedades `meta` para controle de navegação e organização.
 
-### 7. Adicionar o Módulo como Submódulo no Projeto Principal
+```typescript
+// src/modules/class-registration/routes.ts
+import { school } from 'ionicons/icons'
+import ClassRegistration from './views/ClassRegistration.vue'
+
+const routes = [
+  {
+    path: '/class-registration',
+    name: 'ClassRegistration',
+    component: ClassRegistration,
+    meta: {
+      moduleName: 'ClassRegistration',
+      moduleIcon: school,
+      icon: school,
+      name: 'Cadastro de Turmas',
+      order: 1,
+    },
+  },
+]
+
+export default routes
+```
+
+### 4. Adicionar o Módulo como Submódulo no Projeto Principal
 
 No diretório do projeto principal EduPrime, adicione o módulo como submódulo Git:
 
 ```bash
-cd app
-git submodule add https://github.com/seu-usuario/class-registration.git src/modules/class-registration
+cd EduPrime/src/modules
+git submodule add https://github.com/seu-usuario/class-registration.git class-registration
 git submodule init
 git submodule update
 ```
 
-### 8. Configurar Rotas no Projeto Principal
+### 5. Configurar Rotas no Projeto Principal
 
-Edite o arquivo `router/index.js` no projeto principal para adicionar a rota do novo módulo:
+As rotas do novo módulo serão importadas automaticamente para o projeto global do Ionic. Ao definir suas rotas no módulo e adicionar o módulo ao projeto principal, o sistema irá carregar essas rotas e disponibilizá-las no roteador principal.
 
-```javascript
-import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
-import StudentRegistration from '../modules/student-registration/src/components/StudentRegistration.vue'
-import SchoolRegistration from '../modules/school-registration/src/components/SchoolRegistration.vue'
-import TeacherRegistration from '../modules/teacher-registration/src/components/TeacherRegistration.vue'
-import ClassRegistration from '../modules/class-registration/src/components/ClassRegistration.vue'
+### 6. Importar Componentes Globalmente no `main.ts`
 
-const routes = [
-  { path: '/', component: Home },
-  { path: '/student-registration', component: StudentRegistration },
-  { path: '/school-registration', component: SchoolRegistration },
-  { path: '/teacher-registration', component: TeacherRegistration },
-  { path: '/class-registration', component: ClassRegistration },
-]
+Os componentes do novo módulo serão importados automaticamente para o projeto global do Ionic. Isso significa que qualquer componente definido e exportado em `index.ts` do módulo estará disponível globalmente no projeto, sem necessidade de importações adicionais.
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes,
-})
+### 7. Ajustar o Menu no `App.vue`
 
-export default router
-```
-
-### 9. Importar e Usar o Componente no `App.vue`
-
-Importe e use o componente do novo módulo no `App.vue` ou em outros componentes conforme necessário:
-
-```vue
-<script setup lang="ts">
-import { IonApp, IonRouterOutlet } from '@ionic/vue'
-import StudentRegistration from './modules/student-registration/src/components/StudentRegistration.vue'
-import SchoolRegistration from './modules/school-registration/src/components/SchoolRegistration.vue'
-import TeacherRegistration from './modules/teacher-registration/src/components/TeacherRegistration.vue'
-import ClassRegistration from './modules/class-registration/src/components/ClassRegistration.vue'
-</script>
-
-<template>
-  <ion-app>
-    <ion-router-outlet />
-  </ion-app>
-</template>
-```
+A estrutura do menu será gerada dinamicamente com base nas rotas definidas nos módulos. Ao carregar as rotas no projeto principal, o sistema construirá o menu com base nas propriedades `meta` definidas em cada rota, garantindo uma navegação consistente e organizada.
 
 ## Manutenção e Atualização de Submódulos
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-
+import { onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import {
   barChart,
   barChartOutline,
@@ -15,9 +15,6 @@ import {
   peopleOutline,
   person,
   personCircleOutline,
-  settingsOutline,
-  sparkles,
-  sparklesOutline,
   videocam,
 } from 'ionicons/icons'
 import NavItem from './components/NavItem.vue'
@@ -28,6 +25,7 @@ const tabs = ref([
     icon: folderOutline,
     color: 'tertiary',
     url: '/files',
+    order: 3,
     children: [
       {
         name: 'Calendar',
@@ -35,6 +33,7 @@ const tabs = ref([
         color: 'tertiary',
         url: '/Booking',
         children: [],
+        order: 1,
       },
       {
         name: 'Documents',
@@ -54,6 +53,7 @@ const tabs = ref([
                 color: 'tertiary',
                 url: '/files/documents/reports/annual',
                 children: [],
+                order: 1,
               },
               {
                 name: 'Monthly Report',
@@ -61,8 +61,10 @@ const tabs = ref([
                 color: 'tertiary',
                 url: '/files/documents/reports/monthly',
                 children: [],
+                order: 2,
               },
             ],
+            order: 1,
           },
           {
             name: 'Invoices',
@@ -70,6 +72,7 @@ const tabs = ref([
             color: 'tertiary',
             url: '/files/documents/invoices',
             children: [],
+            order: 2,
           },
           {
             name: 'Contracts',
@@ -77,8 +80,10 @@ const tabs = ref([
             color: 'tertiary',
             url: '/files/documents/contracts',
             children: [],
+            order: 3,
           },
         ],
+        order: 2,
       },
       {
         name: 'Images',
@@ -86,6 +91,7 @@ const tabs = ref([
         color: 'tertiary',
         url: '/files/images',
         children: [],
+        order: 3,
       },
       {
         name: 'Videos',
@@ -93,6 +99,7 @@ const tabs = ref([
         color: 'tertiary',
         url: '/files/videos',
         children: [],
+        order: 4,
       },
     ],
   },
@@ -101,25 +108,32 @@ const tabs = ref([
     icon: peopleOutline,
     color: 'success',
     url: '/users',
+    order: 4,
     children: [
       {
         name: 'Admin',
         icon: person,
         color: 'success',
         url: '/users/admin',
-        children: [{
-          name: 'Add User',
-          icon: person,
-          color: 'success',
-          url: '/users/editor',
-          children: [],
-        }, {
-          name: 'List users',
-          icon: person,
-          color: 'success',
-          url: '/users/viewer',
-          children: [],
-        }],
+        children: [
+          {
+            name: 'Add User',
+            icon: person,
+            color: 'success',
+            url: '/users/editor',
+            children: [],
+            order: 1,
+          },
+          {
+            name: 'List users',
+            icon: person,
+            color: 'success',
+            url: '/users/viewer',
+            children: [],
+            order: 2,
+          },
+        ],
+        order: 1,
       },
       {
         name: 'Editor',
@@ -127,6 +141,7 @@ const tabs = ref([
         color: 'success',
         url: '/users/editor',
         children: [],
+        order: 2,
       },
       {
         name: 'Viewer',
@@ -134,64 +149,7 @@ const tabs = ref([
         color: 'success',
         url: '/users/viewer',
         children: [],
-      },
-    ],
-  },
-  {
-    name: 'Insights',
-    icon: sparklesOutline,
-    color: 'warning',
-    url: '/insights',
-    children: [
-      {
-        name: 'Dashboard',
-        icon: sparkles,
-        color: 'warning',
-        url: '/insights/dashboard',
-        children: [],
-      },
-      {
-        name: 'Analytics',
-        icon: sparkles,
-        color: 'warning',
-        url: '/insights/analytics',
-        children: [],
-      },
-      {
-        name: 'Reports',
-        icon: sparkles,
-        color: 'warning',
-        url: '/insights/reports',
-        children: [],
-      },
-    ],
-  },
-  {
-    name: 'Settings',
-    icon: settingsOutline,
-    color: 'secondary',
-    url: '/settings',
-    children: [
-      {
-        name: 'General',
-        icon: settingsOutline,
-        color: 'secondary',
-        url: '/settings/general',
-        children: [],
-      },
-      {
-        name: 'Profile',
-        icon: settingsOutline,
-        color: 'secondary',
-        url: '/settings/profile',
-        children: [],
-      },
-      {
-        name: 'Security',
-        icon: settingsOutline,
-        color: 'secondary',
-        url: '/settings/security',
-        children: [],
+        order: 3,
       },
     ],
   },
@@ -202,6 +160,63 @@ const selectedTab = ref(0)
 function selectTab(index: number) {
   selectedTab.value = index
 }
+
+const router = useRouter()
+const route = useRoute()
+const dynamicTabs: any[] = []
+
+router.getRoutes().forEach((route) => {
+  if (route.meta && route.meta.moduleName && route.meta.moduleIcon) {
+    let moduleTab = dynamicTabs.find(tab => tab.name === route.meta.moduleName)
+    if (!moduleTab) {
+      moduleTab = {
+        name: route.meta.moduleName,
+        icon: route.meta.moduleIcon,
+        color: 'primary', // ou qualquer cor padrão que você preferir
+        url: `/${(route.meta.moduleName as string).toLowerCase()}`,
+        order: route.meta.order || 0,
+        children: [],
+      }
+      dynamicTabs.push(moduleTab)
+    }
+    moduleTab.children.push({
+      name: route.meta.name,
+      icon: route.meta.icon,
+      url: route.path,
+      children: route.children || [],
+      order: route.meta.order || 0,
+    })
+  }
+})
+
+function updateSelectedTab(path: string) {
+  tabs.value.forEach((tab, index) => {
+    tab.children.forEach((child) => {
+      if (child.url === path) {
+        selectedTab.value = index
+      }
+    })
+    if (path.startsWith(tab.url)) {
+      selectedTab.value = index
+    }
+  })
+}
+
+dynamicTabs.sort((a, b) => a.order - b.order)
+dynamicTabs.forEach((tab) => {
+  tab.children.sort((a: { order: number }, b: { order: number }) => a.order - b.order)
+})
+
+tabs.value.push(...dynamicTabs)
+tabs.value.sort((a, b) => a.order - b.order)
+
+onMounted(() => {
+  updateSelectedTab(route.path)
+})
+
+watch(route, (newRoute) => {
+  updateSelectedTab(newRoute.path)
+})
 </script>
 
 <template>
@@ -219,7 +234,8 @@ function selectTab(index: number) {
               </ion-item>
               <ion-item
                 v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button"
-                :class="selectedTab === index ? 'selected' : ''" @click="selectTab(index)"
+                :class="selectedTab === index ? 'selected' : ''"
+                :router-link="tab.children[0].url" @click="selectTab(index)"
               >
                 <ion-icon :icon="tab.icon" color="dark" />
               </ion-item>
@@ -240,11 +256,11 @@ function selectTab(index: number) {
               EduPrime
             </ion-item>
 
-            <ion-searchbar />
+            <ion-searchbar v-if="tabs[selectedTab].children.length > 4" />
             <!--------------------------
               @TODO: Recursive method to implement nested components for nav-items
             ------------------------------>
-            <nav-item v-for="(tab, index) in tabs[selectedTab].children" :key="index" :item="tab" />
+            <nav-item v-for="(tab) in tabs[selectedTab].children" :key="`${tab.name}-${tab.icon}`" :item="tab" />
           </div>
         </ion-content>
       </ion-menu>
