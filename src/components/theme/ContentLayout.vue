@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
-import { IonButtons, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonMenuButton, IonRow, IonTitle, IonToolbar } from '@ionic/vue'
+import { IonButtons, IonCol, IonGrid, IonHeader, IonIcon, IonMenuButton, IonRow, IonTitle, IonToolbar } from '@ionic/vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -22,9 +22,7 @@ watch(() => route.meta.name, updateTitle)
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-menu-button color="primary" />
-        </ion-buttons>
+        <slot name="header-buttons" />
         <ion-grid>
           <ion-row>
             <ion-col size="auto">
@@ -47,7 +45,7 @@ watch(() => route.meta.name, updateTitle)
         </ion-toolbar>
       </ion-header>
 
-      <div id="main-content">
+      <div id="main-content-box" class="ion-padding-start ion-padding-end">
         <slot />
       </div>
     </ion-content>
