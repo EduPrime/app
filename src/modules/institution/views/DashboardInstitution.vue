@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonGrid, IonIcon, IonList, IonRow } from '@ionic/vue'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { addIcons } from 'ionicons'
 import { pencil, trash } from 'ionicons/icons'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
-
+import InstitutionCards from '@/modules/institution/components/InstitutionCards.vue'
 // Registrar os ícones
 addIcons({
   pencil,
@@ -15,11 +15,6 @@ const schoolCount = ref(10)
 const classCount = ref(25)
 const seriesCount = ref(7)
 const teacherCount = ref(30)
-
-onMounted(() => {
-  // Aqui você pode fazer chamadas de API para obter os dados reais
-  // e atualizar os valores das refs schoolCount, classCount, seriesCount e teacherCount
-})
 
 const institutions = ref([
   {
@@ -33,106 +28,46 @@ const institutions = ref([
     state: 'PE',
     postalCode: '56280-000',
   },
-  // Adicione mais instituições aqui
 ])
 
 function editInstitution(institution: any) {
-  // Função para editar instituição
   console.log('Edit Institution', institution)
 }
 
 function deleteInstitution(institution: any) {
-  // Função para deletar instituição
   console.log('Delete Institution', institution)
 }
 </script>
 
 <template>
   <content-layout>
-    <template #default>
-      <ion-grid>
-        <ion-row>
-          <ion-col size="12" size-md="6" size-lg="3">
-            <ion-card color="primary">
-              <ion-card-header>
-                <ion-card-title>Escolas</ion-card-title>
-              </ion-card-header>
-              <ion-card-content>
-                <h1 class="ion-text-xxl">
-                  {{ schoolCount }}
-                </h1>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-
-          <ion-col size="12" size-md="6" size-lg="3">
-            <ion-card color="secondary">
-              <ion-card-header>
-                <ion-card-title>Turmas</ion-card-title>
-              </ion-card-header>
-              <ion-card-content>
-                <h1 class="ion-text-xxl">
-                  {{ classCount }}
-                </h1>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-
-          <ion-col size="12" size-md="6" size-lg="3">
-            <ion-card color="tertiary">
-              <ion-card-header>
-                <ion-card-title>Séries</ion-card-title>
-              </ion-card-header>
-              <ion-card-content>
-                <h1 class="ion-text-xxl">
-                  {{ seriesCount }}
-                </h1>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-
-          <ion-col size="12" size-md="6" size-lg="3">
-            <ion-card color="success">
-              <ion-card-header>
-                <ion-card-title>Docentes</ion-card-title>
-              </ion-card-header>
-              <ion-card-content>
-                <h1 class="ion-text-xxl">
-                  {{ teacherCount }}
-                </h1>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-
-      <ion-list>
-        <ion-card v-for="institution in institutions" :key="institution.id">
-          <ion-card-header class="card-header">
-            <div class="card-title-container">
-              <ion-card-title>{{ institution.name }}</ion-card-title>
-              <ion-buttons>
-                <ion-button fill="clear" @click="editInstitution(institution)">
-                  <ion-icon slot="icon-only" :icon="pencil" />
-                </ion-button>
-                <ion-button fill="clear" color="danger" @click="deleteInstitution(institution)">
-                  <ion-icon slot="icon-only" :icon="trash" />
-                </ion-button>
-              </ion-buttons>
-            </div>
-            <ion-card-subtitle>{{ institution.dateOfBirth }}</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <p><strong>Phone Number:</strong> {{ institution.phoneNumber }}</p>
-            <p><strong>Email:</strong> <a :href="`mailto:${institution.email}`">{{ institution.email }}</a></p>
-            <p><strong>Address:</strong> {{ institution.address }}</p>
-            <p><strong>City:</strong> {{ institution.city }}</p>
-            <p><strong>State:</strong> {{ institution.state }}</p>
-            <p><strong>Postal Code:</strong> {{ institution.postalCode }}</p>
-          </ion-card-content>
-        </ion-card>
-      </ion-list>
-    </template>
+    <institution-cards :school-count="schoolCount" :class-count="classCount" :series-count="seriesCount" :teacher-count="teacherCount" />
+    <ion-list>
+      <ion-card v-for="institution in institutions" :key="institution.id">
+        <ion-card-header class="card-header">
+          <div class="card-title-container">
+            <ion-card-title>{{ institution.name }}</ion-card-title>
+            <ion-buttons>
+              <ion-button fill="clear" @click="editInstitution(institution)">
+                <ion-icon slot="icon-only" :icon="pencil" />
+              </ion-button>
+              <ion-button fill="clear" color="danger" @click="deleteInstitution(institution)">
+                <ion-icon slot="icon-only" :icon="trash" />
+              </ion-button>
+            </ion-buttons>
+          </div>
+          <ion-card-subtitle>{{ institution.dateOfBirth }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <p><strong>Phone Number:</strong> {{ institution.phoneNumber }}</p>
+          <p><strong>Email:</strong> <a :href="`mailto:${institution.email}`">{{ institution.email }}</a></p>
+          <p><strong>Address:</strong> {{ institution.address }}</p>
+          <p><strong>City:</strong> {{ institution.city }}</p>
+          <p><strong>State:</strong> {{ institution.state }}</p>
+          <p><strong>Postal Code:</strong> {{ institution.postalCode }}</p>
+        </ion-card-content>
+      </ion-card>
+    </ion-list>
   </content-layout>
 </template>
 
