@@ -32,10 +32,6 @@ function toggleDetails(index: number) {
   emit('update:schools', updatedSchools)
 }
 
-function viewSchool(school: School) {
-  console.log('Ver', school)
-}
-
 function editSchool(school: School) {
   console.log('Editar', school)
 }
@@ -48,15 +44,12 @@ function deleteSchool(school: School) {
 <template>
   <ion-list>
     <ion-item-sliding v-for="(school, index) in schools" :key="index">
-      <ion-item @click="toggleDetails(index)">
+      <ion-item button @click="toggleDetails(index)">
         <ion-label>
           <h2>{{ school.name }}</h2>
           <p>{{ school.address }}</p>
         </ion-label>
         <ion-buttons slot="end">
-          <ion-button @click.stop="viewSchool(school)">
-            Ver
-          </ion-button>
           <ion-button @click.stop="editSchool(school)">
             <ion-icon slot="icon-only" :icon="pencil" />
           </ion-button>
@@ -66,9 +59,6 @@ function deleteSchool(school: School) {
         </ion-buttons>
       </ion-item>
       <ion-item-options side="end">
-        <ion-item-option @click="viewSchool(school)">
-          Ver
-        </ion-item-option>
         <ion-item-option @click="editSchool(school)">
           Editar
         </ion-item-option>
@@ -102,22 +92,15 @@ function deleteSchool(school: School) {
 </template>
 
 <style scoped>
-#create-button {
-  margin: 16px;
+ion-item:hover {
+  --background: #f0f0f0;
+  --ripple-color: #d0d0d0;
 }
 
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.card-title-container {
-  display: flex;
-  align-items: center;
-}
-
-.card-title-container ion-buttons {
-  margin-left: 8px;
+ion-item {
+  --background: white;
+  --border-radius: 8px;
+  margin: 8px 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 </style>
