@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { schools as schoolData } from '../data/schools'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/institution/components/SchoolCards.vue'
 import SchoolList from '@/modules/institution/components/SchoolList.vue'
@@ -9,29 +10,7 @@ const classCount = ref(25)
 const approvalRate = ref(48)
 const teacherCount = ref(30)
 
-const schools = ref([
-  {
-    name: 'Escola Mercúrio',
-    address: 'Rua A, Bairro B',
-    showDetails: false,
-    series: [
-      {
-        name: 'Educação Infantil',
-        classes: [
-          { name: 'Creche - Turma A', teacher: 'Marie Curie', schedule: 'Matutino (08:00 - 12:00)', subjects: ['Brincadeiras Educativas', 'Artes'] },
-          { name: 'Creche - Turma B', teacher: 'Isaac Newton', schedule: 'Vespertino (13:00 - 17:00)', subjects: ['Brincadeiras Educativas', 'Artes'] },
-        ],
-      },
-      {
-        name: 'Ensino Fundamental I',
-        classes: [
-          { name: '1º ano - Turma A', teacher: 'Albert Einstein', schedule: 'Vespertino (13:00 - 17:00)', subjects: ['Português', 'Matemática', 'Ciências'] },
-          { name: '1º ano - Turma B', teacher: 'Richard Feynman', schedule: 'Matutino (08:00 - 12:00)', subjects: ['Português', 'Matemática', 'Ciências'] },
-        ],
-      },
-    ],
-  },
-])
+const schools = ref(schoolData)
 </script>
 
 <template>
