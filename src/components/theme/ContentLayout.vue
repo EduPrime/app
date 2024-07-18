@@ -1,30 +1,38 @@
 <script setup lang="ts">
-import { onMounted, watch } from 'vue'
-import { IonButtons, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonMenuButton, IonRow, IonTitle, IonToolbar } from '@ionic/vue'
+import { onMounted, ref, watch } from 'vue'
+import { IonCol, IonGrid, IonHeader, IonIcon, IonRow, IonTitle, IonToolbar } from '@ionic/vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
-const metaName = (route.meta.name as string) || ''
-const metaIcon = (route.meta.icon as string) || ''
+const metaName = ref((route.meta.name as string) || '')
+const metaIcon = ref((route.meta.icon as string) || '')
 
 function updateTitle() {
-  document.title = `${metaName} no EduPrime` || 'EduPrime'
+  document.title = `${metaName.value} no EduPrime` || 'EduPrime'
 }
 
 onMounted(() => {
   updateTitle()
 })
 
-watch(() => route.meta.name, updateTitle)
+watch(
+  () => route.meta,
+  (newMeta) => {
+    metaName.value = (newMeta.name as string) || ''
+    metaIcon.value = (newMeta.icon as string) || ''
+    updateTitle()
+  },
+  { immediate: true },
+)
+
+console.log('Meta:', route.meta)
 </script>
 
 <template>
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-menu-button color="primary" />
-        </ion-buttons>
+        <slot name="header-buttons" />
         <ion-grid>
           <ion-row>
             <ion-col size="auto">
@@ -47,7 +55,7 @@ watch(() => route.meta.name, updateTitle)
         </ion-toolbar>
       </ion-header>
 
-      <div id="main-content">
+      <div id="main-content-box" class="ion-padding-start ion-padding-end">
         <slot />
       </div>
     </ion-content>

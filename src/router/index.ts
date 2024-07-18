@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router'
+import { home } from 'ionicons/icons'
 import type { RouteRecordRaw } from 'vue-router'
 
 // Função para carregar dinamicamente todas as rotas dos módulos
@@ -18,6 +19,11 @@ const staticRoutes: Array<RouteRecordRaw> = [
   {
     path: '',
     redirect: '/dashboard/Home',
+    meta: {
+      icon: home,
+      name: 'Main Dashboard',
+    },
+
   },
   {
     path: '/dashboard/:id',
