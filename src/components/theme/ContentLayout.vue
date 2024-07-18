@@ -4,9 +4,11 @@ import { IonButtons, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonMenuBut
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+const metaName = (route.meta.name as string) || ''
+const metaIcon = (route.meta.icon as string) || ''
 
 function updateTitle() {
-  document.title = `EduPrime - ${route.meta?.name}` as string || 'EduPrime'
+  document.title = `${metaName} no EduPrime` || 'EduPrime'
 }
 
 onMounted(() => {
@@ -26,10 +28,10 @@ watch(() => route.meta.name, updateTitle)
         <ion-grid>
           <ion-row>
             <ion-col size="auto">
-              <ion-icon :icon="route.meta.icon" size="large" style="margin-left: 8px;" />
+              <ion-icon :icon="metaIcon" size="large" style="margin-left: 8px;" />
             </ion-col>
             <ion-col>
-              <ion-title>{{ route.meta.name }}</ion-title>
+              <ion-title>{{ metaName }}</ion-title>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -40,12 +42,18 @@ watch(() => route.meta.name, updateTitle)
       <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">
-            {{ route.meta.name }}
+            {{ metaName }}
           </ion-title>
         </ion-toolbar>
       </ion-header>
 
-      <slot />
+      <ion-grid fixed>
+        <ion-row>
+          <ion-col size="12">
+            <slot />
+          </ion-col>
+        </ion-row>
+      </ion-grid>
     </ion-content>
   </ion-page>
 </template>

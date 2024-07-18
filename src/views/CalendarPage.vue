@@ -115,7 +115,7 @@ function getColorForDate(date: Moment) {
 function isDateDisabled(date: Moment) {
   const formattedDate = date.format('YYYY-MM-DD')
   const event = events.value.find(event => event.date === formattedDate)
-  return event?.type === 'disabled' ?? false
+  return event?.type === 'disabled'
 }
 
 function onMonthYearChange(event: any) {
