@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import { useFieldArray, useForm } from 'vee-validate'
-import { schoolSchema } from '../validators/validationSchemas.ts' // Importe o esquema de validação
+import { schoolSchema } from '../validators/validationSchemas'
 
-// Inicializando o formulário
-const { handleSubmit, errors, values } = useForm<School>({
+interface SeriesFieldEntry {
+  name: string
+  classes: {
+    name: string
+    teacher: string
+    schedule: string
+    subjects: string[]
+  }[]
+}
+
+const { handleSubmit, errors, values } = useForm<any>({
   validationSchema: schoolSchema,
 })
 
-const { fields } = useFieldArray({
-  name: 'series',
-})
+const { fields } = useFieldArray<SeriesFieldEntry>('series')
 
 function handleFileUpload(event: Event) {
   const target = event.target as HTMLInputElement
@@ -18,10 +25,12 @@ function handleFileUpload(event: Event) {
   }
 }
 
-const registerSchool = handleSubmit((values) => {
+const registerSchool = handleSubmit((values: any) => {
   console.log('Escola registrada:', values)
   // Aqui você pode adicionar a lógica para enviar os dados para um backend ou API
 })
+
+const seriesErrors: any = (errors as any).series
 </script>
 
 <template>
@@ -68,20 +77,21 @@ const registerSchool = handleSubmit((values) => {
           <ion-label position="stacked">
             Nome da Série
           </ion-label>
-          <ion-input v-model="serie.name" placeholder="Digite o nome da série" />
-          <p v-if="errors.series?.[sIndex]?.name">
-            {{ errors.series[sIndex].name }}
+
+          <ion-input v-model="serie.value.name" placeholder="Digite o nome da série" />
+          <p v-if="seriesErrors?.[sIndex]?.name">
+            {{ seriesErrors?.[sIndex]?.name }}
           </p>
         </ion-item>
 
-        <div v-for="(classe, cIndex) in serie.classes" :key="cIndex">
+        <div v-for="(classe, cIndex) in serie.value.classes" :key="cIndex">
           <ion-item>
             <ion-label position="stacked">
               Nome da Turma
             </ion-label>
             <ion-input v-model="classe.name" placeholder="Digite o nome da turma" />
-            <p v-if="errors.series?.[sIndex]?.classes?.[cIndex]?.name">
-              {{ errors.series[sIndex].classes[cIndex].name }}
+            <p v-if="seriesErrors?.[sIndex]?.classes?.[cIndex]?.name">
+              {{ seriesErrors?.[sIndex]?.classes?.[cIndex]?.name }}
             </p>
           </ion-item>
 
@@ -90,8 +100,8 @@ const registerSchool = handleSubmit((values) => {
               Professor
             </ion-label>
             <ion-input v-model="classe.teacher" placeholder="Digite o nome do professor" />
-            <p v-if="errors.series?.[sIndex]?.classes?.[cIndex]?.teacher">
-              {{ errors.series[sIndex].classes[cIndex].teacher }}
+            <p v-if="seriesErrors?.[sIndex]?.classes?.[cIndex]?.teacher">
+              {{ seriesErrors?.[sIndex]?.classes?.[cIndex]?.teacher }}
             </p>
           </ion-item>
 
@@ -100,8 +110,8 @@ const registerSchool = handleSubmit((values) => {
               Horário
             </ion-label>
             <ion-input v-model="classe.schedule" placeholder="Digite o horário" />
-            <p v-if="errors.series?.[sIndex]?.classes?.[cIndex]?.schedule">
-              {{ errors.series[sIndex].classes[cIndex].schedule }}
+            <p v-if="seriesErrors?.[sIndex]?.classes?.[cIndex]?.schedule">
+              {{ seriesErrors?.[sIndex]?.classes?.[cIndex]?.schedule }}
             </p>
           </ion-item>
 
@@ -111,8 +121,8 @@ const registerSchool = handleSubmit((values) => {
                 Assunto
               </ion-label>
               <ion-input v-model="classe.subjects[subIndex]" placeholder="Digite o assunto" />
-              <p v-if="errors.series?.[sIndex]?.classes?.[cIndex]?.subjects?.[subIndex]">
-                {{ errors.series[sIndex].classes[cIndex].subjects[subIndex].message }}
+              <p v-if="seriesErrors?.[sIndex]?.classes?.[cIndex]?.subjects?.[subIndex]">
+                {{ seriesErrors?.[sIndex]?.classes?.[cIndex]?.subjects?.[subIndex] }}
               </p>
             </ion-item>
           </div>

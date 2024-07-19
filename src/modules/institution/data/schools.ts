@@ -15,6 +15,7 @@ export interface School {
   address: string
   showDetails: boolean
   series: Series[]
+  logo?: File
 }
 
 export const schools: School[] = [
