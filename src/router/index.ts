@@ -23,7 +23,10 @@ const staticRoutes: Array<RouteRecordRaw> = [
       icon: home,
       name: 'Main Dashboard',
     },
-
+  },
+  {
+    path: '/login',
+    component: () => import('../views/LoginPage.vue'),
   },
   {
     path: '/dashboard/:id',
