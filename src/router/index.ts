@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { home } from 'ionicons/icons'
 import type { RouteRecordRaw } from 'vue-router'
-
+import LoginPage from '@/views/LoginPage.vue'
 // Função para carregar dinamicamente todas as rotas dos módulos
 const moduleRoutes = import.meta.glob('../modules/**/routes.ts', { eager: true })
 
@@ -26,7 +26,7 @@ const staticRoutes: Array<RouteRecordRaw> = [
   },
   {
     path: '/login',
-    component: () => import('../views/LoginPage.vue'),
+    component: LoginPage,
   },
   {
     path: '/dashboard/:id',
