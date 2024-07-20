@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import {onMounted, ref, watch} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 import {
   barChart,
   barChartOutline,
@@ -11,6 +11,7 @@ import {
   folderOutline,
   handLeft,
   image,
+  logOutOutline,
   notificationsOutline,
   peopleOutline,
   person,
@@ -217,6 +218,11 @@ onMounted(() => {
 watch(route, (newRoute) => {
   updateSelectedTab(newRoute.path)
 })
+
+function logout() {
+  localStorage.clear()
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -228,26 +234,29 @@ watch(route, (newRoute) => {
             <ion-list>
               <ion-item lines="full" button class="vertical-tab-button" router-link="/">
                 <ion-img
-                  src="/icons/icon-256.webp"
-                  alt="Gestão Pedagógica"
+                    src="/icons/icon-256.webp"
+                    alt="Gestão Pedagógica"
                 />
               </ion-item>
               <ion-item
-                v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button"
-                :class="selectedTab === index ? 'selected' : ''"
-                :router-link="tab.children[0].url" @click="selectTab(index)"
+                  v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button"
+                  :class="selectedTab === index ? 'selected' : ''"
+                  :router-link="tab.children[0].url" @click="selectTab(index)"
               >
-                <ion-icon :icon="tab.icon" color="dark" />
+                <ion-icon :icon="tab.icon" color="dark"/>
               </ion-item>
 
               <!-- Profile and Notifications button -->
             </ion-list>
             <div class="bottom-items">
+              <ion-item lines="full" button class="vertical-tab-button" @click="logout()">
+                <ion-icon :icon="logOutOutline" color="dark"/>
+              </ion-item>
               <ion-item lines="full" button class="vertical-tab-button" router-link="/notifications">
-                <ion-icon :icon="notificationsOutline" color="dark" />
+                <ion-icon :icon="notificationsOutline" color="dark"/>
               </ion-item>
               <ion-item lines="full" button class="vertical-tab-button" router-link="/profile">
-                <ion-icon :icon="personCircleOutline" color="dark" />
+                <ion-icon :icon="personCircleOutline" color="dark"/>
               </ion-item>
             </div>
           </div>
@@ -256,15 +265,15 @@ watch(route, (newRoute) => {
               EduPrime
             </ion-item>
 
-            <ion-searchbar v-if="tabs[selectedTab].children.length > 4" />
+            <ion-searchbar v-if="tabs[selectedTab].children.length > 4"/>
             <!--------------------------
               @TODO: Recursive method to implement nested components for nav-items
             ------------------------------>
-            <nav-item v-for="(tab) in tabs[selectedTab].children" :key="`${tab.name}-${tab.icon}`" :item="tab" />
+            <nav-item v-for="(tab) in tabs[selectedTab].children" :key="`${tab.name}-${tab.icon}`" :item="tab"/>
           </div>
         </ion-content>
       </ion-menu>
-      <ion-router-outlet id="main-content" />
+      <ion-router-outlet id="main-content"/>
     </ion-split-pane>
   </ion-app>
 </template>
@@ -339,7 +348,8 @@ ion-item.app-title-item {
   left: 0;
   height: auto;
 }
-.ion-accordion-toggle-icon{
+
+.ion-accordion-toggle-icon {
   color: var(--ion-color-primary)
 }
 </style>
