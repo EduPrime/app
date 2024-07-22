@@ -28,6 +28,10 @@ const staticRoutes: Array<RouteRecordRaw> = [
   {
     path: '/dashboard/:id',
     component: () => import('../views/HomePage.vue'),
+    meta: {
+      icon: home,
+      name: 'Main Dashboard',
+    },
   },
   {
     path: '/Booking',

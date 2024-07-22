@@ -49,7 +49,7 @@ const props = defineProps<{
     </ion-col>
 
     <ion-col size="12" size-md="6" size-lg="3">
-      <ion-card color="success">
+      <ion-card color="lightaccent">
         <ion-card-header>
           <ion-card-title>Docentes</ion-card-title>
         </ion-card-header>
@@ -62,3 +62,14 @@ const props = defineProps<{
     </ion-col>
   </ion-row>
 </template>
+
+<style scoped>
+ion-card {
+  box-shadow: none;
+  border-radius: 15px;
+}
+
+h1 {
+  font-weight: 700;
+}
+</style>

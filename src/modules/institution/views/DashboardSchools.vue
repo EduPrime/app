@@ -32,9 +32,11 @@ function navigateToRegister() {
 
 <template>
   <content-layout>
-    <ion-grid>
-      <school-cards :student-count="schoolCount" :class-count="classCount" :approval-rate="approvalRate" :teacher-count="teacherCount" />
-      <h1>Escolas ativas ({{ filteredSchools.length }})</h1>
+      <school-cards :student-count="schoolCount" :class-count="classCount" :approval-rate="approvalRate"
+        :teacher-count="teacherCount" />
+     <ion-toolbar>
+      <ion-title>Escolas ativas ({{ filteredSchools.length }})</ion-title>
+      </ion-toolbar>
       <ion-row class="ion-align-items-center ion-justify-content-between">
         <ion-col size-sm="6" size-md="10" size-lg="10">
           <ion-searchbar v-model="searchQuery" placeholder="Buscar escola" />
@@ -47,14 +49,10 @@ function navigateToRegister() {
         </ion-col>
       </ion-row>
       <school-list :schools="filteredSchools" @update:schools="schools = $event" />
-    </ion-grid>
   </content-layout>
 </template>
 
 <style scoped>
-ion-row {
-  --ion-padding-horizontal: 16px;
-}
 
 ion-label h2 {
   margin: 0;
@@ -62,15 +60,6 @@ ion-label h2 {
 }
 
 ion-searchbar {
-  --background: #f0f0f0;
-}
-
-#add-btn {
-  --background: #3880ff;
-  --color: #fff;
-}
-
-#add-btn ion-icon {
-  margin-right: 8px;
+  --background: var(--ion-color-light);
 }
 </style>
