@@ -91,15 +91,10 @@ function deleteSchool(school: School) {
 </template>
 
 <style scoped>
-ion-item:hover {
-  --background: #f0f0f0;
-  --ripple-color: #d0d0d0;
-}
-
 ion-item {
-  --background: white;
+  --background: var(--ion-color-white);
   --border-radius: 8px;
-  margin: 8px 0;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  /* margin: 8px 0; */
+  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); */
 }
 </style>

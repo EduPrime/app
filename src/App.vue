@@ -182,6 +182,7 @@ router.getRoutes().forEach((route) => {
     moduleTab.children.push({
       name: route.meta.name,
       icon: route.meta.icon,
+      color: 'tertiary',
       url: route.path,
       children: route.children || [],
       order: route.meta.order || 0,
@@ -237,17 +238,17 @@ watch(route, (newRoute) => {
                 :class="selectedTab === index ? 'selected' : ''"
                 :router-link="tab.children[0].url" @click="selectTab(index)"
               >
-                <ion-icon :icon="tab.icon" color="dark" />
+                <ion-icon :icon="tab.icon"/>
               </ion-item>
 
               <!-- Profile and Notifications button -->
             </ion-list>
             <div class="bottom-items">
               <ion-item lines="full" button class="vertical-tab-button" router-link="/notifications">
-                <ion-icon :icon="notificationsOutline" color="dark" />
+                <ion-icon :icon="notificationsOutline"/>
               </ion-item>
               <ion-item lines="full" button class="vertical-tab-button" router-link="/profile">
-                <ion-icon :icon="personCircleOutline" color="dark" />
+                <ion-icon :icon="personCircleOutline"/>
               </ion-item>
             </div>
           </div>
@@ -271,20 +272,32 @@ watch(route, (newRoute) => {
 
 <style>
 /* Global Styles */
+ion-split-pane{
+  --side-max-width: 350px;
+}
 ion-menu {
+  --border: 1px solid  #0000001f;
   --width: 90%;
+  --max-width: 350px;
 }
 
 /* Page Styles */
 .vertical-tabs ion-list {
-  width: 60px;
+  width: 61px;
   float: left;
   height: 100vh;
   overflow-y: auto;
+  background: var(--module-panel-background);
+  border-right: 1px solid  #00000023;
 }
 
 ion-item.vertical-tab-button {
   width: 60px;
+  --background: #00000000;
+  --color: var(--ion-color-primary);
+}
+ion-item.vertical-tab-button ion-icon {
+  color: var(--ion-color-primary);
 }
 
 ion-item.vertical-tab-button::part(native) {
@@ -293,7 +306,11 @@ ion-item.vertical-tab-button::part(native) {
 }
 
 ion-item.vertical-tab-button.selected {
-  --background: var(--ion-background-color);
+  --background: var(--ion-color-primary);
+  color:var(--ion-background-color);
+}
+ion-item.vertical-tab-button.selected ion-icon {
+  color :var(--ion-background-color);
 }
 
 .accordion-view {
@@ -307,13 +324,17 @@ ion-accordion::part(content) {
 .tree-view {
   margin-left: 60px;
   padding: 15px;
+  background: var(--sidemenu-background);
+  height: 100%;
+  overflow-y: auto;
 }
 
 .tree-view .tree-view-items ion-list {
-  background: #00000000;
+  --background: transparent;
 }
 
 .tree-view .tree-view-items ion-item {
+  --background: transparent;
   --min-height: 32px;
   --padding-top: 0;
   --padding-bottom: 0;
@@ -341,5 +362,8 @@ ion-item.app-title-item {
 }
 .ion-accordion-toggle-icon{
   color: var(--ion-color-primary)
+}
+.side-menu{
+  width: 350px;
 }
 </style>
