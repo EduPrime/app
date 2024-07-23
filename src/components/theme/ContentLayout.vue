@@ -34,16 +34,8 @@ watch(
           <ion-menu-button color="primary" />
         </ion-buttons>
         <slot name="header-buttons" />
-        <ion-grid>
-          <ion-row class="ion-align-items-center">
-            <ion-col size="auto">
-              <ion-icon :icon="metaIcon" size="large" style="margin-left: 8px;" />
-            </ion-col>
-            <ion-col>
-              <ion-title>{{ metaName }}</ion-title> 
-            </ion-col>
-          </ion-row>
-        </ion-grid>
+        <ion-icon v-if="metaIcon" :icon="metaIcon" slot="start" size="large" class="ion-margin-start" />
+        <ion-title>{{ metaName }}</ion-title> 
         <slot name="header-right" />
       </ion-toolbar>
     </ion-header>

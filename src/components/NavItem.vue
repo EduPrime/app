@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { IonAccordion, IonAccordionGroup, IonIcon, IonItem, IonLabel } from '@ionic/vue'
+import { IonAccordion, IonAccordionGroup, IonIcon, IonItem, IonLabel, menuController } from '@ionic/vue'
 import { useRoute, useRouter } from 'vue-router'
 
 interface MenuItem {
@@ -30,7 +30,8 @@ watch(
 
 function handleClick() {
   // isDisabled.value = true
-  isActive.value = true
+  isActive.value = true;
+  props.item.children?.length == 0 ? menuController.close() : '';
   router.push(props.item.url)
 }
 </script>

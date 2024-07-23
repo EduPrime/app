@@ -19,14 +19,8 @@ function submitForm() {
 </script>
 
 <template>
-  <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Register Teacher</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <form @submit.prevent="submitForm">
+  <content-layout>
+    <form @submit.prevent="submitForm">
         <ion-item>
           <ion-label position="floating">
             Name
@@ -49,6 +43,5 @@ function submitForm() {
           Register
         </ion-button>
       </form>
-    </ion-content>
-  </ion-page>
+  </content-layout>
 </template>

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router'
-import { home } from 'ionicons/icons'
+import { calendar, home } from 'ionicons/icons'
 import type { RouteRecordRaw } from 'vue-router'
 
 // Função para carregar dinamicamente todas as rotas dos módulos
@@ -36,6 +36,10 @@ const staticRoutes: Array<RouteRecordRaw> = [
   {
     path: '/Booking',
     component: () => import('../views/CalendarPage.vue'),
+    meta: {
+      // icon: calendar,
+      name: 'Book Appointment',
+    },
   },
   {
     path: '/files/:id',
