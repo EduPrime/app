@@ -5,6 +5,10 @@ import {
   barChart,
   barChartOutline,
   calendarOutline,
+  chevronBackCircle,
+  chevronBackCircleOutline,
+  chevronForwardCircle,
+  chevronForwardCircleOutline,
   document,
   fileTray,
   folder,
@@ -156,7 +160,11 @@ const tabs = ref([
 ])
 
 const selectedTab = ref(0)
+const showTree = ref(true);
+function toggleTreeView(){
+  showTree.value = !showTree.value;
 
+}
 function selectTab(index: number) {
   selectedTab.value = index
 }
@@ -222,7 +230,10 @@ watch(route, (newRoute) => {
 
 <template>
   <ion-app>
-    <ion-split-pane content-id="main-content">
+    <ion-split-pane content-id="main-content" :class="showTree ? '' : 'tree-hidden'">
+      <ion-buttons class="tree-toggle-btn">
+            <ion-button color="primary" @click="toggleTreeView"><ion-icon slot="icon-only" size="small" :icon="showTree ? chevronBackCircle   : chevronForwardCircle"></ion-icon></ion-button>
+            </ion-buttons>
       <ion-menu content-id="main-content" type="overlay">
         <ion-content>
           <div class="vertical-tabs">
@@ -252,9 +263,9 @@ watch(route, (newRoute) => {
               </ion-item>
             </div>
           </div>
-          <div class="tree-view">
+          <div class="tree-view" v-if="showTree">
             <ion-item lines="none" class="app-title-item">
-              EduPrime
+              EduPrime 
             </ion-item>
 
             <ion-searchbar v-if="tabs[selectedTab].children.length > 4" />
@@ -274,6 +285,10 @@ watch(route, (newRoute) => {
 /* Global Styles */
 ion-split-pane{
   --side-max-width: 350px;
+}
+ion-split-pane.tree-hidden{
+  --side-min-width: 61px;
+  --side-width: 61px;
 }
 ion-menu {
   --border: 1px solid  #0000001f;
@@ -365,5 +380,22 @@ ion-item.app-title-item {
 }
 .side-menu{
   width: 350px;
+}
+.tree-toggle-btn{
+  position: fixed;
+  top: 0;
+  left: 300px;
+}
+
+.tree-hidden .tree-toggle-btn{
+  top: 0;
+  left: 30px;
+}
+
+.tree-toggle-btn>ion-button{
+  --width: 25px;
+  --height: 25px;
+  --min-width: 25px;
+  --padding: 0;
 }
 </style>
