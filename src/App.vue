@@ -161,7 +161,7 @@ const tabs = ref([
 
 const selectedTab = ref(0)
 const showTree = ref(true);
-function toggleTreeView(){
+function toggleTreeView() {
   showTree.value = !showTree.value;
 
 }
@@ -227,45 +227,41 @@ watch(route, (newRoute) => {
   updateSelectedTab(newRoute.path)
 })
 </script>
-
 <template>
   <ion-app>
     <ion-split-pane content-id="main-content" :class="showTree ? '' : 'tree-hidden'">
       <ion-buttons class="tree-toggle-btn">
-            <ion-button color="primary" @click="toggleTreeView"><ion-icon slot="icon-only" size="small" :icon="showTree ? chevronBackCircle   : chevronForwardCircle"></ion-icon></ion-button>
-            </ion-buttons>
+        <ion-button color="primary"  @click="toggleTreeView"><ion-icon slot="icon-only" size="small"
+            :icon="showTree ? chevronBackCircle : chevronForwardCircle"></ion-icon></ion-button>
+      </ion-buttons>
       <ion-menu content-id="main-content" type="overlay">
         <ion-content>
           <div class="vertical-tabs">
             <ion-list>
-              <ion-item lines="full" button class="vertical-tab-button" router-link="/">
-                <ion-img
-                  src="/icons/icon-256.webp"
-                  alt="Gestão Pedagógica"
-                />
+              <ion-item lines="full" button class="vertical-tab-button" router-link="/" :detail="false">
+                <ion-img src="/icons/icon-256.webp" alt="Gestão Pedagógica" />
               </ion-item>
-              <ion-item
-                v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button"
-                :class="selectedTab === index ? 'selected' : ''"
-                :router-link="tab.children[0].url" @click="selectTab(index)"
-              >
-                <ion-icon :icon="tab.icon"/>
+              <ion-item v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button" :detail="false"
+                :class="selectedTab === index ? 'selected' : ''" :router-link="tab.children[0].url"
+                @click="selectTab(index)">
+                <ion-icon :icon="tab.icon" />
               </ion-item>
 
               <!-- Profile and Notifications button -->
             </ion-list>
             <div class="bottom-items">
-              <ion-item lines="full" button class="vertical-tab-button" router-link="/notifications">
-                <ion-icon :icon="notificationsOutline"/>
+              <ion-item lines="full" button class="vertical-tab-button" router-link="/notifications" :detail="false">
+                <ion-icon :icon="notificationsOutline" />
               </ion-item>
-              <ion-item lines="full" button class="vertical-tab-button" router-link="/profile">
-                <ion-icon :icon="personCircleOutline"/>
+              <ion-item lines="full" button class="vertical-tab-button" router-link="/profile" :detail="false">
+                <ion-icon :icon="personCircleOutline" />
               </ion-item>
             </div>
           </div>
-          <div class="tree-view" v-if="showTree">
+          <div class="tree-view">
+            <!-- v-if="showTree" -->
             <ion-item lines="none" class="app-title-item">
-              EduPrime 
+              EduPrime
             </ion-item>
 
             <ion-searchbar v-if="tabs[selectedTab].children.length > 4" />
@@ -283,15 +279,12 @@ watch(route, (newRoute) => {
 
 <style>
 /* Global Styles */
-ion-split-pane{
+ion-split-pane {
   --side-max-width: 350px;
 }
-ion-split-pane.tree-hidden{
-  --side-min-width: 61px;
-  --side-width: 61px;
-}
+
 ion-menu {
-  --border: 1px solid  #0000001f;
+  --border: 1px solid #0000001f;
   --width: 90%;
   --max-width: 350px;
 }
@@ -303,7 +296,7 @@ ion-menu {
   height: 100vh;
   overflow-y: auto;
   background: var(--module-panel-background);
-  border-right: 1px solid  #00000023;
+  border-right: 1px solid #00000023;
 }
 
 ion-item.vertical-tab-button {
@@ -311,6 +304,7 @@ ion-item.vertical-tab-button {
   --background: #00000000;
   --color: var(--ion-color-primary);
 }
+
 ion-item.vertical-tab-button ion-icon {
   color: var(--ion-color-primary);
 }
@@ -322,10 +316,11 @@ ion-item.vertical-tab-button::part(native) {
 
 ion-item.vertical-tab-button.selected {
   --background: var(--ion-color-primary);
-  color:var(--ion-background-color);
+  color: var(--ion-background-color);
 }
+
 ion-item.vertical-tab-button.selected ion-icon {
-  color :var(--ion-background-color);
+  color: var(--ion-background-color);
 }
 
 .accordion-view {
@@ -375,27 +370,62 @@ ion-item.app-title-item {
   left: 0;
   height: auto;
 }
-.ion-accordion-toggle-icon{
+
+.ion-accordion-toggle-icon {
   color: var(--ion-color-primary)
 }
-.side-menu{
+
+.side-menu {
   width: 350px;
 }
-.tree-toggle-btn{
-  position: fixed;
-  top: 0;
-  left: 300px;
+
+@media (min-width: 576px) {
+
+  ion-split-pane.tree-hidden {
+    --side-min-width: 61px;
+    --side-width: 61px;
+  }
+
+  .tree-toggle-btn {
+    position: fixed;
+    top: 0;
+    left: 300px;
+  }
+
+  .tree-hidden .tree-toggle-btn {
+    top: 0;
+    left: 30px;
+  }
+
+  .tree-hidden .tree-view {
+    display: none;
+  }
+
+  .tree-toggle-btn>ion-button {
+    --width: 25px;
+    --height: 25px;
+    --min-width: 25px;
+    --padding: 0;
+  }
 }
 
-.tree-hidden .tree-toggle-btn{
-  top: 0;
-  left: 30px;
-}
+@media (max-width: 576px) {
 
-.tree-toggle-btn>ion-button{
-  --width: 25px;
-  --height: 25px;
-  --min-width: 25px;
-  --padding: 0;
+  .tree-toggle-btn {
+    display: none;
+  }
+
+  .tree-hidden .tree-toggle-btn {
+    top: 0;
+    left: 30px;
+  }
+
+  .tree-toggle-btn>ion-button {
+    --width: 25px;
+    --height: 25px;
+    --min-width: 25px;
+    --padding: 0;
+  }
+
 }
 </style>
