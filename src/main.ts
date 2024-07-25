@@ -56,7 +56,6 @@ import '@ionic/vue/css/display.css'
 
 /* Theme variables */
 import './theme/variables.css'
-
 // Dynamically import modules
 const modules = import.meta.glob('./modules/*/index.ts', { eager: true })
 

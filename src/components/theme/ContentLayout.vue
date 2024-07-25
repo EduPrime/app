@@ -8,7 +8,7 @@ const metaName = ref((route.meta.name as string) || '')
 const metaIcon = ref((route.meta.icon as string) || '')
 
 function updateTitle() {
-  document.title = `${metaName.value} no EduPrime` || 'EduPrime'
+  document.title = metaName.value ?  `${metaName.value} no EduPrime` : 'EduPrime'
 }
 
 onMounted(() => {
@@ -34,22 +34,16 @@ watch(
           <ion-menu-button color="primary" />
         </ion-buttons>
         <slot name="header-buttons" />
-        <ion-grid>
-          <ion-row>
-            <ion-col size="auto">
-              <ion-icon :icon="metaIcon" size="large" style="margin-left: 8px;" />
-            </ion-col>
-            <ion-col>
-              <ion-title>{{ metaName }}</ion-title>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
+        <ion-icon v-if="metaIcon" :icon="metaIcon" slot="start" size="large" class="ion-margin-start" />
+        <ion-title>{{ metaName }}</ion-title> 
+        <slot name="header-right" />
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
+        <slot name="header-buttons" />
           <ion-title size="large">
             {{ metaName }}
           </ion-title>
@@ -67,5 +61,12 @@ watch(
 ion-grid {
   display: flex;
   align-items: center;
+}
+ion-header.md{
+  box-shadow: 0 4px 8px rgba(var(--ion-color-dark-rgb), 0.1);
+  /* border-bottom:1px solid  #0000001f */
+}
+ion-title{
+  font-weight: 800;
 }
 </style>
