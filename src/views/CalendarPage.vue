@@ -157,14 +157,18 @@ loadVisibleMonth()
 </script>
 
 <template>
-  <ion-page>
+  <!-- <ion-page>
     <ion-header>
       <ion-toolbar>
         <ion-title>Book Appointment</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-item button lines="none">
+     
+    </ion-content>
+  </ion-page> -->
+  <content-layout>
+    <ion-item button lines="none">
         <ion-label position="stacked">
           Select Date
         </ion-label>
@@ -219,8 +223,7 @@ loadVisibleMonth()
           <ion-label>{{ event.title }}</ion-label>
         </ion-item>
       </ion-list>
-    </ion-content>
-  </ion-page>
+  </content-layout>
 </template>
 
 <style scoped>
