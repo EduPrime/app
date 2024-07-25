@@ -9,6 +9,8 @@ import {
   chevronBackCircleOutline,
   chevronForwardCircle,
   chevronForwardCircleOutline,
+  close,
+  closeCircle,
   document,
   fileTray,
   folder,
@@ -22,6 +24,7 @@ import {
   videocam,
 } from 'ionicons/icons'
 import NavItem from './components/NavItem.vue'
+import { menuController } from '@ionic/core';
 
 const tabs = ref([
   {
@@ -163,7 +166,6 @@ const selectedTab = ref(0)
 const showTree = ref(true);
 function toggleTreeView() {
   showTree.value = !showTree.value;
-
 }
 function selectTab(index: number) {
   selectedTab.value = index
@@ -231,7 +233,7 @@ watch(route, (newRoute) => {
   <ion-app>
     <ion-split-pane content-id="main-content" :class="showTree ? '' : 'tree-hidden'">
       <ion-buttons class="tree-toggle-btn">
-        <ion-button color="primary"  @click="toggleTreeView"><ion-icon slot="icon-only" size="small"
+        <ion-button color="primary" @click="toggleTreeView"><ion-icon slot="icon-only" size="small"
             :icon="showTree ? chevronBackCircle : chevronForwardCircle"></ion-icon></ion-button>
       </ion-buttons>
       <ion-menu content-id="main-content" type="overlay">
@@ -241,8 +243,8 @@ watch(route, (newRoute) => {
               <ion-item lines="full" button class="vertical-tab-button" router-link="/" :detail="false">
                 <ion-img src="/icons/icon-256.webp" alt="Gestão Pedagógica" />
               </ion-item>
-              <ion-item v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button" :detail="false"
-                :class="selectedTab === index ? 'selected' : ''" :router-link="tab.children[0].url"
+              <ion-item v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button"
+                :detail="false" :class="selectedTab === index ? 'selected' : ''" :router-link="tab.children[0].url"
                 @click="selectTab(index)">
                 <ion-icon :icon="tab.icon" />
               </ion-item>
@@ -262,6 +264,9 @@ watch(route, (newRoute) => {
             <!-- v-if="showTree" -->
             <ion-item lines="none" class="app-title-item">
               EduPrime
+              <!-- Mobile Screen Menu close button -->
+              <ion-menu-button color="primary" slot="end" @click="toggleTreeView"><ion-icon
+                  :icon="closeCircle"></ion-icon></ion-menu-button>
             </ion-item>
 
             <ion-searchbar v-if="tabs[selectedTab].children.length > 4" />
@@ -277,86 +282,125 @@ watch(route, (newRoute) => {
   </ion-app>
 </template>
 
-<style>
+<style lang="scss">
 /* Global Styles */
 ion-split-pane {
   --side-max-width: 350px;
-}
 
-ion-menu {
-  --border: 1px solid #0000001f;
-  --width: 90%;
-  --max-width: 350px;
-}
+  &.split-pane-visible {
+    .tree-toggle-btn {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 300px;
+    }
 
-/* Page Styles */
-.vertical-tabs ion-list {
-  width: 61px;
-  float: left;
-  height: 100vh;
-  overflow-y: auto;
-  background: var(--module-panel-background);
-  border-right: 1px solid #00000023;
-}
+    .tree-toggle-btn>ion-button {
+      --width: 25px;
+      --height: 25px;
+      --min-width: 25px;
+      --padding: 0;
+    }
 
-ion-item.vertical-tab-button {
-  width: 60px;
-  --background: #00000000;
-  --color: var(--ion-color-primary);
-}
+    &.tree-hidden {
+      --side-min-width: 61px;
+      --side-width: 61px;
 
-ion-item.vertical-tab-button ion-icon {
-  color: var(--ion-color-primary);
-}
+      .tree-toggle-btn {
+        top: 0;
+        left: 30px;
+      }
 
-ion-item.vertical-tab-button::part(native) {
-  height: 60px;
-  width: 60px;
-}
+      .tree-view {
+        display: none;
+      }
+    }
+  } 
+  &:not(.split-pane-visible) .tree-toggle-btn{
+    display: none;
+  }
 
-ion-item.vertical-tab-button.selected {
-  --background: var(--ion-color-primary);
-  color: var(--ion-background-color);
-}
+  .tree-toggle-btn>ion-button {
+    --width: 25px;
+    --height: 25px;
+    --min-width: 25px;
+    --padding: 0;
+  }
 
-ion-item.vertical-tab-button.selected ion-icon {
-  color: var(--ion-background-color);
-}
+  ion-menu {
+    --border: 1px solid #0000001f;
+    --width: 90%;
+    --max-width: 350px;
+  }
 
-.accordion-view {
-  margin-left: 60px;
-}
+  ion-item.vertical-tab-button {
+    width: 60px;
+    --background: #00000000;
+    --color: var(--ion-color-primary);
 
-ion-accordion::part(content) {
-  padding-left: 25px;
-}
+    ion-icon {
+      color: var(--ion-color-primary);
+    }
 
-.tree-view {
-  margin-left: 60px;
-  padding: 15px;
-  background: var(--sidemenu-background);
-  height: 100%;
-  overflow-y: auto;
-}
+    &::part(native) {
+      height: 60px;
+      width: 60px;
+    }
 
-.tree-view .tree-view-items ion-list {
-  --background: transparent;
-}
+    &.selected {
+      --background: var(--ion-color-primary);
+      color: var(--ion-background-color);
 
-.tree-view .tree-view-items ion-item {
-  --background: transparent;
-  --min-height: 32px;
-  --padding-top: 0;
-  --padding-bottom: 0;
-  --inner-padding-top: 0;
-  --inner-padding-bottom: 0;
-  margin-bottom: 5px;
-}
+      ion-icon {
+        color: var(--ion-background-color);
+      }
+    }
+  }
 
-.tree-view .tree-view-items ion-item::part(native) {
-  max-height: 16px;
-  font-size: 14px;
-  border-radius: 8px;
+  .vertical-tabs ion-list {
+    width: 61px;
+    float: left;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--module-panel-background);
+    border-right: 1px solid #00000023;
+  }
+
+  .accordion-view {
+    margin-left: 60px;
+
+    ion-accordion::part(content) {
+      padding-left: 25px;
+    }
+  }
+
+  .tree-view {
+    margin-left: 60px;
+    padding: 15px;
+    background: var(--sidemenu-background);
+    height: 100%;
+    overflow-y: auto;
+
+    .tree-view-items ion-list {
+      --background: transparent;
+
+      ion-item {
+        --background: transparent;
+        --min-height: 32px;
+        --padding-top: 0;
+        --padding-bottom: 0;
+        --inner-padding-top: 0;
+        --inner-padding-bottom: 0;
+        margin-bottom: 5px;
+
+        &::part(native) {
+          max-height: 16px;
+          font-size: 14px;
+          border-radius: 8px;
+        }
+      }
+    }
+  }
 }
 
 ion-item.app-title-item {
@@ -377,55 +421,5 @@ ion-item.app-title-item {
 
 .side-menu {
   width: 350px;
-}
-
-@media (min-width: 576px) {
-
-  ion-split-pane.tree-hidden {
-    --side-min-width: 61px;
-    --side-width: 61px;
-  }
-
-  .tree-toggle-btn {
-    position: fixed;
-    top: 0;
-    left: 300px;
-  }
-
-  .tree-hidden .tree-toggle-btn {
-    top: 0;
-    left: 30px;
-  }
-
-  .tree-hidden .tree-view {
-    display: none;
-  }
-
-  .tree-toggle-btn>ion-button {
-    --width: 25px;
-    --height: 25px;
-    --min-width: 25px;
-    --padding: 0;
-  }
-}
-
-@media (max-width: 576px) {
-
-  .tree-toggle-btn {
-    display: none;
-  }
-
-  .tree-hidden .tree-toggle-btn {
-    top: 0;
-    left: 30px;
-  }
-
-  .tree-toggle-btn>ion-button {
-    --width: 25px;
-    --height: 25px;
-    --min-width: 25px;
-    --padding: 0;
-  }
-
 }
 </style>
