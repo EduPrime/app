@@ -26,7 +26,7 @@ const filteredSchools = computed(() => {
   )
 })
 function navigateToRegister() {
-  router.push({ name: 'RegisterInstitution' })
+  router.push({ name: 'RegisterSchool' })
 }
 </script>
 
