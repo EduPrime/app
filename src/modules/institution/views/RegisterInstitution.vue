@@ -39,13 +39,18 @@ function registerInstitution() {
 </script>
 
 <template>
-  <content-layout>
+  <content-layout :show-footer="true" :show-description="true">
     <template #header-buttons>
       <ion-buttons slot="start">
         <ion-back-button default-href="/" />
       </ion-buttons>
     </template>
-
+    <template #description>
+      Todos os campos são obrigatórios, a menos que indicado de outra forma.
+    </template>
+    <h3 class="ion-text-end ion-text-uppercase">
+      Salvar Instituição
+    </h3>
     <ion-item>
       <ion-label position="stacked">
         CNPJ
@@ -144,9 +149,22 @@ function registerInstitution() {
       <ion-input v-model="form.socialMedia" placeholder="Digite as redes sociais" />
     </ion-item>
 
-    <ion-button expand="block" @click="registerInstitution">
-      Registrar
-    </ion-button>
+    <template #footer>
+      <ion-grid>
+        <ion-row class="ion-justify-content-between">
+          <ion-col>
+            <ion-button expand="block" color="danger">
+              Cancelar
+            </ion-button>
+          </ion-col>
+          <ion-col>
+            <ion-button expand="block" color="primary" @click="registerInstitution">
+              Salvar
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </template>
   </content-layout>
 </template>
 
