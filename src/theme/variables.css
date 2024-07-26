@@ -84,6 +84,7 @@ http://ionicframework.com/docs/theming/ */
 	--ion-background-color: #FFFFFF;
 	--sidemenu-background: #ffffff;
 	--module-panel-background: #fff9f9;
+
 }
 
 body.dark {
@@ -251,4 +252,5 @@ body.dark {
 	--ion-color-contrast-rgb: var(--ion-color-lightaccent-contrast-rgb);
 	--ion-color-shade: var(--ion-color-lightaccent-shade);
 	--ion-color-tint: var(--ion-color-lightaccent-tint);
-}
+} 
+  

@@ -1,6 +1,7 @@
 // src/modules/institution/routes.ts
 import { business, school } from 'ionicons/icons'
 import RegisterInstitution from './views/RegisterInstitution.vue'
+import RegisterSchool from './views/RegisterSchool.vue'
 import DashboardInstitution from './views/DashboardInstitution.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
 
@@ -39,6 +40,18 @@ const routes = [
       icon: school,
       name: 'Escolas',
       order: 1,
+    },
+  },
+  {
+    path: '/Institutions/school/register',
+    name: 'RegisterSchool',
+    component: RegisterSchool,
+    meta: {
+      moduleName: 'Institutions',
+      moduleIcon: school,
+      icon: school,
+      name: 'Cad Escola',
+      order: 3,
     },
   },
 ]
