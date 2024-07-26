@@ -11,6 +11,7 @@ import {
   IonCardTitle,
   IonCol,
   IonContent,
+  IonFooter,
   IonGrid,
   IonHeader,
   IonIcon,
@@ -76,6 +77,7 @@ app.component('ion-text', IonText)
 app.component('ion-searchbar', IonSearchbar)
 app.component('ion-img', IonImg)
 app.component('ion-header', IonHeader)
+app.component('ion-footer', IonFooter)
 app.component('ion-page', IonPage)
 app.component('ion-button', IonButton)
 app.component('ion-title', IonTitle)
