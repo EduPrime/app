@@ -32,28 +32,30 @@ function navigateToRegister() {
 
 <template>
   <content-layout>
-      <school-cards :student-count="schoolCount" :class-count="classCount" :approval-rate="approvalRate"
-        :teacher-count="teacherCount" />
-     <ion-toolbar>
+    <school-cards
+      :student-count="schoolCount" :class-count="classCount" :approval-rate="approvalRate"
+      :teacher-count="teacherCount"
+    />
+    <ion-toolbar>
       <ion-title>Escolas ativas ({{ filteredSchools.length }})</ion-title>
-      </ion-toolbar>
-      <ion-row class="ion-align-items-center ion-justify-content-between">
-        <ion-col size-sm="6" size-md="10" size-lg="10">
-          <ion-searchbar v-model="searchQuery" placeholder="Buscar escola" />
-        </ion-col>
-        <ion-col size="2" class="ion-text-end">
-          <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
-            <ion-icon slot="start" :icon="add" />
-            Novo
-          </ion-button>
-        </ion-col>
-      </ion-row>
-      <school-list :schools="filteredSchools" @update:schools="schools = $event" />
+    </ion-toolbar>
+    <ion-row class="ion-align-items-center ion-justify-content-between">
+      <ion-col size="10">
+        <ion-searchbar v-model="searchQuery" placeholder="Buscar escola" />
+      </ion-col>
+      <ion-col size="2" class="ion-text-end">
+        <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
+          <ion-icon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
+          <ion-icon slot="start" :icon="add" class="ion-hide-sm-down" />
+          <span class="ion-hide-sm-down">Novo</span>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <school-list :schools="filteredSchools" @update:schools="schools = $event" />
   </content-layout>
 </template>
 
 <style scoped>
-
 ion-label h2 {
   margin: 0;
   font-weight: bold;
