@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { IonLabel, IonSegment, IonSegmentButton } from '@ionic/vue';
-import * as yup from 'yup';
-import { useForm } from 'vee-validate';
-import EpInput from '@/components/EpInput.vue';
+import { ref } from 'vue'
+import { IonLabel, IonSegment, IonSegmentButton, IonToast } from '@ionic/vue'
+import * as yup from 'yup'
+import { useForm } from 'vee-validate'
+import { toastController } from '@ionic/core'
+import EpInput from '@/components/EpInput.vue'
+
 const selectedSegment = ref('general-info')
 
 const formSchema = yup.object({
@@ -54,29 +56,35 @@ const formSchema = yup.object({
     .number()
     .required('Área Disponível é obrigatória')
     .min(0, 'Área Disponível deve ser um número positivo'),
-  operationLocation: yup.string().required('Local de Operação é obrigatório')
-});
+  operationLocation: yup.string().required('Local de Operação é obrigatório'),
+})
 
-const { handleSubmit, resetForm, values, errors } = useForm({
+const { values, errors } = useForm({
   validationSchema: formSchema,
-});
+})
 
-function registerSchool() {
-  // console.log('Escola registrada:', form.value);
-
-  /** Custom Validations */
-  console.log("Values : ", values);
-  console.log("Errors : ", errors.value);
-  handleSubmit((handleFormData)=>{
-      console.log("Handle Submission Data: ", handleFormData);
+async function registerSchool() {
+  console.log('Values : ', values)
+  console.log('Errors : ', errors.value)
+  let displayErrors: string = ''
+  if (typeof (errors.value) === 'object') {
+    displayErrors = Object.values(errors.value).join(', ')
+  }
+  else {
+    displayErrors = errors.value
+  }
+  const toast: any = await toastController.create({
+    header: 'Errors',
+    message: displayErrors,
   })
+  await toast.present()
 }
 
-//** Mask Inputs
-const idMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/,  /\d/]);
-const postalCodeMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/,"-",  /\d/,/\d/,/\d/]);
-const phoneMask = ref(["(",/\d/,/\d/,")"," ", /\d/, /\d/, /\d/, /\d/, /\d/," ",  /\d/,/\d/,/\d/,/\d/]);
-const areaMask = ref([/\d/,/\d/,/\d/,/\d/,/\d/]);
+//* * Mask Inputs
+const idMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/, /\d/])
+const postalCodeMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/])
+const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, ' ', /\d/, /\d/, /\d/, /\d/])
+const areaMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
 </script>
 
 <template>
@@ -112,29 +120,29 @@ const areaMask = ref([/\d/,/\d/,/\d/,/\d/,/\d/]);
     </ion-segment>
 
     <div v-show="selectedSegment === 'general-info'">
-      <EpInput name="name" label="Nome" placeholder="Digite o nome da escola" />
-      <EpInput name="abbreviation" label="Abreviação" placeholder="Digite a abreviação" />
-      <EpInput name="managerId" :mask="idMask" label="ID do Gerente" placeholder="999999" />
-      <EpInput name="managerPosition" label="Posição do Gerente" placeholder="Digite a posição do gerente" />
-      <EpInput name="logoUrl" label="URL do Logo" placeholder="Digite a URL do logo" />
+      <ep-input name="name" label="Nome" placeholder="Digite o nome da escola" />
+      <ep-input name="abbreviation" label="Abreviação" placeholder="Digite a abreviação" />
+      <ep-input name="managerId" :mask="idMask" label="ID do Gerente" placeholder="999999" />
+      <ep-input name="managerPosition" label="Posição do Gerente" placeholder="Digite a posição do gerente" />
+      <ep-input name="logoUrl" label="URL do Logo" placeholder="Digite a URL do logo" />
     </div>
 
     <div v-show="selectedSegment === 'location'">
-      <EpInput name="address" label="Endereço" placeholder="Digite o endereço" />
-      <EpInput name="city" label="Cidade" placeholder="Digite a cidade" />
-      <EpInput name="state" label="Estado" placeholder="Digite o estado" />
-      <EpInput name="postalCode" :mask="postalCodeMask" inputmode="number" label="CEP" placeholder="99999-999" />
-      <EpInput name="phone" :mask="phoneMask" inputmode="tel" label="Phone" placeholder="(99) 99999-9999" />
-      <EpInput name="latitude" label="Latitude" type="number" placeholder="Digite a latitude" />
-      <EpInput name="longitude" label="Longitude" type="number" placeholder="Digite a longitude" />
+      <ep-input name="address" label="Endereço" placeholder="Digite o endereço" />
+      <ep-input name="city" label="Cidade" placeholder="Digite a cidade" />
+      <ep-input name="state" label="Estado" placeholder="Digite o estado" />
+      <ep-input name="postalCode" :mask="postalCodeMask" inputmode="number" label="CEP" placeholder="99999-999" />
+      <ep-input name="phone" :mask="phoneMask" inputmode="tel" label="Phone" placeholder="(99) 99999-9999" />
+      <ep-input name="latitude" label="Latitude" type="number" placeholder="Digite a latitude" />
+      <ep-input name="longitude" label="Longitude" type="number" placeholder="Digite a longitude" />
     </div>
 
     <div v-show="selectedSegment === 'facilities'">
-      <EpInput name="numberOfFloors" :mask="[/\d/,/\d/]" label="Número de Andares" placeholder="99" />
-      <EpInput name="totalArea" :mask="areaMask" label="Área Total" placeholder="99999" />
-      <EpInput name="builtArea" :mask="areaMask" label="Área Construída" placeholder="99999" />
-      <EpInput name="availableArea" :mask="areaMask" label="Área Disponível" placeholder="99999" />
-      <EpInput name="operationLocation" label="Local de Operação" placeholder="Digite o local de operação" />
+      <ep-input name="numberOfFloors" :mask="[/\d/, /\d/]" label="Número de Andares" placeholder="99" />
+      <ep-input name="totalArea" :mask="areaMask" label="Área Total" placeholder="99999" />
+      <ep-input name="builtArea" :mask="areaMask" label="Área Construída" placeholder="99999" />
+      <ep-input name="availableArea" :mask="areaMask" label="Área Disponível" placeholder="99999" />
+      <ep-input name="operationLocation" label="Local de Operação" placeholder="Digite o local de operação" />
     </div>
     <template #footer>
       <ion-grid>
@@ -152,5 +160,6 @@ const areaMask = ref([/\d/,/\d/,/\d/,/\d/,/\d/]);
         </ion-row>
       </ion-grid>
     </template>
+    <ion-toast />
   </content-layout>
 </template>
