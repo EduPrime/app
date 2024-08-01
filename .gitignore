@@ -1,32 +1,62 @@
-# Specifies intentionally untracked files to ignore when using Git
-# http://git-scm.com/docs/gitignore
+# Diretórios de dependências
+node_modules/
+frontend/node_modules/
+backend/node_modules/
 
-*~
-*.sw[mnpcod]
-.tmp
-*.tmp
-*.tmp.*
-*.sublime-project
-*.sublime-workspace
+# Logs
+logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Arquivos do sistema
 .DS_Store
 Thumbs.db
-UserInterfaceState.xcuserstate
-$RECYCLE.BIN/
 
-*.log
-log.txt
-npm-debug.log*
+# Pastas de build
+dist/
+build/
+frontend/build/
+frontend/dist/
+backend/build/
+backend/dist/
 
-/.idea
-/.ionic
-/.sass-cache
-/.sourcemaps
-/.versions
-/.vscode/*
-!/.vscode/extensions.json
-/coverage
-/dist
-/node_modules
-/platforms
-/plugins
-/www
+# Arquivos de saída de Capacitor
+frontend/android/
+frontend/ios/
+frontend/www/
+
+# Pastas de cache
+.cache/
+frontend/.cache/
+backend/.cache/
+
+# Arquivos temporários
+*.tmp
+*.swp
+
+# Ambientes e configurações locais
+.env
+frontend/.env
+backend/.env
+
+# Arquivos de testes
+coverage/
+frontend/coverage/
+backend/coverage/
+
+# Configurações específicas do editor
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Submódulos
+.gitmodules
+
+# Outros
+*.bak
+*.backup
+*.tmp
+*.temp
