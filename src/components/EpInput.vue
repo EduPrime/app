@@ -5,12 +5,14 @@ import type { Ref } from 'vue'
 import { defineProps, ref } from 'vue'
 import { maskito as vMaskito } from '@maskito/vue'
 
+import type { TextFieldTypes } from '@ionic/core'
+
 const props: any = defineProps({
   name: { type: String, required: true },
-  type: String,
+  type: String as () => TextFieldTypes,
   label: String,
   labelPosition: {
-    type: [String],
+    type: String as () => 'stacked' | 'fixed' | 'start' | 'end' | 'floating' | undefined,
     default: 'stacked',
   },
   placeholder: String,
