@@ -76,6 +76,9 @@ async function registerSchool() {
   const toast: any = await toastController.create({
     header: 'Errors',
     message: displayErrors,
+    duration: 2500,
+    position: 'bottom',
+    color: 'dark',
   })
   await toast.present()
 }
