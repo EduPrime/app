@@ -25,6 +25,7 @@
     "@ionic/vue-router": "^8.2.6",
     "@maskito/core": "^3.0.0",
     "@maskito/vue": "^3.0.0",
+    "@supabase/postgrest-js": "^1.15.8",
     "axios": "^1.7.2",
     "echarts": "^5.5.1",
     "ionicons": "^7.4.0",
