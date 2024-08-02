@@ -2,7 +2,7 @@
 import { IonInput, IonItem } from '@ionic/vue'
 import { useField } from 'vee-validate'
 import type { Ref } from 'vue'
-import { defineProps, ref } from 'vue'
+import { ref } from 'vue'
 import { maskito as vMaskito } from '@maskito/vue'
 
 import type { TextFieldTypes } from '@ionic/core'

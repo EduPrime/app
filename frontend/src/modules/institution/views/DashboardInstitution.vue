@@ -1,15 +1,19 @@
 <script setup lang="ts">
-import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonCol, IonGrid, IonIcon, IonList, IonRow } from '@ionic/vue'
-import { ref } from 'vue'
+import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonIcon, IonList } from '@ionic/vue'
+import { onMounted, ref } from 'vue'
 import { addIcons } from 'ionicons'
 import { pencil, trash } from 'ionicons/icons'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import InstitutionCards from '@/modules/institution/components/InstitutionCards.vue'
+import { postgrest } from '@/services/postgrestClient' // Ajuste o caminho conforme necessário
+
 // Registrar os ícones
 addIcons({
   pencil,
   trash,
 })
+
+const items = ref<any[]>([])
 
 const schoolCount = ref(10)
 const classCount = ref(25)
@@ -37,6 +41,18 @@ function editInstitution(institution: any) {
 function deleteInstitution(institution: any) {
   console.log('Delete Institution', institution)
 }
+async function fetchData() {
+  const { data, error } = await postgrest.from('Institution').select('*')
+  if (error) {
+    console.error('Erro ao buscar dados:', error)
+  }
+  else {
+    items.value = data
+  }
+}
+onMounted(() => {
+  fetchData()
+})
 </script>
 
 <template>
@@ -68,6 +84,7 @@ function deleteInstitution(institution: any) {
         </ion-card-content>
       </ion-card>
     </ion-list>
+    {{ items }}
   </content-layout>
 </template>
 
