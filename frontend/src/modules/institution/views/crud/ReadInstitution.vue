@@ -1,64 +1,29 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { defineEmits, onMounted, ref } from 'vue'
 import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon, IonProgressBar } from '@ionic/vue'
 import { pencil } from 'ionicons/icons'
 import type { Institution } from '../../types/Institution'
-import InstitutionService from '../../services/InstitutionService'
-import UpdateInstitution from './UpdateInstitution.vue'
-import InstitutionCards from '@/modules/institution/components/InstitutionCards.vue'
 
-const institution = ref<Institution | null>(null)
-const loading = ref(true)
+const props = defineProps<{ institution: Institution | null }>()
+const emit = defineEmits<{
+  (e: 'click'): void
+}>()
+const institution = ref<Institution | null>(props.institution)
 const isEditing = ref(false)
-const schoolCount = ref(10)
-const classCount = ref(25)
-const seriesCount = ref(7)
-const teacherCount = ref(30)
 
-const IService = new InstitutionService()
-
-async function loadInstitutions() {
-  loading.value = true
-  try {
-    const institutions = await IService.getAll()
-    institution.value = institutions?.at(0) ?? null
-  }
-  catch (error) {
-    console.error('Erro ao carregar as instituições:', error)
-  }
-  finally {
-    loading.value = false
-  }
-}
-
-function editInstitution() {
+function editBtn() {
+  emit('click')
   isEditing.value = true
 }
-
-function onSave() {
-  isEditing.value = false
-  loadInstitutions() // Recarrega os dados da instituição após a edição
-}
-
-onMounted(() => {
-  loadInstitutions()
-})
 </script>
 
 <template>
-  <ion-progress-bar v-if="loading" type="indeterminate" />
-  <institution-cards
-    :school-count="schoolCount"
-    :class-count="classCount"
-    :series-count="seriesCount"
-    :teacher-count="teacherCount"
-  />
   <ion-card v-if="institution && !isEditing">
     <ion-card-header class="card-header">
       <div class="card-title-container">
         <ion-card-title>{{ institution?.name }}</ion-card-title>
         <ion-buttons>
-          <ion-button fill="clear" @click="editInstitution">
+          <ion-button fill="clear" @click="editBtn">
             <ion-icon slot="icon-only" :icon="pencil" />
           </ion-button>
         </ion-buttons>
@@ -73,7 +38,6 @@ onMounted(() => {
       <p><strong>CEP:</strong> {{ institution.postalCode }}</p>
     </ion-card-content>
   </ion-card>
-  <update-institution v-if="isEditing" :institution="institution" @saved="onSave" />
 </template>
 
   <style scoped>
