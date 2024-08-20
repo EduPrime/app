@@ -4,10 +4,12 @@ import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonInp
 import InstitutionService from '../../services/InstitutionService'
 import type { Institution } from '../../types/Institution'
 
-// Props para receber a instituição
 const props = defineProps<{ institution: Institution | null }>()
 
-const emit = defineEmits(['saved', 'cancel'])
+// Definindo os eventos que o componente pode emitir
+const emit = defineEmits<{
+  (e: 'cancel'): void
+}>()
 
 const institutionService = new InstitutionService()
 
@@ -38,16 +40,15 @@ async function submitForm() {
     else {
       await institutionService.create(form.value as Institution)
     }
-    emit('saved') // Emite evento para informar que os dados foram salvos
   }
   catch (error) {
     console.error('Erro ao salvar a instituição:', error)
   }
 }
 
-// Função para cancelar a edição
 function cancelEdit() {
-  emit('cancel') // Emite evento para informar que a edição foi cancelada
+  console.log('cancelEdit chamado')
+  emit('cancel')
 }
 </script>
 

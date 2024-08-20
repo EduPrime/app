@@ -6,6 +6,7 @@ import InstitutionService from '../services/InstitutionService'
 import ReadInstitution from './crud/ReadInstitution.vue'
 import UpdateInstitution from './crud/UpdateInstitution.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
+import InstitutionCards from '@/modules/institution/components/InstitutionCards.vue'
 
 // Estados para os dados da instituição e carregamento
 const institution = ref<Institution | null>(null)
@@ -35,19 +36,10 @@ async function loadInstitution() {
     loading.value = false
   }
 }
-
-// Alterna para o modo de edição
-function editInstitution() {
+function clickToEdit() {
+  console.log('O botão foi clicado no componente filho!')
   isEditing.value = true
 }
-
-// Volta para o modo de visualização após salvar ou cancelar
-function onSave() {
-  isEditing.value = false
-  loadInstitution() // Recarrega a instituição após a edição
-}
-
-// Carrega os dados da instituição quando o componente é montado
 onMounted(() => {
   loadInstitution()
 })
@@ -56,20 +48,21 @@ onMounted(() => {
 <template>
   <content-layout>
     <ion-progress-bar v-if="loading" type="indeterminate" />
-    <read-institution
-      v-if="!isEditing && institution"
-      :institution="institution"
+    <institution-cards
       :school-count="schoolCount"
       :class-count="classCount"
       :series-count="seriesCount"
       :teacher-count="teacherCount"
-      @edit="editInstitution"
+    />
+    <read-institution
+      v-if="!isEditing && institution"
+      :institution="institution"
+      @click="clickToEdit"
     />
     <update-institution
       v-else-if="isEditing && institution"
       :institution="institution"
-      @saved="onSave"
-      @cancel="onSave"
+      @cancel="isEditing = false"
     />
   </content-layout>
 </template>
