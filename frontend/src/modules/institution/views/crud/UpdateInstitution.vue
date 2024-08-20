@@ -9,6 +9,7 @@ const props = defineProps<{ institution: Institution | null }>()
 // Definindo os eventos que o componente pode emitir
 const emit = defineEmits<{
   (e: 'cancel'): void
+  (e: 'save'): void
 }>()
 
 const institutionService = new InstitutionService()
@@ -24,21 +25,24 @@ const form = ref<Partial<Institution>>({
   postalCode: '',
 })
 
-// Carrega os dados da instituição ao montar o componente
 onMounted(() => {
   if (props.institution) {
     form.value = { ...props.institution }
   }
 })
 
-// Função para submissão do formulário
 async function submitForm() {
   try {
+    let result: Institution | null = null
     if (form.value.id) {
-      await institutionService.update(form.value.id, form.value as Institution)
+      result = await institutionService.update(form.value.id, form.value as Institution)
+    }
+    if (result !== null) {
+      console.log('Instituição salva com sucesso:', result)
+      emit('save')
     }
     else {
-      await institutionService.create(form.value as Institution)
+      console.error('Falha ao salvar a instituição')
     }
   }
   catch (error) {

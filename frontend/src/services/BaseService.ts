@@ -110,6 +110,7 @@ export default class BaseService<T> {
         .update(updates)
         .eq('id', id)
         .is('deletedAt', null) // Ensure the record is not soft-deleted
+        .select()
         .single()
 
       if (error)
