@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { IonProgressBar } from '@ionic/vue'
 import { onMounted, ref } from 'vue'
 import type { Institution } from '../types/Institution'
 import InstitutionService from '../services/InstitutionService'
 import ReadInstitution from './crud/ReadInstitution.vue'
 import UpdateInstitution from './crud/UpdateInstitution.vue'
+import showToast from '@/utils/toast-alert'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import InstitutionCards from '@/modules/institution/components/InstitutionCards.vue'
 
@@ -19,10 +19,8 @@ const classCount = ref(25)
 const seriesCount = ref(7)
 const teacherCount = ref(30)
 
-// Instancia o serviço da instituição
 const IService = new InstitutionService()
 
-// Função para carregar a instituição
 async function loadInstitution() {
   loading.value = true
   try {
@@ -40,6 +38,12 @@ function clickToEdit() {
   console.log('O botão foi clicado no componente filho!')
   isEditing.value = true
 }
+
+function updatedInstitution() {
+  loadInstitution()
+  showToast('Instituição atualizada com sucesso!')
+  isEditing.value = false
+}
 onMounted(() => {
   loadInstitution()
 })
@@ -47,7 +51,6 @@ onMounted(() => {
 
 <template>
   <content-layout>
-    <ion-progress-bar v-if="loading" type="indeterminate" />
     <institution-cards
       :school-count="schoolCount"
       :class-count="classCount"
@@ -56,6 +59,7 @@ onMounted(() => {
     />
     <read-institution
       v-if="!isEditing && institution"
+      :key="institution.id + Date.now()"
       :institution="institution"
       @click="clickToEdit"
     />
@@ -63,6 +67,7 @@ onMounted(() => {
       v-else-if="isEditing && institution"
       :institution="institution"
       @cancel="isEditing = false"
+      @save="updatedInstitution"
     />
   </content-layout>
 </template>
