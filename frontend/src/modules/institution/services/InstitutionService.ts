@@ -1,9 +1,10 @@
-import axios from 'axios'
+import type { Institution } from '../types/Institution'
+import BaseService from '@/services/BaseService'
 
-export default class TeacherService {
-  private apiUrl = 'https://api.example.com/teachers'
-
-  registerInstituion(teacher: any) {
-    return axios.post(this.apiUrl, teacher)
+export default class InstitutionService extends BaseService<Institution> {
+  constructor() {
+    super('Institution') // Passando o nome da tabela para a classe base
   }
+
+  // Métodos específicos para a tabela Institution podem ser adicionados aqui
 }
