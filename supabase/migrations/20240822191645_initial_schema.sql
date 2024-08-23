@@ -45,13 +45,14 @@ CREATE TYPE period AS ENUM (
 --
 
 CREATE TABLE attendance (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     date timestamp(3) without time zone NOT NULL,
     student_id uuid NOT NULL,
     status attendance_status NOT NULL,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
-    updated_at timestamp(3) without time zone
+    updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid()
 );
 
 
@@ -61,15 +62,16 @@ CREATE TABLE attendance (
 --
 
 CREATE TABLE class_session (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     day_of_week day_of_week NOT NULL,
-    starttime VARCHAR(255) NOT NULL,
-    endtime VARCHAR(255) NOT NULL,
+    start_time VARCHAR(255) NOT NULL,
+    end_time VARCHAR(255) NOT NULL,
     discipline_id uuid NOT NULL,
     timetable_id uuid NOT NULL,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
-    updated_at timestamp(3) without time zone
+    updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid()
 );
 
 
@@ -77,17 +79,18 @@ CREATE TABLE class_session (
 -- TOC entry 280 (class 1259 O_id 18871)
 -- Name: Classroom; Type: TABLE; Schema: public; Owner: -
 --
-
 CREATE TABLE classroom (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     period period DEFAULT 'MORNING'::period NOT NULL,
     series_id uuid NOT NULL,
     status status DEFAULT 'ACTIVE',
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
-    updated_at timestamp(3) without time zone
+    updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid()
 );
+
 
 
 --
@@ -96,13 +99,14 @@ CREATE TABLE classroom (
 --
 
 CREATE TABLE course (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     school_id uuid NOT NULL,
     status status DEFAULT 'ACTIVE',
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
-    updated_at timestamp(3) without time zone
+    updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid()
 );
 
 
@@ -112,13 +116,14 @@ CREATE TABLE course (
 --
 
 CREATE TABLE discipline (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     teacher_id uuid NOT NULL,
     status status DEFAULT 'ACTIVE',
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
-    updated_at timestamp(3) without time zone
+    updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid()
 );
 
 
@@ -128,14 +133,15 @@ CREATE TABLE discipline (
 --
 
 CREATE TABLE grade (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     value double precision NOT NULL,
     date timestamp(3) without time zone NOT NULL,
     student_id uuid NOT NULL,
     discipline_id uuid NOT NULL,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
-    updated_at timestamp(3) without time zone
+    updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid()
 );
 
 
@@ -145,7 +151,7 @@ CREATE TABLE grade (
 --
 
 CREATE TABLE institution (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     address VARCHAR(255),
     city VARCHAR(100),
@@ -156,6 +162,7 @@ CREATE TABLE institution (
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
     updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid(),
     singleton integer DEFAULT 1 NOT NULL
 );
 
@@ -166,7 +173,7 @@ CREATE TABLE institution (
 --
 
 CREATE TABLE school (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     address VARCHAR(255),
     city VARCHAR(100),
@@ -200,6 +207,7 @@ CREATE TABLE school (
     floortype integer,
     energymeter integer,
     hasexternalarea boolean,
+    user_created UUID DEFAULT auth.uid(),
     updated_at timestamp(3) without time zone
 );
 
@@ -210,13 +218,14 @@ CREATE TABLE school (
 --
 
 CREATE TABLE series (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     course_id uuid NOT NULL,
     timetable_id uuid,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
-    updated_at timestamp(3) without time zone
+    updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid()
 );
 
 
@@ -226,7 +235,7 @@ CREATE TABLE series (
 --
 
 CREATE TABLE student (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     birthdate DATE NOT NULL, 
     gender CHAR(1), -- Gênero
@@ -240,7 +249,8 @@ CREATE TABLE student (
     photo BYTEA,  
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
-    updated_at timestamp(3) without time zone
+    updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid()
 );
 
 
@@ -250,7 +260,7 @@ CREATE TABLE student (
 --
 
 CREATE TABLE teacher (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     email VARCHAR(255),
     phone VARCHAR(15),
@@ -258,7 +268,8 @@ CREATE TABLE teacher (
     status status DEFAULT 'ACTIVE',
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
-    updated_at timestamp(3) without time zone
+    updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid()
 );
 
 
@@ -268,13 +279,14 @@ CREATE TABLE teacher (
 --
 
 CREATE TABLE timetable (
-    id uuid PRIMARY KEY NOT NULL,
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
     classroom_id uuid NOT NULL,
     discipline_id uuid,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
-    updated_at timestamp(3) without time zone
+    updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid()
 );
 
 
@@ -288,7 +300,8 @@ CREATE TABLE timetable_school (
     school_id uuid NOT NULL,
     created_at timestamp(3) without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at timestamp(3) without time zone,
-    updated_at timestamp(3) without time zone
+    updated_at timestamp(3) without time zone,
+    user_created UUID DEFAULT auth.uid()
 );
 
 
@@ -303,94 +316,6 @@ CREATE TABLE _teachertotimetable (
 );
 
 --
--- TOC entry 3778 (class 2606 O_id 18918)
--- Name: Attendance Attendance_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
-
-
---
--- TOC entry 3776 (class 2606 O_id 18913)
--- Name: class_session ClassSession_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
-
-
---
--- TOC entry 3766 (class 2606 O_id 18878)
--- Name: Classroom Classroom_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
-
-
---
--- TOC entry 3762 (class 2606 O_id 18863)
--- Name: Course Course_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
-
-
---
--- TOC entry 3772 (class 2606 O_id 18899)
--- Name: Discipline Discipline_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
-
-
---
--- TOC entry 3780 (class 2606 O_id 18923)
--- Name: Grade Grade_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
-
-
---
--- TOC entry 3757 (class 2606 O_id 18847)
--- Name: Institution Institution_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
-
-
---
--- TOC entry 3760 (class 2606 O_id 18856)
--- Name: School School_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
-
-
---
--- TOC entry 3764 (class 2606 O_id 18870)
--- Name: Series Series_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
-
-
---
--- TOC entry 3768 (class 2606 O_id 18885)
--- Name: Student Student_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
-
-
---
--- TOC entry 3770 (class 2606 O_id 18892)
--- Name: Teacher Teacher_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
-
-
---
 -- TOC entry 3782 (class 2606 O_id 18928)
 -- Name: timetable_school TimetableSchool_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
@@ -398,13 +323,7 @@ CREATE TABLE _teachertotimetable (
 ALTER TABLE ONLY timetable_school
     ADD CONSTRAINT timetableschool_pkey PRIMARY KEY (timetable_id, school_id);
 
-
---
--- TOC entry 3774 (class 2606 O_id 18906)
--- Name: Timetable Timetable_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-
+ 
 
 --
 -- TOC entry 3758 (class 1259 O_id 19042)
@@ -602,6 +521,21 @@ ALTER TABLE ONLY _teachertotimetable
 
 
 -- Completed on 2024-08-22 14:37:41
+
+ALTER TABLE "public"."attendance" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."class_session" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."classroom" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."course" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."discipline" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."grade" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."institution" ENABLE ROW LEVEL SECURITY; -- Excluded as requested
+ALTER TABLE "public"."school" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."series" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."student" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."teacher" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."timetable" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."timetable_school" ENABLE ROW LEVEL SECURITY;
+
 
 --
 -- FUNCTION
