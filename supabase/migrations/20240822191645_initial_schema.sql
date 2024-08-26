@@ -1,4 +1,4 @@
-
+DEALLOCATE ALL;
 CREATE TYPE status AS ENUM (
     'ACTIVE',
     'INACTIVE',

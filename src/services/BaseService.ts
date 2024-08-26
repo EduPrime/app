@@ -1,14 +1,19 @@
-import { PostgrestClient } from '@supabase/postgrest-js'
+import type { SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 
-const API_URL = import.meta.env.VITE_API_URL
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
+
+// Cria o cliente Supabase usando as variáveis de ambiente
+const supabase: SupabaseClient = createClient(supabaseUrl, supabaseKey)
 
 export default class BaseService<T> {
-  protected client: PostgrestClient
+  protected client: SupabaseClient
   protected table: string
 
   constructor(table: string) {
     this.table = table
-    this.client = new PostgrestClient(API_URL)
+    this.client = supabase // Usa o cliente Supabase criado
   }
 
   /**
@@ -22,7 +27,7 @@ export default class BaseService<T> {
         .from(this.table)
         .select('*')
         .eq('id', id)
-        .is('deletedAt', null) // Ensure the record is not soft-deleted
+        .is('deleted_at', null) // Ensure the record is not soft-deleted
         .single()
 
       if (error)
@@ -49,7 +54,7 @@ export default class BaseService<T> {
       const query = this.client
         .from(this.table)
         .select('*')
-        .is('deletedAt', null) // Ensure only active records are returned
+        .is('deleted_at', null) // Ensure only active records are returned
 
       // Apply ordering only if `orderBy` is provided
       if (orderBy) {
@@ -109,7 +114,7 @@ export default class BaseService<T> {
         .from(this.table)
         .update(updates)
         .eq('id', id)
-        .is('deletedAt', null) // Ensure the record is not soft-deleted
+        .is('deleted_at', null) // Ensure the record is not soft-deleted
         .select()
         .single()
 
@@ -133,7 +138,7 @@ export default class BaseService<T> {
     try {
       const { data, error } = await this.client
         .from(this.table)
-        .update({ deletedAt: new Date().toISOString() })
+        .update({ deleted_at: new Date().toISOString() })
         .eq('id', id)
         .single()
 
