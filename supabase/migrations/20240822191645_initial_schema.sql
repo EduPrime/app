@@ -31,7 +31,7 @@ CREATE TYPE period AS ENUM (
 
 CREATE TABLE attendance (
     id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
-    date timestamptz zone NOT NULL,
+    date timestamptz NOT NULL,
     student_id uuid NOT NULL,
     status attendance_status NOT NULL,
     metadata jsonb,
