@@ -2,11 +2,12 @@
 import { onMounted, ref } from 'vue'
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonInput, IonItem, IonLabel } from '@ionic/vue'
 import InstitutionService from '../../services/InstitutionService'
-import type { Institution } from '../../types/Institution'
+import type { Database, Enums, Tables } from '@/types/database.types'
 
-const props = defineProps<{ institution: Institution | null }>()
+const props = defineProps<{
+  institution: Tables<'institution'> | undefined
+}>()
 
-// Definindo os eventos que o componente pode emitir
 const emit = defineEmits<{
   (e: 'cancel'): void
   (e: 'save'): void
@@ -14,16 +15,7 @@ const emit = defineEmits<{
 
 const institutionService = new InstitutionService()
 
-// Estado do formulário
-const form = ref<Partial<Institution>>({
-  name: '',
-  phone: '',
-  email: '',
-  address: '',
-  city: '',
-  state: '',
-  postalCode: '',
-})
+const form = ref<Tables<'institution'>>()
 
 onMounted(() => {
   if (props.institution) {
@@ -33,9 +25,9 @@ onMounted(() => {
 
 async function submitForm() {
   try {
-    let result: Institution | null = null
-    if (form.value.id) {
-      result = await institutionService.update(form.value.id, form.value as Institution)
+    let result: Database['public']['Tables']['institution']['Row'] | null = null
+    if (form.value?.id) {
+      result = await institutionService.update(form.value.id, form.value as Database['public']['Tables']['institution']['Update'])
     }
     if (result !== null) {
       console.log('Instituição salva com sucesso:', result)
@@ -68,49 +60,49 @@ function cancelEdit() {
           <ion-label position="stacked">
             Nome
           </ion-label>
-          <ion-input v-model="form.name" placeholder="Nome da Instituição" required />
+          <ion-input v-model="form?.name ?? ''" placeholder="Nome da Instituição" required />
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">
             Telefone
           </ion-label>
-          <ion-input v-model="form.phone" placeholder="Telefone" type="tel" />
+          <ion-input v-model="form?.phone ?? ''" placeholder="Telefone" type="tel" />
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">
             E-mail
           </ion-label>
-          <ion-input v-model="form.email" placeholder="E-mail" type="email" />
+          <ion-input v-model="form?.email ?? ''" placeholder="E-mail" type="email" />
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">
             Endereço
           </ion-label>
-          <ion-input v-model="form.address" placeholder="Endereço" />
+          <ion-input v-model="form?.address ?? ''" placeholder="Endereço" />
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">
             Cidade
           </ion-label>
-          <ion-input v-model="form.city" placeholder="Cidade" />
+          <ion-input v-model="form?.city ?? ''" placeholder="Cidade" />
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">
             UF
           </ion-label>
-          <ion-input v-model="form.state" placeholder="Estado" />
+          <ion-input v-model="form?.state ?? ''" placeholder="Estado" />
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">
             CEP
           </ion-label>
-          <ion-input v-model="form.postalCode" placeholder="CEP" type="text" />
+          <ion-input v-model="form?.postalcode ?? ''" placeholder="CEP" type="text" />
         </ion-item>
 
         <ion-button expand="block" type="submit">

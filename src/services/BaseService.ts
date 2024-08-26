@@ -1,19 +1,19 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { createClient } from '@supabase/supabase-js'
+import type { Database, Tables } from '@/types/database.types'
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
 
-// Cria o cliente Supabase usando as variáveis de ambiente
-const supabase: SupabaseClient = createClient(supabaseUrl, supabaseKey)
+const supabase = createClient<Database>(supabaseUrl, supabaseKey)
 
-export default class BaseService<T> {
-  protected client: SupabaseClient
-  protected table: string
+export default class BaseService<TableName extends keyof Database['public']['Tables']> {
+  protected client: SupabaseClient<Database>
+  protected table: TableName
 
-  constructor(table: string) {
+  constructor(table: TableName) {
     this.table = table
-    this.client = supabase // Usa o cliente Supabase criado
+    this.client = supabase
   }
 
   /**
@@ -21,19 +21,19 @@ export default class BaseService<T> {
    * @param id - The ID of the record to fetch
    * @returns The record object or null if it does not exist or is soft-deleted
    */
-  async getById(id: string): Promise<T | null> {
+  async getById(id: string): Promise<Tables<TableName> | null> {
     try {
       const { data, error } = await this.client
         .from(this.table)
         .select('*')
         .eq('id', id)
-        .is('deleted_at', null) // Ensure the record is not soft-deleted
+        .is('deleted_at', null)
         .single()
 
       if (error)
         throw error
 
-      return data
+      return data as Tables<TableName> | null
     }
     catch (error) {
       console.error(`Erro ao buscar registro por ID na tabela ${this.table}:`, error)
@@ -49,21 +49,23 @@ export default class BaseService<T> {
    * @param limit - The maximum number of records to return (optional, default: no limit)
    * @returns An array of records or null if an error occurs
    */
-  async getAll(orderBy?: keyof T, ascending: boolean = true, limit?: number): Promise<T[] | null> {
+  async getAll(
+    orderBy?: keyof Tables<TableName>,
+    ascending: boolean = true,
+    limit?: number,
+  ): Promise<Tables<TableName>[] | null> {
     try {
-      const query = this.client
+      let query = this.client
         .from(this.table)
         .select('*')
-        .is('deleted_at', null) // Ensure only active records are returned
+        .is('deleted_at', null)
 
-      // Apply ordering only if `orderBy` is provided
       if (orderBy) {
-        query.order(orderBy as string, { ascending })
+        query = query.order(orderBy as string, { ascending })
       }
 
-      // Apply limit if provided
       if (limit) {
-        query.limit(limit)
+        query = query.limit(limit)
       }
 
       const { data, error } = await query
@@ -71,7 +73,7 @@ export default class BaseService<T> {
       if (error)
         throw error
 
-      return data
+      return data as Tables<TableName>[] | null
     }
     catch (error) {
       console.error(`Erro ao buscar todos os registros na tabela ${this.table}:`, error)
@@ -84,10 +86,12 @@ export default class BaseService<T> {
    * @param record - The record object to create
    * @returns The created record object or throws an error if the operation fails
    */
-  async create(record: T): Promise<T | null> {
+  async create(
+    record: Database['public']['Tables'][TableName]['Insert'],
+  ): Promise<Database['public']['Tables'][TableName]['Row'] | null> {
     try {
       const { data, error } = await this.client
-        .from(this.table)
+        .from(this.table as string & keyof Database['public']['Tables'])
         .insert(record)
         .single()
 
@@ -108,13 +112,13 @@ export default class BaseService<T> {
    * @param updates - Partial updates to apply to the record
    * @returns The updated record object or null if it does not exist or is soft-deleted
    */
-  async update(id: string, updates: Partial<T>): Promise<T | null> {
+  async update(id: string, updates: Database['public']['Tables'][TableName]['Update']): Promise<Database['public']['Tables'][TableName]['Row'] | null> {
     try {
       const { data, error } = await this.client
-        .from(this.table)
+        .from(this.table as string & keyof Database['public']['Tables'])
         .update(updates)
         .eq('id', id)
-        .is('deleted_at', null) // Ensure the record is not soft-deleted
+        .is('deleted_at', null)
         .select()
         .single()
 
@@ -134,10 +138,10 @@ export default class BaseService<T> {
    * @param id - The ID of the record to soft delete
    * @returns The updated record object or null if it does not exist
    */
-  async softDelete(id: string): Promise<T | null> {
+  async softDelete(id: string): Promise<Database['public']['Tables'][TableName]['Row'] | null> {
     try {
       const { data, error } = await this.client
-        .from(this.table)
+        .from(this.table as string & keyof Database['public']['Tables'])
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', id)
         .single()

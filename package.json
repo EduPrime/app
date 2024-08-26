@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint --config ./eslint.config.js . --fix",
-    "type-check": "vue-tsc --noEmit"
+    "type-check": "vue-tsc --noEmit",
+    "update-types": "npx supabase gen types --lang=typescript --local > src/types/database.types.ts"
   },
   "dependencies": {
     "@antfu/eslint-config": "^2.27.1",

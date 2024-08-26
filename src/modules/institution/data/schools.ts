@@ -83,7 +83,6 @@ export const schools: School[] = [
       },
     ],
   },
-  // Adicione mais 7 escolas aqui seguindo o mesmo padrão.
   {
     name: 'Escola Marte',
     address: 'Rua D, Bairro E',
