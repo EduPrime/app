@@ -11,11 +11,15 @@
     },
     "resolveJsonModule": true,
     "types": ["vite/client"],
+    "maxNodeModuleJsDepth": 7,
     "strict": true,
+    "strictPropertyInitialization": false,
     "noEmit": true,
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "noErrorTruncation": true
   },
   "references": [{ "path": "./tsconfig.node.json" }],
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
