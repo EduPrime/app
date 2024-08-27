@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import type { Institution } from '../types/Institution'
 import InstitutionService from '../services/InstitutionService'
 import ReadInstitution from './crud/ReadInstitution.vue'
 import UpdateInstitution from './crud/UpdateInstitution.vue'
 import showToast from '@/utils/toast-alert'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import InstitutionCards from '@/modules/institution/components/InstitutionCards.vue'
+import type { Database, Enums, Tables } from '@/types/database.types'
 
 // Estados para os dados da instituição e carregamento
-const institution = ref<Institution | null>(null)
+const institution = ref< Tables<'institution'> | null>()
 const loading = ref(true)
 const isEditing = ref(false)
 

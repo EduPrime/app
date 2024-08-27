@@ -2,18 +2,21 @@
 import { defineEmits, onMounted, ref } from 'vue'
 import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon, IonProgressBar } from '@ionic/vue'
 import { pencil } from 'ionicons/icons'
-import type { Institution } from '../../types/Institution'
+import type { Database, Enums, Tables } from '@/types/database.types'
 
-const props = defineProps<{ institution: Institution | null }>()
+const props = defineProps<{
+  institution: Tables<'institution'> | undefined
+}>()
 const emit = defineEmits<{
   (e: 'click'): void
 }>()
-const institution = ref<Institution | null>(props.institution)
+const institution = ref< Tables<'institution'> | null>()
 const isEditing = ref(false)
 
 function editBtn() {
   emit('click')
   isEditing.value = true
+  console.log('O botão foi clicado no componente filho!', props.institution)
 }
 </script>
 
@@ -35,7 +38,7 @@ function editBtn() {
       <p><strong>Endereço:</strong> {{ institution.address }}</p>
       <p><strong>Cidade:</strong> {{ institution.city }}</p>
       <p><strong>UF:</strong> {{ institution.state }}</p>
-      <p><strong>CEP:</strong> {{ institution.postalCode }}</p>
+      <p><strong>CEP:</strong> {{ institution.postalcode }}</p>
     </ion-card-content>
   </ion-card>
 </template>
