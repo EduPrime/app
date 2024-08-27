@@ -19,7 +19,7 @@ const form = computed(() => {
 })
 async function submitForm() {
   try {
-    let result: Database['public']['Tables']['institution']['Row'] | null = null
+    let result: Tables<'institution'> | null = null
     if (form.value?.id) {
       result = await institutionService.update(form.value.id, form.value as Database['public']['Tables']['institution']['Update'])
     }

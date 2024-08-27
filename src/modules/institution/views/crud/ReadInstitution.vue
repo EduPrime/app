@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, defineEmits, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon } from '@ionic/vue'
 import { pencil } from 'ionicons/icons'
 import type { Database, Enums, Tables } from '@/types/database.types'
