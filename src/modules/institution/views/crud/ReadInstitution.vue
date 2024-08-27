@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { defineEmits, onMounted, ref } from 'vue'
-import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon, IonProgressBar } from '@ionic/vue'
+import { computed, defineEmits, ref } from 'vue'
+import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon } from '@ionic/vue'
 import { pencil } from 'ionicons/icons'
 import type { Database, Enums, Tables } from '@/types/database.types'
 
@@ -10,13 +10,12 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'click'): void
 }>()
-const institution = ref< Tables<'institution'> | null>()
+const institution = computed(() => props.institution)
 const isEditing = ref(false)
 
 function editBtn() {
   emit('click')
   isEditing.value = true
-  console.log('O botão foi clicado no componente filho!', props.institution)
 }
 </script>
 
