@@ -7,6 +7,7 @@ import type { ObjectSchema } from 'yup'
 import { date, object, string } from 'yup'
 import EpInput from '@/components/EpInput.vue'
 import EpTextarea from '@/components/EpTextarea.vue'
+import EpJson from '@/components/EpJson.vue'
 import type { Tables } from '@/types/database.types'
 
   type TeacherPartial = Omit<Pick<Tables<'teacher'>, 'name' | 'birthdate' | 'email' | 'phone' | 'address' | 'specializations'>, 'birthdate'> & {
@@ -79,11 +80,16 @@ const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, 
       <ep-input name="birthdate" label="Data de Nascimento" type="date" placeholder="YYYY-MM-DD" />
       <ep-input name="email" label="Email" placeholder="Digite o email" />
       <ep-input name="phone" :mask="phoneMask" inputmode="tel" label="Telefone" placeholder="(99) 99999-9999" />
-      <ep-textarea type="text" textarea name="address" label="Endereço" placeholder="Digite o endereço" />
+      <ep-textarea name="address" label="Endereço" placeholder="Digite o endereço" />
     </div>
 
     <div v-show="selectedSegment === 'additional-info'">
-      <ep-input name="specializations" label="Especializações" placeholder="Ex: {&quot;subjects&quot;: [&quot;Matemática&quot;, &quot;Física&quot;], &quot;degree&quot;: &quot;Mestrado&quot;}" />
+      <ep-json
+        name="specializations"
+        :fields="[
+          { key: 'specialization', label: 'Formações', placeholder: 'Ex: Cursos, Especializações' },
+        ]"
+      />
     </div>
 
     <template #footer>

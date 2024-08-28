@@ -33,7 +33,7 @@ function handleBlur() {
   touched.value = true
 }
 function customFormatter(inputLength: number, maxLength: number): string {
-  return `${maxLength - inputLength} caracteres`
+  return `${maxLength - inputLength} `
 }
 
 const maskOptions: Ref<any> | string | null = props.mask
