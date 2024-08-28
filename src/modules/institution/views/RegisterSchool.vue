@@ -100,10 +100,6 @@ const areaMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
     <template #description>
       Todos os campos são obrigatórios, a menos que indicado de outra forma.
     </template>
-    <h3 class="ion-text-end ion-text-uppercase">
-      Inserir Escola
-    </h3>
-
     <ion-segment v-model="selectedSegment">
       <ion-segment-button value="general-info">
         <ion-label style="font-size: calc(1rem - 2px);">
