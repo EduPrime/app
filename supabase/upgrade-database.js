@@ -12,7 +12,6 @@ const dbName = process.env.DATABASE_NAME
 
 const dbUrl = `postgresql://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`
 
-// Função para executar um comando e retornar uma Promise
 function runCommand(command) {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
@@ -29,7 +28,6 @@ function runCommand(command) {
   })
 }
 
-// Função para gerar tipos do Supabase
 async function generateNewTypes() {
   try {
     await runCommand(`npx supabase gen types --lang=typescript --db-url "${dbUrl}" > src/types/database.types.ts`)
@@ -40,7 +38,6 @@ async function generateNewTypes() {
   }
 }
 
-// Função para resetar o banco de dados
 async function dbReset() {
   try {
     await runCommand(`npx supabase db reset --db-url "${dbUrl}"`)
@@ -51,7 +48,6 @@ async function dbReset() {
   }
 }
 
-// Função principal para chamar a função correta com base no argumento
 async function main() {
   const command = process.argv[2]
 
@@ -68,5 +64,4 @@ async function main() {
   }
 }
 
-// Executa a função principal
 main()

@@ -1,5 +1,5 @@
 import { calendar, chatbubbles, create, document, list, notifications, person, school, star } from 'ionicons/icons'
-import ManageTeachers from './views/RegisterTeacher.vue'
+import ManageTeachers from './views/ManageTeachers.vue'
 import RegisterTeacher from './views/RegisterTeacher.vue'
 import TeacherProfile from './views/RegisterTeacher.vue'
 import TeacherSchedule from './views/RegisterTeacher.vue'

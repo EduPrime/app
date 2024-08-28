@@ -1,9 +1,11 @@
-import axios from 'axios'
+import BaseService from '@/services/BaseService'
 
-export default class TeacherService {
-  private apiUrl = 'https://api.example.com/teachers'
+const table = 'teacher' as const
 
-  registerTeacher(teacher: any) {
-    return axios.post(this.apiUrl, teacher)
+type TeacherTable = typeof table
+
+export default class TeacherService extends BaseService<TeacherTable> {
+  constructor() {
+    super(table) // Passando o nome da tabela para a classe base
   }
 }
