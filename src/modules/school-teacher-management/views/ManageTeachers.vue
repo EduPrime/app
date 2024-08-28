@@ -11,7 +11,7 @@ import type { Database, Enums, Tables } from '@/types/database.types'
 const router = useRouter()
 
 const teacherService = new TeacherService()
-const teacherData = ref< Tables<'institution'> | []>([])
+const teacherData = ref< Tables<'teacher'> | []>([])
 const schoolCount = ref(154)
 const classCount = ref(25)
 const approvalRate = ref(48)
@@ -22,7 +22,8 @@ const filteredTeacher = computed(() => {
   if (!searchQuery.value) {
     return teacherData.value
   }
-  return teacherData.value.filter((t: { name: string, address: string }) =>
+  const result: any = teacherData.value
+  return result.filter((t: { name: string, address: string }) =>
     t.name.toLowerCase().includes(searchQuery.value.toLowerCase())
     || (t.address && t.address.toLowerCase().includes(searchQuery.value.toLowerCase())),
   )
@@ -30,7 +31,7 @@ const filteredTeacher = computed(() => {
 
 async function loadTeachers() {
   try {
-    const teachers = await teacherService.getAll()
+    const teachers: any = await teacherService.getAll()
     teacherData.value = teachers || []
   }
   catch (error) {
