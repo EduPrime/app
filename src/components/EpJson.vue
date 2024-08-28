@@ -26,6 +26,7 @@ const props: any = defineProps({
     default: 255,
   },
 })
+const emit = defineEmits(['update:entries'])
 
 const { errors }: any = useField(props.name)
 const touched = ref(false)
@@ -37,13 +38,20 @@ function handleBlur() {
 const entries = ref([
   props.fields.reduce((acc: any, field: { key: any }) => ({ ...acc, [field.key]: '' }), {}),
 ])
-
+function emitEntries() {
+  const nonEmptyEntries = entries.value.filter(entry =>
+    Object.values(entry).some(entr => (entr as string).trim() !== ''),
+  )
+  emit('update:entries', nonEmptyEntries)
+}
 function addEntry() {
   entries.value.push(props.fields.reduce((acc: any, field: { key: any }) => ({ ...acc, [field.key]: '' }), {}))
+  emitEntries()
 }
 
 function removeEntry(index: number) {
   entries.value.splice(index, 1)
+  emitEntries()
 }
 
 const maskOptions: Ref<any> | string | null = props.mask
