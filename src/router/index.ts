@@ -26,6 +26,22 @@ const staticRoutes: Array<RouteRecordRaw> = [
 
   },
   {
+    path: '/login',
+    component: () => import('../views/LoginPage.vue'),
+    meta: {
+      icon: home,
+      name: 'Login',
+    },
+  },
+  {
+    path: '/signup',
+    component: () => import('../views/SignUpPage.vue'),
+    meta: {
+      icon: home,
+      name: 'SignUp',
+    },
+  },
+  {
     path: '/dashboard/:id',
     component: () => import('../views/HomePage.vue'),
     meta: {
