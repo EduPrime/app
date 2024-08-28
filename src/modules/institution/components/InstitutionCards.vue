@@ -9,7 +9,7 @@ const props = defineProps<{
 
 <template>
   <ion-row>
-    <ion-col size="12" size-md="6" size-lg="3">
+    <ion-col size="6" size-md="6" size-lg="3">
       <ion-card color="primary">
         <ion-card-header>
           <ion-card-title>Escolas</ion-card-title>
@@ -22,7 +22,7 @@ const props = defineProps<{
       </ion-card>
     </ion-col>
 
-    <ion-col size="12" size-md="6" size-lg="3">
+    <ion-col size="6" size-md="6" size-lg="3">
       <ion-card color="secondary">
         <ion-card-header>
           <ion-card-title>Turmas</ion-card-title>
@@ -35,7 +35,7 @@ const props = defineProps<{
       </ion-card>
     </ion-col>
 
-    <ion-col size="12" size-md="6" size-lg="3">
+    <ion-col size="6" size-md="6" size-lg="3">
       <ion-card color="tertiary">
         <ion-card-header>
           <ion-card-title>Séries</ion-card-title>
@@ -48,7 +48,7 @@ const props = defineProps<{
       </ion-card>
     </ion-col>
 
-    <ion-col size="12" size-md="6" size-lg="3">
+    <ion-col size="6" size-md="6" size-lg="3">
       <ion-card color="lightaccent">
         <ion-card-header>
           <ion-card-title>Docentes</ion-card-title>
