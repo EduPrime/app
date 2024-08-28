@@ -197,8 +197,11 @@ CREATE TABLE student (
 CREATE TABLE teacher (
     id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
+    birthdate DATE NOT NULL, 
     email VARCHAR(255),
     phone VARCHAR(15),
+    address VARCHAR(255),
+    specializations  jsonb,
     school_id uuid NOT NULL,
     status status DEFAULT 'ACTIVE',
     metadata jsonb,

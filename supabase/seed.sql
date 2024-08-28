@@ -288,64 +288,78 @@ VALUES
     );
 
 -- Inserção de Professores
-INSERT INTO
-    teacher (id, name, email, school_id, created_at)
+-- Inserção de Professores com novos campos
+INSERT INTO teacher (
+    id, 
+    name, 
+    birthdate, 
+    email, 
+    phone, 
+    address, 
+    specializations, 
+    school_id, 
+    created_at
+)
 VALUES
     (
-        gen_random_uuid (),
+        gen_random_uuid(),
         'Prof. João Pereira',
+        '1980-03-15',
         'joao.pereira@example.com',
+        '1234567890',
+        'Rua das Flores, 123, Bairro Central',
+        '{"subjects": ["Matemática", "Física"], "degree": "Mestrado em Educação"}',
         (
-            SELECT
-                id
-            FROM
-                school
-            WHERE
-                name = 'Escola Fundamental Alfa'
+            SELECT id
+            FROM school
+            WHERE name = 'Escola Fundamental Alfa'
         ),
-        NOW ()
+        NOW()
     ),
     (
-        gen_random_uuid (),
+        gen_random_uuid(),
         'Profª. Maria Fernandes',
+        '1975-07-22',
         'maria.fernandes@example.com',
+        '0987654321',
+        'Avenida dos Professores, 456, Bairro Novo',
+        '{"subjects": ["Português", "Literatura"], "degree": "Doutorado em Letras"}',
         (
-            SELECT
-                id
-            FROM
-                school
-            WHERE
-                name = 'Escola Fundamental Alfa'
+            SELECT id
+            FROM school
+            WHERE name = 'Escola Fundamental Alfa'
         ),
-        NOW ()
+        NOW()
     ),
     (
-        gen_random_uuid (),
+        gen_random_uuid(),
         'Prof. Paulo Santos',
+        '1990-11-30',
         'paulo.santos@example.com',
+        '1122334455',
+        'Praça da Liberdade, 789, Centro',
+        '{"subjects": ["História", "Geografia"], "degree": "Licenciatura em História"}',
         (
-            SELECT
-                id
-            FROM
-                school
-            WHERE
-                name = 'Colégio Beta'
+            SELECT id
+            FROM school
+            WHERE name = 'Colégio Beta'
         ),
-        NOW ()
+        NOW()
     ),
     (
-        gen_random_uuid (),
+        gen_random_uuid(),
         'Profª. Rita Oliveira',
+        '1982-05-12',
         'rita.oliveira@example.com',
+        '5566778899',
+        'Estrada Velha, 1010, Bairro Antigo',
+        '{"subjects": ["Ciências", "Biologia"], "degree": "Mestrado em Ciências Biológicas"}',
         (
-            SELECT
-                id
-            FROM
-                school
-            WHERE
-                name = 'Colégio Beta'
+            SELECT id
+            FROM school
+            WHERE name = 'Colégio Beta'
         ),
-        NOW ()
+        NOW()
     );
 
 -- Inserção de Disciplinas
