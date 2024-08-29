@@ -39,11 +39,16 @@ const entries = ref([
   props.fields.reduce((acc: any, field: { key: any }) => ({ ...acc, [field.key]: '' }), {}),
 ])
 function emitEntries() {
-  const nonEmptyEntries = entries.value.filter(entry =>
-    Object.values(entry).some(entr => (entr as string).trim() !== ''),
-  )
+  const nonEmptyEntries = entries.value
+    .map((entry) => {
+      const key = Object.keys(entry)[0] // Obtém a chave dinamicamente
+      return entry[key] // Retorna o valor da chave
+    })
+    .filter(value => typeof value === 'string' && value.trim() !== '') // Filtra apenas strings não vazias
+
   emit('update:entries', nonEmptyEntries)
 }
+
 function addEntry() {
   entries.value.push(props.fields.reduce((acc: any, field: { key: any }) => ({ ...acc, [field.key]: '' }), {}))
   emitEntries()

@@ -6,7 +6,7 @@ import TeacherService from '../services/TeacherService'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import TeacherList from '@/modules/school-teacher-management/components/TeacherList.vue'
 import TeacherCards from '@/modules/school-teacher-management/components/TeacherCards.vue'
-import type { Database, Enums, Tables } from '@/types/database.types'
+import type { Tables } from '@/types/database.types'
 
 const router = useRouter()
 
@@ -31,7 +31,7 @@ const filteredTeacher = computed(() => {
 
 async function loadTeachers() {
   try {
-    const teachers: any = await teacherService.getAll()
+    const teachers: any = await teacherService.getAll('created_at', true)
     teacherData.value = teachers || []
   }
   catch (error) {
@@ -40,7 +40,7 @@ async function loadTeachers() {
 }
 
 function navigateToRegister() {
-  router.push({ name: 'RegisterSchool' })
+  router.push({ name: 'RegisterTeacher' })
 }
 onMounted(() => {
   loadTeachers()

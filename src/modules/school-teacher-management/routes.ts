@@ -4,7 +4,7 @@ import RegisterTeacher from './views/RegisterTeacher.vue'
 import TeacherProfile from './views/RegisterTeacher.vue'
 import TeacherSchedule from './views/RegisterTeacher.vue'
 import TeacherDocs from './views/RegisterTeacher.vue'
-import TeacherFeedback from './views/RegisterTeacher.vue'
+import TeacherFeedback from './views/TeacherFeedback.vue'
 import TeacherNotifications from './views/RegisterTeacher.vue'
 import TeacherReports from './views/RegisterTeacher.vue'
 

@@ -93,6 +93,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
       const { data, error } = await this.client
         .from(this.table as string & keyof Database['public']['Tables'])
         .insert(record)
+        .select()
         .single()
 
       if (error)
