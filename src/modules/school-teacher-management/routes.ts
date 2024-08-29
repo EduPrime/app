@@ -1,7 +1,7 @@
 import { calendar, chatbubbles, create, document, list, notifications, person, school, star } from 'ionicons/icons'
 import ManageTeachers from './views/ManageTeachers.vue'
 import RegisterTeacher from './views/RegisterTeacher.vue'
-import TeacherProfile from './views/RegisterTeacher.vue'
+import EditTeacher from './views/EditTeacher.vue'
 import TeacherSchedule from './views/RegisterTeacher.vue'
 import TeacherDocs from './views/RegisterTeacher.vue'
 import TeacherFeedback from './views/TeacherFeedback.vue'
@@ -34,9 +34,9 @@ const routes = [
     },
   },
   {
-    path: '/teachers/profile/:id',
+    path: '/teachers/profile/',
     name: 'TeacherProfile',
-    component: TeacherProfile,
+    component: EditTeacher,
     meta: {
       moduleName: 'Teachers',
       moduleIcon: person,
@@ -108,7 +108,7 @@ const routes = [
   {
     path: '/teachers/messages/:id',
     name: 'TeacherMessages',
-    component: TeacherProfile, // Troque por um componente real
+    component: TeacherReports, // Troque por um componente real
     meta: {
       moduleName: 'Teachers',
       moduleIcon: chatbubbles,
