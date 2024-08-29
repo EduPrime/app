@@ -8,6 +8,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['update:files'])
+// const storageURL = `${import.meta.env.VITE_SUPABASE_S3URL}`
 // const fileUploadProgress: Ref<any> = ref(0)
 function toggleDetails(index: number) {
   const updatedFiles = [...props.files]
@@ -30,9 +31,12 @@ function deleteFile(file: FileAttachment) {
     <ion-item-sliding v-for="(file, index) in files" :key="index">
       <ion-item button @click="toggleDetails(index)">
         <ion-icon slot="start" :icon="documentAttach" />
+        <!-- <ion-thumbnail v-if="file.storage_path" slot="start">
+          <ion-img :src="storageURL + file.storage_path" />
+        </ion-thumbnail> -->
         <ion-label>
-          <h2>{{ file.name }}</h2>
-          <p>{{ file.type }} | {{ file.size }} </p>
+          <h2>{{ file.file_name }}</h2>
+          <p>{{ file.mime_type }} | {{ file.size }} </p>
         </ion-label>
         <ion-buttons slot="end">
           <ion-button color="danger" @click.stop="deleteFile(file)">

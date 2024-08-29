@@ -1,58 +1,88 @@
 export interface FileAttachment {
-  name: string
-  path: string
+  id?: string
+  file_name: string
+  mime_type: string
   size: number
-  type: string
-  mimetype: string
-  version: number
-  uploadedBy: string
-  uploadedAt: string
-  status: string
+  is_current_version?: boolean
+  file_hash?: string
+  upload_date?: string
+  storage_path: string
+  version?: number
+  signature_status: string
+  certificateid?: string
+  compression_applied?: boolean
+  metadata?: Record<string, any>
+  is_deleted?: boolean
+  userid?: string
 }
 
 export const files: FileAttachment[] = [
   {
-    name: 'Escola Mercúrio',
-    type: '',
-    mimetype: '',
+    id: 'uuid-1',
+    file_name: 'Escola Mercúrio',
+    mime_type: '',
     size: 5000,
-    path: '',
+    is_current_version: true,
+    file_hash: 'hash-1',
+    upload_date: '',
+    storage_path: '',
     version: 1,
-    uploadedAt: '',
-    uploadedBy: '',
-    status: 'Published',
+    signature_status: 'Unsigned',
+    certificateid: 'cert-uuid-1',
+    compression_applied: false,
+    is_deleted: false,
+    userid: 'user-uuid-1',
+
   },
   {
-    name: 'File Document name',
-    type: 'PDF',
-    mimetype: '',
+    id: 'uuid-2',
+    file_name: 'File Document name',
+    mime_type: 'application/pdf',
     size: 5000,
-    path: '',
+    is_current_version: true,
+    file_hash: 'hash-2',
+    upload_date: '',
+    storage_path: '',
     version: 1,
-    uploadedAt: '',
-    uploadedBy: '',
-    status: 'Published',
+    signature_status: 'Unsigned',
+    certificateid: 'cert-uuid-2',
+    compression_applied: false,
+    is_deleted: false,
+    userid: 'user-uuid-2',
+
   },
   {
-    name: 'Excel report',
-    type: 'xls',
-    mimetype: '',
+    id: 'uuid-3',
+    file_name: 'Excel report',
+    mime_type: 'application/vnd.ms-excel',
     size: 5000,
-    path: '',
+    is_current_version: true,
+    file_hash: 'hash-3',
+    upload_date: '',
+    storage_path: '',
     version: 1,
-    uploadedAt: '',
-    uploadedBy: '',
-    status: 'Published',
+    signature_status: 'Unsigned',
+    certificateid: 'cert-uuid-3',
+    compression_applied: false,
+    is_deleted: false,
+    userid: 'user-uuid-3',
+
   },
   {
-    name: 'Escola Mercúrio',
-    type: '',
-    mimetype: '',
+    id: 'uuid-4',
+    file_name: 'Escola Mercúrio',
+    mime_type: '',
     size: 5000,
-    path: '',
+    is_current_version: true,
+    file_hash: 'hash-4',
+    upload_date: '',
+    storage_path: '',
     version: 1,
-    uploadedAt: '',
-    uploadedBy: '',
-    status: 'Published',
+    signature_status: 'Unsigned',
+    certificateid: 'cert-uuid-4',
+    compression_applied: false,
+    is_deleted: false,
+    userid: 'user-uuid-4',
+
   },
 ]

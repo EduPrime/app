@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { useDropzone } from 'vue3-dropzone'
-import type { Ref } from 'vue'
-import { defineEmits, defineProps, ref } from 'vue'
 import { IonButton, IonIcon, IonProgressBar } from '@ionic/vue'
 import { cloudUpload, cloudUploadOutline } from 'ionicons/icons'
+import type { Ref } from 'vue'
+import { defineEmits, defineProps, ref } from 'vue'
+import { useDropzone } from 'vue3-dropzone'
 import GedService from '../services/GedService'
-// import { createClient } from '@supabase/supabase-js'
 
 const props = defineProps({
   bucketName: {
@@ -14,9 +13,6 @@ const props = defineProps({
   },
 })
 const emit = defineEmits(['uploadSuccess', 'uploadError'])
-// const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-// const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
-// const supabase = createClient(supabaseUrl, supabaseKey)
 const gedService = new GedService()
 const { getRootProps, getInputProps, isDragActive, open } = useDropzone({ onDrop })
 const fileItems: Ref<any[]> = ref([])
@@ -32,9 +28,26 @@ async function uploadFile(item: any) {
       emit('uploadError', error)
     }
     else {
-      item.error = false
       item.errorMessage = ''
-      emit('uploadSuccess', data)
+      item.progress = 100
+      const newDocumentRecord = {
+        compression_applied: false,
+        file_name: item.file.name,
+        is_current_version: true,
+        is_deleted: false,
+        mime_type: item.file.type,
+        signature_status: 'Unsigned',
+        size: item.file.size,
+        storage_path: data.fullPath,
+        file_hash: new Date().toISOString(), // TODO: Update to File hash
+        upload_date: new Date().toISOString(),
+        version: 1,
+        userid: '691ca4d1-108d-44f8-beb3-dc9e3676da6f', // TODO Update to the user id from login with database record
+      }
+      gedService.saveFileDetails(newDocumentRecord)
+      item.error = false
+      emit('uploadSuccess', newDocumentRecord)
+      return item
     }
   }
   catch (error) {

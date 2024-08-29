@@ -235,6 +235,47 @@ CREATE TABLE _teachertotimetable (
     a uuid NOT NULL,
     b uuid NOT NULL
 );
+-- 2. Create the user table
+CREATE TABLE "user" (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid()
+    -- Add additional fields here if needed
+);
+
+-- 3. Create the certificate table
+CREATE TABLE "certificate" (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid()
+    -- Add additional fields here if needed
+);
+
+-- 4. Create the document table
+CREATE TABLE "document" (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    file_name TEXT NOT NULL,
+    mime_type TEXT NOT NULL,
+    size BIGINT NOT NULL,
+    is_current_version BOOLEAN NOT NULL DEFAULT TRUE,
+    file_hash TEXT NOT NULL UNIQUE,
+    upload_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+    storage_path TEXT NOT NULL,
+    version INTEGER NOT NULL,
+    signature_status TEXT NOT NULL,
+    certificateId UUID,
+    compression_applied BOOLEAN NOT NULL DEFAULT FALSE,
+    metadata JSONB,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    userId UUID NOT NULL,
+
+    -- Foreign Key Constraints
+    CONSTRAINT fk_certificate
+        FOREIGN KEY (certificateId)
+        REFERENCES "certificate" (id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_user
+        FOREIGN KEY (userId)
+        REFERENCES "user" (id)
+        ON DELETE RESTRICT
+);
 
 ALTER TABLE ONLY timetable_school
     ADD CONSTRAINT timetableschool_pkey PRIMARY KEY (timetable_id, school_id);
@@ -318,6 +359,9 @@ ALTER TABLE "public"."student" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."teacher" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."timetable" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."timetable_school" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."document" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."certificate" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE "public"."user" ENABLE ROW LEVEL SECURITY;
 
 
 --
