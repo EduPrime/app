@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IonButton, IonCol, IonGrid, IonIcon, IonInput, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonRow } from '@ionic/vue'
 import { useField } from 'vee-validate'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { maskito as vMaskito } from '@maskito/vue'
 import type { Ref } from 'vue'
 import { add } from 'ionicons/icons'
@@ -25,6 +25,10 @@ const props: any = defineProps({
     type: Number,
     default: 255,
   },
+  entries: {
+    type: Array,
+    default: () => [],
+  },
 })
 const emit = defineEmits(['update:entries'])
 
@@ -35,16 +39,32 @@ function handleBlur() {
   touched.value = true
 }
 
-const entries = ref([
-  props.fields.reduce((acc: any, field: { key: any }) => ({ ...acc, [field.key]: '' }), {}),
-])
+const entries = ref(
+  props.entries.length > 0
+    ? props.entries
+    : [
+        props.fields.reduce(
+          (acc: any, field: { key: any }) => ({ ...acc, [field.key]: '' }),
+          {},
+        ),
+      ],
+)
+watch(
+  () => props.entries,
+  (newEntries) => {
+    if (newEntries.length > 0) {
+      entries.value = newEntries
+    }
+  },
+  { immediate: true },
+)
 function emitEntries() {
   const nonEmptyEntries = entries.value
-    .map((entry) => {
+    .map((entry: { [x: string]: any }) => {
       const key = Object.keys(entry)[0] // Obtém a chave dinamicamente
       return entry[key] // Retorna o valor da chave
     })
-    .filter(value => typeof value === 'string' && value.trim() !== '') // Filtra apenas strings não vazias
+    .filter((value: string) => typeof value === 'string' && value.trim() !== '') // Filtra apenas strings não vazias
 
   emit('update:entries', nonEmptyEntries)
 }

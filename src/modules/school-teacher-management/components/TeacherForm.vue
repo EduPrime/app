@@ -15,7 +15,7 @@ import type { Tables } from '@/types/database.types'
 import showToast from '@/utils/toast-alert'
 
 type TeacherPartial = Omit<Pick<Tables<'teacher'>, 'name' | 'birthdate' | 'email' | 'phone' | 'address' | 'specializations' | 'school_id'>, 'birthdate'> & {
-  birthdate: Date // Redefinindo o campo birthdate para ser do tipo Date
+  birthdate: Date | string // Redefinindo o campo birthdate para ser do tipo Date
 }
 
 defineEmits<{
@@ -54,7 +54,7 @@ const { values, errors, validate, setFieldValue } = useForm<TeacherPartial>({
 })
 
 const selectedSegment = ref('general-info')
-const specializations = ref<string[]>([])
+const specializations = ref<{ specialization: string }[]>([])
 const schoolList = ref<{ id: string, name: string }[]>([])
 const teacherService = new TeacherService()
 
@@ -125,21 +125,20 @@ const teacherId = computed(() => route.currentRoute.value.params.id) as { value:
 async function getTeacherData() {
   if (teacherId.value) {
     const teacherDbData = await teacherService.getById(teacherId.value)
-
     if (teacherDbData) {
+      const birthdateString = teacherDbData.birthdate
+      setFieldValue('birthdate', birthdateString)
       setFieldValue('name', teacherDbData.name)
-      setFieldValue('birthdate', new Date(teacherDbData.birthdate))
       setFieldValue('email', teacherDbData.email)
       setFieldValue('phone', teacherDbData.phone)
       setFieldValue('address', teacherDbData.address)
       setFieldValue('school_id', teacherDbData.school_id)
 
-      // Converter specializations para um array genérico de objetos
       if (teacherDbData.specializations && typeof teacherDbData.specializations === 'object') {
-        specializations.value = Object.entries(teacherDbData.specializations).flatMap(([key, value]) => {
+        specializations.value = Object.entries(teacherDbData.specializations).flatMap(([key, value]: [string, any]) => {
           if (Array.isArray(value)) {
             console.log(key)
-            return value.map(item => ({ specialization: item }))
+            return value.map((item: any) => ({ specialization: item }))
           }
           else {
             return [{ specialization: value }]
@@ -149,7 +148,6 @@ async function getTeacherData() {
       else {
         specializations.value = []
       }
-      console.log('specializations', specializations.value)
     }
 
     else {
@@ -208,6 +206,7 @@ onMounted(async () => {
       :fields="[
         { key: 'specialization', label: 'Formações', placeholder: 'Ex: Cursos, Especializações' },
       ]"
+      :entries="specializations"
       @update:entries="handleEntriesUpdate"
     />
   </div>
