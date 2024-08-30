@@ -68,7 +68,7 @@ onMounted(() => {
         </ion-button>
       </ion-col>
     </ion-row>
-    <teacher-list :schools="filteredTeacher" @update:schools="teacherData = $event" />
+    <teacher-list :teachers="filteredTeacher" @update:schools="teacherData = $event" />
   </content-layout>
 </template>
 

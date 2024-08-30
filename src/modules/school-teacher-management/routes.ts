@@ -34,14 +34,14 @@ const routes = [
     },
   },
   {
-    path: '/teachers/profile/',
-    name: 'TeacherProfile',
+    path: '/teachers/edit/:id',
+    name: 'EditTeacher',
     component: EditTeacher,
     meta: {
       moduleName: 'Teachers',
       moduleIcon: person,
       icon: person,
-      name: 'Perfil do Professor',
+      name: 'Editar Professor',
       order: 3,
     },
   },

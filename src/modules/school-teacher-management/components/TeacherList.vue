@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { pencil, trash } from 'ionicons/icons'
+import { useRouter } from 'vue-router'
 
-interface School {
+interface Teacher {
+  id: string
   name: string
   address: string
   showDetails: boolean
@@ -17,57 +19,59 @@ interface School {
 }
 
 const props = defineProps<{
-  schools: School[]
+  teachers: Teacher[]
 }>()
 
-const emit = defineEmits(['update:schools'])
+const emit = defineEmits(['update:teachers'])
+const router = useRouter()
 
 function toggleDetails(index: number) {
-  const updatedSchools = [...props.schools]
-  updatedSchools[index] = {
-    ...updatedSchools[index],
-    showDetails: !updatedSchools[index].showDetails,
+  const updatedTeachers = [...props.teachers]
+  updatedTeachers[index] = {
+    ...updatedTeachers[index],
+    showDetails: !updatedTeachers[index].showDetails,
   }
-  emit('update:schools', updatedSchools)
+  emit('update:teachers', updatedTeachers)
 }
 
-function editSchool(school: School) {
-  console.log('Editar', school)
+function editTeacher(teacher: Teacher) {
+  console.log('Editar', teacher)
+  router.push({ name: 'EditTeacher', params: { id: teacher.id.toString() } })
 }
 
-function deleteSchool(school: School) {
-  console.log('Excluir', school)
+function deleteTeacher(teacher: Teacher) {
+  console.log('Excluir', teacher)
 }
 </script>
 
 <template>
   <ion-list>
-    <ion-item-sliding v-for="(school, index) in schools" :key="index">
+    <ion-item-sliding v-for="(teacher, index) in teachers" :key="index">
       <ion-item button @click="toggleDetails(index)">
         <ion-label>
-          <h2>{{ school.name }}</h2>
-          <p>{{ school.address }}</p>
+          <h2>{{ teacher.name }}</h2>
+          <p>{{ teacher.address }}</p>
         </ion-label>
         <ion-buttons slot="end">
-          <ion-button @click.stop="editSchool(school)">
+          <ion-button @click.stop="editTeacher(teacher)">
             <ion-icon slot="icon-only" :icon="pencil" />
           </ion-button>
-          <ion-button color="danger" @click.stop="deleteSchool(school)">
+          <ion-button color="danger" @click.stop="deleteTeacher(teacher)">
             <ion-icon slot="icon-only" :icon="trash" />
           </ion-button>
         </ion-buttons>
       </ion-item>
       <ion-item-options side="end">
-        <ion-item-option @click="editSchool(school)">
+        <ion-item-option @click="editTeacher(teacher)">
           Editar
         </ion-item-option>
-        <ion-item-option color="danger" @click="deleteSchool(school)">
+        <ion-item-option color="danger" @click="deleteTeacher(teacher)">
           Excluir
         </ion-item-option>
       </ion-item-options>
-      <ion-item v-if="school.showDetails">
+      <ion-item v-if="teacher.showDetails">
         <ion-grid>
-          <ion-row v-for="(serie, sIndex) in school.series" :key="sIndex">
+          <ion-row v-for="(serie, sIndex) in teacher.series" :key="sIndex">
             <ion-col size="12">
               <strong>{{ serie.name }}</strong>
             </ion-col>

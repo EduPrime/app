@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { IonLabel, IonSegment, IonSegmentButton, IonSelect, IonSelectOption } from '@ionic/vue'
 import { useForm } from 'vee-validate'
@@ -17,6 +17,7 @@ import showToast from '@/utils/toast-alert'
 type TeacherPartial = Omit<Pick<Tables<'teacher'>, 'name' | 'birthdate' | 'email' | 'phone' | 'address' | 'specializations' | 'school_id'>, 'birthdate'> & {
   birthdate: Date // Redefinindo o campo birthdate para ser do tipo Date
 }
+
 defineEmits<{
   (e: 'cancel'): void
   (e: 'save'): void
@@ -25,15 +26,20 @@ defineEmits<{
 defineExpose({
   registerTeacher,
 })
+
 const router = useRouter()
 
 const formSchema = object({
-  name: string().required('Nome é obrigatório')
+  name: string()
+    .required('Nome é obrigatório')
     .min(12, 'O nome deve ter pelo menos 12 caracteres'),
-  birthdate: date().required('Data de nascimento é obrigatória')
+  birthdate: date()
+    .required('Data de nascimento é obrigatória')
     .typeError('Data de nascimento inválida')
     .min(hundredYearsAgo(), 'A pessoa não pode ter mais de 100 anos'),
-  email: string().email('E-mail inválido').required('E-mail é obrigatório'),
+  email: string()
+    .email('E-mail inválido')
+    .required('E-mail é obrigatório'),
   phone: string()
     .required('Telefone é obrigatório')
     .matches(/^\(\d{2}\) \d{5}-\d{4}$/, 'Telefone inválido')
@@ -50,6 +56,7 @@ const { values, errors, validate, setFieldValue } = useForm<TeacherPartial>({
 const selectedSegment = ref('general-info')
 const specializations = ref<string[]>([])
 const schoolList = ref<{ id: string, name: string }[]>([])
+const teacherService = new TeacherService()
 
 function handleEntriesUpdate(updatedEntries: never[]) {
   specializations.value = updatedEntries
@@ -93,7 +100,6 @@ async function registerTeacher() {
       school_id: values.school_id,
     }
     try {
-      const teacherService = new TeacherService()
       const newTeacher = await teacherService.create(formData)
 
       if (newTeacher) {
@@ -113,8 +119,50 @@ async function registerTeacher() {
 //* * Mask Inputs
 const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/])
 
+// check if the teacher is being edited
+const route = useRouter()
+const teacherId = computed(() => route.currentRoute.value.params.id) as { value: string }
+async function getTeacherData() {
+  if (teacherId.value) {
+    const teacherDbData = await teacherService.getById(teacherId.value)
+
+    if (teacherDbData) {
+      setFieldValue('name', teacherDbData.name)
+      setFieldValue('birthdate', new Date(teacherDbData.birthdate))
+      setFieldValue('email', teacherDbData.email)
+      setFieldValue('phone', teacherDbData.phone)
+      setFieldValue('address', teacherDbData.address)
+      setFieldValue('school_id', teacherDbData.school_id)
+
+      // Converter specializations para um array genérico de objetos
+      if (teacherDbData.specializations && typeof teacherDbData.specializations === 'object') {
+        specializations.value = Object.entries(teacherDbData.specializations).flatMap(([key, value]) => {
+          if (Array.isArray(value)) {
+            console.log(key)
+            return value.map(item => ({ specialization: item }))
+          }
+          else {
+            return [{ specialization: value }]
+          }
+        })
+      }
+      else {
+        specializations.value = []
+      }
+      console.log('specializations', specializations.value)
+    }
+
+    else {
+      console.error(`Dados do professor não encontrados para o ID: ${teacherId.value}`)
+    }
+  }
+}
+
 onMounted(async () => {
   await loadSchools()
+  if (teacherId.value) {
+    await getTeacherData()
+  }
 })
 </script>
 
