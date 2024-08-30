@@ -1,10 +1,8 @@
 <script setup lang="ts">
 import { IonInput, IonItem } from '@ionic/vue'
 import { useField } from 'vee-validate'
-import type { Ref } from 'vue'
-import { ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { maskito as vMaskito } from '@maskito/vue'
-
 import type { TextFieldTypes } from '@ionic/core'
 
 const props: any = defineProps({
@@ -29,19 +27,34 @@ function handleBlur() {
   touched.value = true
 }
 
-const maskOptions: Ref<any> | string | null = props.mask
-  ? ref({
-    mask: props.mask ?? null,
-    elementPredicate: (el: HTMLIonInputElement) => {
-      return new Promise((resolve) => {
-        requestAnimationFrame(async () => {
-          const input = await el.getInputElement()
-          resolve(input)
+const maskOptions: any = ref(props.mask
+  ? {
+      mask: props.mask,
+      elementPredicate: (el: HTMLIonInputElement) => {
+        return new Promise((resolve) => {
+          requestAnimationFrame(async () => {
+            const input = await el.getInputElement()
+            resolve(input)
+          })
         })
-      })
-    },
-  })
-  : null
+      },
+    }
+  : null)
+
+function applyMask() {
+  if (value.value && maskOptions.value && typeof maskOptions.value.mask === 'function') {
+    const inputMask = maskOptions.value.mask
+    value.value = inputMask(value.value)
+  }
+}
+
+onMounted(() => {
+  applyMask()
+})
+
+watch(value, () => {
+  applyMask()
+})
 </script>
 
 <template>
@@ -49,9 +62,13 @@ const maskOptions: Ref<any> | string | null = props.mask
     <ion-input
       v-model="value"
       v-maskito="maskOptions"
-      :class="{ 'ion-invalid': errors.length > 0, 'ion-touched': touched, 'ion-valid': errors.length === 0 }" :label="label"
-      :placeholder="placeholder" :label-placement="labelPosition" :error-text="errors.length > 0 ? errors[0] : ''"
-      :type="type || 'text'" @ion-blur="handleBlur"
+      :class="{ 'ion-invalid': errors.length > 0, 'ion-touched': touched, 'ion-valid': errors.length === 0 }"
+      :label="label"
+      :placeholder="placeholder"
+      :label-placement="labelPosition"
+      :error-text="errors.length > 0 ? errors[0] : ''"
+      :type="type || 'text'"
+      @ion-blur="handleBlur"
     />
   </ion-item>
 </template>

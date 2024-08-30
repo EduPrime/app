@@ -92,7 +92,7 @@ async function registerTeacher() {
 
     const formData = {
       name: values.name,
-      birthdate: birthdateValue.toISOString().split('T')[0], // Converte Date para string no formato YYYY-MM-DD
+      birthdate: birthdateValue.toISOString().split('T')[0],
       email: values.email,
       phone: values.phone,
       address: values.address,
@@ -130,7 +130,7 @@ async function getTeacherData() {
       setFieldValue('birthdate', birthdateString)
       setFieldValue('name', teacherDbData.name)
       setFieldValue('email', teacherDbData.email)
-      setFieldValue('phone', teacherDbData.phone)
+      setFieldValue('phone', applyPhoneMask(teacherDbData.phone))
       setFieldValue('address', teacherDbData.address)
       setFieldValue('school_id', teacherDbData.school_id)
 
@@ -155,7 +155,11 @@ async function getTeacherData() {
     }
   }
 }
-
+function applyPhoneMask(phone: string | null): string {
+  if (!phone)
+    return ''
+  return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
+}
 onMounted(async () => {
   await loadSchools()
   if (teacherId.value) {
