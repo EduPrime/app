@@ -3,6 +3,7 @@ import { IonInput, IonItem } from '@ionic/vue'
 import { useField } from 'vee-validate'
 import { onMounted, ref, watch } from 'vue'
 import { maskito as vMaskito } from '@maskito/vue'
+import { maskitoTransform } from '@maskito/core'
 import type { TextFieldTypes } from '@ionic/core'
 
 const props: any = defineProps({
@@ -42,9 +43,8 @@ const maskOptions: any = ref(props.mask
   : null)
 
 function applyMask() {
-  if (value.value && maskOptions.value && typeof maskOptions.value.mask === 'function') {
-    const inputMask = maskOptions.value.mask
-    value.value = inputMask(value.value)
+  if (value.value && props.mask) {
+    value.value = maskitoTransform(value.value, maskOptions.value)
   }
 }
 
@@ -60,21 +60,16 @@ watch(value, () => {
 <template>
   <ion-item>
     <ion-input
-      v-model="value"
-      v-maskito="maskOptions"
+      v-model="value" v-maskito="maskOptions"
       :class="{ 'ion-invalid': errors.length > 0, 'ion-touched': touched, 'ion-valid': errors.length === 0 }"
-      :label="label"
-      :placeholder="placeholder"
-      :label-placement="labelPosition"
-      :error-text="errors.length > 0 ? errors[0] : ''"
-      :type="type || 'text'"
-      @ion-blur="handleBlur"
+      :label="label" :placeholder="placeholder" :label-placement="labelPosition"
+      :error-text="errors.length > 0 ? errors[0] : ''" :type="type || 'text'" @ion-blur="handleBlur"
     />
   </ion-item>
 </template>
 
 <style scoped lang="scss">
 ion-input::part(native) .native-input {
-    min-height: 44px;
+  min-height: 44px;
 }
 </style>
