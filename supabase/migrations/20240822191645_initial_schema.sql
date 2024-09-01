@@ -91,13 +91,84 @@ CREATE TABLE school
     updated_at                              TIMESTAMPTZ
 );
 
-CREATE TABLE attendance
+CREATE TABLE teacher
 (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    student_id   UUID                                       NOT NULL REFERENCES student (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    date         TIMESTAMPTZ                                NOT NULL,
-    status       attendance_status                          NOT NULL,
+    name         VARCHAR(100)                               NOT NULL,
+    email        VARCHAR(255),
+    phone        VARCHAR(15),
+    status       status           DEFAULT 'ACTIVE',
+    metadata     JSONB,
+    user_created UUID             DEFAULT auth.uid(),
+    created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at   TIMESTAMPTZ,
+    updated_at   TIMESTAMPTZ
+);
+
+CREATE TABLE discipline
+(
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    teacher_id   UUID                                       NOT NULL REFERENCES teacher (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    name         VARCHAR(100)                               NOT NULL,
+    status       status           DEFAULT 'ACTIVE',
+    metadata     JSONB,
+    user_created UUID             DEFAULT auth.uid(),
+    created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at   TIMESTAMPTZ,
+    updated_at   TIMESTAMPTZ
+);
+
+CREATE TABLE course
+(
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    name         VARCHAR(100)                               NOT NULL,
+    status       status           DEFAULT 'ACTIVE',
+    metadata     JSONB,
+    user_created UUID             DEFAULT auth.uid(),
+    created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at   TIMESTAMPTZ,
+    updated_at   TIMESTAMPTZ
+);
+
+CREATE TABLE classroom
+(
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    series_id    UUID                                       NOT NULL,
+    name         VARCHAR(100)                               NOT NULL,
+    period       period           DEFAULT 'MORNING'         NOT NULL,
+    status       status           DEFAULT 'ACTIVE',
+    metadata     JSONB,
+    user_created UUID             DEFAULT auth.uid(),
+    created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at   TIMESTAMPTZ,
+    updated_at   TIMESTAMPTZ
+);
+
+CREATE TABLE timetable
+(
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    school_id     UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    classroom_id  UUID                                       NOT NULL REFERENCES classroom (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    discipline_id UUID                                       REFERENCES discipline (id) ON UPDATE CASCADE ON DELETE SET NULL,
+    name          VARCHAR(100)                               NOT NULL,
+    metadata      JSONB,
+    user_created  UUID             DEFAULT auth.uid(),
+    created_at    TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at    TIMESTAMPTZ,
+    updated_at    TIMESTAMPTZ
+);
+
+CREATE TABLE series
+(
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    course_id    UUID                                       NOT NULL REFERENCES course (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    timetable_id UUID                                       REFERENCES timetable (id) ON UPDATE CASCADE ON DELETE SET NULL,
+    name         VARCHAR(100)                               NOT NULL,
     metadata     JSONB,
     user_created UUID             DEFAULT auth.uid(),
     created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -121,80 +192,6 @@ CREATE TABLE class_session
     updated_at    TIMESTAMPTZ
 );
 
-CREATE TABLE classroom
-(
-    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    series_id    UUID                                       NOT NULL REFERENCES series (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    name         VARCHAR(100)                               NOT NULL,
-    period       period           DEFAULT 'MORNING'         NOT NULL,
-    status       status           DEFAULT 'ACTIVE',
-    metadata     JSONB,
-    user_created UUID             DEFAULT auth.uid(),
-    created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at   TIMESTAMPTZ,
-    updated_at   TIMESTAMPTZ
-);
-
-CREATE TABLE course
-(
-    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    name         VARCHAR(100)                               NOT NULL,
-    status       status           DEFAULT 'ACTIVE',
-    metadata     JSONB,
-    user_created UUID             DEFAULT auth.uid(),
-    created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at   TIMESTAMPTZ,
-    updated_at   TIMESTAMPTZ
-);
-
-CREATE TABLE discipline
-(
-    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    teacher_id   UUID                                       NOT NULL REFERENCES teacher (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    name         VARCHAR(100)                               NOT NULL,
-    status       status           DEFAULT 'ACTIVE',
-    metadata     JSONB,
-    user_created UUID             DEFAULT auth.uid(),
-    created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at   TIMESTAMPTZ,
-    updated_at   TIMESTAMPTZ
-);
-
--- Grade table
-CREATE TABLE grade
-(
-    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    school_id     UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    student_id    UUID                                       NOT NULL REFERENCES student (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    discipline_id UUID                                       NOT NULL REFERENCES discipline (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    value         double precision                           NOT NULL,
-    date          TIMESTAMPTZ                                NOT NULL,
-    metadata      JSONB,
-    user_created  UUID             DEFAULT auth.uid(),
-    created_at    TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at    TIMESTAMPTZ,
-    updated_at    TIMESTAMPTZ
-);
-
--- Series table
-CREATE TABLE series
-(
-    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    course_id    UUID                                       NOT NULL REFERENCES course (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    timetable_id UUID                                       REFERENCES timetable (id) ON UPDATE CASCADE ON DELETE SET NULL,
-    name         VARCHAR(100)                               NOT NULL,
-    metadata     JSONB,
-    user_created UUID             DEFAULT auth.uid(),
-    created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at   TIMESTAMPTZ,
-    updated_at   TIMESTAMPTZ
-);
-
--- Student table
 CREATE TABLE student
 (
     id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -217,15 +214,13 @@ CREATE TABLE student
     updated_at     TIMESTAMPTZ
 );
 
--- Teacher table
-CREATE TABLE teacher
+CREATE TABLE attendance
 (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    name         VARCHAR(100)                               NOT NULL,
-    email        VARCHAR(255),
-    phone        VARCHAR(15),
-    status       status           DEFAULT 'ACTIVE',
+    student_id   UUID                                       NOT NULL REFERENCES student (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    date         TIMESTAMPTZ                                NOT NULL,
+    status       attendance_status                          NOT NULL,
     metadata     JSONB,
     user_created UUID             DEFAULT auth.uid(),
     created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -233,14 +228,14 @@ CREATE TABLE teacher
     updated_at   TIMESTAMPTZ
 );
 
--- Timetable table
-CREATE TABLE timetable
+CREATE TABLE grade
 (
     id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     school_id     UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    classroom_id  UUID                                       NOT NULL REFERENCES classroom (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    discipline_id UUID                                       REFERENCES discipline (id) ON UPDATE CASCADE ON DELETE SET NULL,
-    name          VARCHAR(100)                               NOT NULL,
+    student_id    UUID                                       NOT NULL REFERENCES student (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    discipline_id UUID                                       NOT NULL REFERENCES discipline (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    value         double precision                           NOT NULL,
+    date          TIMESTAMPTZ                                NOT NULL,
     metadata      JSONB,
     user_created  UUID             DEFAULT auth.uid(),
     created_at    TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -248,7 +243,6 @@ CREATE TABLE timetable
     updated_at    TIMESTAMPTZ
 );
 
--- Timetable School table
 CREATE TABLE timetable_school
 (
     timetable_id UUID                                  NOT NULL REFERENCES timetable (id) ON UPDATE CASCADE ON DELETE RESTRICT,
@@ -263,19 +257,11 @@ CREATE TABLE timetable_school
 
 CREATE TABLE teacher_to_timetable
 (
-    school_id UUID NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    a         UUID NOT NULL REFERENCES teacher (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    b         UUID NOT NULL REFERENCES timetable (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    PRIMARY KEY (a, b)
+    school_id    UUID NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    teacher_id   UUID NOT NULL REFERENCES teacher (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    timetable_id UUID NOT NULL REFERENCES timetable (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    PRIMARY KEY (school_id, teacher_id, timetable_id)
 );
-
--- CREATE TABLE user_school
--- (
---     user_id   uuid,
---     school_id UUID NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
---     roles     text[],
---     PRIMARY KEY (user_id, school_id)
--- );
 
 CREATE TABLE role
 (
@@ -286,15 +272,27 @@ CREATE TABLE role
 
 CREATE TABLE role_permission
 (
-    school_id UUID      NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    role_id   UUID      NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    user_id   UUID      NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    school_id  UUID    NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    role_id    UUID    NOT NULL REFERENCES role (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    "table"    varchar NOT NULL,
     can_select boolean NOT NULL,
     can_insert boolean NOT NULL,
     can_update boolean NOT NULL,
     can_delete boolean NOT NULL,
-    PRIMARY KEY (user_id, school_id)
+    PRIMARY KEY (role_id, school_id, "table")
 );
+
+CREATE TABLE user_role
+(
+    school_id UUID NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    role_id   UUID NOT NULL REFERENCES role (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    user_id   UUID NOT NULL,
+    PRIMARY KEY (school_id, role_id, user_id)
+);
+
+ALTER TABLE ONLY classroom
+    ADD CONSTRAINT classroom_seriesid_fkey FOREIGN KEY (series_id) REFERENCES series (id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
 
 -- RLS
 ALTER TABLE "public"."attendance"
@@ -362,5 +360,3 @@ $$
             END LOOP;
     END;
 $$;
-
--- Qualquer outra lógica ou dados que você queira adicionar
