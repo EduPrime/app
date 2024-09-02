@@ -6,11 +6,12 @@ import { useForm } from 'vee-validate'
 import { date, object, string } from 'yup'
 import TeacherService from '../services/TeacherService'
 import SchoolService from '../services/SchoolService'
+import QualificationForm from './QualificationForm.vue'
 import { hundredYearsAgo } from '@/utils/hundred-years-ago'
 import { isValidDDD } from '@/utils/ddd-validator'
 import EpInput from '@/components/EpInput.vue'
 import EpTextarea from '@/components/EpTextarea.vue'
-import EpJson from '@/components/EpJson.vue'
+
 import type { Tables } from '@/types/database.types'
 import showToast from '@/utils/toast-alert'
 
@@ -28,7 +29,8 @@ defineExpose({
 })
 
 const router = useRouter()
-
+const route = useRouter()
+const teacherId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = object({
   name: string()
     .required('Nome é obrigatório')
@@ -54,7 +56,7 @@ const { values, errors, validate, setFieldValue } = useForm<TeacherPartial>({
 })
 
 const selectedSegment = ref('general-info')
-const specializations = ref<{ specialization: string }[]>([])
+const specializations = ref<{ institution: string, course: string, start: string | number | undefined, end: string | number | undefined }[]>([])
 const schoolList = ref<{ id: string, name: string }[]>([])
 const teacherService = new TeacherService()
 
@@ -100,13 +102,24 @@ async function registerTeacher() {
       school_id: values.school_id,
     }
     try {
-      const newTeacher = await teacherService.create(formData)
-
-      if (newTeacher) {
-        showToast('Professor cadastrado com sucesso!')
-        setTimeout(() => {
-          router.push('/teachers/manage')
-        }, 2000)
+      let result
+      if (teacherId.value) {
+        result = await teacherService.update(teacherId.value, formData)
+        if (result) {
+          showToast('Professor atualizado com sucesso')
+          setTimeout(() => {
+            router.push('/teachers/manage')
+          }, 2000)
+        }
+      }
+      else {
+        result = await teacherService.create(formData)
+        if (result) {
+          showToast('Professor cadastrado com sucesso!')
+          setTimeout(() => {
+            router.push('/teachers/manage')
+          }, 2000)
+        }
       }
     }
     catch (error) {
@@ -120,8 +133,7 @@ async function registerTeacher() {
 const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/])
 
 // check if the teacher is being edited
-const route = useRouter()
-const teacherId = computed(() => route.currentRoute.value.params.id) as { value: string }
+
 async function getTeacherData() {
   if (teacherId.value) {
     const teacherDbData = await teacherService.getById(teacherId.value)
@@ -135,21 +147,12 @@ async function getTeacherData() {
       setFieldValue('school_id', teacherDbData.school_id)
 
       if (teacherDbData.specializations && typeof teacherDbData.specializations === 'object') {
-        specializations.value = Object.entries(teacherDbData.specializations).flatMap(([key, value]: [string, any]) => {
-          if (Array.isArray(value)) {
-            console.log(key)
-            return value.map((item: any) => ({ specialization: item }))
-          }
-          else {
-            return [{ specialization: value }]
-          }
-        })
+        specializations.value = teacherDbData.specializations as any
       }
       else {
         specializations.value = []
       }
     }
-
     else {
       console.error(`Dados do professor não encontrados para o ID: ${teacherId.value}`)
     }
@@ -160,6 +163,7 @@ function applyPhoneMask(phone: string | null): string {
     return ''
   return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
 }
+
 onMounted(async () => {
   await loadSchools()
   if (teacherId.value) {
@@ -203,15 +207,8 @@ onMounted(async () => {
     <ep-input v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone" placeholder="(99) 99999-9999" />
     <ep-textarea v-model="values.address" name="address" label="Endereço" placeholder="Digite o endereço" />
   </div>
-
+  <!-- another tab -->
   <div v-show="selectedSegment === 'additional-info'">
-    <ep-json
-      name="specializations"
-      :fields="[
-        { key: 'specialization', label: 'Formações', placeholder: 'Ex: Cursos, Especializações' },
-      ]"
-      :entries="specializations"
-      @update:entries="handleEntriesUpdate"
-    />
+    <qualification-form v-model="specializations" @update:qualifications="handleEntriesUpdate" />
   </div>
 </template>

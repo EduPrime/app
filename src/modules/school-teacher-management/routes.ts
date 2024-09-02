@@ -5,7 +5,7 @@ import EditTeacher from './views/EditTeacher.vue'
 import TeacherSchedule from './views/RegisterTeacher.vue'
 import TeacherDocs from './views/RegisterTeacher.vue'
 import TeacherFeedback from './views/TeacherFeedback.vue'
-import TeacherNotifications from './views/RegisterTeacher.vue'
+import TeacherNotifications from './views/TeacherNotifications.vue'
 import TeacherReports from './views/RegisterTeacher.vue'
 
 const routes = [
@@ -79,18 +79,6 @@ const routes = [
       icon: star,
       name: 'Avaliações e Feedback',
       order: 6,
-    },
-  },
-  {
-    path: '/teachers/notifications/:id',
-    name: 'TeacherNotifications',
-    component: TeacherNotifications,
-    meta: {
-      moduleName: 'Teachers',
-      moduleIcon: notifications,
-      icon: notifications,
-      name: 'Notificações',
-      order: 7,
     },
   },
   {

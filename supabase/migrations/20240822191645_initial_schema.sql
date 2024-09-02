@@ -201,7 +201,7 @@ CREATE TABLE teacher (
     email VARCHAR(255),
     phone VARCHAR(15),
     address VARCHAR(255),
-    specializations  jsonb,
+    qualifications  jsonb,
     school_id uuid NOT NULL,
     status status DEFAULT 'ACTIVE',
     metadata jsonb,
