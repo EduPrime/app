@@ -39,7 +39,6 @@ function toggleDetails(index: number) {
 }
 
 function editTeacher(teacher: Teacher) {
-  console.log('Editar', teacher)
   router.push({ name: 'EditTeacher', params: { id: teacher.id.toString() } })
 }
 

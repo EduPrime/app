@@ -3,6 +3,9 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { add } from 'ionicons/icons'
 import { useRoute, useRouter } from 'vue-router'
 import TeacherService from '../services/TeacherService'
+import SchoolService from '../services/SchoolService'
+import SeriesService from '../services/SeriesService'
+import StudentService from '../services/StudentService'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import TeacherList from '@/modules/school-teacher-management/components/TeacherList.vue'
 import TeacherCards from '@/modules/school-teacher-management/components/TeacherCards.vue'
@@ -12,12 +15,28 @@ const router = useRouter()
 const route = useRoute()
 
 const teacherService = new TeacherService()
+const schoolService = new SchoolService()
+const seriesService = new SeriesService()
+const studentService = new StudentService()
+
 const teacherData = ref< Tables<'teacher'> | []>([])
-const schoolCount = ref(154)
-const classCount = ref(25)
-const approvalRate = ref(48)
-const teacherCount = ref(30)
+const schoolCount = ref(0)
+const seriesCount = ref(0)
+const studentCount = ref(0)
+const teacherCount = ref(0)
 const searchQuery = ref('')
+
+onMounted(async () => {
+  try {
+    schoolCount.value = await schoolService.countEntries()
+    teacherCount.value = await teacherService.countEntries()
+    seriesCount.value = await seriesService.countEntries()
+    studentCount.value = await studentService.countEntries()
+  }
+  catch (error) {
+    console.error('Erro ao contar escolas:', error)
+  }
+})
 
 const filteredTeacher = computed(() => {
   if (!searchQuery.value) {
@@ -60,7 +79,7 @@ watch(
 <template>
   <content-layout>
     <teacher-cards
-      :student-count="schoolCount" :class-count="classCount" :approval-rate="approvalRate"
+      :school-count="schoolCount" :series-count="seriesCount" :student-count="studentCount"
       :teacher-count="teacherCount"
     />
     <ion-toolbar>

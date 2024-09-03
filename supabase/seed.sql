@@ -308,7 +308,10 @@ VALUES
         'joao.pereira@example.com',
         '1234567890',
         'Rua das Flores, 123, Bairro Central',
-        '{"subjects": ["Matemática", "Física"], "degree": "Mestrado em Educação"}',
+        '[
+            {"start": "2015-03-01", "end": "2017-12-15", "course": "Mestrado em Educação Inovadora", "institution": "Universidade Nova Esperança"},
+            {"start": "2012-01-10", "end": "2014-12-10", "course": "Licenciatura em Matemática", "institution": "Faculdade de Ciências Exatas"}
+        ]',
         (
             SELECT id
             FROM school
@@ -323,7 +326,10 @@ VALUES
         'maria.fernandes@example.com',
         '0987654321',
         'Avenida dos Professores, 456, Bairro Novo',
-        '{"subjects": ["Português", "Literatura"], "degree": "Doutorado em Letras"}',
+        '[
+            {"start": "2000-09-01", "end": "2004-06-15", "course": "Doutorado em Literatura Brasileira", "institution": "Universidade dos Escritores"},
+            {"start": "1995-02-20", "end": "1999-11-20", "course": "Licenciatura em Letras", "institution": "Instituto Superior de Letras"}
+        ]',
         (
             SELECT id
             FROM school
@@ -338,7 +344,10 @@ VALUES
         'paulo.santos@example.com',
         '1122334455',
         'Praça da Liberdade, 789, Centro',
-        '{"subjects": ["História", "Geografia"], "degree": "Licenciatura em História"}',
+        '[
+            {"start": "2018-09-03", "end": "2022-09-03", "course": "Licenciatura em História", "institution": "Universidade de História e Cultura"},
+            {"start": "2015-01-05", "end": "2017-12-15", "course": "Curso de Especialização em Ensino de Geografia", "institution": "Faculdade do Saber"}
+        ]',
         (
             SELECT id
             FROM school
@@ -353,7 +362,10 @@ VALUES
         'rita.oliveira@example.com',
         '5566778899',
         'Estrada Velha, 1010, Bairro Antigo',
-        '{"subjects": ["Ciências", "Biologia"], "degree": "Mestrado em Ciências Biológicas"}',
+        '[
+            {"start": "2010-08-01", "end": "2013-05-30", "course": "Mestrado em Ciências Biológicas", "institution": "Instituto de Pesquisa Biológica"},
+            {"start": "2007-03-20", "end": "2009-12-20", "course": "Bacharelado em Biologia", "institution": "Universidade da Vida"}
+        ]',
         (
             SELECT id
             FROM school

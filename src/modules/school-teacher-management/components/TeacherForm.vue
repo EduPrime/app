@@ -81,6 +81,12 @@ async function loadSchools() {
     }))
   }
 }
+function filterValidQualifications(qualifications: { institution: string, course: string }[]) {
+  return qualifications.filter((qualification) => {
+    return qualification.course.trim() !== '' && qualification.institution.trim() !== ''
+  })
+}
+
 async function registerTeacher() {
   const validationResult = await validate()
 
@@ -92,13 +98,14 @@ async function registerTeacher() {
   // Verifique se 'birthdate' é uma instância de Date, caso contrário, converta
     const birthdateValue = values.birthdate instanceof Date ? values.birthdate : new Date(values.birthdate)
 
+    const validQualifications = filterValidQualifications(qualifications.value)
     const formData = {
       name: values.name,
       birthdate: birthdateValue.toISOString().split('T')[0],
       email: values.email,
       phone: values.phone,
       address: values.address,
-      qualifications: qualifications.value,
+      qualifications: validQualifications,
       school_id: values.school_id,
     }
     try {
@@ -131,8 +138,6 @@ async function registerTeacher() {
 
 //* * Mask Inputs
 const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/])
-
-// check if the teacher is being edited
 
 async function getTeacherData() {
   if (teacherId.value) {

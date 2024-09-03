@@ -44,10 +44,11 @@ function addQualification() {
 
 <template>
   <div>
+    <ion-label class="ion-text-wrap">
+      <h2>Qualificações</h2>
+    </ion-label>
+
     <ion-list v-if="qualifications.length > 0">
-      <ion-label class="ion-text-wrap">
-        <h2>Qualificações</h2>
-      </ion-label>
       <ion-accordion-group expand="inset">
         <ion-accordion v-for="(qualification, index) in qualifications" :key="index">
           <ion-item slot="header" color="light">
@@ -82,10 +83,15 @@ function addQualification() {
         </ion-accordion>
       </ion-accordion-group>
     </ion-list>
-    <ion-fab slot="fixed" vertical="bottom" horizontal="end">
-      <ion-fab-button @click="addQualification">
-        <ion-icon :icon="add" />
-      </ion-fab-button>
-    </ion-fab>
+
+    <p v-else class="ion-text-center">
+      As qualificações do professor não existem ainda, insira agora mesmo.
+    </p>
+
+    <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="addQualification">
+      <ion-icon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
+      <ion-icon slot="start" :icon="add" class="ion-hide-sm-down" />
+      <span class="ion-hide-sm-down">Qualificação</span>
+    </ion-button>
   </div>
 </template>

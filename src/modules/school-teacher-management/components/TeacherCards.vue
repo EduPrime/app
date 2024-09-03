@@ -1,9 +1,9 @@
 <script setup lang="ts">
 const props = defineProps<{
-  studentCount: number
+  schoolCount: number
   teacherCount: number
-  classCount: number
-  approvalRate: number
+  seriesCount: number
+  studentCount: number
 }>()
 </script>
 
@@ -13,12 +13,12 @@ const props = defineProps<{
       <ion-card color="primary">
         <ion-card-header>
           <ion-card-title>
-            Alunos
+            Escolas
           </ion-card-title>
         </ion-card-header>
         <ion-card-content>
           <h1 class="ion-text-xxl">
-            {{ props.studentCount }}
+            {{ props.schoolCount }}
           </h1>
         </ion-card-content>
       </ion-card>
@@ -48,7 +48,7 @@ const props = defineProps<{
         </ion-card-header>
         <ion-card-content>
           <h1 class="ion-text-xxl">
-            {{ props.classCount }}
+            {{ props.seriesCount }}
           </h1>
         </ion-card-content>
       </ion-card>
@@ -58,12 +58,12 @@ const props = defineProps<{
       <ion-card color="lightaccent">
         <ion-card-header>
           <ion-card-title>
-            Aprovação
+            Alunos
           </ion-card-title>
         </ion-card-header>
         <ion-card-content>
           <h1 class="ion-text-xxl">
-            {{ props.approvalRate }}%
+            {{ props.studentCount }}
           </h1>
         </ion-card-content>
       </ion-card>
