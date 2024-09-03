@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { IonAccordion, IonAccordionGroup, IonFab, IonFabButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from '@ionic/vue'
 import { add } from 'ionicons/icons'
 
@@ -13,7 +13,6 @@ const qualifications = ref(props.modelValue || [])
 watch(
   () => props.modelValue,
   (newVal) => {
-    console.log('Novo valor para modelValue:', newVal)
     qualifications.value = newVal || []
   },
   { deep: true, immediate: true },

@@ -296,7 +296,7 @@ INSERT INTO teacher (
     email, 
     phone, 
     address, 
-    specializations, 
+    qualifications, 
     school_id, 
     created_at
 )

@@ -15,7 +15,7 @@ import EpTextarea from '@/components/EpTextarea.vue'
 import type { Tables } from '@/types/database.types'
 import showToast from '@/utils/toast-alert'
 
-type TeacherPartial = Omit<Pick<Tables<'teacher'>, 'name' | 'birthdate' | 'email' | 'phone' | 'address' | 'specializations' | 'school_id'>, 'birthdate'> & {
+type TeacherPartial = Omit<Pick<Tables<'teacher'>, 'name' | 'birthdate' | 'email' | 'phone' | 'address' | 'qualifications' | 'school_id'>, 'birthdate'> & {
   birthdate: Date | string // Redefinindo o campo birthdate para ser do tipo Date
 }
 
@@ -47,7 +47,7 @@ const formSchema = object({
     .matches(/^\(\d{2}\) \d{5}-\d{4}$/, 'Telefone inválido')
     .test('valid-ddd', 'DDD inválido', value => isValidDDD(value || '')),
   address: string().optional(),
-  specializations: string().optional(),
+  qualifications: string().optional(),
   school_id: string().required('Selecionar escola é obrigatório'),
 })
 
@@ -56,12 +56,12 @@ const { values, errors, validate, setFieldValue } = useForm<TeacherPartial>({
 })
 
 const selectedSegment = ref('general-info')
-const specializations = ref<{ institution: string, course: string, start: string | number | undefined, end: string | number | undefined }[]>([])
+const qualifications = ref<{ institution: string, course: string, start: string | number | undefined, end: string | number | undefined }[]>([])
 const schoolList = ref<{ id: string, name: string }[]>([])
 const teacherService = new TeacherService()
 
 function handleEntriesUpdate(updatedEntries: never[]) {
-  specializations.value = updatedEntries
+  qualifications.value = updatedEntries
 }
 const schoolId = computed({
   get: () => values.school_id,
@@ -98,7 +98,7 @@ async function registerTeacher() {
       email: values.email,
       phone: values.phone,
       address: values.address,
-      specializations: specializations.value,
+      qualifications: qualifications.value,
       school_id: values.school_id,
     }
     try {
@@ -146,11 +146,11 @@ async function getTeacherData() {
       setFieldValue('address', teacherDbData.address)
       setFieldValue('school_id', teacherDbData.school_id)
 
-      if (teacherDbData.specializations && typeof teacherDbData.specializations === 'object') {
-        specializations.value = teacherDbData.specializations as any
+      if (teacherDbData.qualifications && typeof teacherDbData.qualifications === 'object') {
+        qualifications.value = teacherDbData.qualifications as any
       }
       else {
-        specializations.value = []
+        qualifications.value = []
       }
     }
     else {
@@ -209,6 +209,6 @@ onMounted(async () => {
   </div>
   <!-- another tab -->
   <div v-show="selectedSegment === 'additional-info'">
-    <qualification-form v-model="specializations" @update:qualifications="handleEntriesUpdate" />
+    <qualification-form v-model="qualifications" @update:qualifications="handleEntriesUpdate" />
   </div>
 </template>

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { pencil, trash } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
+import { IonAlert } from '@ionic/vue'
+import { ref } from 'vue'
+import TeacherService from '../services/TeacherService'
+import showToast from '@/utils/toast-alert'
 
 interface Teacher {
   id: string
@@ -31,7 +35,7 @@ function toggleDetails(index: number) {
     ...updatedTeachers[index],
     showDetails: !updatedTeachers[index].showDetails,
   }
-  emit('update:teachers', updatedTeachers)
+  emit('update:teachers')
 }
 
 function editTeacher(teacher: Teacher) {
@@ -39,12 +43,65 @@ function editTeacher(teacher: Teacher) {
   router.push({ name: 'EditTeacher', params: { id: teacher.id.toString() } })
 }
 
-function deleteTeacher(teacher: Teacher) {
-  console.log('Excluir', teacher)
+const isAlertOpen = ref(false)
+const teacherToDelete = ref<Teacher | null>(null)
+function openDeleteAlert(teacher: Teacher) {
+  teacherToDelete.value = teacher
+  isAlertOpen.value = true
 }
+function handleAlertDismiss(ev: CustomEvent) {
+  const role = ev.detail.role
+  if (role === 'confirm' && teacherToDelete.value) {
+    deleteTeacher(teacherToDelete.value)
+  }
+  else {
+    handleCancel()
+  }
+}
+async function deleteTeacher(teacher: Teacher) {
+  const teacherService = new TeacherService()
+
+  if (teacher.id) {
+    const result = await teacherService.softDelete(teacher.id)
+    if (result) {
+      showToast(`${teacher.name} excluído com sucesso`)
+      emit('update:teachers')
+      isAlertOpen.value = false
+      teacherToDelete.value = null
+    }
+  }
+  else {
+    console.error('Erro ao excluir o professor.')
+  }
+}
+
+function handleCancel() {
+  console.info('Exclusão cancelada')
+  isAlertOpen.value = false
+  teacherToDelete.value = null
+}
+const alertButtons = [
+  {
+    text: 'Cancelar',
+    role: 'cancel',
+
+  },
+  {
+    text: 'Excluir',
+    role: 'confirm',
+
+  },
+]
 </script>
 
 <template>
+  <ion-alert
+    :is-open="isAlertOpen"
+    header="Confirmar Exclusão"
+    message="Tem certeza de que deseja excluir este item?"
+    :buttons="alertButtons"
+    @did-dismiss="handleAlertDismiss"
+  />
   <ion-list>
     <ion-item-sliding v-for="(teacher, index) in teachers" :key="index">
       <ion-item button @click="toggleDetails(index)">
@@ -54,9 +111,9 @@ function deleteTeacher(teacher: Teacher) {
         </ion-label>
         <ion-buttons slot="end">
           <ion-button @click.stop="editTeacher(teacher)">
-            <ion-icon slot="icon-only" :icon="pencil" />
+            <ion-icon id="present-alert" slot="icon-only" :icon="pencil" />
           </ion-button>
-          <ion-button color="danger" @click.stop="deleteTeacher(teacher)">
+          <ion-button color="danger" @click.stop="openDeleteAlert(teacher)">
             <ion-icon slot="icon-only" :icon="trash" />
           </ion-button>
         </ion-buttons>
@@ -65,7 +122,7 @@ function deleteTeacher(teacher: Teacher) {
         <ion-item-option @click="editTeacher(teacher)">
           Editar
         </ion-item-option>
-        <ion-item-option color="danger" @click="deleteTeacher(teacher)">
+        <ion-item-option color="danger" @click="openDeleteAlert(teacher)">
           Excluir
         </ion-item-option>
       </ion-item-options>

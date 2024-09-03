@@ -639,7 +639,7 @@ export interface Database {
           name: string
           phone: string | null
           school_id: string
-          specializations: Json | null
+          qualifications: Json | null
           status: Database['public']['Enums']['status'] | null
           updated_at: string | null
           user_created: string | null
@@ -655,7 +655,7 @@ export interface Database {
           name: string
           phone?: string | null
           school_id: string
-          specializations?: Json | null
+          qualifications?: Json | null
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
@@ -671,7 +671,7 @@ export interface Database {
           name?: string
           phone?: string | null
           school_id?: string
-          specializations?: Json | null
+          qualifications?: Json | null
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null

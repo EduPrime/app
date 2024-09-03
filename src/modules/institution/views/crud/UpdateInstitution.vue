@@ -24,7 +24,7 @@ async function submitForm() {
       result = await institutionService.update(form.value.id, form.value as Database['public']['Tables']['institution']['Update'])
     }
     if (result !== null) {
-      console.log('Instituição salva com sucesso:', result)
+      console.info('Instituição salva com sucesso:', result)
       emit('save')
     }
     else {
@@ -37,7 +37,6 @@ async function submitForm() {
 }
 
 function cancelEdit() {
-  console.log('cancelEdit chamado')
   emit('cancel')
 }
 </script>

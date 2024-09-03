@@ -69,7 +69,6 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
       }
 
       const { data, error } = await query
-
       if (error)
         throw error
 
@@ -145,6 +144,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
         .from(this.table as string & keyof Database['public']['Tables'])
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', id)
+        .select()
         .single()
 
       if (error)

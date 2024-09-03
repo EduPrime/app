@@ -35,7 +35,6 @@ async function loadInstitution() {
   }
 }
 function clickToEdit() {
-  console.log('O botão foi clicado no componente filho!')
   isEditing.value = true
 }
 

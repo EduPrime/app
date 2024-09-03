@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { add } from 'ionicons/icons'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import TeacherService from '../services/TeacherService'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import TeacherList from '@/modules/school-teacher-management/components/TeacherList.vue'
@@ -9,6 +9,7 @@ import TeacherCards from '@/modules/school-teacher-management/components/Teacher
 import type { Tables } from '@/types/database.types'
 
 const router = useRouter()
+const route = useRoute()
 
 const teacherService = new TeacherService()
 const teacherData = ref< Tables<'teacher'> | []>([])
@@ -45,6 +46,15 @@ function navigateToRegister() {
 onMounted(() => {
   loadTeachers()
 })
+// force reload teachers when returning from RegisterTeacher
+watch(
+  () => route.name,
+  (newName, oldName) => {
+    if (newName === 'ManageTeachers' && oldName === 'RegisterTeacher') {
+      loadTeachers()
+    }
+  },
+)
 </script>
 
 <template>
@@ -68,7 +78,7 @@ onMounted(() => {
         </ion-button>
       </ion-col>
     </ion-row>
-    <teacher-list :teachers="filteredTeacher" @update:schools="teacherData = $event" />
+    <teacher-list :teachers="filteredTeacher" @update:teachers="loadTeachers" />
   </content-layout>
 </template>
 
