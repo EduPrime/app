@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { IonButton, IonIcon, IonProgressBar } from '@ionic/vue'
+import { IonButton, IonIcon, IonProgressBar, IonThumbnail } from '@ionic/vue'
 import { cloudUpload, cloudUploadOutline } from 'ionicons/icons'
-import type { Ref } from 'vue'
 import { defineEmits, defineProps, ref } from 'vue'
 import { useDropzone } from 'vue3-dropzone'
-import GedService from '../services/GedService'
+import DocumentService from '../services/GedService'
+import type { Tables } from '@/types/database.types'
 
 const props = defineProps({
   bucketName: {
@@ -12,14 +12,17 @@ const props = defineProps({
     required: true,
   },
 })
+
 const emit = defineEmits(['uploadSuccess', 'uploadError'])
-const gedService = new GedService()
+
+const gedService = new DocumentService()
 const { getRootProps, getInputProps, isDragActive, open } = useDropzone({ onDrop })
-const fileItems: Ref<any[]> = ref([])
+const fileItems = ref<Tables<'document'> | []>([])
 
 async function uploadFile(item: any) {
   try {
-    const { data, error } = await gedService.uploadFile(item.file, props.bucketName)
+    const path = `uploads/${item.file.name}` // Define o caminho para armazenar o arquivo no bucket
+    const { data, error } = await gedService.uploadFile(props.bucketName, path, item.file)
 
     if (error) {
       item.error = true
@@ -32,19 +35,21 @@ async function uploadFile(item: any) {
       item.progress = 100
       const newDocumentRecord = {
         compression_applied: false,
+        created_at: new Date().toISOString(),
+        deleted_at: null,
+        file_hash: null,
         file_name: item.file.name,
         is_current_version: true,
         is_deleted: false,
+        metadata: null,
         mime_type: item.file.type,
-        signature_status: 'Unsigned',
         size: item.file.size,
-        storage_path: data.fullPath,
-        file_hash: new Date().toISOString(), // TODO: Update to File hash
+        storage_path: data?.path || '',
+        updated_at: null,
         upload_date: new Date().toISOString(),
         version: 1,
-        userid: '691ca4d1-108d-44f8-beb3-dc9e3676da6f', // TODO Update to the user id from login with database record
       }
-      gedService.saveFileDetails(newDocumentRecord)
+      gedService.create(newDocumentRecord) // Salva os detalhes do arquivo na base de dados
       item.error = false
       emit('uploadSuccess', newDocumentRecord)
       return item

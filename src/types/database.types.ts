@@ -7,6 +7,31 @@ export type Json =
   | Json[]
 
 export interface Database {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       _teachertotimetable: {
@@ -274,6 +299,63 @@ export interface Database {
             referencedColumns: ['id']
           },
         ]
+      }
+      document: {
+        Row: {
+          compression_applied: boolean | null
+          created_at: string
+          deleted_at: string | null
+          file_hash: string | null
+          file_name: string
+          id: string
+          is_current_version: boolean | null
+          is_deleted: boolean | null
+          metadata: Json | null
+          mime_type: string
+          size: number
+          storage_path: string
+          updated_at: string | null
+          upload_date: string | null
+          user_created: string | null
+          version: number | null
+        }
+        Insert: {
+          compression_applied?: boolean | null
+          created_at?: string
+          deleted_at?: string | null
+          file_hash?: string | null
+          file_name: string
+          id?: string
+          is_current_version?: boolean | null
+          is_deleted?: boolean | null
+          metadata?: Json | null
+          mime_type: string
+          size: number
+          storage_path: string
+          updated_at?: string | null
+          upload_date?: string | null
+          user_created?: string | null
+          version?: number | null
+        }
+        Update: {
+          compression_applied?: boolean | null
+          created_at?: string
+          deleted_at?: string | null
+          file_hash?: string | null
+          file_name?: string
+          id?: string
+          is_current_version?: boolean | null
+          is_deleted?: boolean | null
+          metadata?: Json | null
+          mime_type?: string
+          size?: number
+          storage_path?: string
+          updated_at?: string | null
+          upload_date?: string | null
+          user_created?: string | null
+          version?: number | null
+        }
+        Relationships: []
       }
       grade: {
         Row: {
@@ -629,6 +711,8 @@ export interface Database {
       }
       teacher: {
         Row: {
+          address: string | null
+          birthdate: string
           created_at: string
           deleted_at: string | null
           email: string | null
@@ -636,12 +720,15 @@ export interface Database {
           metadata: Json | null
           name: string
           phone: string | null
+          qualifications: Json | null
           school_id: string
           status: Database['public']['Enums']['status'] | null
           updated_at: string | null
           user_created: string | null
         }
         Insert: {
+          address?: string | null
+          birthdate: string
           created_at?: string
           deleted_at?: string | null
           email?: string | null
@@ -649,12 +736,15 @@ export interface Database {
           metadata?: Json | null
           name: string
           phone?: string | null
+          qualifications?: Json | null
           school_id: string
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
         }
         Update: {
+          address?: string | null
+          birthdate?: string
           created_at?: string
           deleted_at?: string | null
           email?: string | null
@@ -662,6 +752,7 @@ export interface Database {
           metadata?: Json | null
           name?: string
           phone?: string | null
+          qualifications?: Json | null
           school_id?: string
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null

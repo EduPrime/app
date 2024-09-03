@@ -1,4 +1,4 @@
-// src/modules/institution/routes.ts
+// src/modules/ged/routes.ts
 import { cloudUpload, cloudUploadOutline } from 'ionicons/icons'
 import UploadFiles from './views/UploadFiles.vue'
 

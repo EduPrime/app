@@ -197,8 +197,11 @@ CREATE TABLE student (
 CREATE TABLE teacher (
     id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     name VARCHAR(100) NOT NULL,
+    birthdate DATE NOT NULL, 
     email VARCHAR(255),
     phone VARCHAR(15),
+    address VARCHAR(255),
+    qualifications  jsonb,
     school_id uuid NOT NULL,
     status status DEFAULT 'ACTIVE',
     metadata jsonb,
@@ -230,51 +233,47 @@ CREATE TABLE timetable_school (
     user_created UUID DEFAULT auth.uid()
 );
 
+CREATE TABLE document (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    file_name VARCHAR(255) NOT NULL,
+    mime_type VARCHAR(255) NOT NULL,
+    size BIGINT NOT NULL,
+    is_current_version BOOLEAN DEFAULT TRUE,
+    file_hash TEXT UNIQUE,
+    upload_date timestamptz DEFAULT CURRENT_TIMESTAMP,
+    storage_path TEXT NOT NULL,
+    version INTEGER DEFAULT 1,
+    compression_applied BOOLEAN DEFAULT FALSE,
+    metadata JSONB,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    created_at timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamptz,
+    deleted_at timestamptz,
+    user_created UUID DEFAULT auth.uid()
+);
+
+-- Política para permitir uploads por usuários anônimos no bucket 'ged'
+CREATE POLICY "allow_anon_insert"
+ON storage.objects
+FOR INSERT
+TO anon
+WITH CHECK (
+  bucket_id = 'ged'
+);
+
+-- Política para permitir leitura por usuários anônimos no bucket 'ged'
+CREATE POLICY "public_read_policy"
+ON storage.objects
+FOR SELECT
+USING (
+  bucket_id = 'ged'
+  AND auth.role() = 'anon'
+);
+
 -- Melhorar campos
 CREATE TABLE _teachertotimetable (
     a uuid NOT NULL,
     b uuid NOT NULL
-);
--- 2. Create the user table
-CREATE TABLE "user" (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid()
-    -- Add additional fields here if needed
-);
-
--- 3. Create the certificate table
-CREATE TABLE "certificate" (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid()
-    -- Add additional fields here if needed
-);
-
--- 4. Create the document table
-CREATE TABLE "document" (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    file_name TEXT NOT NULL,
-    mime_type TEXT NOT NULL,
-    size BIGINT NOT NULL,
-    is_current_version BOOLEAN NOT NULL DEFAULT TRUE,
-    file_hash TEXT NOT NULL UNIQUE,
-    upload_date TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    storage_path TEXT NOT NULL,
-    version INTEGER NOT NULL,
-    signature_status TEXT NOT NULL,
-    certificateId UUID,
-    compression_applied BOOLEAN NOT NULL DEFAULT FALSE,
-    metadata JSONB,
-    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
-    userId UUID NOT NULL,
-
-    -- Foreign Key Constraints
-    CONSTRAINT fk_certificate
-        FOREIGN KEY (certificateId)
-        REFERENCES "certificate" (id)
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_user
-        FOREIGN KEY (userId)
-        REFERENCES "user" (id)
-        ON DELETE RESTRICT
 );
 
 ALTER TABLE ONLY timetable_school
@@ -359,9 +358,6 @@ ALTER TABLE "public"."student" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."teacher" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."timetable" ENABLE ROW LEVEL SECURITY;
 ALTER TABLE "public"."timetable_school" ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."document" ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."certificate" ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."user" ENABLE ROW LEVEL SECURITY;
 
 
 --

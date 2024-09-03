@@ -1,36 +1,45 @@
-/* eslint-disable style/quotes */
-import { createClient } from '@supabase/supabase-js'
-import type { SupabaseClient } from '@supabase/supabase-js'
-import type { FileAttachment } from '../data/files'
+import BaseService from '@/services/BaseService'
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseKey = import.meta.env.VITE_SUPABASE_KEY
+const table = 'document' as const
 
-export default class GedService {
-  private supabase: SupabaseClient = createClient(
-    supabaseUrl,
-    supabaseKey,
-  )
+type DocumentTable = typeof table
 
-  async uploadFile(file: File, bucket: string) {
-    return await this.supabase.storage
-      .from(bucket)
-      .upload(`uploads/${file.name}`, file)
+export default class DocumentService extends BaseService<DocumentTable> {
+  constructor() {
+    super(table)
   }
 
-  async saveFileDetails(file: FileAttachment) {
-    return await this.supabase.from('document').insert(file)
-  }
+  /**
+   * Upload a file to Supabase storage
+   * @param bucketName - The name of the storage bucket
+   * @param path - The path within the bucket where the file should be uploaded
+   * @param file - The file object to be uploaded
+   * @param options - Optional settings like cache control and upsert
+   * @returns An object containing the upload data or an error
+   */
+  async uploadFile(
+    bucketName: string,
+    path: string,
+    file: File,
+    options?: { cacheControl?: string, upsert?: boolean },
+  ): Promise<{ data: any, error: any }> {
+    try {
+      const { data, error } = await this.client.storage
+        .from(bucketName)
+        .upload(path, file, {
+          cacheControl: options?.cacheControl || '3600',
+          upsert: options?.upsert || false,
+        })
 
-  async getFiles() {
-    // this.signin() //** Sign in temparory for testing, add this user manually on dashboard to allow signin */
-    return await this.supabase.from('document').select()
-  }
+      if (error) {
+        throw error
+      }
 
-  async signin() {
-    return this.supabase.auth.signInWithPassword({
-      email: "",
-      password: "", /** Add email pass here, to signin and uncomment above to allow calling signin action */
-    })
+      return { data, error: null }
+    }
+    catch (error) {
+      console.error(`Erro ao fazer upload do arquivo no bucket ${bucketName}:`, error)
+      return { data: null, error }
+    }
   }
 }

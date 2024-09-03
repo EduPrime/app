@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { IonItem, IonLabel, IonList, IonListHeader } from '@ionic/vue'
+import { IonItem, IonLabel, IonList, IonListHeader, IonThumbnail } from '@ionic/vue'
 import { documentAttach, trash } from 'ionicons/icons'
-import type { FileAttachment } from '../data/files'
+import type { Tables } from '@/types/database.types'
 
 const props = defineProps<{
-  files: FileAttachment[]
+  files: Tables<'document'> | []
 }>()
 
 const emit = defineEmits(['update:files'])
-// const storageURL = `${import.meta.env.VITE_SUPABASE_S3URL}`
-// const fileUploadProgress: Ref<any> = ref(0)
+
 function toggleDetails(index: number) {
   const updatedFiles = [...props.files]
   updatedFiles[index] = {
@@ -18,7 +17,7 @@ function toggleDetails(index: number) {
   emit('update:files', updatedFiles)
 }
 
-function deleteFile(file: FileAttachment) {
+function deleteFile(file: Tables<'document'>) {
   console.log('Excluir', file)
 }
 </script>
