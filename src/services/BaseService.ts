@@ -69,7 +69,6 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
       }
 
       const { data, error } = await query
-
       if (error)
         throw error
 
@@ -93,6 +92,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
       const { data, error } = await this.client
         .from(this.table as string & keyof Database['public']['Tables'])
         .insert(record)
+        .select()
         .single()
 
       if (error)
@@ -144,6 +144,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
         .from(this.table as string & keyof Database['public']['Tables'])
         .update({ deleted_at: new Date().toISOString() })
         .eq('id', id)
+        .select()
         .single()
 
       if (error)
@@ -154,6 +155,29 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
     catch (error) {
       console.error(`Erro ao deletar registro na tabela ${this.table}:`, error)
       throw new Error(`Failed to delete record from ${this.table}`)
+    }
+  }
+
+  /**
+   * Count the number of records in the table, ignoring soft-deleted records.
+   * @returns The number of records in the table or 0 if an error occurs.
+   */
+  async countEntries(): Promise<number> {
+    try {
+      const { count, error } = await this.client
+        .from(this.table)
+        .select('*', { count: 'exact', head: true })
+        .is('deleted_at', null)
+
+      if (error) {
+        throw error
+      }
+
+      return count || 0 // Retorna 0 se count for null
+    }
+    catch (error) {
+      console.error(`Erro ao contar registros na tabela ${this.table}:`, error)
+      throw new Error(`Failed to count entries in ${this.table}`)
     }
   }
 }

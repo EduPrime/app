@@ -629,6 +629,8 @@ export interface Database {
       }
       teacher: {
         Row: {
+          address: string | null
+          birthdate: string
           created_at: string
           deleted_at: string | null
           email: string | null
@@ -637,11 +639,14 @@ export interface Database {
           name: string
           phone: string | null
           school_id: string
+          qualifications: Json | null
           status: Database['public']['Enums']['status'] | null
           updated_at: string | null
           user_created: string | null
         }
         Insert: {
+          address?: string | null
+          birthdate: string
           created_at?: string
           deleted_at?: string | null
           email?: string | null
@@ -650,11 +655,14 @@ export interface Database {
           name: string
           phone?: string | null
           school_id: string
+          qualifications?: Json | null
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
         }
         Update: {
+          address?: string | null
+          birthdate?: string
           created_at?: string
           deleted_at?: string | null
           email?: string | null
@@ -663,6 +671,7 @@ export interface Database {
           name?: string
           phone?: string | null
           school_id?: string
+          qualifications?: Json | null
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
