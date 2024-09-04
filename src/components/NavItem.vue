@@ -30,37 +30,29 @@ watch(
 
 function handleClick() {
   // isDisabled.value = true
-  isActive.value = true
-  props.item.children?.length == 0 ? menuController.close() : ''
+  isActive.value = true;
+  props.item.children?.length == 0 ? menuController.close() : '';
   router.push(props.item.url)
 }
 </script>
 
 <template>
   <div>
-    <IonAccordionGroup v-if="item.children && item.children.length" multiple>
-      <IonAccordion>
-        <template #header>
-          <IonItem button lines="none" :disabled="isDisabled" :class="isActive ? 'menu-active' : '' " @click="handleClick">
-            <template #start>
-              <IonIcon :color="item.color" :icon="item.icon" />
-            </template>
-            <IonLabel>{{ item.name }}</IonLabel>
-          </IonItem>
-        </template>
-        <template #content>
-          <div>
-            <nav-item v-for="(child, index) in item.children" :key="index" :item="child" />
-          </div>
-        </template>
-      </IonAccordion>
-    </IonAccordionGroup>
-    <IonItem v-else button lines="none" :router-link="item.url" :disabled="isDisabled" :class="isActive ? 'menu-active' : '' " @click="handleClick">
-      <template #start>
-        <IonIcon :color="item.color" :icon="item.icon" />
-      </template>
-      <IonLabel>{{ item.name }}</IonLabel>
-    </IonItem>
+    <ion-accordion-group v-if="item.children && item.children.length" multiple>
+      <ion-accordion>
+        <ion-item slot="header" button lines="none" :disabled="isDisabled"  :class="isActive ? 'menu-active' : '' " @click="handleClick">
+          <ion-icon slot="start" :color="item.color" :icon="item.icon" />
+          <ion-label>{{ item.name }}</ion-label>
+        </ion-item>
+        <div slot="content">
+          <nav-item v-for="(child, index) in item.children" :key="index" :item="child" />
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+    <ion-item v-else button lines="none" :router-link="item.url" :disabled="isDisabled" :class="isActive ? 'menu-active' : '' " @click="handleClick">
+      <ion-icon slot="start" :color="item.color" :icon="item.icon" />
+      <ion-label>{{ item.name }}</ion-label>
+    </ion-item>
   </div>
 </template>
 

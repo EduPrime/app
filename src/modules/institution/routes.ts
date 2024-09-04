@@ -5,6 +5,7 @@ import RegisterSchool from './views/RegisterSchool.vue'
 import DashboardInstitution from './views/DashboardInstitution.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
 import AcademicYear from './views/AcademicYear.vue'
+import RegisterAcademicTemplate from './views/RegisterAcademicTemplate.vue'
 
 const routes = [
   {
@@ -57,7 +58,7 @@ const routes = [
   },
   {
     path: '/Institutions/academic/years',
-    name: 'RegisterSchool',
+    name: 'AcademicYear',
     component: AcademicYear,
     meta: {
       moduleName: 'Institutions',
@@ -65,6 +66,18 @@ const routes = [
       icon: layers,
       name: 'Ano Letivo',
       order: 5,
+    },
+  },
+  {
+    path: '/Institutions/academic/addTemplate',
+    name: 'RegisterAcademicTemplate',
+    component: RegisterAcademicTemplate,
+    meta: {
+      moduleName: 'Institutions',
+      moduleIcon: layers,
+      icon: layers,
+      name: 'Modelo ano letivo',
+      order: 6,
     },
   },
 ]

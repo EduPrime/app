@@ -2,24 +2,23 @@
 import { onMounted, ref, watch } from 'vue'
 import { IonBackButton, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonGrid, IonItem, IonLabel, IonRow, IonSelect, IonSelectOption } from '@ionic/vue'
 
+// Serviços
 import SchoolService from '../services/SchoolService'
 import AcademicTemplateService from '../services/AcademicTemplateService'
 import AcademicYearService from '../services/AcademicYearService'
 import type { Tables } from '@/types/database.types'
 
-// Serviços
 const schoolService = new SchoolService()
 const academicTemplateService = new AcademicTemplateService()
 const academicYearService = new AcademicYearService()
 
-// Refs para escolas e templates
 const schools = ref<Tables<'school'>[] | null>(null)
-const selectedSchool = ref<Tables<'school'> | null>(null)
+const selectedSchoolId = ref<string | null>(null)
 const templates = ref<Tables<'academic_year_template'>[] | null>(null)
 const selectedTemplate = ref<string | null>(null)
 const templateDetails = ref<Tables<'academic_year_template'> | null>(null)
 
-// Carregar detalhes do template selecionado
+// Função para carregar detalhes do template selecionado
 async function loadTemplateDetails() {
   if (selectedTemplate.value) {
     const foundTemplate: any = selectedTemplate.value ? templates.value?.find(template => template.id === selectedTemplate.value) || null : null
@@ -30,28 +29,41 @@ async function loadTemplateDetails() {
   }
 }
 
-// Carregar lista de escolas
+// Função para carregar lista de escolas
 async function loadSchools() {
   schools.value = await schoolService.getAll()
 }
 
-// Carregar lista de templates
+// Função para carregar lista de templates
 async function loadTemplates() {
   templates.value = await academicTemplateService.getAll()
 }
 
-// Confirmar a aplicação do template
+// Função para confirmar a aplicação do template
 function confirmTemplate() {
   if (selectedSchool.value && selectedTemplate.value) {
-    console.log(`Template ${templateDetails.value?.name} aplicado para a escola ${selectedSchool.value.name}`)
+    // console.log(`Template ${templateDetails.value?.name} aplicado para a escola ${selectedSchool.value.name}`)
   }
 }
 
-watch(selectedSchool, async (newValue) => {
+// Função para formatar a data no padrão brasileiro
+function formatDate(dateString: string) {
+  const date = new Date(dateString)
+  return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(date)
+}
+
+// Função para calcular se é um dia útil
+function isBusinessDay(dateString: string) {
+  const date = new Date(dateString)
+  const day = date.getUTCDay()
+  return day !== 0 && day !== 6 // 0 = Domingo, 6 = Sábado
+}
+
+// Função que observa a mudança na escola selecionada e carrega o template registrado
+watch(selectedSchoolId, async (newValue) => {
   if (newValue) {
-    const academicYear = await academicYearService.getBySchoolId(newValue.id)
+    const academicYear = await academicYearService.getBySchoolId(newValue)
     if (academicYear && academicYear.length > 0) {
-      // -1 pega o último array
       selectedTemplate.value = academicYear[academicYear.length - 1].template_id
       await loadTemplateDetails()
     }
@@ -62,6 +74,7 @@ watch(selectedSchool, async (newValue) => {
   }
 })
 
+// Função montada ao inicializar o componente
 onMounted(() => {
   loadSchools()
   loadTemplates()
@@ -71,7 +84,7 @@ onMounted(() => {
 <template>
   <content-layout :show-footer="true" :show-description="true">
     <template #header-buttons>
-      <ion-buttons slot:start>
+      <ion-buttons slot="start">
         <IonBackButton default-href="/" />
       </ion-buttons>
     </template>
@@ -85,7 +98,7 @@ onMounted(() => {
     <!-- Seleção de Escola -->
     <IonItem>
       <IonLabel>Escolha a Escola</IonLabel>
-      <IonSelect id="escolas" v-model="selectedSchool" placeholder="Selecione uma escola">
+      <IonSelect id="escolas" v-model="selectedSchoolId" placeholder="Selecione uma escola">
         <IonSelectOption v-for="school in schools" :key="school.id" :value="school">
           {{ school.name }}
         </IonSelectOption>
@@ -112,16 +125,13 @@ onMounted(() => {
         <p>Etapas:</p>
         <ul>
           <li v-for="stage in templateDetails.stages" :key="stage.stageNumber">
-            Etapa {{ stage.stageNumber }}: {{ stage.startDate }} - {{ stage.endDate }} ({{ stage.teachingDays }} dias)
+            Etapa {{ stage.stageNumber }}:
+            {{ formatDate(stage.startDate) }} - {{ formatDate(stage.endDate) }}
+            ({{ stage.teachingDays }} dias {{ isBusinessDay(stage.startDate) ? 'úteis' : '' }})
           </li>
         </ul>
       </IonCardContent>
     </IonCard>
-
-    <!-- Botão de Confirmação -->
-    <IonButton expand="full" :disabled="!selectedTemplate" @click="confirmTemplate">
-      Usar este Template
-    </IonButton>
 
     <template #footer>
       <IonGrid>
@@ -132,7 +142,7 @@ onMounted(() => {
             </IonButton>
           </IonCol>
           <IonCol>
-            <IonButton expand="block" color="primary">
+            <IonButton expand="block" color="primary" @click="confirmTemplate">
               Salvar
             </IonButton>
           </IonCol>
