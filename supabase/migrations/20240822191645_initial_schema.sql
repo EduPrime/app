@@ -274,7 +274,7 @@ CREATE TABLE document (
 CREATE TABLE academic_year_template (
     id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     ref_year INTEGER NOT NULL, -- Ano de referência
-    name VARCHAR(100) NOT NULL, -- Nome do modelo de ano letivo
+    name VARCHAR(100) NOT NULL UNIQUE, -- Nome do modelo de ano letivo
     stages jsonb NOT NULL, -- JSONB para armazenar etapas do ano letivo
     stage_count INTEGER GENERATED ALWAYS AS (jsonb_array_length(stages)) STORED, -- Número de etapas, calculado automaticamente
     metadata jsonb, -- Metadados adicionais, se necessário

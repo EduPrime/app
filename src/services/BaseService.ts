@@ -94,6 +94,25 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
   }
 
   /**
+   * Calls an RPC function in the database
+   * @param functionName - Name of the RPC function in the database
+   * @param params - Parameters to be passed to the function
+   * @returns The result of the function or null if there is an error
+   */
+  async callRpc(functionName: any, params: Record<string, any>): Promise<any | null> {
+    try {
+      const { data, error } = await this.client.rpc(functionName, params)
+      if (error)
+        throw error
+      return data
+    }
+    catch (error) {
+      console.error(`Erro ao chamar a função RPC ${functionName}:`, error)
+      throw new Error(`Failed to call RPC function ${functionName}`)
+    }
+  }
+
+  /**
    * Create a new record
    * @param record - The record object to create
    * @returns The created record object or throws an error if the operation fails

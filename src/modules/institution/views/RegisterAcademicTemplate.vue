@@ -1,41 +1,74 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { IonAccordion, IonAccordionGroup, IonButton, IonInput, IonItem, IonLabel, IonList } from '@ionic/vue'
+import { ref, watch } from 'vue'
+import { IonAccordion, IonAccordionGroup, IonBackButton, IonButton, IonCol, IonGrid, IonInput, IonItem, IonLabel, IonList, IonRow } from '@ionic/vue'
+import { useRouter } from 'vue-router'
+import AcademicTemplateService from '../services/AcademicTemplateService'
 
-// Refs para os campos do novo modelo de ano letivo
+import showToast from '@/utils/toast-alert'
+import { debounce } from '@/utils/debounce'
+import type { Tables } from '@/types/database.types'
+
+const router = useRouter()
+const academicTemplateService = new AcademicTemplateService()
+
 const refYear = ref(new Date().getFullYear())
-const modelName = ref('')
-// Inicia com 4 etapas como modelo
-const stages = ref([
-  { id: Date.now() + 1, startDate: '2024-01-01', endDate: '2024-03-31', teachingDays: 60 },
-  { id: Date.now() + 2, startDate: '2024-04-01', endDate: '2024-06-30', teachingDays: 65 },
-  { id: Date.now() + 3, startDate: '2024-07-01', endDate: '2024-09-30', teachingDays: 55 },
-  { id: Date.now() + 4, startDate: '2024-10-01', endDate: '2024-12-31', teachingDays: 50 },
-])
+const modelName = ref< Tables<'academic_year_template'>['name']>('')
 
-// Função para adicionar uma nova etapa
+const stages = ref< { startDate: string, endDate: string, teachingDays: number }[]>([])
+
 function addStage() {
-  stages.value.push({ id: Date.now(), startDate: '', endDate: '', teachingDays: 0 })
+  stages.value.push({ startDate: '', endDate: '', teachingDays: 0 })
 }
 
-// Função para remover uma etapa
 function removeStage(index: number) {
   stages.value.splice(index, 1)
 }
 
-// Função para salvar o novo modelo de ano letivo
-function saveAcademicYearTemplate() {
-  const newTemplate = {
-    ref_year: refYear.value,
-    name: modelName.value,
-    stages: stages.value,
+async function saveAcademicYearTemplate() {
+  try {
+    const newTemplate = {
+      ref_year: refYear.value,
+      name: modelName.value || 'Modelo de Ano Letivo', // Verifica se tem nome
+      stages: stages.value as unknown as Tables<'academic_year_template'>['stages'],
+    }
+    const result = await academicTemplateService.create(newTemplate)
+    if (result) {
+      showToast('Modelo de Ano Letivo criado com sucesso!')
+
+      setTimeout(() => {
+        router.push('/Institutions/academic/years')
+      }, 2000)
+    }
   }
-  console.log('Novo modelo salvo:', newTemplate)
+  catch (error) {
+    console.error('Erro ao criar Modelo de Ano Letivo:', error)
+    showToast('Erro ao criar o Modelo de Ano Letivo. Tente novamente.', 'top', 'danger')
+  }
 }
+const calculateBusinessDays = debounce(async (startDate: string, endDate: string, index: number) => {
+  if (startDate && endDate) {
+    const teachingDays = await academicTemplateService.getBusinessDays(startDate, endDate)
+    stages.value[index].teachingDays = teachingDays || 0
+  }
+}, 950)
+
+watch(stages, (newStages) => {
+  newStages.forEach((stage, index) => {
+    if (stage.startDate && stage.endDate) {
+      calculateBusinessDays(stage.startDate, stage.endDate, index)
+    }
+  })
+}, { deep: true })
 </script>
 
 <template>
   <content-layout :show-footer="true">
+    <template #header-buttons>
+      <ion-buttons slot="start">
+        <IonBackButton default-href="/" />
+      </ion-buttons>
+    </template>
+
     <h3 class="ion-text-center ion-text-uppercase">
       Criar Novo Modelo de Ano Letivo
     </h3>
@@ -58,7 +91,7 @@ function saveAcademicYearTemplate() {
 
     <IonList v-if="stages.length > 0">
       <IonAccordionGroup expand="inset">
-        <IonAccordion v-for="(stage, index) in stages" :key="stage.id">
+        <IonAccordion v-for="(stage, index) in stages" :key="index">
           <IonItem slot="header" color="light">
             <IonLabel>Etapa {{ index + 1 }}</IonLabel>
           </IonItem>
@@ -102,14 +135,25 @@ function saveAcademicYearTemplate() {
       Não há etapas ainda, adicione uma nova etapa.
     </p>
 
-    <!-- Botão para adicionar uma nova etapa -->
-    <IonButton expand="full" @click="addStage">
+    <IonButton v-if="modelName" expand="full" @click="addStage">
       Adicionar Etapa
     </IonButton>
 
-    <!-- Botão para salvar o modelo -->
-    <IonButton expand="full" color="primary" @click="saveAcademicYearTemplate">
-      Salvar Modelo
-    </IonButton>
+    <template #footer>
+      <IonGrid>
+        <IonRow class="ion-justify-content-between">
+          <IonCol>
+            <IonButton expand="block" color="danger">
+              Cancelar
+            </IonButton>
+          </IonCol>
+          <IonCol>
+            <IonButton expand="block" color="primary" @click="saveAcademicYearTemplate">
+              Salvar
+            </IonButton>
+          </IonCol>
+        </IonRow>
+      </IonGrid>
+    </template>
   </content-layout>
 </template>
