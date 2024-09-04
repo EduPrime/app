@@ -1,9 +1,10 @@
 // src/modules/institution/routes.ts
-import { business, school } from 'ionicons/icons'
+import { business, layers, school } from 'ionicons/icons'
 import RegisterInstitution from './views/RegisterInstitution.vue'
 import RegisterSchool from './views/RegisterSchool.vue'
 import DashboardInstitution from './views/DashboardInstitution.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
+import AcademicYear from './views/AcademicYear.vue'
 
 const routes = [
   {
@@ -39,7 +40,7 @@ const routes = [
       moduleIcon: school,
       icon: school,
       name: 'Escolas',
-      order: 1,
+      order: 3,
     },
   },
   {
@@ -51,7 +52,19 @@ const routes = [
       moduleIcon: school,
       icon: school,
       name: 'Cad Escola',
-      order: 3,
+      order: 4,
+    },
+  },
+  {
+    path: '/Institutions/academic/years',
+    name: 'RegisterSchool',
+    component: AcademicYear,
+    meta: {
+      moduleName: 'Institutions',
+      moduleIcon: layers,
+      icon: layers,
+      name: 'Ano Letivo',
+      order: 5,
     },
   },
 ]
