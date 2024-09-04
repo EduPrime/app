@@ -708,23 +708,6 @@ BEGIN
         ('Proclamação da República', TO_DATE(current_year || '-11-15', 'YYYY-MM-DD'), 'Comemoração da Proclamação da República do Brasil'),
         ('Natal', TO_DATE(current_year || '-12-25', 'YYYY-MM-DD'), 'Comemoração do Natal');
 END $$;
-
-
- CREATE OR REPLACE FUNCTION calculate_business_days(start_date DATE, end_date DATE)
-RETURNS INTEGER AS $$
-DECLARE
-    business_days INTEGER;
-BEGIN
-    -- Calcular dias úteis excluindo fins de semana e feriados
-    SELECT COUNT(*)
-    INTO business_days
-    FROM generate_series(start_date, end_date, INTERVAL '1 day') AS day
-    WHERE EXTRACT(ISODOW FROM day) < 6  -- Excluir sábados (6) e domingos (7)
-      AND day::DATE NOT IN (SELECT holiday_date FROM holidays); -- Excluir feriados
-
-    RETURN business_days;
-END;
-$$ LANGUAGE plpgsql;
 -- Inserção de um Template de Ano Letivo com 4 etapas usando o ano atual
 DO $$
 DECLARE

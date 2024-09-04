@@ -390,6 +390,22 @@ ALTER TABLE ONLY _teachertotimetable
 --
 -- FUNCTION
 --
+ CREATE OR REPLACE FUNCTION calculate_business_days(start_date DATE, end_date DATE)
+RETURNS INTEGER AS $$
+DECLARE
+    business_days INTEGER;
+BEGIN
+    -- Calcular dias úteis excluindo fins de semana e feriados
+    SELECT COUNT(*)
+    INTO business_days
+    FROM generate_series(start_date, end_date, INTERVAL '1 day') AS day
+    WHERE EXTRACT(ISODOW FROM day) < 6  -- Excluir sábados (6) e domingos (7)
+      AND day::DATE NOT IN (SELECT holiday_date FROM holidays); -- Excluir feriados
+
+    RETURN business_days;
+END;
+$$ LANGUAGE plpgsql;
+
 -- Função para atualizar a coluna updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
