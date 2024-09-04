@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { IonAccordion, IonAccordionGroup, IonButton, IonCol, IonInput, IonItem, IonLabel, IonList, IonRow } from '@ionic/vue'
+import { IonAccordion, IonAccordionGroup, IonButton, IonInput, IonItem, IonLabel, IonList } from '@ionic/vue'
 
 // Refs para os campos do novo modelo de ano letivo
-const refYear = ref(new Date().getFullYear()) // Pega o ano atual
+const refYear = ref(new Date().getFullYear())
 const modelName = ref('')
-const stages = ref([{ startDate: '', endDate: '', teachingDays: 0 }]) // Inicia com uma etapa
+// Inicia com 4 etapas como modelo
+const stages = ref([
+  { id: Date.now() + 1, startDate: '2024-01-01', endDate: '2024-03-31', teachingDays: 60 },
+  { id: Date.now() + 2, startDate: '2024-04-01', endDate: '2024-06-30', teachingDays: 65 },
+  { id: Date.now() + 3, startDate: '2024-07-01', endDate: '2024-09-30', teachingDays: 55 },
+  { id: Date.now() + 4, startDate: '2024-10-01', endDate: '2024-12-31', teachingDays: 50 },
+])
 
 // Função para adicionar uma nova etapa
 function addStage() {
-  stages.value.push({ startDate: '', endDate: '', teachingDays: 0 })
+  stages.value.push({ id: Date.now(), startDate: '', endDate: '', teachingDays: 0 })
 }
 
 // Função para remover uma etapa
@@ -24,8 +30,7 @@ function saveAcademicYearTemplate() {
     name: modelName.value,
     stages: stages.value,
   }
-//   console.log('Novo modelo salvo:', newTemplate)
-  // Adicionar lógica de chamada à API para salvar o novo modelo
+  console.log('Novo modelo salvo:', newTemplate)
 }
 </script>
 
@@ -51,52 +56,51 @@ function saveAcademicYearTemplate() {
       <IonInput v-model="modelName" placeholder="Digite o nome do modelo" />
     </IonItem>
 
-    <!-- Etapas do Ano Letivo -->
     <IonList v-if="stages.length > 0">
       <IonAccordionGroup expand="inset">
-        <IonAccordion v-for="(stage, index) in stages" :key="index">
-          <template #header>
-            <IonItem color="light">
-              <IonLabel>Etapa {{ index + 1 }}</IonLabel>
+        <IonAccordion v-for="(stage, index) in stages" :key="stage.id">
+          <IonItem slot="header" color="light">
+            <IonLabel>Etapa {{ index + 1 }}</IonLabel>
+          </IonItem>
+          <IonList slot="content">
+            <!-- Data de Início -->
+            <IonItem>
+              <IonLabel position="stacked">
+                Data de Início
+              </IonLabel>
+              <IonInput v-model="stage.startDate" type="date" placeholder="Selecione a data de início" />
             </IonItem>
-          </template>
-          <template #content>
-            <IonList>
-              <!-- Data de Início -->
-              <IonItem>
-                <IonLabel position="stacked">
-                  Data de Início
-                </IonLabel>
-                <IonInput v-model="stage.startDate" type="date" placeholder="Selecione a data de início" />
-              </IonItem>
 
-              <!-- Data de Fim -->
-              <IonItem>
-                <IonLabel position="stacked">
-                  Data de Fim
-                </IonLabel>
-                <IonInput v-model="stage.endDate" type="date" placeholder="Selecione a data de fim" />
-              </IonItem>
+            <!-- Data de Fim -->
+            <IonItem>
+              <IonLabel position="stacked">
+                Data de Fim
+              </IonLabel>
+              <IonInput v-model="stage.endDate" type="date" placeholder="Selecione a data de fim" />
+            </IonItem>
 
-              <!-- Número de Dias Letivos -->
-              <IonItem>
-                <IonLabel position="stacked">
-                  Dias Letivos
-                </IonLabel>
-                <IonInput v-model.number="stage.teachingDays" type="number" placeholder="Digite o número de dias letivos" />
-              </IonItem>
+            <!-- Número de Dias Letivos -->
+            <IonItem>
+              <IonLabel position="stacked">
+                Dias Letivos
+              </IonLabel>
+              <IonInput v-model.number="stage.teachingDays" type="number" placeholder="Digite o número de dias letivos" />
+            </IonItem>
 
-              <!-- Botão para remover a etapa -->
-              <IonItem>
-                <IonButton color="danger" expand="full" @click="removeStage(index)">
-                  Remover Etapa
-                </IonButton>
-              </IonItem>
-            </IonList>
-          </template>
+            <!-- Botão para remover a etapa -->
+            <IonItem>
+              <IonButton color="danger" expand="full" @click="removeStage(index)">
+                Remover Etapa
+              </IonButton>
+            </IonItem>
+          </IonList>
         </IonAccordion>
       </IonAccordionGroup>
     </IonList>
+
+    <p v-else class="ion-text-center">
+      Não há etapas ainda, adicione uma nova etapa.
+    </p>
 
     <!-- Botão para adicionar uma nova etapa -->
     <IonButton expand="full" @click="addStage">
@@ -109,7 +113,3 @@ function saveAcademicYearTemplate() {
     </IonButton>
   </content-layout>
 </template>
-
-<style scoped>
-/* Estilos adicionais */
-</style>
