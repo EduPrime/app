@@ -154,25 +154,53 @@ VALUES (gen_random_uuid(),
         '79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid);
 
 -- Inserção de Professores
-INSERT INTO teacher (id, name, email, school_id, created_at)
+INSERT INTO teacher (id, name, birthdate, email, phone, address, qualifications, school_id, created_at)
 VALUES (gen_random_uuid(),
         'Prof. João Pereira',
+        '1980-03-15',
         'joao.pereira@example.com',
+        '1234567890',
+        'Rua das Flores, 123, Bairro Central',
+        '[
+            {"start": "2015-03-01", "end": "2017-12-15", "course": "Mestrado em Educação Inovadora", "institution": "Universidade Nova Esperança"},
+            {"start": "2012-01-10", "end": "2014-12-10", "course": "Licenciatura em Matemática", "institution": "Faculdade de Ciências Exatas"}
+        ]',
         '79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid,
         NOW()),
        (gen_random_uuid(),
         'Profª. Maria Fernandes',
+        '1975-07-22',
         'maria.fernandes@example.com',
+        '0987654321',
+        'Avenida dos Professores, 456, Bairro Novo',
+        '[
+            {"start": "2000-09-01", "end": "2004-06-15", "course": "Doutorado em Literatura Brasileira", "institution": "Universidade dos Escritores"},
+            {"start": "1995-02-20", "end": "1999-11-20", "course": "Licenciatura em Letras", "institution": "Instituto Superior de Letras"}
+        ]',
         '79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid,
         NOW()),
        (gen_random_uuid(),
         'Prof. Paulo Santos',
+        '1990-11-30',
         'paulo.santos@example.com',
+        '1122334455',
+        'Praça da Liberdade, 789, Centro',
+        '[
+            {"start": "2018-09-03", "end": "2022-09-03", "course": "Licenciatura em História", "institution": "Universidade de História e Cultura"},
+            {"start": "2015-01-05", "end": "2017-12-15", "course": "Curso de Especialização em Ensino de Geografia", "institution": "Faculdade do Saber"}
+        ]',
         'ac144f88-bbff-47a2-847f-3605957576c8'::uuid,
         NOW()),
        (gen_random_uuid(),
         'Profª. Rita Oliveira',
+        '1982-05-12',
         'rita.oliveira@example.com',
+        '5566778899',
+        'Estrada Velha, 1010, Bairro Antigo',
+        '[
+            {"start": "2010-08-01", "end": "2013-05-30", "course": "Mestrado em Ciências Biológicas", "institution": "Instituto de Pesquisa Biológica"},
+            {"start": "2007-03-20", "end": "2009-12-20", "course": "Bacharelado em Biologia", "institution": "Universidade da Vida"}
+        ]',
         'ac144f88-bbff-47a2-847f-3605957576c8'::uuid,
         NOW());
 
