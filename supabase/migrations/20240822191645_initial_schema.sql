@@ -148,7 +148,6 @@ CREATE TABLE school (
     manager_id uuid,
     managerposition VARCHAR(255),
     operationlocation VARCHAR(255),
-    condition integer,
     sharedschoolinepcode integer,
     creationdecree VARCHAR(255),
     numberoffloors integer,

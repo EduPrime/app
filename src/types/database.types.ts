@@ -573,7 +573,6 @@ export interface Database {
           blockdiaryentriesforclosedacademicyears: boolean | null
           builtarea: string | null
           city: string | null
-          condition: number | null
           created_at: string
           creationdecree: string | null
           deleted_at: string | null
@@ -612,7 +611,6 @@ export interface Database {
           blockdiaryentriesforclosedacademicyears?: boolean | null
           builtarea?: string | null
           city?: string | null
-          condition?: number | null
           created_at?: string
           creationdecree?: string | null
           deleted_at?: string | null
@@ -651,7 +649,6 @@ export interface Database {
           blockdiaryentriesforclosedacademicyears?: boolean | null
           builtarea?: string | null
           city?: string | null
-          condition?: number | null
           created_at?: string
           creationdecree?: string | null
           deleted_at?: string | null

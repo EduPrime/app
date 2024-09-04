@@ -41,7 +41,7 @@ async function loadTemplates() {
 
 // Função para confirmar a aplicação do template
 function confirmTemplate() {
-  if (selectedSchool.value && selectedTemplate.value) {
+  if (selectedTemplate.value) {
     // console.log(`Template ${templateDetails.value?.name} aplicado para a escola ${selectedSchool.value.name}`)
   }
 }
@@ -59,10 +59,9 @@ function isBusinessDay(dateString: string) {
   return day !== 0 && day !== 6 // 0 = Domingo, 6 = Sábado
 }
 
-// Função que observa a mudança na escola selecionada e carrega o template registrado
-watch(selectedSchoolId, async (newValue) => {
+watch(selectedSchoolId, async (newValue: any) => {
   if (newValue) {
-    const academicYear = await academicYearService.getBySchoolId(newValue)
+    const academicYear = await academicYearService.getBySchoolId(newValue?.id)
     if (academicYear && academicYear.length > 0) {
       selectedTemplate.value = academicYear[academicYear.length - 1].template_id
       await loadTemplateDetails()
@@ -108,7 +107,7 @@ onMounted(() => {
     <!-- Seleção de Template -->
     <IonItem>
       <IonLabel>Modelo de Ano Letivo</IonLabel>
-      <IonSelect id="templates" v-model="selectedTemplate" placeholder="Selecione um template" :disabled="!selectedSchool" @ion-change="loadTemplateDetails">
+      <IonSelect id="templates" v-model="selectedTemplate" placeholder="Selecione um template" :disabled="!selectedSchoolId" @ion-change="loadTemplateDetails">
         <IonSelectOption v-for="template in templates" :key="template.id" :value="template.id">
           {{ template.name }}
         </IonSelectOption>
