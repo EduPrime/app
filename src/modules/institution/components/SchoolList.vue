@@ -48,14 +48,20 @@ function deleteSchool(school: School) {
           <h2>{{ school.name }}</h2>
           <p>{{ school.address }}</p>
         </ion-label>
-        <ion-buttons slot="end">
-          <ion-button @click.stop="editSchool(school)">
-            <ion-icon slot="icon-only" :icon="pencil" />
-          </ion-button>
-          <ion-button color="danger" @click.stop="deleteSchool(school)">
-            <ion-icon slot="icon-only" :icon="trash" />
-          </ion-button>
-        </ion-buttons>
+        <template #end>
+          <ion-buttons>
+            <ion-button @click.stop="editSchool(school)">
+              <template #icon-only>
+                <ion-icon :icon="pencil" />
+              </template>
+            </ion-button>
+            <ion-button color="danger" @click.stop="deleteSchool(school)">
+              <template #icon-only>
+                <ion-icon :icon="trash" />
+              </template>
+            </ion-button>
+          </ion-buttons>
+        </template>
       </ion-item>
       <ion-item-options side="end">
         <ion-item-option @click="editSchool(school)">

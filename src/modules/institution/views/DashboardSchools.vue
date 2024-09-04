@@ -31,8 +31,8 @@ function navigateToRegister() {
 </script>
 
 <template>
-  <content-layout>
-    <school-cards
+  <ContentLayout>
+    <SchoolCards
       :student-count="schoolCount" :class-count="classCount" :approval-rate="approvalRate"
       :teacher-count="teacherCount"
     />
@@ -45,14 +45,18 @@ function navigateToRegister() {
       </ion-col>
       <ion-col size="2" class="ion-text-end">
         <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
-          <ion-icon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
-          <ion-icon slot="start" :icon="add" class="ion-hide-sm-down" />
+          <template #icon-only>
+            <ion-icon :icon="add" class="ion-hide-sm-up" />
+          </template>
+          <template #start>
+            <ion-icon :icon="add" class="ion-hide-sm-down" />
+          </template>
           <span class="ion-hide-sm-down">Novo</span>
         </ion-button>
       </ion-col>
     </ion-row>
-    <school-list :schools="filteredSchools" @update:schools="schools = $event" />
-  </content-layout>
+    <SchoolList :schools="filteredSchools" @update:schools="schools = $event" />
+  </ContentLayout>
 </template>
 
 <style scoped>

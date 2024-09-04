@@ -4,8 +4,6 @@ import { onMounted, ref } from 'vue'
 import SchoolService from '../services/SchoolService'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 
-import type { Tables } from '@/types/database.types'
-
 const schoolService = new SchoolService()
 
 const courseData = ref()
@@ -26,13 +24,13 @@ onMounted(async () => {
 </script>
 
 <template>
-  <content-layout>
+  <ContentLayout>
     Teste
     <p id="escolas" />
     <pre>
     {{ courseData }}
 </pre>
-  </content-layout>
+  </ContentLayout>
 </template>
 
 <style scoped>

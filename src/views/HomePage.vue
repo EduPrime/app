@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { IonBackButton, IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar } from '@ionic/vue'
 import * as echarts from 'echarts'
 import { nextTick, onMounted, ref } from 'vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
@@ -137,7 +136,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <content-layout>
+  <ContentLayout>
     <div id="container">
       <strong class="capitalize">Dashboard Home page</strong>
       <p class="ion-padding" />
@@ -146,7 +145,7 @@ onMounted(async () => {
       <div id="attendance-chart" class="chart" />
       <div id="financial-chart" class="chart" />
     </div>
-  </content-layout>
+  </ContentLayout>
 </template>
 
 <style scoped>

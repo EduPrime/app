@@ -6,10 +6,7 @@ import {
   barChartOutline,
   calendarOutline,
   chevronBackCircle,
-  chevronBackCircleOutline,
   chevronForwardCircle,
-  chevronForwardCircleOutline,
-  close,
   closeCircle,
   document,
   fileTray,
@@ -24,7 +21,6 @@ import {
   videocam,
 } from 'ionicons/icons'
 import NavItem from './components/NavItem.vue'
-import { menuController } from '@ionic/core';
 
 const tabs = ref([
   {
@@ -163,9 +159,9 @@ const tabs = ref([
 ])
 
 const selectedTab = ref(0)
-const showTree = ref(true);
+const showTree = ref(true)
 function toggleTreeView() {
-  showTree.value = !showTree.value;
+  showTree.value = !showTree.value
 }
 function selectTab(index: number) {
   selectedTab.value = index
@@ -229,12 +225,19 @@ watch(route, (newRoute) => {
   updateSelectedTab(newRoute.path)
 })
 </script>
+
 <template>
   <ion-app>
     <ion-split-pane content-id="main-content" :class="showTree ? '' : 'tree-hidden'">
       <ion-buttons class="tree-toggle-btn">
-        <ion-button color="primary" @click="toggleTreeView"><ion-icon slot="icon-only" size="small"
-            :icon="showTree ? chevronBackCircle : chevronForwardCircle"></ion-icon></ion-button>
+        <ion-button color="primary" @click="toggleTreeView">
+          <template #icon-only>
+            <ion-icon
+              size="small"
+              :icon="showTree ? chevronBackCircle : chevronForwardCircle"
+            />
+          </template>
+        </ion-button>
       </ion-buttons>
       <ion-menu content-id="main-content" type="overlay">
         <ion-content>
@@ -243,9 +246,11 @@ watch(route, (newRoute) => {
               <ion-item lines="full" button class="vertical-tab-button" router-link="/" :detail="false">
                 <ion-img src="/icons/icon-256.webp" alt="Gestão Pedagógica" />
               </ion-item>
-              <ion-item v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button"
+              <ion-item
+                v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button"
                 :detail="false" :class="selectedTab === index ? 'selected' : ''" :router-link="tab.children[0].url"
-                @click="selectTab(index)">
+                @click="selectTab(index)"
+              >
                 <ion-icon :icon="tab.icon" />
               </ion-item>
 
@@ -265,15 +270,20 @@ watch(route, (newRoute) => {
             <ion-item lines="none" class="app-title-item">
               EduPrime
               <!-- Mobile Screen Menu close button -->
-              <ion-menu-button color="primary" slot="end" @click="toggleTreeView"><ion-icon
-                  :icon="closeCircle"></ion-icon></ion-menu-button>
+              <template #end>
+                <ion-menu-button color="primary" @click="toggleTreeView">
+                  <ion-icon
+                    :icon="closeCircle"
+                  />
+                </ion-menu-button>
+              </template>
             </ion-item>
 
             <ion-searchbar v-if="tabs[selectedTab].children.length > 4" />
             <!--------------------------
               @TODO: Recursive method to implement nested components for nav-items
             ------------------------------>
-            <nav-item v-for="(tab) in tabs[selectedTab].children" :key="`${tab.name}-${tab.icon}`" :item="tab" />
+            <NavItem v-for="(tab) in tabs[selectedTab].children" :key="`${tab.name}-${tab.icon}`" :item="tab" />
           </div>
         </ion-content>
       </ion-menu>
@@ -315,7 +325,7 @@ ion-split-pane {
         display: none;
       }
     }
-  } 
+  }
   &:not(.split-pane-visible) .tree-toggle-btn{
     display: none;
   }

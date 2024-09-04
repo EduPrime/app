@@ -39,34 +39,34 @@ watch(
 
 <template>
   <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-menu-button color="primary" />
-        </ion-buttons>
+    <IonHeader :translucent="true">
+      <IonToolbar>
+        <IonButtons slot="start">
+          <IonMenuButton color="primary" />
+        </IonButtons>
         <slot name="header-buttons" />
-        <ion-icon v-if="metaIcon" slot="start" :icon="metaIcon" size="large" class="ion-margin-start" />
-        <ion-title>{{ metaName }}</ion-title>
+        <IonIcon v-if="metaIcon" slot="start" :icon="metaIcon" size="large" class="ion-margin-start" />
+        <IonTitle>{{ metaName }}</IonTitle>
         <slot name="header-right" />
-      </ion-toolbar>
-    </ion-header>
+      </IonToolbar>
+    </IonHeader>
 
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
+      <IonHeader collapse="condense">
+        <IonToolbar>
           <slot name="header-buttons" />
-          <ion-title size="large">
+          <IonTitle size="large">
             {{ metaName }}
-          </ion-title>
-        </ion-toolbar>
-      </ion-header>
+          </IonTitle>
+        </IonToolbar>
+      </IonHeader>
 
       <div id="main-content-box" class="ion-margin">
         <ion-row v-if="props.showDescription" class="ion-margin">
           <ion-col style="background-color: #aa86ff; box-shadow: 5px 5px 0px 0px rgba(110, 68, 255, 0.4); border-radius: 3px;">
-            <ion-note class="ion-padding" style="color: #ffffff; display: flex; align-items: center; justify-content: center;">
+            <IonNote class="ion-padding" style="color: #ffffff; display: flex; align-items: center; justify-content: center;">
               <slot name="description" />
-            </ion-note>
+            </IonNote>
           </ion-col>
         </ion-row>
 
@@ -78,11 +78,11 @@ watch(
       </div>
     </ion-content>
 
-    <ion-footer v-if="props.showFooter" :translucent="true">
-      <ion-toolbar>
+    <IonFooter v-if="props.showFooter" :translucent="true">
+      <IonToolbar>
         <slot name="footer" />
-      </ion-toolbar>
-    </ion-footer>
+      </IonToolbar>
+    </IonFooter>
   </ion-page>
 </template>
 

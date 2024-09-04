@@ -44,53 +44,53 @@ function addQualification() {
 
 <template>
   <div>
-    <ion-label class="ion-text-wrap">
+    <IonLabel class="ion-text-wrap">
       <h2>Qualificações</h2>
-    </ion-label>
+    </IonLabel>
 
-    <ion-list v-if="qualifications.length > 0">
-      <ion-accordion-group expand="inset">
-        <ion-accordion v-for="(qualification, index) in qualifications" :key="index">
-          <ion-item slot="header" color="light">
-            <ion-label>{{ qualification.course || 'Nova qualificação' }}</ion-label>
-          </ion-item>
-          <ion-list slot="content">
-            <ion-item>
-              <ion-label position="stacked">
+    <IonList v-if="qualifications.length > 0">
+      <IonAccordionGroup expand="inset">
+        <IonAccordion v-for="(qualification, index) in qualifications" :key="index">
+          <IonItem slot="header" color="light">
+            <IonLabel>{{ qualification.course || 'Nova qualificação' }}</IonLabel>
+          </IonItem>
+          <IonList slot="content">
+            <IonItem>
+              <IonLabel position="stacked">
                 Qualificação
-              </ion-label>
-              <ion-input v-model="qualifications[index].course" />
-            </ion-item>
-            <ion-item>
-              <ion-label position="stacked">
+              </IonLabel>
+              <IonInput v-model="qualifications[index].course" />
+            </IonItem>
+            <IonItem>
+              <IonLabel position="stacked">
                 Instituição
-              </ion-label>
-              <ion-input v-model="qualifications[index].institution" />
-            </ion-item>
-            <ion-item>
+              </IonLabel>
+              <IonInput v-model="qualifications[index].institution" />
+            </IonItem>
+            <IonItem>
               <ion-grid>
                 <ion-row>
                   <ion-col>
-                    <ion-input :key="`start-${index}`" v-model="qualifications[index].start" name="start" label="Início" type="date" />
+                    <IonInput :key="`start-${index}`" v-model="qualifications[index].start" name="start" label="Início" type="date" />
                   </ion-col>
                   <ion-col>
-                    <ion-input :key="`end-${index}`" v-model="qualifications[index].end" name="end" label="Fim" type="date" />
+                    <IonInput :key="`end-${index}`" v-model="qualifications[index].end" name="end" label="Fim" type="date" />
                   </ion-col>
                 </ion-row>
               </ion-grid>
-            </ion-item>
-          </ion-list>
-        </ion-accordion>
-      </ion-accordion-group>
-    </ion-list>
+            </IonItem>
+          </IonList>
+        </IonAccordion>
+      </IonAccordionGroup>
+    </IonList>
 
     <p v-else class="ion-text-center">
       As qualificações do professor não existem ainda, insira agora mesmo.
     </p>
 
     <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="addQualification">
-      <ion-icon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
-      <ion-icon slot="start" :icon="add" class="ion-hide-sm-down" />
+      <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
+      <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
       <span class="ion-hide-sm-down">Qualificação</span>
     </ion-button>
   </div>
