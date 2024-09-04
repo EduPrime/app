@@ -1,22 +1,28 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { IonBackButton, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonGrid, IonItem, IonLabel, IonRow, IonSelect, IonSelectOption } from '@ionic/vue'
 
 import SchoolService from '../services/SchoolService'
 import AcademicTemplateService from '../services/AcademicTemplateService'
+import AcademicYearService from '../services/AcademicYearService'
 import type { Tables } from '@/types/database.types'
 
-const schools = ref<Tables<'school'>[] | null>()
+// Serviços
 const schoolService = new SchoolService()
 const academicTemplateService = new AcademicTemplateService()
-const selectedSchool = ref(null)
+const academicYearService = new AcademicYearService()
+
+// Refs para escolas e templates
+const schools = ref<Tables<'school'>[] | null>(null)
+const selectedSchool = ref<Tables<'school'> | null>(null)
 const templates = ref<Tables<'academic_year_template'>[] | null>(null)
-const selectedTemplate = ref(null)
+const selectedTemplate = ref<string | null>(null)
 const templateDetails = ref<Tables<'academic_year_template'> | null>(null)
 
+// Carregar detalhes do template selecionado
 async function loadTemplateDetails() {
   if (selectedTemplate.value) {
-    const foundTemplate: any = templates.value?.find(template => template.id === selectedTemplate.value) || null
+    const foundTemplate: any = selectedTemplate.value ? templates.value?.find(template => template.id === selectedTemplate.value) || null : null
     templateDetails.value = foundTemplate || null
   }
   else {
@@ -24,19 +30,37 @@ async function loadTemplateDetails() {
   }
 }
 
+// Carregar lista de escolas
 async function loadSchools() {
   schools.value = await schoolService.getAll()
 }
 
+// Carregar lista de templates
 async function loadTemplates() {
   templates.value = await academicTemplateService.getAll()
 }
 
+// Confirmar a aplicação do template
 function confirmTemplate() {
   if (selectedSchool.value && selectedTemplate.value) {
-    console.log(`Template ${templateDetails.value?.name} aplicado para a escola ${selectedSchool.value}`)
+    console.log(`Template ${templateDetails.value?.name} aplicado para a escola ${selectedSchool.value.name}`)
   }
 }
+
+watch(selectedSchool, async (newValue) => {
+  if (newValue) {
+    const academicYear = await academicYearService.getBySchoolId(newValue.id)
+    if (academicYear && academicYear.length > 0) {
+      // -1 pega o último array
+      selectedTemplate.value = academicYear[academicYear.length - 1].template_id
+      await loadTemplateDetails()
+    }
+    else {
+      selectedTemplate.value = null
+      templateDetails.value = null
+    }
+  }
+})
 
 onMounted(() => {
   loadSchools()
@@ -47,8 +71,8 @@ onMounted(() => {
 <template>
   <content-layout :show-footer="true" :show-description="true">
     <template #header-buttons>
-      <ion-buttons slot="start">
-        <ion-back-button default-href="/" />
+      <ion-buttons slot:start>
+        <IonBackButton default-href="/" />
       </ion-buttons>
     </template>
     <template #description>
@@ -59,31 +83,31 @@ onMounted(() => {
     </h3>
 
     <!-- Seleção de Escola -->
-    <ion-item>
-      <ion-label>Escolha a Escola</ion-label>
-      <ion-select id="escolas" v-model="selectedSchool" placeholder="Selecione uma escola">
-        <ion-select-option v-for="school in schools" :key="school.id" :value="school.id">
+    <IonItem>
+      <IonLabel>Escolha a Escola</IonLabel>
+      <IonSelect id="escolas" v-model="selectedSchool" placeholder="Selecione uma escola">
+        <IonSelectOption v-for="school in schools" :key="school.id" :value="school">
           {{ school.name }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
+        </IonSelectOption>
+      </IonSelect>
+    </IonItem>
 
     <!-- Seleção de Template -->
-    <ion-item>
-      <ion-label>Modelo de Ano Letivo</ion-label>
-      <ion-select id="templates" v-model="selectedTemplate" placeholder="Selecione um template" :disabled="!selectedSchool" @ion-change="loadTemplateDetails">
-        <ion-select-option v-for="template in templates" :key="template.id" :value="template.id">
+    <IonItem>
+      <IonLabel>Modelo de Ano Letivo</IonLabel>
+      <IonSelect id="templates" v-model="selectedTemplate" placeholder="Selecione um template" :disabled="!selectedSchool" @ion-change="loadTemplateDetails">
+        <IonSelectOption v-for="template in templates" :key="template.id" :value="template.id">
           {{ template.name }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
+        </IonSelectOption>
+      </IonSelect>
+    </IonItem>
 
     <!-- Detalhes do Template Selecionado -->
-    <ion-card v-if="templateDetails">
-      <ion-card-header>
-        <ion-card-title>Template Selecionado: {{ templateDetails.name }}</ion-card-title>
-      </ion-card-header>
-      <ion-card-content>
+    <IonCard v-if="templateDetails">
+      <IonCardHeader>
+        <IonCardTitle>Template Selecionado: {{ templateDetails.name }}</IonCardTitle>
+      </IonCardHeader>
+      <IonCardContent>
         <p>Ano de Referência: {{ templateDetails.ref_year }}</p>
         <p>Etapas:</p>
         <ul>
@@ -91,29 +115,29 @@ onMounted(() => {
             Etapa {{ stage.stageNumber }}: {{ stage.startDate }} - {{ stage.endDate }} ({{ stage.teachingDays }} dias)
           </li>
         </ul>
-      </ion-card-content>
-    </ion-card>
+      </IonCardContent>
+    </IonCard>
 
     <!-- Botão de Confirmação -->
-    <ion-button expand="full" :disabled="!selectedTemplate" @click="confirmTemplate">
+    <IonButton expand="full" :disabled="!selectedTemplate" @click="confirmTemplate">
       Usar este Template
-    </ion-button>
+    </IonButton>
 
     <template #footer>
-      <ion-grid>
-        <ion-row class="ion-justify-content-between">
-          <ion-col>
-            <ion-button expand="block" color="danger">
+      <IonGrid>
+        <IonRow class="ion-justify-content-between">
+          <IonCol>
+            <IonButton expand="block" color="danger">
               Cancelar
-            </ion-button>
-          </ion-col>
-          <ion-col>
-            <ion-button expand="block" color="primary">
+            </IonButton>
+          </IonCol>
+          <IonCol>
+            <IonButton expand="block" color="primary">
               Salvar
-            </ion-button>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+            </IonButton>
+          </IonCol>
+        </IonRow>
+      </IonGrid>
     </template>
   </content-layout>
 </template>

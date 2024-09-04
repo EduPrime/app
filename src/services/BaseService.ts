@@ -23,12 +23,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
    */
   async getById(id: string): Promise<Tables<TableName> | null> {
     try {
-      const { data, error } = await this.client
-        .from(this.table)
-        .select('*')
-        .eq('id', id)
-        .is('deleted_at', null)
-        .single()
+      const { data, error } = await this.client.from(this.table).select('*').eq('id', id).is('deleted_at', null).single()
 
       if (error)
         throw error
@@ -55,10 +50,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
     limit?: number,
   ): Promise<Tables<TableName>[] | null> {
     try {
-      let query = this.client
-        .from(this.table)
-        .select('*')
-        .is('deleted_at', null)
+      let query = this.client.from(this.table).select('*').is('deleted_at', null)
 
       if (orderBy) {
         query = query.order(orderBy as string, { ascending })
@@ -81,6 +73,27 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
   }
 
   /**
+   * Fetch records by school_id, ignoring soft-deleted records
+   * @param schoolId - The school_id to filter records by
+   * @returns An array of records that match the school_id or null if an error occurs
+   */
+  async getBySchoolId(schoolId: string): Promise<Tables<TableName>[] | null> {
+    try {
+      const { data, error } = await this.client.from(this.table).select('*').eq('school_id', schoolId).is('deleted_at', null)
+
+      if (error) {
+        throw error
+      }
+
+      return data as Tables<TableName>[] | null
+    }
+    catch (error) {
+      console.error(`Erro ao buscar registros por school_id na tabela ${this.table}:`, error)
+      throw new Error(`Failed to fetch records by school_id from ${this.table}`)
+    }
+  }
+
+  /**
    * Create a new record
    * @param record - The record object to create
    * @returns The created record object or throws an error if the operation fails
@@ -89,11 +102,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
     record: Database['public']['Tables'][TableName]['Insert'],
   ): Promise<Database['public']['Tables'][TableName]['Row'] | null> {
     try {
-      const { data, error } = await this.client
-        .from(this.table as string & keyof Database['public']['Tables'])
-        .insert(record)
-        .select()
-        .single()
+      const { data, error } = await this.client.from(this.table as string & keyof Database['public']['Tables']).insert(record).select().single()
 
       if (error)
         throw error
@@ -114,13 +123,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
    */
   async update(id: string, updates: Database['public']['Tables'][TableName]['Update']): Promise<Database['public']['Tables'][TableName]['Row'] | null> {
     try {
-      const { data, error } = await this.client
-        .from(this.table as string & keyof Database['public']['Tables'])
-        .update(updates)
-        .eq('id', id)
-        .is('deleted_at', null)
-        .select()
-        .single()
+      const { data, error } = await this.client.from(this.table as string & keyof Database['public']['Tables']).update(updates).eq('id', id).is('deleted_at', null).select().single()
 
       if (error)
         throw error
@@ -140,12 +143,8 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
    */
   async softDelete(id: string): Promise<Database['public']['Tables'][TableName]['Row'] | null> {
     try {
-      const { data, error } = await this.client
-        .from(this.table as string & keyof Database['public']['Tables'])
-        .update({ deleted_at: new Date().toISOString() })
-        .eq('id', id)
-        .select()
-        .single()
+      const { data, error } = await this.client.from(this.table as string & keyof Database['public']['Tables']).update({ deleted_at: new Date()
+        .toISOString() }).eq('id', id).select().single()
 
       if (error)
         throw error
@@ -164,10 +163,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
    */
   async countEntries(): Promise<number> {
     try {
-      const { count, error } = await this.client
-        .from(this.table)
-        .select('*', { count: 'exact', head: true })
-        .is('deleted_at', null)
+      const { count, error } = await this.client.from(this.table).select('*', { count: 'exact', head: true }).is('deleted_at', null)
 
       if (error) {
         throw error

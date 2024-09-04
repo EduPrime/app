@@ -21,7 +21,7 @@ function runCommand(command) {
         reject(error)
       }
       else {
-        console.log(stdout)
+        console.info(stdout)
         resolve()
       }
     })

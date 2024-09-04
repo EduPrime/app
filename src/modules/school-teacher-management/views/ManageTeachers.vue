@@ -77,8 +77,8 @@ watch(
 </script>
 
 <template>
-  <content-layout>
-    <teacher-cards
+  <ContentLayout>
+    <TeacherCards
       :school-count="schoolCount" :series-count="seriesCount" :student-count="studentCount"
       :teacher-count="teacherCount"
     />
@@ -91,14 +91,18 @@ watch(
       </ion-col>
       <ion-col size="2" class="ion-text-end">
         <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
-          <ion-icon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
-          <ion-icon slot="start" :icon="add" class="ion-hide-sm-down" />
+          <template #icon-only>
+            <ion-icon :icon="add" class="ion-hide-sm-up" />
+          </template>
+          <template #start>
+            <ion-icon :icon="add" class="ion-hide-sm-down" />
+          </template>
           <span class="ion-hide-sm-down">Novo</span>
         </ion-button>
       </ion-col>
     </ion-row>
-    <teacher-list :teachers="filteredTeacher" @update:teachers="loadTeachers" />
-  </content-layout>
+    <TeacherList :teachers="filteredTeacher" @update:teachers="loadTeachers" />
+  </ContentLayout>
 </template>
 
 <style scoped>

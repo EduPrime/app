@@ -94,7 +94,7 @@ const alertButtons = [
 </script>
 
 <template>
-  <ion-alert
+  <IonAlert
     :is-open="isAlertOpen"
     header="Confirmar Exclusão"
     message="Tem certeza de que deseja excluir este item?"
@@ -108,14 +108,20 @@ const alertButtons = [
           <h2>{{ teacher.name }}</h2>
           <p>{{ teacher.address }}</p>
         </ion-label>
-        <ion-buttons slot="end">
-          <ion-button @click.stop="editTeacher(teacher)">
-            <ion-icon id="present-alert" slot="icon-only" :icon="pencil" />
-          </ion-button>
-          <ion-button color="danger" @click.stop="openDeleteAlert(teacher)">
-            <ion-icon slot="icon-only" :icon="trash" />
-          </ion-button>
-        </ion-buttons>
+        <template #end>
+          <ion-buttons>
+            <ion-button @click.stop="editTeacher(teacher)">
+              <template #icon-only>
+                <ion-icon id="present-alert" :icon="pencil" />
+              </template>
+            </ion-button>
+            <ion-button color="danger" @click.stop="openDeleteAlert(teacher)">
+              <template #icon-only>
+                <ion-icon :icon="trash" />
+              </template>
+            </ion-button>
+          </ion-buttons>
+        </template>
       </ion-item>
       <ion-item-options side="end">
         <ion-item-option @click="editTeacher(teacher)">

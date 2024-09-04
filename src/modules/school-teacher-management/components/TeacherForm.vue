@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { IonLabel, IonSegment, IonSegmentButton, IonSelect, IonSelectOption } from '@ionic/vue'
 import { useForm } from 'vee-validate'
@@ -46,9 +46,12 @@ const formSchema = object({
     .required('Telefone é obrigatório')
     .matches(/^\(\d{2}\) \d{5}-\d{4}$/, 'Telefone inválido')
     .test('valid-ddd', 'DDD inválido', value => isValidDDD(value || '')),
-  address: string().optional(),
-  qualifications: string().optional(),
-  school_id: string().required('Selecionar escola é obrigatório'),
+  address: string()
+    .optional(),
+  qualifications: string()
+    .optional(),
+  school_id: string()
+    .required('Selecionar escola é obrigatório'),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<TeacherPartial>({
@@ -178,42 +181,42 @@ onMounted(async () => {
 </script>
 
 <template>
-  <ion-segment v-model="selectedSegment">
-    <ion-segment-button value="general-info">
-      <ion-label style="font-size: calc(1rem - 2px);">
+  <IonSegment v-model="selectedSegment">
+    <IonSegmentButton value="general-info">
+      <IonLabel style="font-size: calc(1rem - 2px);">
         Informações Gerais
-      </ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="additional-info">
-      <ion-label style="font-size: calc(1rem - 2px);">
+      </IonLabel>
+    </IonSegmentButton>
+    <IonSegmentButton value="additional-info">
+      <IonLabel style="font-size: calc(1rem - 2px);">
         Informações Adicionais
-      </ion-label>
-    </ion-segment-button>
-  </ion-segment>
+      </IonLabel>
+    </IonSegmentButton>
+  </IonSegment>
   <div v-show="selectedSegment === 'general-info'">
     <ion-list id="schoolList">
       <ion-item>
-        <ion-select
+        <IonSelect
           v-model="schoolId"
           justify="space-between"
           label="Escola do Professor"
           placeholder="Selecione a escola"
           @ion-change="handleSchoolChange"
         >
-          <ion-select-option v-for="school in schoolList" :key="school.id" :value="school.id">
+          <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
             {{ school.name }}
-          </ion-select-option>
-        </ion-select>
+          </IonSelectOption>
+        </IonSelect>
       </ion-item>
     </ion-list>
-    <ep-input v-model="values.name" name="name" label="Nome" placeholder="Digite o nome do professor" />
-    <ep-input v-model="values.birthdate" name="birthdate" label="Data de Nascimento" type="date" placeholder="YYYY-MM-DD" />
-    <ep-input v-model="values.email" name="email" label="Email" placeholder="Digite o email" />
-    <ep-input v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone" placeholder="(99) 99999-9999" />
-    <ep-textarea v-model="values.address" name="address" label="Endereço" placeholder="Digite o endereço" />
+    <EpInput v-model="values.name" name="name" label="Nome" placeholder="Digite o nome do professor" />
+    <EpInput v-model="values.birthdate" name="birthdate" label="Data de Nascimento" type="date" placeholder="YYYY-MM-DD" />
+    <EpInput v-model="values.email" name="email" label="Email" placeholder="Digite o email" />
+    <EpInput v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone" placeholder="(99) 99999-9999" />
+    <EpTextarea v-model="values.address" name="address" label="Endereço" placeholder="Digite o endereço" />
   </div>
   <!-- another tab -->
   <div v-show="selectedSegment === 'additional-info'">
-    <qualification-form v-model="qualifications" @update:qualifications="handleEntriesUpdate" />
+    <QualificationForm v-model="qualifications" @update:qualifications="handleEntriesUpdate" />
   </div>
 </template>

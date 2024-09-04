@@ -20,26 +20,28 @@ function editBtn() {
 </script>
 
 <template>
-  <ion-card v-if="institution && !isEditing">
-    <ion-card-header class="card-header">
+  <IonCard v-if="institution && !isEditing">
+    <IonCardHeader class="card-header">
       <div class="card-title-container">
-        <ion-card-title>{{ institution?.name }}</ion-card-title>
-        <ion-buttons>
-          <ion-button fill="clear" @click="editBtn">
-            <ion-icon slot="icon-only" :icon="pencil" />
-          </ion-button>
-        </ion-buttons>
+        <IonCardTitle>{{ institution?.name }}</IonCardTitle>
+        <IonButtons>
+          <IonButton fill="clear" @click="editBtn">
+            <template #icon-only>
+              <IonIcon :icon="pencil" />
+            </template>
+          </IonButton>
+        </IonButtons>
       </div>
-    </ion-card-header>
-    <ion-card-content>
+    </IonCardHeader>
+    <IonCardContent>
       <p><strong>Telefone:</strong> {{ institution.phone }}</p>
       <p><strong>E-mail:</strong> <a :href="`mailto:${institution?.email}`">{{ institution.email }}</a></p>
       <p><strong>Endereço:</strong> {{ institution.address }}</p>
       <p><strong>Cidade:</strong> {{ institution.city }}</p>
       <p><strong>UF:</strong> {{ institution.state }}</p>
       <p><strong>CEP:</strong> {{ institution.postalcode }}</p>
-    </ion-card-content>
-  </ion-card>
+    </IonCardContent>
+  </IonCard>
 </template>
 
   <style scoped>

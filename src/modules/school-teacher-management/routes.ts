@@ -1,11 +1,10 @@
-import { calendar, chatbubbles, create, document, list, notifications, person, school, star } from 'ionicons/icons'
+import { calendar, chatbubbles, create, document, list, person, school, star } from 'ionicons/icons'
 import ManageTeachers from './views/ManageTeachers.vue'
 import RegisterTeacher from './views/RegisterTeacher.vue'
 import EditTeacher from './views/EditTeacher.vue'
 import TeacherSchedule from './views/RegisterTeacher.vue'
 import TeacherDocs from './views/RegisterTeacher.vue'
 import TeacherFeedback from './views/TeacherFeedback.vue'
-import TeacherNotifications from './views/TeacherNotifications.vue'
 import TeacherReports from './views/RegisterTeacher.vue'
 
 const routes = [
