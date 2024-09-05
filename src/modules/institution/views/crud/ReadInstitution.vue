@@ -26,9 +26,7 @@ function editBtn() {
         <IonCardTitle>{{ institution?.name }}</IonCardTitle>
         <IonButtons>
           <IonButton fill="clear" @click="editBtn">
-            <template #icon-only>
-              <IonIcon :icon="pencil" />
-            </template>
+              <IonIcon slot="icon-only" :icon="pencil" />
           </IonButton>
         </IonButtons>
       </div>

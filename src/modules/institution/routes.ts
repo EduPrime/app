@@ -33,6 +33,18 @@ const routes = [
     },
   },
   {
+    path: '/Institutions/schools/manage/:id',
+    name: 'ManageSchools',
+    component: DashboardSchools,
+    meta: {
+      moduleName: 'Institutions',
+      moduleIcon: school,
+      icon: school,
+      name: 'Atual Escolas',
+      order: 3,
+    },
+  },
+  {
     path: '/Institutions/schools',
     name: 'InstitutionListInstitutions',
     component: DashboardSchools,
@@ -41,7 +53,7 @@ const routes = [
       moduleIcon: school,
       icon: school,
       name: 'Escolas',
-      order: 3,
+      order: 4,
     },
   },
   {
@@ -53,7 +65,7 @@ const routes = [
       moduleIcon: school,
       icon: school,
       name: 'Cad Escola',
-      order: 4,
+      order: 5,
     },
   },
   {
@@ -65,7 +77,7 @@ const routes = [
       moduleIcon: layers,
       icon: layers,
       name: 'Ano Letivo',
-      order: 5,
+      order: 6,
     },
   },
   {
@@ -77,7 +89,7 @@ const routes = [
       moduleIcon: layers,
       icon: layers,
       name: 'Modelo ano letivo',
-      order: 6,
+      order: 7,
     },
   },
 ]

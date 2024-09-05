@@ -184,14 +184,10 @@ loadVisibleMonth()
       <template #end>
         <IonButtons>
           <IonButton @click="prevMonth">
-            <template #icon-only>
-              <IonIcon :icon="arrowBackOutline" />
-            </template>
+              <IonIcon slot="icon-only" :icon="arrowBackOutline" />
           </IonButton>
           <IonButton @click="nextMonth">
-            <template #icon-only>
-              <IonIcon :icon="arrowForwardOutline" />
-            </template>
+              <IonIcon slot="icon-only" :icon="arrowForwardOutline" />
           </IonButton>
         </IonButtons>
       </template>
