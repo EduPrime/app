@@ -23,12 +23,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
    */
   async getById(id: string): Promise<Tables<TableName> | null> {
     try {
-      const { data, error } = await this.client
-        .from(this.table)
-        .select('*')
-        .eq('id', id)
-        .is('deleted_at', null)
-        .single()
+      const { data, error } = await this.client.from(this.table).select('*').eq('id', id).is('deleted_at', null).single()
 
       if (error)
         throw error
@@ -55,10 +50,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
     limit?: number,
   ): Promise<Tables<TableName>[] | null> {
     try {
-      let query = this.client
-        .from(this.table)
-        .select('*')
-        .is('deleted_at', null)
+      let query = this.client.from(this.table).select('*').is('deleted_at', null)
 
       if (orderBy) {
         query = query.order(orderBy as string, { ascending })
@@ -69,7 +61,6 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
       }
 
       const { data, error } = await query
-
       if (error)
         throw error
 
@@ -82,6 +73,46 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
   }
 
   /**
+   * Fetch records by school_id, ignoring soft-deleted records
+   * @param schoolId - The school_id to filter records by
+   * @returns An array of records that match the school_id or null if an error occurs
+   */
+  async getBySchoolId(schoolId: string): Promise<Tables<TableName>[] | null> {
+    try {
+      const { data, error } = await this.client.from(this.table).select('*').eq('school_id', schoolId).is('deleted_at', null)
+
+      if (error) {
+        throw error
+      }
+
+      return data as Tables<TableName>[] | null
+    }
+    catch (error) {
+      console.error(`Erro ao buscar registros por school_id na tabela ${this.table}:`, error)
+      throw new Error(`Failed to fetch records by school_id from ${this.table}`)
+    }
+  }
+
+  /**
+   * Calls an RPC function in the database
+   * @param functionName - Name of the RPC function in the database
+   * @param params - Parameters to be passed to the function
+   * @returns The result of the function or null if there is an error
+   */
+  async callRpc(functionName: any, params: Record<string, any>): Promise<any | null> {
+    try {
+      const { data, error } = await this.client.rpc(functionName, params)
+      if (error)
+        throw error
+      return data
+    }
+    catch (error) {
+      console.error(`Erro ao chamar a função RPC ${functionName}:`, error)
+      throw new Error(`Failed to call RPC function ${functionName}`)
+    }
+  }
+
+  /**
    * Create a new record
    * @param record - The record object to create
    * @returns The created record object or throws an error if the operation fails
@@ -90,10 +121,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
     record: Database['public']['Tables'][TableName]['Insert'],
   ): Promise<Database['public']['Tables'][TableName]['Row'] | null> {
     try {
-      const { data, error } = await this.client
-        .from(this.table as string & keyof Database['public']['Tables'])
-        .insert(record)
-        .single()
+      const { data, error } = await this.client.from(this.table as string & keyof Database['public']['Tables']).insert(record).select().single()
 
       if (error)
         throw error
@@ -114,13 +142,7 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
    */
   async update(id: string, updates: Database['public']['Tables'][TableName]['Update']): Promise<Database['public']['Tables'][TableName]['Row'] | null> {
     try {
-      const { data, error } = await this.client
-        .from(this.table as string & keyof Database['public']['Tables'])
-        .update(updates)
-        .eq('id', id)
-        .is('deleted_at', null)
-        .select()
-        .single()
+      const { data, error } = await this.client.from(this.table as string & keyof Database['public']['Tables']).update(updates).eq('id', id).is('deleted_at', null).select().single()
 
       if (error)
         throw error
@@ -140,11 +162,8 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
    */
   async softDelete(id: string): Promise<Database['public']['Tables'][TableName]['Row'] | null> {
     try {
-      const { data, error } = await this.client
-        .from(this.table as string & keyof Database['public']['Tables'])
-        .update({ deleted_at: new Date().toISOString() })
-        .eq('id', id)
-        .single()
+      const { data, error } = await this.client.from(this.table as string & keyof Database['public']['Tables']).update({ deleted_at: new Date()
+        .toISOString() }).eq('id', id).select().single()
 
       if (error)
         throw error
@@ -154,6 +173,26 @@ export default class BaseService<TableName extends keyof Database['public']['Tab
     catch (error) {
       console.error(`Erro ao deletar registro na tabela ${this.table}:`, error)
       throw new Error(`Failed to delete record from ${this.table}`)
+    }
+  }
+
+  /**
+   * Count the number of records in the table, ignoring soft-deleted records.
+   * @returns The number of records in the table or 0 if an error occurs.
+   */
+  async countEntries(): Promise<number> {
+    try {
+      const { count, error } = await this.client.from(this.table).select('*', { count: 'exact', head: true }).is('deleted_at', null)
+
+      if (error) {
+        throw error
+      }
+
+      return count || 0 // Retorna 0 se count for null
+    }
+    catch (error) {
+      console.error(`Erro ao contar registros na tabela ${this.table}:`, error)
+      throw new Error(`Failed to count entries in ${this.table}`)
     }
   }
 }

@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router'
-import { calendar, home } from 'ionicons/icons'
+import { home } from 'ionicons/icons'
 import type { RouteRecordRaw } from 'vue-router'
 
 // Função para carregar dinamicamente todas as rotas dos módulos
