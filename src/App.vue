@@ -231,12 +231,11 @@ watch(route, (newRoute) => {
     <ion-split-pane content-id="main-content" :class="showTree ? '' : 'tree-hidden'">
       <ion-buttons class="tree-toggle-btn">
         <ion-button color="primary" @click="toggleTreeView">
-          <template #icon-only>
-            <ion-icon
-              size="small"
-              :icon="showTree ? chevronBackCircle : chevronForwardCircle"
-            />
-          </template>
+          <ion-icon
+            slot="icon-only"
+            size="small"
+            :icon="showTree ? chevronBackCircle : chevronForwardCircle"
+          />
         </ion-button>
       </ion-buttons>
       <ion-menu content-id="main-content" type="overlay">
