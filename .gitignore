@@ -9,7 +9,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # Ignore local environment files for editors
-.vscode/
 .idea/
 
 # Ignore build artifacts and dependencies
