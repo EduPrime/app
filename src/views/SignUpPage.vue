@@ -1,5 +1,6 @@
 <script>
 import { supabase } from '../supabaseClient'
+import { useUserStore } from '@/store/user.js'
 
 export default {
   data() {
@@ -36,6 +37,10 @@ export default {
       else {
         const { user, session } = data
         if (user && session) {
+          const userStore = useUserStore()
+          userStore.setUser(user)
+          sessionStorage.setItem('user', JSON.stringify(user))
+
           this.$router.replace(`/dashboard/${user.id}`)
         }
       }
