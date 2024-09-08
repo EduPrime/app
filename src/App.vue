@@ -14,12 +14,14 @@ import {
   folderOutline,
   handLeft,
   image,
+  logOutOutline,
   notificationsOutline,
   peopleOutline,
   person,
   personCircleOutline,
   videocam,
 } from 'ionicons/icons'
+import { supabase } from './supabaseClient'
 import NavItem from './components/NavItem.vue'
 
 const tabs = ref([
@@ -172,7 +174,7 @@ const route = useRoute()
 const dynamicTabs: any[] = []
 
 router.getRoutes().forEach((route) => {
-  if (route.meta && route.meta.moduleName && route.meta.moduleIcon) {
+  if (route.meta && route.meta.moduleName && route.meta.moduleIcon && route.meta.showInTab) {
     let moduleTab = dynamicTabs.find(tab => tab.name === route.meta.moduleName)
     if (!moduleTab) {
       moduleTab = {
@@ -217,6 +219,12 @@ dynamicTabs.forEach((tab) => {
 tabs.value.push(...dynamicTabs)
 tabs.value.sort((a, b) => a.order - b.order)
 
+const isPublicPage = ref(route.path === '/login' || route.path === '/signup')
+
+watch(route, (newRoute) => {
+  isPublicPage.value = newRoute.path === '/login' || newRoute.path === '/signup'
+})
+
 onMounted(() => {
   updateSelectedTab(route.path)
 })
@@ -224,11 +232,28 @@ onMounted(() => {
 watch(route, (newRoute) => {
   updateSelectedTab(newRoute.path)
 })
+
+async function logout() {
+  const { error } = await supabase.auth.signOut()
+  if (error) {
+    console.error('Erro ao deslogar:', error.message)
+  }
+  else {
+    sessionStorage.removeItem('user')
+
+    router.push('/login')
+  }
+}
 </script>
 
 <template>
   <ion-app>
-    <ion-split-pane content-id="main-content" :class="showTree ? '' : 'tree-hidden'">
+    <template v-if="isPublicPage">
+      <!-- Router outlet com uma key para forçar re-renderização -->
+      <ion-router-outlet :key="route.fullPath" />
+    </template>
+
+    <ion-split-pane v-if="!isPublicPage" content-id="main-content" :class="showTree ? '' : 'tree-hidden'">
       <ion-buttons class="tree-toggle-btn">
         <ion-button color="primary" @click="toggleTreeView">
           <template #icon-only>
@@ -259,6 +284,9 @@ watch(route, (newRoute) => {
             <div class="bottom-items">
               <ion-item lines="full" button class="vertical-tab-button" router-link="/notifications" :detail="false">
                 <ion-icon :icon="notificationsOutline" />
+              </ion-item>
+              <ion-item lines="full" button class="vertical-tab-button" :detail="false" @click="logout">
+                <ion-icon :icon="logOutOutline" />
               </ion-item>
               <ion-item lines="full" button class="vertical-tab-button" router-link="/profile" :detail="false">
                 <ion-icon :icon="personCircleOutline" />

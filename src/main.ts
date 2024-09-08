@@ -35,6 +35,7 @@ import {
   IonToolbar,
   IonicVue,
 } from '@ionic/vue'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 import router from './router'
 import ContentLayout from './components/theme/ContentLayout.vue'
@@ -60,9 +61,12 @@ import './theme/variables.css'
 // Dynamically import modules
 const modules = import.meta.glob('./modules/*/index.ts', { eager: true })
 
+const pinia = createPinia()
+
 const app = createApp(App)
   .use(IonicVue)
   .use(router)
+  .use(pinia)
 
 app.component('ion-app', IonApp)
 app.component('ion-content', IonContent)

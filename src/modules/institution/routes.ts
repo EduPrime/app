@@ -18,6 +18,7 @@ const routes = [
       icon: business,
       name: 'Instituição',
       order: 1,
+      showInTab: true,
     },
   },
   {
@@ -30,6 +31,7 @@ const routes = [
       icon: business,
       name: 'Cad Instituição',
       order: 2,
+      showInTab: true,
     },
   },
   {
@@ -42,6 +44,7 @@ const routes = [
       icon: school,
       name: 'Escolas',
       order: 3,
+      showInTab: true,
     },
   },
   {
@@ -54,6 +57,7 @@ const routes = [
       icon: school,
       name: 'Cad Escola',
       order: 4,
+      showInTab: true,
     },
   },
   {
@@ -66,6 +70,7 @@ const routes = [
       icon: layers,
       name: 'Ano Letivo',
       order: 5,
+      showInTab: true,
     },
   },
   {
@@ -78,6 +83,7 @@ const routes = [
       icon: layers,
       name: 'Modelo ano letivo',
       order: 6,
+      showInTab: true,
     },
   },
 ]
