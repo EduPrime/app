@@ -62,16 +62,16 @@ defineProps({})
 </script>
 
 <template>
-  <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-title>Cadastro de Turmas</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
+  <IonPage>
+    <IonHeader>
+      <IonToolbar>
+        <IonTitle>Cadastro de Turmas</IonTitle>
+      </IonToolbar>
+    </IonHeader>
+    <IonContent>
       <!-- Formulário de Cadastro de Turmas -->
-    </ion-content>
-  </ion-page>
+    </IonContent>
+  </IonPage>
 </template>
 
 <style scoped>

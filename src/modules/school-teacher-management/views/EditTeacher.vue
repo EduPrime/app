@@ -25,7 +25,7 @@ function handleSave() {
       Todos os campos são obrigatórios, a menos que indicado de outra forma.
     </template>
     <div id="teacher-form">
-      <teacher-form ref="teacherFormRef" @cancel="handleCancel" @save="handleSave" />
+      <TeacherForm ref="teacherFormRef" @cancel="handleCancel" @save="handleSave" />
     </div>
 
     <template #footer>

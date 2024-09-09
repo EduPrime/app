@@ -7,6 +7,31 @@ export type Json =
   | Json[]
 
 export interface Database {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       _teachertotimetable: {
@@ -38,6 +63,81 @@ export interface Database {
             referencedColumns: ['id']
           },
         ]
+      }
+      academic_year: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          metadata: Json | null
+          ref_year: number
+          school_id: string
+          template_id: string
+          updated_at: string | null
+          user_created: string | null
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          metadata?: Json | null
+          ref_year: number
+          school_id: string
+          template_id: string
+          updated_at?: string | null
+          user_created?: string | null
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          metadata?: Json | null
+          ref_year?: number
+          school_id?: string
+          template_id?: string
+          updated_at?: string | null
+          user_created?: string | null
+        }
+        Relationships: []
+      }
+      academic_year_template: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          ref_year: number
+          stage_count: number | null
+          stages: Json
+          updated_at: string | null
+          user_created: string | null
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          ref_year: number
+          stage_count?: number | null
+          stages: Json
+          updated_at?: string | null
+          user_created?: string | null
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          ref_year?: number
+          stage_count?: number | null
+          stages?: Json
+          updated_at?: string | null
+          user_created?: string | null
+        }
+        Relationships: []
       }
       attendance: {
         Row: {
@@ -275,6 +375,63 @@ export interface Database {
           },
         ]
       }
+      document: {
+        Row: {
+          compression_applied: boolean | null
+          created_at: string
+          deleted_at: string | null
+          file_hash: string | null
+          file_name: string
+          id: string
+          is_current_version: boolean | null
+          is_deleted: boolean | null
+          metadata: Json | null
+          mime_type: string
+          size: number
+          storage_path: string
+          updated_at: string | null
+          upload_date: string | null
+          user_created: string | null
+          version: number | null
+        }
+        Insert: {
+          compression_applied?: boolean | null
+          created_at?: string
+          deleted_at?: string | null
+          file_hash?: string | null
+          file_name: string
+          id?: string
+          is_current_version?: boolean | null
+          is_deleted?: boolean | null
+          metadata?: Json | null
+          mime_type: string
+          size: number
+          storage_path: string
+          updated_at?: string | null
+          upload_date?: string | null
+          user_created?: string | null
+          version?: number | null
+        }
+        Update: {
+          compression_applied?: boolean | null
+          created_at?: string
+          deleted_at?: string | null
+          file_hash?: string | null
+          file_name?: string
+          id?: string
+          is_current_version?: boolean | null
+          is_deleted?: boolean | null
+          metadata?: Json | null
+          mime_type?: string
+          size?: number
+          storage_path?: string
+          updated_at?: string | null
+          upload_date?: string | null
+          user_created?: string | null
+          version?: number | null
+        }
+        Relationships: []
+      }
       grade: {
         Row: {
           created_at: string
@@ -328,6 +485,30 @@ export interface Database {
             referencedColumns: ['id']
           },
         ]
+      }
+      holidays: {
+        Row: {
+          description: string | null
+          holiday_date: string
+          id: string
+          name: string
+          weekday: string | null
+        }
+        Insert: {
+          description?: string | null
+          holiday_date: string
+          id?: string
+          name: string
+          weekday?: string | null
+        }
+        Update: {
+          description?: string | null
+          holiday_date?: string
+          id?: string
+          name?: string
+          weekday?: string | null
+        }
+        Relationships: []
       }
       institution: {
         Row: {
@@ -392,7 +573,6 @@ export interface Database {
           blockdiaryentriesforclosedacademicyears: boolean | null
           builtarea: string | null
           city: string | null
-          condition: number | null
           created_at: string
           creationdecree: string | null
           deleted_at: string | null
@@ -431,7 +611,6 @@ export interface Database {
           blockdiaryentriesforclosedacademicyears?: boolean | null
           builtarea?: string | null
           city?: string | null
-          condition?: number | null
           created_at?: string
           creationdecree?: string | null
           deleted_at?: string | null
@@ -470,7 +649,6 @@ export interface Database {
           blockdiaryentriesforclosedacademicyears?: boolean | null
           builtarea?: string | null
           city?: string | null
-          condition?: number | null
           created_at?: string
           creationdecree?: string | null
           deleted_at?: string | null
@@ -638,8 +816,8 @@ export interface Database {
           metadata: Json | null
           name: string
           phone: string | null
-          school_id: string
           qualifications: Json | null
+          school_id: string
           status: Database['public']['Enums']['status'] | null
           updated_at: string | null
           user_created: string | null
@@ -654,8 +832,8 @@ export interface Database {
           metadata?: Json | null
           name: string
           phone?: string | null
-          school_id: string
           qualifications?: Json | null
+          school_id: string
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
@@ -670,8 +848,8 @@ export interface Database {
           metadata?: Json | null
           name?: string
           phone?: string | null
-          school_id?: string
           qualifications?: Json | null
+          school_id?: string
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
@@ -787,7 +965,13 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_business_days: {
+        Args: {
+          start_date: string
+          end_date: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       attendance_status: 'PRESENT' | 'ABSENT' | 'EXCUSED'

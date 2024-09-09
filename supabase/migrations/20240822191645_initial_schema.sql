@@ -266,11 +266,81 @@ CREATE TABLE teacher_to_timetable
     PRIMARY KEY (school_id, teacher_id, timetable_id)
 );
 
+
 CREATE TABLE role
 (
     id        UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     school_id UUID         NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     name      varchar(100) NOT NULL
+);
+  CREATE TABLE holidays (
+    id UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+    name VARCHAR(100) NOT NULL,
+    holiday_date DATE NOT NULL,
+    description VARCHAR(100),
+    weekday VARCHAR(10) -- Coluna para armazenar o dia da semana
+);
+CREATE OR REPLACE FUNCTION set_weekday()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.weekday := TO_CHAR(NEW.holiday_date, 'Day');
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_set_weekday
+BEFORE INSERT OR UPDATE ON holidays
+FOR EACH ROW
+EXECUTE FUNCTION set_weekday();
+
+
+CREATE TABLE document (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    file_name VARCHAR(255) NOT NULL,
+    mime_type VARCHAR(255) NOT NULL,
+    size BIGINT NOT NULL,
+    is_current_version BOOLEAN DEFAULT TRUE,
+    file_hash TEXT UNIQUE,
+    upload_date timestamptz DEFAULT CURRENT_TIMESTAMP,
+    storage_path TEXT NOT NULL,
+    version INTEGER DEFAULT 1,
+    compression_applied BOOLEAN DEFAULT FALSE,
+    metadata JSONB,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    created_at timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamptz,
+    deleted_at timestamptz,
+    user_created UUID DEFAULT auth.uid()
+);
+CREATE TABLE academic_year_template (
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+    ref_year INTEGER NOT NULL, -- Ano de referência
+    name VARCHAR(100) NOT NULL UNIQUE, -- Nome do modelo de ano letivo
+    stages jsonb NOT NULL, -- JSONB para armazenar etapas do ano letivo
+    stage_count INTEGER GENERATED ALWAYS AS (jsonb_array_length(stages)) STORED, -- Número de etapas, calculado automaticamente
+    metadata jsonb, -- Metadados adicionais, se necessário
+    created_at timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamptz,
+    deleted_at timestamptz,
+    user_created UUID DEFAULT auth.uid() -- Usuário que criou o registro
+);
+
+CREATE TABLE academic_year (
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+    school_id uuid NOT NULL, -- Chave estrangeira para a tabela school
+    template_id uuid NOT NULL, -- Chave estrangeira para a tabela academic_year_template
+    ref_year INTEGER NOT NULL, -- Ano de referência
+    metadata jsonb, -- Metadados adicionais, se necessário
+    created_at timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    updated_at timestamptz,
+    deleted_at timestamptz,
+    user_created UUID DEFAULT auth.uid() -- Usuário que criou o registro
+);
+
+-- Melhorar campos
+CREATE TABLE _teachertotimetable (
+    a uuid NOT NULL,
+    b uuid NOT NULL
 );
 
 CREATE TABLE role_permission
@@ -296,40 +366,89 @@ CREATE TABLE user_role
 ALTER TABLE ONLY classroom
     ADD CONSTRAINT classroom_seriesid_fkey FOREIGN KEY (series_id) REFERENCES series (id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
+ALTER TABLE ONLY course
+    ADD CONSTRAINT course_schoolid_fkey FOREIGN KEY (school_id) REFERENCES school(id) ON UPDATE CASCADE ON DELETE RESTRICT;
 
--- RLS
-ALTER TABLE "public"."attendance"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."class_session"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."classroom"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."course"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."discipline"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."grade"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."institution"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."school"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."series"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."student"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."teacher"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."timetable"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."timetable_school"
-    ENABLE ROW LEVEL SECURITY;
-ALTER TABLE "public"."teacher_to_timetable"
-    ENABLE ROW LEVEL SECURITY;
+ALTER TABLE ONLY discipline
+    ADD CONSTRAINT discipline_teacherid_fkey FOREIGN KEY (teacher_id) REFERENCES teacher(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE ONLY grade
+    ADD CONSTRAINT grade_disciplineid_fkey FOREIGN KEY (discipline_id) REFERENCES discipline(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE ONLY grade
+    ADD CONSTRAINT grade_studentid_fkey FOREIGN KEY (student_id) REFERENCES student(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE ONLY school
+    ADD CONSTRAINT school_institutionid_fkey FOREIGN KEY (institution_id) REFERENCES institution(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE ONLY series
+    ADD CONSTRAINT series_courseid_fkey FOREIGN KEY (course_id) REFERENCES course(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE ONLY series
+    ADD CONSTRAINT series_timetableid_fkey FOREIGN KEY (timetable_id) REFERENCES timetable(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+ALTER TABLE ONLY student
+    ADD CONSTRAINT student_classroomid_fkey FOREIGN KEY (classroom_id) REFERENCES classroom(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE ONLY teacher
+    ADD CONSTRAINT teacher_schoolid_fkey FOREIGN KEY (school_id) REFERENCES school(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE ONLY timetable_school
+    ADD CONSTRAINT timetableschool_schoolid_fkey FOREIGN KEY (school_id) REFERENCES school(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE ONLY timetable_school
+    ADD CONSTRAINT timetableschool_timetableid_fkey FOREIGN KEY (timetable_id) REFERENCES timetable(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE ONLY timetable
+    ADD CONSTRAINT timetable_classroomid_fkey FOREIGN KEY (classroom_id) REFERENCES classroom(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+ALTER TABLE ONLY timetable
+    ADD CONSTRAINT timetable_disciplineid_fkey FOREIGN KEY (discipline_id) REFERENCES discipline(id) ON UPDATE CASCADE ON DELETE SET NULL;
+
+ALTER TABLE ONLY _teachertotimetable
+    ADD CONSTRAINT _teachertotimetable_a_fkey FOREIGN KEY (a) REFERENCES teacher(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE ONLY _teachertotimetable
+    ADD CONSTRAINT _teachertotimetable_b_fkey FOREIGN KEY (b) REFERENCES timetable(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+-- Completed on 2024-08-22 14:37:41
+
+-- ALTER TABLE "public"."attendance" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."class_session" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."classroom" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."course" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."discipline" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."grade" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."institution" ENABLE ROW LEVEL SECURITY; -- Excluded as requested
+-- ALTER TABLE "public"."school" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."series" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."student" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."teacher" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."timetable" ENABLE ROW LEVEL SECURITY;
+-- ALTER TABLE "public"."timetable_school" ENABLE ROW LEVEL SECURITY;
+
+
 --
 -- FUNCTION
 --
--- Definindo a função para atualizar o campo updated_at
+ CREATE OR REPLACE FUNCTION calculate_business_days(start_date DATE, end_date DATE)
+RETURNS INTEGER AS $$
+DECLARE
+    business_days INTEGER;
+BEGIN
+    -- Calcular dias úteis excluindo fins de semana e feriados
+    SELECT COUNT(*)
+    INTO business_days
+    FROM generate_series(start_date, end_date, INTERVAL '1 day') AS day
+    WHERE EXTRACT(ISODOW FROM day) < 6  -- Excluir sábados (6) e domingos (7)
+      AND day::DATE NOT IN (SELECT holiday_date FROM holidays); -- Excluir feriados
+
+    RETURN business_days;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Função para atualizar a coluna updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
     RETURNS TRIGGER AS
 $$
@@ -339,27 +458,24 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
 -- Bloco PL/pgSQL para adicionar triggers a todas as tabelas com o campo updated_at
-DO
-$$
-    DECLARE
-        tbl RECORD;
-    BEGIN
-        FOR tbl IN
-            SELECT table_name
-            FROM information_schema.columns
-            WHERE column_name = 'updated_at'
-              AND table_schema = 'public'
-            LOOP
-                EXECUTE format('
+DO $$
+DECLARE
+    tbl RECORD;
+BEGIN
+    FOR tbl IN
+        SELECT table_name
+        FROM information_schema.columns
+        WHERE column_name = 'updated_at' AND table_schema = 'public'
+    LOOP
+        EXECUTE format('
             CREATE TRIGGER set_updated_at_%I
-            BEFORE UPDATE ON %I
+            AFTER UPDATE ON %I
             FOR EACH ROW
             WHEN (OLD.* IS DISTINCT FROM NEW.*)
             EXECUTE FUNCTION update_updated_at_column();',
-                               tbl.table_name, tbl.table_name
-                        );
-            END LOOP;
-    END;
+            tbl.table_name, tbl.table_name
+        );
+    END LOOP;
+END;
 $$;

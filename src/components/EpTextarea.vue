@@ -52,8 +52,8 @@ const maskOptions: Ref<any> | string | null = props.mask
 </script>
 
 <template>
-  <ion-item>
-    <ion-textarea
+  <IonItem>
+    <IonTextarea
       v-model="value"
       v-maskito="maskOptions"
       :class="{ 'ion-invalid': errors.length > 0, 'ion-touched': touched, 'ion-valid': errors.length === 0 }"
@@ -67,7 +67,7 @@ const maskOptions: Ref<any> | string | null = props.mask
       auto-grow
       @ion-blur="handleBlur"
     />
-  </ion-item>
+  </IonItem>
 </template>
 
 <style scoped lang="scss">

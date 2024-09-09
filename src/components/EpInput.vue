@@ -58,14 +58,14 @@ watch(value, () => {
 </script>
 
 <template>
-  <ion-item>
-    <ion-input
+  <IonItem>
+    <IonInput
       v-model="value" v-maskito="maskOptions"
       :class="{ 'ion-invalid': errors.length > 0, 'ion-touched': touched, 'ion-valid': errors.length === 0 }"
       :label="label" :placeholder="placeholder" :label-placement="labelPosition"
       :error-text="errors.length > 0 ? errors[0] : ''" :type="type || 'text'" @ion-blur="handleBlur"
     />
-  </ion-item>
+  </IonItem>
 </template>
 
 <style scoped lang="scss">

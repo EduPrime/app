@@ -3,32 +3,34 @@ import { IonBackButton, IonButtons, IonContent, IonHeader, IonMenuButton, IonPag
 </script>
 
 <template>
-  <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-menu-button color="primary" />
-          <ion-back-button default-href="/" />
-        </ion-buttons>
-        <ion-title>Notifications</ion-title>
-      </ion-toolbar>
-    </ion-header>
+  <IonPage>
+    <IonHeader :translucent="true">
+      <IonToolbar>
+        <template #start>
+          <IonButtons>
+            <IonMenuButton color="primary" />
+            <IonBackButton default-href="/" />
+          </IonButtons>
+        </template>
+        <IonTitle>Notifications</IonTitle>
+      </IonToolbar>
+    </IonHeader>
 
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">
+    <IonContent :fullscreen="true">
+      <IonHeader collapse="condense">
+        <IonToolbar>
+          <IonTitle size="large">
             Notifications
-          </ion-title>
-        </ion-toolbar>
-      </ion-header>
+          </IonTitle>
+        </IonToolbar>
+      </IonHeader>
 
       <div id="container">
         <strong class="capitalize">Notifications</strong>
         <p>Here to be added notifications list design</p>
       </div>
-    </ion-content>
-  </ion-page>
+    </IonContent>
+  </IonPage>
 </template>
 
 <style scoped>

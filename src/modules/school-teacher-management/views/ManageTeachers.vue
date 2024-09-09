@@ -77,8 +77,8 @@ watch(
 </script>
 
 <template>
-  <content-layout>
-    <teacher-cards
+  <ContentLayout>
+    <TeacherCards
       :school-count="schoolCount" :series-count="seriesCount" :student-count="studentCount"
       :teacher-count="teacherCount"
     />
@@ -97,8 +97,8 @@ watch(
         </ion-button>
       </ion-col>
     </ion-row>
-    <teacher-list :teachers="filteredTeacher" @update:teachers="loadTeachers" />
-  </content-layout>
+    <TeacherList :teachers="filteredTeacher" @update:teachers="loadTeachers" />
+  </ContentLayout>
 </template>
 
 <style scoped>
