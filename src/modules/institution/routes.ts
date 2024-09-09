@@ -6,6 +6,7 @@ import DashboardInstitution from './views/DashboardInstitution.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
 import AcademicYear from './views/AcademicYear.vue'
 import RegisterAcademicTemplate from './views/RegisterAcademicTemplate.vue'
+import EditSchools from './views/EditSchools.vue'
 
 const routes = [
   {
@@ -33,14 +34,14 @@ const routes = [
     },
   },
   {
-    path: '/Institutions/schools/manage/:id',
-    name: 'ManageSchools',
-    component: DashboardSchools,
+    path: '/Institutions/schools/edit/:id',
+    name: 'EditSchools',
+    component: EditSchools,
     meta: {
       moduleName: 'Institutions',
       moduleIcon: school,
       icon: school,
-      name: 'Atual Escolas',
+      name: 'Atualizar Escola',
       order: 3,
     },
   },

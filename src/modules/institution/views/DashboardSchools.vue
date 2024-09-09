@@ -82,10 +82,6 @@ onMounted(() => {
         </ion-button>
       </ion-col>
     </ion-row>
-    <ion-row v-for="school in filteredSchool" :key="schoolData">
-      <ion-col size="12">
-      </ion-col>
-    </ion-row> 
     <school-list :schools="filteredSchool" @update:schools="schoolData = $event" />
   </content-layout>
 </template>

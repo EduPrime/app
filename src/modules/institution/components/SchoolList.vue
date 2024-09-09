@@ -5,21 +5,7 @@ import { IonAlert } from '@ionic/vue'
 import { ref } from 'vue'
 import SchoolService from '../services/SchoolService'
 import showToast from '@/utils/toast-alert'
-
-interface School {
-  name: string
-  address: string
-  showDetails: boolean
-  series: Array<{
-    name: string
-    classes: Array<{
-      name: string
-      teacher: string
-      schedule: string
-      subjects: string[]
-    }>
-  }>
-}
+import type { Database, Tables } from '@/types/database.types'
 
 const props = defineProps<{
   schools: School[]
@@ -38,8 +24,7 @@ function toggleDetails(index: number) {
 }
 
 function editSchool(school: School) {
-  router.push({ name: 'EditSchool', params: { id: school.id.toString() } })
-  console.log('Editar', school)
+  router.push({ name: 'EditSchools', params: { id: school.school.id.toString() } })
 }
 
 const isAlertOpen = ref(false)
@@ -48,7 +33,6 @@ function openDeleteAlert(school: School) {
   schoolToDelete.value = school
   isAlertOpen.value = true
 }
-
 function handleAlertDismiss(ev: CustomEvent) {
   const role = ev.detail.role
   if (role === 'confirm' && schoolToDelete.value) {
@@ -61,11 +45,10 @@ function handleAlertDismiss(ev: CustomEvent) {
 async function deleteSchool(school: School) {
   const schoolService = new SchoolService()
 
-  if (school.id) {
-    console.log('Excluir', school)
-    const result = await schoolService.softDelete(school.id)
+  if (school.school.id) {
+    const result = await schoolService.softDelete(school.school.id)
     if (result) {
-      showToast(`${school.name} excluído com sucesso`)
+      showToast(`${school.school.name} excluído com sucesso`)
       emit('update:schools')
       isAlertOpen.value = false
       schoolToDelete.value = null
@@ -81,15 +64,16 @@ function handleCancel() {
   isAlertOpen.value = false
   schoolToDelete.value = null
 }
-
 const alertButtons = [
   {
     text: 'Cancelar',
     role: 'cancel',
+
   },
   {
     text: 'Excluir',
     role: 'confirm',
+
   },
 ]
 </script>
@@ -101,22 +85,22 @@ const alertButtons = [
     message="Tem certeza de que deseja excluir este item?"
     :buttons="alertButtons"
     @did-dismiss="handleAlertDismiss"
-    />
+  />
   <ion-list>
     <ion-item-sliding v-for="(school, index) in schools" :key="index">
       <ion-item button @click="toggleDetails(index)">
         <ion-label>
-          <h2>{{ school.name }}</h2>
-          <p>{{ school.address }}</p>
+          <h2>{{ school.school.name }}</h2>
+          <p>{{ school.school.address }}</p>
         </ion-label>
-          <ion-buttons>
-            <ion-button @click.stop="editSchool(school)">
-                <ion-icon slot="icon-only" :icon="pencil" />
-            </ion-button>
-            <ion-button color="danger" @click.stop="openDeleteAlert(school)">
-                <ion-icon slot="icon-only" :icon="trash" />
-            </ion-button>
-          </ion-buttons>
+        <ion-buttons slot="end">
+          <ion-button @click.stop="editSchool(school)">
+            <ion-icon id="present-alert" slot="icon-only" :icon="pencil" />
+          </ion-button>
+          <ion-button color="danger" @click.stop="openDeleteAlert(school)">
+            <ion-icon slot="icon-only" :icon="trash" />
+          </ion-button>
+        </ion-buttons>
       </ion-item>
       <ion-item-options side="end">
         <ion-item-option @click="editSchool(school)">
@@ -132,18 +116,6 @@ const alertButtons = [
             <ion-col size="12">
               <strong>{{ serie.name }}</strong>
             </ion-col>
-            <ion-col v-for="(classItem, cIndex) in serie.classes" :key="cIndex" size="12">
-              <ion-card>
-                <ion-card-header>
-                  <ion-card-title>{{ classItem.name }}</ion-card-title>
-                </ion-card-header>
-                <ion-card-content>
-                  <p><strong>Professor:</strong> {{ classItem.teacher }}</p>
-                  <p><strong>Horário:</strong> {{ classItem.schedule }}</p>
-                  <p><strong>Disciplinas:</strong> {{ classItem.subjects.join(', ') }}</p>
-                </ion-card-content>
-              </ion-card>
-            </ion-col>
           </ion-row>
         </ion-grid>
       </ion-item>
@@ -155,7 +127,5 @@ const alertButtons = [
 ion-item {
   --background: var(--ion-color-white);
   --border-radius: 8px;
-  /* margin: 8px 0; */
-  /* box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); */
 }
 </style>
