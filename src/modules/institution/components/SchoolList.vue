@@ -13,7 +13,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:schools'])
 const router = useRouter()
-
+const school = ref< Tables<'school'> | []>([]) 
 function toggleDetails(index: number) {
   const updatedSchools = [...props.schools]
   updatedSchools[index] = {
@@ -49,6 +49,11 @@ async function deleteSchool(school: School) {
     const result = await schoolService.softDelete(school.school.id)
     if (result) {
       showToast(`${school.school.name} excluído com sucesso`)
+      setTimeout(() => {
+            router.push('/Institutions/schools').then(() => {
+              location.reload()
+            })
+          }, 2000)
       emit('update:schools')
       isAlertOpen.value = false
       schoolToDelete.value = null
