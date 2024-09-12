@@ -312,6 +312,25 @@ CREATE TABLE document (
     deleted_at timestamptz,
     user_created UUID DEFAULT auth.uid()
 );
+
+-- Política para permitir uploads por usuários anônimos no bucket 'ged'
+CREATE POLICY "allow_anon_insert"
+ON storage.objects
+FOR INSERT
+TO anon
+WITH CHECK (
+  bucket_id = 'ged'
+);
+
+-- Política para permitir leitura por usuários anônimos no bucket 'ged'
+CREATE POLICY "public_read_policy"
+ON storage.objects
+FOR SELECT
+USING (
+  bucket_id = 'ged'
+  AND auth.role() = 'anon'
+);
+
 CREATE TABLE academic_year_template (
     id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
     ref_year INTEGER NOT NULL, -- Ano de referência
