@@ -23,30 +23,30 @@ function deleteFile(file: Tables<'document'>) {
 </script>
 
 <template>
-  <ion-list>
-    <ion-list-header color="light">
+  <IonList>
+    <IonListHeader color="light">
       Uploaded Files
-    </ion-list-header>
+    </IonListHeader>
     <ion-item-sliding v-for="(file, index) in files" :key="index">
-      <ion-item button @click="toggleDetails(index)">
+      <IonItem button @click="toggleDetails(index)">
         <ion-icon slot="start" :icon="documentAttach" />
-        <ion-label>
+        <IonLabel>
           <h2>{{ file.file_name }}</h2>
           <p>{{ file.mime_type }} | {{ file.size }} KB </p>
-        </ion-label>
+        </IonLabel>
         <ion-buttons slot="end">
           <ion-button color="danger" @click.stop="deleteFile(file)">
             <ion-icon slot="icon-only" :icon="trash" />
           </ion-button>
         </ion-buttons>
-      </ion-item>
+      </IonItem>
       <ion-item-options side="end">
         <ion-item-option color="danger" @click="deleteFile(file)">
           Excluir
         </ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
-  </ion-list>
+  </IonList>
 </template>
 
 <style scoped>

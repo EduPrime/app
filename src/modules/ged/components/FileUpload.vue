@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { IonChip, IonListHeader, IonThumbnail } from '@ionic/vue'
-import type { Meta, UppyFile } from '@uppy/core'
 import Uppy from '@uppy/core'
-import '@uppy/core/dist/style.css'
-import '@uppy/dashboard/dist/style.css'
 import Tus from '@uppy/tus'
 import { Dashboard } from '@uppy/vue'
 import { documentOutline } from 'ionicons/icons'
 import { defineEmits, defineProps, onMounted, ref } from 'vue'
+import type { Meta, UppyFile } from '@uppy/core'
+import '@uppy/core/dist/style.css'
+import '@uppy/dashboard/dist/style.css'
 
 const props = defineProps({
   bucketName: {
@@ -107,24 +107,24 @@ onMounted(() => {
 
 <template>
   <div>
-    <dashboard :uppy="uppy" inline="true" />
+    <Dashboard :uppy="uppy" inline="true" />
     <div v-if="fileItems?.length">
-      <ion-list-header color="primary">
+      <IonListHeader color="primary">
         New Uploaded Files
-      </ion-list-header>
+      </IonListHeader>
       <div v-for="(item, index) in fileItems" :key="index" class="file-item">
         <ion-item>
-          <ion-thumbnail v-if="item.type.startsWith('image/')" slot="start" class="file-preview">
+          <IonThumbnail v-if="item.type.startsWith('image/')" slot="start" class="file-preview">
             <img :src="item.preview" alt="Preview" class="file-preview-image">
-          </ion-thumbnail>
+          </IonThumbnail>
           <ion-icon v-if="!item.type.startsWith('image/')" slot="start" :icon="documentOutline" />
           <ion-label class="file-details">
             <p class="file-name">
               <span>{{ item.name }}</span>
             </p>
-            <ion-chip color="success">
+            <IonChip color="success">
               {{ (item.size / (1024 * 1024)).toFixed(2) }} MB
-            </ion-chip>
+            </IonChip>
           </ion-label>
         </ion-item>
       </div>

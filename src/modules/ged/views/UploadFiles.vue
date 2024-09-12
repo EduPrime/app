@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { IonToast } from '@ionic/vue'
 import { onMounted, ref } from 'vue'
+import type { Tables } from '@/types/database.types'
 import type { Ref } from 'vue'
 import FilesList from '../components/FilesList.vue'
 import FileUpload from '../components/FileUpload.vue'
 import GedService from '../services/GedService'
-import type { Tables } from '@/types/database.types'
 
 const gedService = new GedService()
 const bucketName = 'ged'
@@ -38,8 +38,8 @@ onMounted(async () => {
     <h3 class="ion-text-end">
       GED
     </h3>
-    <file-upload :bucket-name="bucketName" :max-file-size="500" @upload-success="handleUploadSuccess" />
-    <files-list :files="documentFiles" />
-    <ion-toast />
+    <FileUpload :bucket-name="bucketName" :max-file-size="500" @upload-success="handleUploadSuccess" />
+    <FilesList :files="documentFiles" />
+    <IonToast />
   </content-layout>
 </template>
