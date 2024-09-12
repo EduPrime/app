@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { IonItem, IonLabel, IonList, IonListHeader, IonThumbnail } from '@ionic/vue'
+import { IonItem, IonLabel, IonList, IonListHeader } from '@ionic/vue'
 import { documentAttach, trash } from 'ionicons/icons'
 import type { Tables } from '@/types/database.types'
 
 const props = defineProps<{
-  files: Tables<'document'> | []
+  files: Tables<'document'>[] | []
 }>()
 
 const emit = defineEmits(['update:files'])
@@ -30,12 +30,9 @@ function deleteFile(file: Tables<'document'>) {
     <ion-item-sliding v-for="(file, index) in files" :key="index">
       <ion-item button @click="toggleDetails(index)">
         <ion-icon slot="start" :icon="documentAttach" />
-        <!-- <ion-thumbnail v-if="file.storage_path" slot="start">
-          <ion-img :src="storageURL + file.storage_path" />
-        </ion-thumbnail> -->
         <ion-label>
           <h2>{{ file.file_name }}</h2>
-          <p>{{ file.mime_type }} | {{ file.size }} </p>
+          <p>{{ file.mime_type }} | {{ file.size }} KB </p>
         </ion-label>
         <ion-buttons slot="end">
           <ion-button color="danger" @click.stop="deleteFile(file)">

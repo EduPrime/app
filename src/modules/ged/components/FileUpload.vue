@@ -1,189 +1,133 @@
 <script setup lang="ts">
-import { IonButton, IonIcon, IonProgressBar, IonThumbnail } from '@ionic/vue'
-import { cloudUpload, cloudUploadOutline } from 'ionicons/icons'
-import { defineEmits, defineProps, ref } from 'vue'
-import { useDropzone } from 'vue3-dropzone'
-import DocumentService from '../services/GedService'
-import type { Tables } from '@/types/database.types'
+import { IonChip, IonListHeader, IonThumbnail } from '@ionic/vue'
+import type { Meta, UppyFile } from '@uppy/core'
+import Uppy from '@uppy/core'
+import '@uppy/core/dist/style.css'
+import '@uppy/dashboard/dist/style.css'
+import Tus from '@uppy/tus'
+import { Dashboard } from '@uppy/vue'
+import { documentOutline } from 'ionicons/icons'
+import { defineEmits, defineProps, onMounted, ref } from 'vue'
 
 const props = defineProps({
   bucketName: {
     type: String,
     required: true,
   },
+  maxFileSize: {
+    default: 500,
+    type: Number,
+    required: false,
+  },
+})
+const emit = defineEmits(['uploadSuccess', 'uploadError'])
+const fileItems = ref<any[]>([])
+const uppy = new Uppy({
+  restrictions: {
+    maxNumberOfFiles: 10,
+    allowedFileTypes: ['image/*', 'application/pdf'],
+    maxFileSize: props.maxFileSize * (1024 * 1024),
+  },
+  autoProceed: false,
+  debug: false,
+}).use(Tus, {
+  endpoint: `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/upload/resumable`,
+  headers: {
+    Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_KEY}`,
+  },
+  uploadDataDuringCreation: true,
+  chunkSize: 6 * 1024 * 1024,
+  allowedMetaFields: ['bucketName', 'objectName', 'contentType', 'cacheControl'],
+  onError: (error) => {
+    console.log(`Failed because: ${error}`)
+  },
 })
 
-const emit = defineEmits(['uploadSuccess', 'uploadError'])
-
-const gedService = new DocumentService()
-const { getRootProps, getInputProps, isDragActive, open } = useDropzone({ onDrop })
-const fileItems = ref<Tables<'document'> | []>([])
-
-async function uploadFile(item: any) {
-  try {
-    const path = `uploads/${item.file.name}` // Define o caminho para armazenar o arquivo no bucket
-    const { data, error } = await gedService.uploadFile(props.bucketName, path, item.file)
-
-    if (error) {
-      item.error = true
-      item.errorMessage = 'Upload failed. Please try again.'
+onMounted(() => {
+  uppy.on('file-added', (file) => {
+    const supabaseMetadata = {
+      bucketName: props.bucketName,
+      objectName: `uploads/${file.name}`,
+      contentType: file.type,
+    }
+    file.meta = {
+      ...file.meta,
+      ...supabaseMetadata,
+    }
+    console.log('file added', file)
+  })
+    .on('upload-progress', (file: any, progress) => {
+      const item = fileItems.value.find((item: any) => item.file.id === file.id)
+      if (item) {
+        item.progress = progress.bytesUploaded / (progress.bytesTotal ?? 1) * 100
+      }
+    })
+    .on('upload-error', (file: UppyFile<Meta, Record<string, never>> | undefined, error) => {
+      const item = file ? fileItems.value.find((item: any) => item.file.id === file.id) : null
+      if (item) {
+        item.error = true
+        item.errorMessage = 'Upload failed. Please try again.'
+      }
       console.error('File upload error:', error)
       emit('uploadError', error)
-    }
-    else {
-      item.errorMessage = ''
-      item.progress = 100
-      const newDocumentRecord = {
-        compression_applied: false,
-        created_at: new Date().toISOString(),
-        deleted_at: null,
-        file_hash: null,
-        file_name: item.file.name,
-        is_current_version: true,
-        is_deleted: false,
-        metadata: null,
-        mime_type: item.file.type,
-        size: item.file.size,
-        storage_path: data?.path || '',
-        updated_at: null,
-        upload_date: new Date().toISOString(),
-        version: 1,
+    })
+    .on('upload-success', async (file: UppyFile<Meta, Record<string, never>> | undefined, response) => {
+      if (file) {
+        const fileItem = {
+          file,
+          preview: URL.createObjectURL(file.data),
+          name: file.name,
+          size: file.size,
+          type: file.type,
+          progress: 100,
+          error: false,
+          errorMessage: '',
+        }
+        fileItems.value.push(fileItem)
+        const storage_path = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${props.bucketName}/uploads/${file.name}`
+        const newDocumentRecord = {
+          compression_applied: false,
+          file_hash: null,
+          file_name: file.name,
+          is_current_version: true,
+          is_deleted: false,
+          metadata: null,
+          mime_type: file.type,
+          size: file.size,
+          storage_path,
+          upload_date: new Date().toISOString(),
+          version: 1,
+        }
+        console.log('Upload Response: ', response)
+        emit('uploadSuccess', newDocumentRecord)
       }
-      gedService.create(newDocumentRecord) // Salva os detalhes do arquivo na base de dados
-      item.error = false
-      emit('uploadSuccess', newDocumentRecord)
-      return item
-    }
-  }
-  catch (error) {
-    item.error = true
-    item.errorMessage = 'Upload failed. Please try again.'
-    console.error('File upload error:', error)
-    emit('uploadError', error)
-  }
-}
-
-async function saveFiles(files: any) {
-  for (const file of files) {
-    const preview = URL.createObjectURL(file)
-    const fileItem = {
-      file,
-      preview,
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      progress: 0,
-      error: false,
-      errorMessage: '',
-    }
-    fileItems.value.push(fileItem)
-    uploadFile(fileItem)
-  }
-}
-
-function retryUpload(item: any) {
-  item.progress = 0
-  item.error = false
-  item.errorMessage = ''
-  uploadFile(item)
-}
-
-function onDrop(acceptedFiles: any, rejectReasons: any) {
-  saveFiles(acceptedFiles)
-  if (rejectReasons.length) {
-    console.log('Rejected files:', rejectReasons)
-  }
-}
+    })
+})
 </script>
 
 <template>
   <div>
-    <!-- Dropzone Area -->
-    <div class="file-upload" v-bind="getRootProps()">
-      <input v-bind="getInputProps()">
-      <p v-if="isDragActive">
-        <ion-icon :icon="cloudUploadOutline" />
-        <br>
-        Drop the files here ...
-      </p>
-      <p v-else>
-        <ion-icon :icon="cloudUpload" />
-        <br>
-        Drag and drop some files here, or click to select files
-      </p>
-    </div>
-    <ion-button expand="block" color="primary" @click="open">
-      Open File Dialog
-    </ion-button>
-    <!-- File List and Previews -->
-    <div v-if="fileItems.length" class="file-list">
+    <dashboard :uppy="uppy" inline="true" />
+    <div v-if="fileItems?.length">
+      <ion-list-header color="primary">
+        New Uploaded Files
+      </ion-list-header>
       <div v-for="(item, index) in fileItems" :key="index" class="file-item">
         <ion-item>
-          <ion-thumbnail class="file-preview">
-            <img v-if="item.type.startsWith('image/')" :src="item.preview" alt="Preview" class="file-preview-image">
+          <ion-thumbnail v-if="item.type.startsWith('image/')" slot="start" class="file-preview">
+            <img :src="item.preview" alt="Preview" class="file-preview-image">
           </ion-thumbnail>
+          <ion-icon v-if="!item.type.startsWith('image/')" slot="start" :icon="documentOutline" />
           <ion-label class="file-details">
-            <span class="file-name">{{ item.name }}</span>
-            <span class="file-size">{{ (item.size / 1024).toFixed(2) }} KB</span>
-            <ion-progress-bar v-if="!item.error" :value="item.progress / 100" />
-            <p v-if="item.error" class="error-message">
-              {{ item.errorMessage }}
+            <p class="file-name">
+              <span>{{ item.name }}</span>
             </p>
+            <ion-chip color="success">
+              {{ (item.size / (1024 * 1024)).toFixed(2) }} MB
+            </ion-chip>
           </ion-label>
-          <ion-button v-if="item.error" slot="end" color="danger" size="small" @click="retryUpload(item)">
-            Retry
-          </ion-button>
         </ion-item>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.file-upload {
-  padding: 20px;
-  border: 2px dashed #ccc;
-  text-align: center;
-  background: #f9f9f9;
-}
-
-.file-upload p {
-  margin: 20px 0;
-}
-
-.file-list {
-  margin-top: 20px;
-}
-
-.file-preview {
-  margin-right: 10px;
-}
-
-.file-preview-image {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 5px;
-}
-
-.file-name {
-  display: block;
-  font-weight: bold;
-}
-
-.file-size {
-  display: block;
-  color: #888;
-  margin-bottom: 5px;
-}
-
-.error-message {
-  color: red;
-  font-size: 14px;
-  margin-top: 5px;
-}
-
-ion-progress-bar {
-  border-radius: 45px;
-}
-</style>
