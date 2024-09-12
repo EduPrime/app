@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import { IonLabel, IonSegment, IonSegmentButton, IonSelect, IonSelectOption } from '@ionic/vue'
-import { useForm } from 'vee-validate'
-import * as yup from 'yup'
-import SchoolService from '../services/SchoolService'
-import InstitutionService from '../services/InstitutionService'
-import QualificationForm from './QualificationForm.vue'
-import { hundredYearsAgo } from '@/utils/hundred-years-ago'
-import { isValidDDD } from '@/utils/ddd-validator'
 import EpInput from '@/components/EpInput.vue'
 import EpTextarea from '@/components/EpTextarea.vue'
-import type { Tables } from '@/types/database.types'
+import { isValidDDD } from '@/utils/ddd-validator'
+import { hundredYearsAgo } from '@/utils/hundred-years-ago'
 import showToast from '@/utils/toast-alert'
 import { toastController } from '@ionic/core'
+import { IonLabel, IonSegment, IonSegmentButton, IonSelect, IonSelectOption } from '@ionic/vue'
+import { useForm } from 'vee-validate'
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import * as yup from 'yup'
+import type { Tables } from '@/types/database.types'
+import InstitutionService from '../../institution/services/InstitutionService'
+import SchoolService from '../../institution/services/SchoolService'
+import QualificationForm from './QualificationForm.vue'
 
 defineEmits<{
   (e: 'cancel'): void
@@ -27,7 +27,7 @@ defineExpose({
 const selectedSegment = ref('general-info')
 const router = useRouter()
 const route = useRouter()
-const schoolData = ref< Tables<'school'> | []>([]) 
+const schoolData = ref< Tables<'school'> | []>([])
 const schoolId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const schoolService = new SchoolService()
 const institutionService = new InstitutionService()
@@ -63,7 +63,7 @@ const formSchema = yup.object ({
   state: yup
     .string()
     .max(2)
-    .matches(/^[A-Za-z]{2}$/, 'O campo deve conter exatamente 2 letras')
+    .matches(/^[A-Z]{2}$/i, 'O campo deve conter exatamente 2 letras')
     .required('Estado é obrigatório'),
   postalcode: yup
     .string()
@@ -117,7 +117,7 @@ async function registerSchool() {
             })
           }, 2000)
         }
-      } 
+      }
       else {
         result = await schoolService.create(formData)
         if (result) {
@@ -130,10 +130,10 @@ async function registerSchool() {
         }
       }
     }
-      catch (error) {
-        console.error('Erro ao salvar escola:', error)
-        showToast('Erro ao cadastrar escola. Tente novamente.', 'top', 'danger')
-      }
+    catch (error) {
+      console.error('Erro ao salvar escola:', error)
+      showToast('Erro ao cadastrar escola. Tente novamente.', 'top', 'danger')
+    }
   }
 }
 
@@ -164,7 +164,7 @@ async function getSchoolData() {
 //* * Mask Inputs
 const managerMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/, /\d/])
 const stateMask = ref([/\w/, /\w/])
-const abbreviationMask = ref([/[\w\d]/, /[\w\d]/, /[\w\d]/, /[\w\d]/, /[\w\d]/, /[\w\d]/, /[\w\d]/, /[\w\d]/, /[\w\d]/, /[\w\d]/])
+const abbreviationMask = ref([/\w/, /\w/, /\w/, /\w/, /\w/, /\w/, /\w/, /\w/, /\w/, /\w/])
 const postalCodeMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/])
 const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/])
 const areaMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
@@ -175,38 +175,37 @@ onMounted(async () => {
     await getSchoolData()
   }
 })
-
 </script>
 
 <template>
-  <ion-segment v-model="selectedSegment">
-    <ion-segment-button value="general-info">
-      <ion-label style="font-size: calc(1rem - 2px);">
+  <IonSegment v-model="selectedSegment">
+    <IonSegmentButton value="general-info">
+      <IonLabel style="font-size: calc(1rem - 2px);">
         Informações Gerais
-      </ion-label>
-    </ion-segment-button>
-    <ion-segment-button value="location">
-      <ion-label style="font-size: calc(1rem - 2px);">
+      </IonLabel>
+    </IonSegmentButton>
+    <IonSegmentButton value="location">
+      <IonLabel style="font-size: calc(1rem - 2px);">
         Localização
-      </ion-label>
-    </ion-segment-button>
-  </ion-segment>
+      </IonLabel>
+    </IonSegmentButton>
+  </IonSegment>
 
   <div v-show="selectedSegment === 'general-info'">
-    <ep-input v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome da escola" />
-    <ep-input v-model="values.abbreviation" name="abbreviation" :mask="abbreviationMask" label="Abreviação*" placeholder="Digite a abreviação" />
-    <ep-input v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone*" placeholder="(99) 99999-9999" />
-    <ep-input v-model="values.email" name="email" label="Email" placeholder="educacao@email.com" />
-    <ep-input v-model="values.website" name="website" label="Site" placeholder="escolaeducacao.com.br" />
-    <ep-input v-model="values.social_network" name="social_network" label="Rede Social" placeholder="Digite o link da rede social" />
-    <ep-input v-model="values.logourl" name="logourl" label="URL do Logo*" placeholder="Digite a URL do logo" />
+    <EpInput v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome da escola" />
+    <EpInput v-model="values.abbreviation" name="abbreviation" :mask="abbreviationMask" label="Abreviação*" placeholder="Digite a abreviação" />
+    <EpInput v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone*" placeholder="(99) 99999-9999" />
+    <EpInput v-model="values.email" name="email" label="Email" placeholder="educacao@email.com" />
+    <EpInput v-model="values.website" name="website" label="Site" placeholder="escolaeducacao.com.br" />
+    <EpInput v-model="values.social_network" name="social_network" label="Rede Social" placeholder="Digite o link da rede social" />
+    <EpInput v-model="values.logourl" name="logourl" label="URL do Logo*" placeholder="Digite a URL do logo" />
   </div>
 
   <div v-show="selectedSegment === 'location'">
-    <ep-input v-model="values.address" name="address" label="Endereço*" placeholder="Digite o endereço" />
-    <ep-input v-model="values.city" name="city" label="Cidade*" placeholder="Digite a cidade" />
-    <ep-input v-model="values.school_zone" name="school_zone" label="Zona Escolar*" placeholder="Digite a zona escolar" />
-    <ep-input v-model="values.state" :maxlength="2" name="state" :mask="stateMask" label="Estado*" placeholder="Digite o estado" />
-    <ep-input v-model="values.postalcode" name="postalcode" :mask="postalCodeMask" inputmode="number" label="CEP*" placeholder="00000-000" /> 
+    <EpInput v-model="values.address" name="address" label="Endereço*" placeholder="Digite o endereço" />
+    <EpInput v-model="values.city" name="city" label="Cidade*" placeholder="Digite a cidade" />
+    <EpInput v-model="values.school_zone" name="school_zone" label="Zona Escolar*" placeholder="Digite a zona escolar" />
+    <EpInput v-model="values.state" :maxlength="2" name="state" :mask="stateMask" label="Estado*" placeholder="Digite o estado" />
+    <EpInput v-model="values.postalcode" name="postalcode" :mask="postalCodeMask" inputmode="number" label="CEP*" placeholder="00000-000" />
   </div>
 </template>

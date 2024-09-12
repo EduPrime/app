@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { pencil, trash } from 'ionicons/icons'
-import { useRouter } from 'vue-router'
-import { IonAlert } from '@ionic/vue'
-import { ref } from 'vue'
-import SchoolService from '../services/SchoolService'
 import showToast from '@/utils/toast-alert'
+import { IonAlert } from '@ionic/vue'
+import { pencil, trash } from 'ionicons/icons'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import type { Database, Tables } from '@/types/database.types'
+import SchoolService from '../../institution/services/SchoolService'
 
 const props = defineProps<{
   schools: School[]
@@ -13,7 +13,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:schools'])
 const router = useRouter()
-const school = ref< Tables<'school'> | []>([]) 
+const school = ref< Tables<'school'> | []>([])
 function toggleDetails(index: number) {
   const updatedSchools = [...props.schools]
   updatedSchools[index] = {
@@ -50,10 +50,10 @@ async function deleteSchool(school: School) {
     if (result) {
       showToast(`${school.school.name} excluído com sucesso`)
       setTimeout(() => {
-            router.push('/Institutions/schools').then(() => {
-              location.reload()
-            })
-          }, 2000)
+        router.push('/Institutions/schools').then(() => {
+          location.reload()
+        })
+      }, 2000)
       emit('update:schools')
       isAlertOpen.value = false
       schoolToDelete.value = null
@@ -84,7 +84,7 @@ const alertButtons = [
 </script>
 
 <template>
-  <ion-alert
+  <IonAlert
     :is-open="isAlertOpen"
     header="Confirmar Exclusão"
     message="Tem certeza de que deseja excluir este item?"

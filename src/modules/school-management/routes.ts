@@ -1,18 +1,38 @@
-// src/modules/class-registration/routes.ts
 import { school } from 'ionicons/icons'
-import ClassRegistration from './views/ClassRegistration.vue'
+import DashboardSchools from './views/DashboardSchools.vue'
+import EditSchools from './views/EditSchools.vue'
+import RegisterSchool from './views/RegisterSchool.vue'
 
 const routes = [
   {
-    path: '/class-registration',
-    name: 'ClassRegistration',
-    component: ClassRegistration,
+    path: '/Schools/edit/:id',
+    name: 'EditSchools',
+    component: EditSchools,
+    moduleName: 'Schools',
+    moduleIcon: school,
+  },
+  {
+    path: '/Schools/list',
+    name: 'InstitutionListInstitutions',
+    component: DashboardSchools,
     meta: {
-      moduleName: 'ClassRegistration',
+      moduleName: 'Schools',
       moduleIcon: school,
       icon: school,
-      name: 'Cadastro de Turmas',
-      order: 1,
+      name: 'Escolas',
+      order: 4,
+    },
+  },
+  {
+    path: '/Schools/register',
+    name: 'RegisterSchool',
+    component: RegisterSchool,
+    meta: {
+      moduleName: 'Schools',
+      moduleIcon: school,
+      icon: school,
+      name: 'Cad Escola',
+      order: 5,
     },
   },
 ]

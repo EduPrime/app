@@ -1,12 +1,12 @@
 // src/modules/institution/routes.ts
 import { business, layers, school } from 'ionicons/icons'
-import RegisterInstitution from './views/RegisterInstitution.vue'
-import RegisterSchool from './views/RegisterSchool.vue'
+import AcademicYear from './views/AcademicYear.vue'
 import DashboardInstitution from './views/DashboardInstitution.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
-import AcademicYear from './views/AcademicYear.vue'
-import RegisterAcademicTemplate from './views/RegisterAcademicTemplate.vue'
 import EditSchools from './views/EditSchools.vue'
+import RegisterAcademicTemplate from './views/RegisterAcademicTemplate.vue'
+import RegisterInstitution from './views/RegisterInstitution.vue'
+import RegisterSchool from './views/RegisterSchool.vue'
 
 const routes = [
   {
@@ -31,36 +31,6 @@ const routes = [
       icon: business,
       name: 'Cad Instituição',
       order: 2,
-    },
-  },
-  {
-    path: '/Institutions/schools/edit/:id',
-    name: 'EditSchools',
-    component: EditSchools,
-
-  },
-  {
-    path: '/Institutions/schools',
-    name: 'InstitutionListInstitutions',
-    component: DashboardSchools,
-    meta: {
-      moduleName: 'Institutions',
-      moduleIcon: school,
-      icon: school,
-      name: 'Escolas',
-      order: 4,
-    },
-  },
-  {
-    path: '/Institutions/school/register',
-    name: 'RegisterSchool',
-    component: RegisterSchool,
-    meta: {
-      moduleName: 'Institutions',
-      moduleIcon: school,
-      icon: school,
-      name: 'Cad Escola',
-      order: 5,
     },
   },
   {
