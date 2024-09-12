@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { pencil, trash } from 'ionicons/icons'
-import { useRouter } from 'vue-router'
-import { IonAlert } from '@ionic/vue'
-import { ref } from 'vue'
-import TeacherService from '../services/TeacherService'
 import showToast from '@/utils/toast-alert'
+import { IonAlert } from '@ionic/vue'
+import { pencil, trash } from 'ionicons/icons'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import TeacherService from '../services/TeacherService'
 
 interface Teacher {
   id: string
@@ -94,7 +94,7 @@ const alertButtons = [
 </script>
 
 <template>
-  <ion-alert
+  <IonAlert
     :is-open="isAlertOpen"
     header="Confirmar Exclusão"
     message="Tem certeza de que deseja excluir este item?"
