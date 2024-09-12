@@ -6,7 +6,7 @@ import UpdateInstitution from './crud/UpdateInstitution.vue'
 import showToast from '@/utils/toast-alert'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import InstitutionCards from '@/modules/institution/components/InstitutionCards.vue'
-import type { Database, Enums, Tables } from '@/types/database.types'
+import type { Tables } from '@/types/database.types'
 
 // Estados para os dados da instituição e carregamento
 const institution = ref< Tables<'institution'> | null>()
@@ -35,7 +35,6 @@ async function loadInstitution() {
   }
 }
 function clickToEdit() {
-  console.log('O botão foi clicado no componente filho!')
   isEditing.value = true
 }
 
@@ -50,26 +49,26 @@ onMounted(() => {
 </script>
 
 <template>
-  <content-layout>
-    <institution-cards
+  <ContentLayout>
+    <InstitutionCards
       :school-count="schoolCount"
       :class-count="classCount"
       :series-count="seriesCount"
       :teacher-count="teacherCount"
     />
-    <read-institution
+    <ReadInstitution
       v-if="!isEditing && institution"
       :key="institution.id + Date.now()"
       :institution="institution"
       @click="clickToEdit"
     />
-    <update-institution
+    <UpdateInstitution
       v-else-if="isEditing && institution"
       :institution="institution"
       @cancel="isEditing = false"
       @save="updatedInstitution"
     />
-  </content-layout>
+  </ContentLayout>
 </template>
 
 <style scoped>

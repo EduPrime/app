@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonInput, IonItem, IonLabel } from '@ionic/vue'
 import InstitutionService from '../../services/InstitutionService'
-import type { Database, Enums, Tables } from '@/types/database.types'
+import type { Database, Tables } from '@/types/database.types'
 
 const props = defineProps<{
   institution: Tables<'institution'>
@@ -24,7 +24,7 @@ async function submitForm() {
       result = await institutionService.update(form.value.id, form.value as Database['public']['Tables']['institution']['Update'])
     }
     if (result !== null) {
-      console.log('Instituição salva com sucesso:', result)
+      console.info('Instituição salva com sucesso:', result)
       emit('save')
     }
     else {
@@ -37,77 +37,76 @@ async function submitForm() {
 }
 
 function cancelEdit() {
-  console.log('cancelEdit chamado')
   emit('cancel')
 }
 </script>
 
 <template>
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Editar Instituição</ion-card-title>
-    </ion-card-header>
+  <IonCard>
+    <IonCardHeader>
+      <IonCardTitle>Editar Instituição</IonCardTitle>
+    </IonCardHeader>
 
-    <ion-card-content>
+    <IonCardContent>
       <form @submit.prevent="submitForm">
-        <ion-item>
-          <ion-label position="stacked">
+        <IonItem>
+          <IonLabel position="stacked">
             Nome
-          </ion-label>
-          <ion-input v-model="form.name" placeholder="Nome da Instituição" required />
-        </ion-item>
+          </IonLabel>
+          <IonInput v-model="form.name" placeholder="Nome da Instituição" required />
+        </IonItem>
 
-        <ion-item>
-          <ion-label position="stacked">
+        <IonItem>
+          <IonLabel position="stacked">
             Telefone
-          </ion-label>
-          <ion-input v-model="form.phone as string" placeholder="Telefone" type="tel" required />
-        </ion-item>
+          </IonLabel>
+          <IonInput v-model="form.phone as string" placeholder="Telefone" type="tel" required />
+        </IonItem>
 
-        <ion-item>
-          <ion-label position="stacked">
+        <IonItem>
+          <IonLabel position="stacked">
             E-mail
-          </ion-label>
-          <ion-input v-model="form.email as string" placeholder="E-mail" type="email" />
-        </ion-item>
+          </IonLabel>
+          <IonInput v-model="form.email as string" placeholder="E-mail" type="email" />
+        </IonItem>
 
-        <ion-item>
-          <ion-label position="stacked">
+        <IonItem>
+          <IonLabel position="stacked">
             Endereço
-          </ion-label>
-          <ion-input v-model="form.address as string" placeholder="Endereço" />
-        </ion-item>
+          </IonLabel>
+          <IonInput v-model="form.address as string" placeholder="Endereço" />
+        </IonItem>
 
-        <ion-item>
-          <ion-label position="stacked">
+        <IonItem>
+          <IonLabel position="stacked">
             Cidade
-          </ion-label>
-          <ion-input v-model="form.city as string" placeholder="Cidade" />
-        </ion-item>
+          </IonLabel>
+          <IonInput v-model="form.city as string" placeholder="Cidade" />
+        </IonItem>
 
-        <ion-item>
-          <ion-label position="stacked">
+        <IonItem>
+          <IonLabel position="stacked">
             UF
-          </ion-label>
-          <ion-input v-model="form.state as string" placeholder="Estado" />
-        </ion-item>
+          </IonLabel>
+          <IonInput v-model="form.state as string" placeholder="Estado" />
+        </IonItem>
 
-        <ion-item>
-          <ion-label position="stacked">
+        <IonItem>
+          <IonLabel position="stacked">
             CEP
-          </ion-label>
-          <ion-input v-model="form.postalcode as string" placeholder="CEP" type="text" />
-        </ion-item>
+          </IonLabel>
+          <IonInput v-model="form.postalcode as string" placeholder="CEP" type="text" />
+        </IonItem>
 
-        <ion-button expand="block" type="submit">
+        <IonButton expand="block" type="submit">
           Salvar
-        </ion-button>
-        <ion-button expand="block" color="medium" @click="cancelEdit">
+        </IonButton>
+        <IonButton expand="block" color="medium" @click="cancelEdit">
           Cancelar
-        </ion-button>
+        </IonButton>
       </form>
-    </ion-card-content>
-  </ion-card>
+    </IonCardContent>
+  </IonCard>
 </template>
 
 <style scoped>

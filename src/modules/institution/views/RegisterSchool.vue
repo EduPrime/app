@@ -100,52 +100,48 @@ const areaMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
     <template #description>
       Todos os campos são obrigatórios, a menos que indicado de outra forma.
     </template>
-    <h3 class="ion-text-end ion-text-uppercase">
-      Inserir Escola
-    </h3>
-
-    <ion-segment v-model="selectedSegment">
-      <ion-segment-button value="general-info">
-        <ion-label style="font-size: calc(1rem - 2px);">
+    <IonSegment v-model="selectedSegment">
+      <IonSegmentButton value="general-info">
+        <IonLabel style="font-size: calc(1rem - 2px);">
           Informações Gerais
-        </ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="location">
-        <ion-label style="font-size: calc(1rem - 2px);">
+        </IonLabel>
+      </IonSegmentButton>
+      <IonSegmentButton value="location">
+        <IonLabel style="font-size: calc(1rem - 2px);">
           Localização
-        </ion-label>
-      </ion-segment-button>
-      <ion-segment-button value="facilities">
-        <ion-label style="font-size: calc(1rem - 2px);">
+        </IonLabel>
+      </IonSegmentButton>
+      <IonSegmentButton value="facilities">
+        <IonLabel style="font-size: calc(1rem - 2px);">
           Instalações
-        </ion-label>
-      </ion-segment-button>
-    </ion-segment>
+        </IonLabel>
+      </IonSegmentButton>
+    </IonSegment>
 
     <div v-show="selectedSegment === 'general-info'">
-      <ep-input name="name" label="Nome" placeholder="Digite o nome da escola" />
-      <ep-input name="abbreviation" label="Abreviação" placeholder="Digite a abreviação" />
-      <ep-input name="managerId" :mask="idMask" label="ID do Gerente" placeholder="999999" />
-      <ep-input name="managerPosition" label="Posição do Gerente" placeholder="Digite a posição do gerente" />
-      <ep-input name="logoUrl" label="URL do Logo" placeholder="Digite a URL do logo" />
+      <EpInput name="name" label="Nome" placeholder="Digite o nome da escola" />
+      <EpInput name="abbreviation" label="Abreviação" placeholder="Digite a abreviação" />
+      <EpInput name="managerId" :mask="idMask" label="ID do Gerente" placeholder="999999" />
+      <EpInput name="managerPosition" label="Posição do Gerente" placeholder="Digite a posição do gerente" />
+      <EpInput name="logoUrl" label="URL do Logo" placeholder="Digite a URL do logo" />
     </div>
 
     <div v-show="selectedSegment === 'location'">
-      <ep-input name="address" label="Endereço" placeholder="Digite o endereço" />
-      <ep-input name="city" label="Cidade" placeholder="Digite a cidade" />
-      <ep-input name="state" label="Estado" placeholder="Digite o estado" />
-      <ep-input name="postalCode" :mask="postalCodeMask" inputmode="number" label="CEP" placeholder="99999-999" />
-      <ep-input name="phone" :mask="phoneMask" inputmode="tel" label="Phone" placeholder="(99) 99999-9999" />
-      <ep-input name="latitude" label="Latitude" type="number" placeholder="Digite a latitude" />
-      <ep-input name="longitude" label="Longitude" type="number" placeholder="Digite a longitude" />
+      <EpInput name="address" label="Endereço" placeholder="Digite o endereço" />
+      <EpInput name="city" label="Cidade" placeholder="Digite a cidade" />
+      <EpInput name="state" label="Estado" placeholder="Digite o estado" />
+      <EpInput name="postalCode" :mask="postalCodeMask" inputmode="number" label="CEP" placeholder="99999-999" />
+      <EpInput name="phone" :mask="phoneMask" inputmode="tel" label="Phone" placeholder="(99) 99999-9999" />
+      <EpInput name="latitude" label="Latitude" type="number" placeholder="Digite a latitude" />
+      <EpInput name="longitude" label="Longitude" type="number" placeholder="Digite a longitude" />
     </div>
 
     <div v-show="selectedSegment === 'facilities'">
-      <ep-input name="numberOfFloors" :mask="[/\d/, /\d/]" label="Número de Andares" placeholder="99" />
-      <ep-input name="totalArea" :mask="areaMask" label="Área Total" placeholder="99999" />
-      <ep-input name="builtArea" :mask="areaMask" label="Área Construída" placeholder="99999" />
-      <ep-input name="availableArea" :mask="areaMask" label="Área Disponível" placeholder="99999" />
-      <ep-input name="operationLocation" label="Local de Operação" placeholder="Digite o local de operação" />
+      <EpInput name="numberOfFloors" :mask="[/\d/, /\d/]" label="Número de Andares" placeholder="99" />
+      <EpInput name="totalArea" :mask="areaMask" label="Área Total" placeholder="99999" />
+      <EpInput name="builtArea" :mask="areaMask" label="Área Construída" placeholder="99999" />
+      <EpInput name="availableArea" :mask="areaMask" label="Área Disponível" placeholder="99999" />
+      <EpInput name="operationLocation" label="Local de Operação" placeholder="Digite o local de operação" />
     </div>
     <template #footer>
       <ion-grid>
@@ -163,6 +159,6 @@ const areaMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
         </ion-row>
       </ion-grid>
     </template>
-    <ion-toast />
+    <IonToast />
   </content-layout>
 </template>

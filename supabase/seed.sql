@@ -688,3 +688,135 @@ VALUES
         ),
         NOW ()
     );
+
+----- Criar manual, usuário migration sem permissão, substituir ids na user_roles
+INSERT INTO public.role (id, school_id, name)
+VALUES ('2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid, '79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'Professor'),
+       ('bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid, '79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'Gestor');
+
+INSERT INTO public.user_role (school_id, role_id, user_id)
+VALUES ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        '2ff53f52-cdd9-4b04-80c4-02d146b653e7'::uuid),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        '905096b1-ad84-46c2-a309-29a0501470f7'::uuid);
+
+-- permissões para Professor
+INSERT INTO public.role_permission (school_id, role_id, can_select, can_insert, can_update, can_delete,
+                                    "table")
+VALUES ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, false, false, false, 'student'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, true, true, false, 'attendance'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, true, true, false, 'grade'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, false, false, false, 'classroom'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, false, false, false, 'discipline'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, false, false, false, 'class_session');
+
+-- permissões para Gestor
+INSERT INTO public.role_permission (school_id, role_id, can_select, can_insert, can_update, can_delete,
+                                    "table")
+VALUES ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'student'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'teacher'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'classroom'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'discipline'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'course'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'series'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'timetable'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'class_session'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'attendance'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'grade');
+
+----- Criar manual, usuário migration sem permissão, substituir ids na user_roles
+-- 2ff - professor
+-- 905 - gestor
+-- gestor@eduprime.com
+-- profesor@eduprime.com
+-- Seed para inserir feriados usando o ano vigente
+DO $$
+DECLARE
+    current_year INTEGER := EXTRACT(YEAR FROM CURRENT_DATE);
+BEGIN
+    INSERT INTO holidays (name, holiday_date, description)
+    VALUES
+        ('Ano Novo', TO_DATE(current_year || '-01-01', 'YYYY-MM-DD'), 'Comemoração do início do novo ano'),
+        ('Carnaval', TO_DATE(current_year || '-02-13', 'YYYY-MM-DD'), 'Dia de Carnaval'),
+        ('Paixão de Cristo', TO_DATE(current_year || '-03-29', 'YYYY-MM-DD'), 'Sexta-feira Santa'),
+        ('Tiradentes', TO_DATE(current_year || '-04-21', 'YYYY-MM-DD'), 'Comemoração em memória de Tiradentes'),
+        ('Dia do Trabalhador', TO_DATE(current_year || '-05-01', 'YYYY-MM-DD'), 'Dia do Trabalho'),
+        ('Corpus Christi', TO_DATE(current_year || '-05-30', 'YYYY-MM-DD'), 'Dia de Corpus Christi'),
+        ('Independência do Brasil', TO_DATE(current_year || '-09-07', 'YYYY-MM-DD'), 'Comemoração da Independência do Brasil'),
+        ('Nossa Senhora Aparecida', TO_DATE(current_year || '-10-12', 'YYYY-MM-DD'), 'Dia de Nossa Senhora Aparecida, padroeira do Brasil'),
+        ('Finados', TO_DATE(current_year || '-11-02', 'YYYY-MM-DD'), 'Dia de Finados'),
+        ('Proclamação da República', TO_DATE(current_year || '-11-15', 'YYYY-MM-DD'), 'Comemoração da Proclamação da República do Brasil'),
+        ('Natal', TO_DATE(current_year || '-12-25', 'YYYY-MM-DD'), 'Comemoração do Natal');
+END $$;
+-- Inserção de um Template de Ano Letivo com 4 etapas usando o ano atual
+DO $$
+DECLARE
+    current_year INTEGER := EXTRACT(YEAR FROM CURRENT_DATE);
+    teaching_days_stage1 INTEGER;
+    teaching_days_stage2 INTEGER;
+    teaching_days_stage3 INTEGER;
+    teaching_days_stage4 INTEGER;
+BEGIN
+    -- Calcular os dias úteis para cada etapa
+    teaching_days_stage1 := calculate_business_days((current_year || '-02-01')::DATE, (current_year || '-04-30')::DATE);
+    teaching_days_stage2 := calculate_business_days((current_year || '-05-01')::DATE, (current_year || '-07-15')::DATE);
+    teaching_days_stage3 := calculate_business_days((current_year || '-07-16')::DATE, (current_year || '-09-30')::DATE);
+    teaching_days_stage4 := calculate_business_days((current_year || '-10-01')::DATE, (current_year || '-12-20')::DATE);
+
+    -- Inserir o template de ano letivo
+    INSERT INTO academic_year_template (id, ref_year, name, stages, created_at)
+    VALUES (
+        gen_random_uuid(),
+        current_year,
+        'Modelo Padrão Quatro Etapas',
+        jsonb_build_array(
+            jsonb_build_object('stageNumber', 1, 'startDate', (current_year || '-02-01')::DATE, 'endDate', (current_year || '-04-30')::DATE, 'teachingDays', teaching_days_stage1),
+            jsonb_build_object('stageNumber', 2, 'startDate', (current_year || '-05-01')::DATE, 'endDate', (current_year || '-07-15')::DATE, 'teachingDays', teaching_days_stage2),
+            jsonb_build_object('stageNumber', 3, 'startDate', (current_year || '-07-16')::DATE, 'endDate', (current_year || '-09-30')::DATE, 'teachingDays', teaching_days_stage3),
+            jsonb_build_object('stageNumber', 4, 'startDate', (current_year || '-10-01')::DATE, 'endDate', (current_year || '-12-20')::DATE, 'teachingDays', teaching_days_stage4)
+        ),
+        NOW()
+    );
+END $$;
+-- Inserção de Ano Letivo para todas as escolas usando o template criado
+DO $$
+DECLARE
+    current_year INTEGER := EXTRACT(YEAR FROM CURRENT_DATE);
+    template_id UUID;
+BEGIN
+    -- Seleciona o ID do template atual para o ano vigente
+    SELECT id INTO template_id
+    FROM academic_year_template
+    WHERE ref_year = current_year AND name = 'Modelo Padrão Quatro Etapas';
+
+    -- Verifica se o template foi encontrado
+    IF template_id IS NOT NULL THEN
+        -- Inserção de ano letivo para cada escola usando o template selecionado
+        INSERT INTO academic_year (id, school_id, template_id, ref_year, created_at)
+        SELECT 
+            gen_random_uuid(),
+            s.id, 
+            template_id, 
+            current_year, 
+            NOW()
+        FROM school s;
+    ELSE
+        RAISE NOTICE 'Nenhum template de ano letivo encontrado para o ano atual.';
+    END IF;
+END $$;

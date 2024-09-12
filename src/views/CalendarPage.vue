@@ -8,18 +8,14 @@ import {
   IonButton,
   IonButtons,
   IonChip,
-  IonContent,
   IonDatetime,
   IonDatetimeButton,
-  IonHeader,
   IonIcon,
   IonItem,
   IonLabel,
   IonList,
   IonListHeader,
   IonModal,
-  IonPage,
-  IonTitle,
   IonToolbar,
 } from '@ionic/vue'
 import { Swiper, SwiperSlide } from 'swiper/vue'
@@ -27,7 +23,8 @@ import 'swiper/css'
 
 const getSwiper: Ref<any> = ref(null)
 const currentDate = ref(moment())
-const monthYear = ref(new Date().toISOString())
+const monthYear = ref(new Date()
+  .toISOString())
 const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const weeksInMonth = ref<any[]>([])
 const selectedDate = ref(moment())
@@ -164,65 +161,73 @@ loadVisibleMonth()
       </ion-toolbar>
     </ion-header>
     <ion-content>
-     
+
     </ion-content>
   </ion-page> -->
   <content-layout>
-    <ion-item button lines="none">
-        <ion-label position="stacked">
-          Select Date
-        </ion-label>
-      </ion-item>
+    <IonItem button lines="none">
+      <IonLabel position="stacked">
+        Select Date
+      </IonLabel>
+    </IonItem>
 
-      <ion-toolbar>
-        <ion-datetime-button slot="start" datetime="datetime" presentation="year-month" />
-        <ion-modal :keep-contents-mounted="true">
-          <ion-datetime
-            id="datetime" :value="monthYear" presentation="month-year"
-            @ion-change="onMonthYearChange"
-          />
-        </ion-modal>
-        <ion-buttons slot="end">
-          <ion-button @click="prevMonth">
-            <ion-icon slot="icon-only" :icon="arrowBackOutline" />
-          </ion-button>
-          <ion-button @click="nextMonth">
-            <ion-icon slot="icon-only" :icon="arrowForwardOutline" />
-          </ion-button>
-        </ion-buttons>
-      </ion-toolbar>
+    <IonToolbar>
+      <template #start>
+        <IonDatetimeButton datetime="datetime" presentation="year-month" />
+      </template>
+      <IonModal :keep-contents-mounted="true">
+        <IonDatetime
+          id="datetime" :value="monthYear" presentation="month-year"
+          @ion-change="onMonthYearChange"
+        />
+      </IonModal>
+      <template #end>
+        <IonButtons>
+          <IonButton @click="prevMonth">
+            <template #icon-only>
+              <IonIcon :icon="arrowBackOutline" />
+            </template>
+          </IonButton>
+          <IonButton @click="nextMonth">
+            <template #icon-only>
+              <IonIcon :icon="arrowForwardOutline" />
+            </template>
+          </IonButton>
+        </IonButtons>
+      </template>
+    </IonToolbar>
 
-      <swiper
-        :options="slideOpts" :slides-per-view="1" :space-between="8" @ion-slide-will-change="handleSlideChange"
-        @swiper="onSwiper" @touch-end="(swiper: any) => checkNextSlide(swiper)"
-      >
-        <swiper-slide v-for="(week, index) in weeksInMonth" :key="index">
-          <div class="date-selector">
-            <div v-for="day in week" :key="day.date.format('YYYY-MM-DD')" class="day-chip">
-              <ion-chip
-                :disabled="isDateDisabled(day.date)" shape="rounded"
-                :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
-              >
-                <div>
-                  <div class="day-name">
-                    {{ day.weekday }}
-                  </div>
-                  <div class="day-number">
-                    {{ day.date.date() }}
-                  </div>
+    <Swiper
+      :options="slideOpts" :slides-per-view="1" :space-between="8" @ion-slide-will-change="handleSlideChange"
+      @swiper="onSwiper" @touch-end="(swiper: any) => checkNextSlide(swiper)"
+    >
+      <SwiperSlide v-for="(week, index) in weeksInMonth" :key="index">
+        <div class="date-selector">
+          <div v-for="day in week" :key="day.date.format('YYYY-MM-DD')" class="day-chip">
+            <IonChip
+              :disabled="isDateDisabled(day.date)" shape="rounded"
+              :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
+            >
+              <div>
+                <div class="day-name">
+                  {{ day.weekday }}
                 </div>
-              </ion-chip>
-            </div>
+                <div class="day-number">
+                  {{ day.date.date() }}
+                </div>
+              </div>
+            </IonChip>
           </div>
-        </swiper-slide>
-      </swiper>
+        </div>
+      </SwiperSlide>
+    </Swiper>
 
-      <ion-list>
-        <ion-list-header>Events on {{ selectedDate.format('YYYY-MM-DD') }}</ion-list-header>
-        <ion-item v-for="event in eventsForSelectedDate" :key="event.title">
-          <ion-label>{{ event.title }}</ion-label>
-        </ion-item>
-      </ion-list>
+    <IonList>
+      <IonListHeader>Events on {{ selectedDate.format('YYYY-MM-DD') }}</IonListHeader>
+      <IonItem v-for="event in eventsForSelectedDate" :key="event.title">
+        <IonLabel>{{ event.title }}</IonLabel>
+      </IonItem>
+    </IonList>
   </content-layout>
 </template>
 

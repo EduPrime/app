@@ -64,6 +64,81 @@ export interface Database {
           },
         ]
       }
+      academic_year: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          metadata: Json | null
+          ref_year: number
+          school_id: string
+          template_id: string
+          updated_at: string | null
+          user_created: string | null
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          metadata?: Json | null
+          ref_year: number
+          school_id: string
+          template_id: string
+          updated_at?: string | null
+          user_created?: string | null
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          metadata?: Json | null
+          ref_year?: number
+          school_id?: string
+          template_id?: string
+          updated_at?: string | null
+          user_created?: string | null
+        }
+        Relationships: []
+      }
+      academic_year_template: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          metadata: Json | null
+          name: string
+          ref_year: number
+          stage_count: number | null
+          stages: Json
+          updated_at: string | null
+          user_created: string | null
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name: string
+          ref_year: number
+          stage_count?: number | null
+          stages: Json
+          updated_at?: string | null
+          user_created?: string | null
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          metadata?: Json | null
+          name?: string
+          ref_year?: number
+          stage_count?: number | null
+          stages?: Json
+          updated_at?: string | null
+          user_created?: string | null
+        }
+        Relationships: []
+      }
       attendance: {
         Row: {
           created_at: string
@@ -411,6 +486,30 @@ export interface Database {
           },
         ]
       }
+      holidays: {
+        Row: {
+          description: string | null
+          holiday_date: string
+          id: string
+          name: string
+          weekday: string | null
+        }
+        Insert: {
+          description?: string | null
+          holiday_date: string
+          id?: string
+          name: string
+          weekday?: string | null
+        }
+        Update: {
+          description?: string | null
+          holiday_date?: string
+          id?: string
+          name?: string
+          weekday?: string | null
+        }
+        Relationships: []
+      }
       institution: {
         Row: {
           address: string | null
@@ -474,7 +573,6 @@ export interface Database {
           blockdiaryentriesforclosedacademicyears: boolean | null
           builtarea: string | null
           city: string | null
-          condition: number | null
           created_at: string
           creationdecree: string | null
           deleted_at: string | null
@@ -513,7 +611,6 @@ export interface Database {
           blockdiaryentriesforclosedacademicyears?: boolean | null
           builtarea?: string | null
           city?: string | null
-          condition?: number | null
           created_at?: string
           creationdecree?: string | null
           deleted_at?: string | null
@@ -552,7 +649,6 @@ export interface Database {
           blockdiaryentriesforclosedacademicyears?: boolean | null
           builtarea?: string | null
           city?: string | null
-          condition?: number | null
           created_at?: string
           creationdecree?: string | null
           deleted_at?: string | null
@@ -869,7 +965,13 @@ export interface Database {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      calculate_business_days: {
+        Args: {
+          start_date: string
+          end_date: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       attendance_status: 'PRESENT' | 'ABSENT' | 'EXCUSED'
