@@ -37,13 +37,7 @@ const routes = [
     path: '/Institutions/schools/edit/:id',
     name: 'EditSchools',
     component: EditSchools,
-    meta: {
-      moduleName: 'Institutions',
-      moduleIcon: school,
-      icon: school,
-      name: 'Atualizar Escola',
-      order: 3,
-    },
+
   },
   {
     path: '/Institutions/schools',

@@ -37,17 +37,29 @@ const formSchema = yup.object ({
     .string()
     .required('Nome é obrigatório')
     .min(12, 'O nome deve ter pelo menos 12 caracteres'),
-    phone: yup
+  phone: yup
     .string()
     .required('Telefone é obrigatório')
     .matches(/^\(\d{2}\) \d{5}-\d{4}$/, 'Telefone inválido')
     .test('valid-ddd', 'DDD inválido', value => isValidDDD(value || '')),
+  email: yup
+    .string()
+    .email('Email inválido'),
+  website: yup
+    .string()
+    .url('Deve ser uma URL válida'),
+  social_network: yup
+    .string()
+    .url('Deve ser uma URL válida'),
   address: yup
     .string()
     .required('Endereço é obrigatório'),
   city: yup
     .string()
     .required('Cidade é obrigatório'),
+  school_zone: yup
+    .string()
+    .required('Zona da Escola é obrigatório'),
   state: yup
     .string()
     .max(2)
@@ -59,7 +71,6 @@ const formSchema = yup.object ({
     .matches(/^\d{5}-\d{3}$/, 'Código postal deve estar no formato 00000-000'),
   logourl: yup
     .string()
-    .required('URL do Logo é obrigatório')
     .url('Deve ser uma URL válida'),
   abbreviation: yup
     .string()
@@ -81,6 +92,10 @@ async function registerSchool() {
   else {
     const formData = {
       institution_id: institutionId.value,
+      school_zone: values.school_zone,
+      email: values.email,
+      website: values.website,
+      social_network: values.social_network,
       name: values.name,
       phone: values.phone,
       address: values.address,
@@ -129,10 +144,14 @@ async function getSchoolData() {
       setFieldValue('institutionId', schoolDbData.institutionId),
       setFieldValue('name', schoolDbData.name),
       setFieldValue('phone', schoolDbData.phone),
+      setFieldValue('email', schoolDbData.email),
+      setFieldValue('website', schoolDbData.website),
+      setFieldValue('social_network', schoolDbData.social_network),
       setFieldValue('address', schoolDbData.address),
       setFieldValue('city', schoolDbData.city),
       setFieldValue('state', schoolDbData.state),
       setFieldValue('postalcode', schoolDbData.postalcode),
+      setFieldValue('school_zone', schoolDbData.school_zone),
       setFieldValue('logourl', schoolDbData.logourl),
       setFieldValue('abbreviation', schoolDbData.abbreviation)
     }
@@ -177,12 +196,16 @@ onMounted(async () => {
     <ep-input v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome da escola" />
     <ep-input v-model="values.abbreviation" name="abbreviation" :mask="abbreviationMask" label="Abreviação*" placeholder="Digite a abreviação" />
     <ep-input v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone*" placeholder="(99) 99999-9999" />
+    <ep-input v-model="values.email" name="email" label="Email" placeholder="educacao@email.com" />
+    <ep-input v-model="values.website" name="website" label="Site" placeholder="escolaeducacao.com.br" />
+    <ep-input v-model="values.social_network" name="social_network" label="Rede Social" placeholder="Digite o link da rede social" />
     <ep-input v-model="values.logourl" name="logourl" label="URL do Logo*" placeholder="Digite a URL do logo" />
   </div>
 
   <div v-show="selectedSegment === 'location'">
     <ep-input v-model="values.address" name="address" label="Endereço*" placeholder="Digite o endereço" />
     <ep-input v-model="values.city" name="city" label="Cidade*" placeholder="Digite a cidade" />
+    <ep-input v-model="values.school_zone" name="school_zone" label="Zona Escolar*" placeholder="Digite a zona escolar" />
     <ep-input v-model="values.state" :maxlength="2" name="state" :mask="stateMask" label="Estado*" placeholder="Digite o estado" />
     <ep-input v-model="values.postalcode" name="postalcode" :mask="postalCodeMask" inputmode="number" label="CEP*" placeholder="00000-000" /> 
   </div>
