@@ -1,13 +1,14 @@
 import { calendar, chatbubbles, create, document, list, person, school, star } from 'ionicons/icons'
+import type { CustomRouteRecordRaw } from '@/router/RouterType'
+import EditTeacher from './views/EditTeacher.vue'
 import ManageTeachers from './views/ManageTeachers.vue'
 import RegisterTeacher from './views/RegisterTeacher.vue'
-import EditTeacher from './views/EditTeacher.vue'
 import TeacherSchedule from './views/RegisterTeacher.vue'
 import TeacherDocs from './views/RegisterTeacher.vue'
-import TeacherFeedback from './views/TeacherFeedback.vue'
 import TeacherReports from './views/RegisterTeacher.vue'
+import TeacherFeedback from './views/TeacherFeedback.vue'
 
-const routes = [
+const routes: Array<CustomRouteRecordRaw> = [
   {
     path: '/teachers/manage',
     name: 'ManageTeachers',
@@ -18,7 +19,7 @@ const routes = [
       icon: list,
       name: 'Gerenciar Professores',
       order: 1,
-      showInTab: true,
+      requiredRole: ['public'],
     },
   },
   {
@@ -31,7 +32,7 @@ const routes = [
       icon: create,
       name: 'Registrar Novo Professor',
       order: 2,
-      showInTab: true,
+      requiredRole: ['public'],
     },
   },
   {
@@ -44,7 +45,7 @@ const routes = [
       icon: person,
       name: 'Editar Professor',
       order: 3,
-      showInTab: true,
+      requiredRole: ['public'],
     },
   },
   {
@@ -57,7 +58,7 @@ const routes = [
       icon: calendar,
       name: 'Grade de Aula',
       order: 4,
-      showInTab: true,
+      requiredRole: ['public'],
     },
   },
   {
@@ -70,7 +71,7 @@ const routes = [
       icon: document,
       name: 'Documentação',
       order: 5,
-      showInTab: true,
+      requiredRole: ['public'],
     },
   },
   {
@@ -83,7 +84,7 @@ const routes = [
       icon: star,
       name: 'Avaliações e Feedback',
       order: 6,
-      showInTab: true,
+      requiredRole: ['public'],
     },
   },
   {
@@ -96,7 +97,7 @@ const routes = [
       icon: school,
       name: 'Relatórios e Monitoramento',
       order: 8,
-      showInTab: true,
+      requiredRole: ['public'],
     },
   },
   {
@@ -109,7 +110,7 @@ const routes = [
       icon: chatbubbles,
       name: 'Mensagens',
       order: 9,
-      showInTab: true,
+      requiredRole: ['public'],
     },
   },
 ]

@@ -1,6 +1,6 @@
 <script>
-import { supabase } from '../supabaseClient'
-import { useUserStore } from '../store/user'
+import { useUserStore } from '../store/user.ts'
+import { supabase } from '../supabaseClient.ts'
 
 export default {
   data() {

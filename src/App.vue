@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import {
   barChart,
   barChartOutline,
@@ -21,8 +19,17 @@ import {
   personCircleOutline,
   videocam,
 } from 'ionicons/icons'
-import { supabase } from './supabaseClient'
+import { onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type CustomUser from '@/router/CustomUser'
+import type { CustomRouteRecordNormalized } from '@/router/RouterType'
+import type { RouteRecordNormalized } from 'vue-router'
 import NavItem from './components/NavItem.vue'
+import { useUserStore } from './store/user'
+import { supabase } from './supabaseClient'
+
+const userStore = useUserStore()
+const user: CustomUser = userStore.user as CustomUser
 
 const tabs = ref([
   {
@@ -173,8 +180,21 @@ const router = useRouter()
 const route = useRoute()
 const dynamicTabs: any[] = []
 
+function hasShowFlag(route: RouteRecordNormalized) {
+  return route.meta.showInTab ?? true
+}
+
+function hasRequiredAttributes(route: RouteRecordNormalized) {
+  return route.meta && route.meta.moduleName && route.meta.moduleIcon && route.meta.requiredRole
+}
+
+function checkUserAuthorization(route: CustomRouteRecordNormalized) {
+  console.log(route.meta.requiredRole?.includes('public'))
+  return route.meta.requiredRole?.includes(user.user_metadata.role) || route.meta.requiredRole?.includes('public')
+}
+
 router.getRoutes().forEach((route) => {
-  if (route.meta && route.meta.moduleName && route.meta.moduleIcon && route.meta.showInTab) {
+  if (hasRequiredAttributes(route) && hasShowFlag(route) && checkUserAuthorization(route)) {
     let moduleTab = dynamicTabs.find(tab => tab.name === route.meta.moduleName)
     if (!moduleTab) {
       moduleTab = {
@@ -239,7 +259,7 @@ async function logout() {
     console.error('Erro ao deslogar:', error.message)
   }
   else {
-    sessionStorage.removeItem('user')
+    userStore.logout()
 
     router.push('/login')
   }
