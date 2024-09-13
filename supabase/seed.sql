@@ -689,6 +689,62 @@ VALUES
         NOW ()
     );
 
+----- Criar manual, usuário migration sem permissão, substituir ids na user_roles
+INSERT INTO public.role (id, school_id, name)
+VALUES ('2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid, '79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'Professor'),
+       ('bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid, '79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'Gestor');
+
+INSERT INTO public.user_role (school_id, role_id, user_id)
+VALUES ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        '2ff53f52-cdd9-4b04-80c4-02d146b653e7'::uuid),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        '905096b1-ad84-46c2-a309-29a0501470f7'::uuid);
+
+-- permissões para Professor
+INSERT INTO public.role_permission (school_id, role_id, can_select, can_insert, can_update, can_delete,
+                                    "table")
+VALUES ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, false, false, false, 'student'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, true, true, false, 'attendance'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, true, true, false, 'grade'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, false, false, false, 'classroom'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, false, false, false, 'discipline'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+        true, false, false, false, 'class_session');
+
+-- permissões para Gestor
+INSERT INTO public.role_permission (school_id, role_id, can_select, can_insert, can_update, can_delete,
+                                    "table")
+VALUES ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'student'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'teacher'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'classroom'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'discipline'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'course'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'series'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'timetable'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'class_session'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'attendance'),
+       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+        true, true, true, true, 'grade');
+
+----- Criar manual, usuário migration sem permissão, substituir ids na user_roles
+-- 2ff - professor
+-- 905 - gestor
+-- gestor@eduprime.com
+-- profesor@eduprime.com
 -- Seed para inserir feriados usando o ano vigente
 DO $$
 DECLARE
@@ -764,4 +820,3 @@ BEGIN
         RAISE NOTICE 'Nenhum template de ano letivo encontrado para o ano atual.';
     END IF;
 END $$;
-
