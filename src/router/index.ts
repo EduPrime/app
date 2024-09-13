@@ -147,7 +147,7 @@ router.beforeEach(async (to, from, next) => {
     else {
       const role = user?.user_metadata?.role
 
-      if (to.meta.requiredRoles && !toArray(to.meta.requiredRoles).includes(role)) {
+      if (to.meta.requiredRoles && !(to.meta.requiredRoles).includes(role)) {
         return next('/login')
       }
     }
