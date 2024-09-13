@@ -1,13 +1,14 @@
 // src/modules/institution/routes.ts
 import { business, layers, school } from 'ionicons/icons'
-import RegisterInstitution from './views/RegisterInstitution.vue'
-import RegisterSchool from './views/RegisterSchool.vue'
+import type { CustomRouteRecordRaw } from '@/router/RouterType'
+import AcademicYear from './views/AcademicYear.vue'
 import DashboardInstitution from './views/DashboardInstitution.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
-import AcademicYear from './views/AcademicYear.vue'
 import RegisterAcademicTemplate from './views/RegisterAcademicTemplate.vue'
+import RegisterInstitution from './views/RegisterInstitution.vue'
+import RegisterSchool from './views/RegisterSchool.vue'
 
-const routes = [
+const routes: Array<CustomRouteRecordRaw> = [
   {
     path: '/Institutions/',
     name: 'DashboardInstitution',
@@ -18,6 +19,7 @@ const routes = [
       icon: business,
       name: 'Instituição',
       order: 1,
+      requiredRole: ['public'],
     },
   },
   {
@@ -30,6 +32,7 @@ const routes = [
       icon: business,
       name: 'Cad Instituição',
       order: 2,
+      requiredRole: ['public'],
     },
   },
   {
@@ -42,6 +45,7 @@ const routes = [
       icon: school,
       name: 'Escolas',
       order: 3,
+      requiredRole: ['public'],
     },
   },
   {
@@ -54,6 +58,7 @@ const routes = [
       icon: school,
       name: 'Cad Escola',
       order: 4,
+      requiredRole: ['public'],
     },
   },
   {
@@ -66,6 +71,7 @@ const routes = [
       icon: layers,
       name: 'Ano Letivo',
       order: 5,
+      requiredRole: ['public'],
     },
   },
   {
@@ -78,6 +84,7 @@ const routes = [
       icon: layers,
       name: 'Modelo ano letivo',
       order: 6,
+      requiredRole: ['public'],
     },
   },
 ]

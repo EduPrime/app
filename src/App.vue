@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
 import {
   barChart,
   barChartOutline,
@@ -14,13 +12,24 @@ import {
   folderOutline,
   handLeft,
   image,
+  logOutOutline,
   notificationsOutline,
   peopleOutline,
   person,
   personCircleOutline,
   videocam,
 } from 'ionicons/icons'
+import { onMounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import type CustomUser from '@/router/CustomUser'
+import type { CustomRouteRecordNormalized } from '@/router/RouterType'
+import type { RouteRecordNormalized } from 'vue-router'
 import NavItem from './components/NavItem.vue'
+import { useUserStore } from './store/user'
+import { supabase } from './supabaseClient'
+
+const userStore = useUserStore()
+const user: CustomUser = userStore.user as CustomUser
 
 const tabs = ref([
   {
@@ -171,8 +180,21 @@ const router = useRouter()
 const route = useRoute()
 const dynamicTabs: any[] = []
 
+function hasShowFlag(route: RouteRecordNormalized) {
+  return route.meta.showInTab ?? true
+}
+
+function hasRequiredAttributes(route: RouteRecordNormalized) {
+  return route.meta && route.meta.moduleName && route.meta.moduleIcon && route.meta.requiredRole
+}
+
+function checkUserAuthorization(route: CustomRouteRecordNormalized) {
+  console.log(route.meta.requiredRole?.includes('public'))
+  return route.meta.requiredRole?.includes(user.user_metadata.role) || route.meta.requiredRole?.includes('public')
+}
+
 router.getRoutes().forEach((route) => {
-  if (route.meta && route.meta.moduleName && route.meta.moduleIcon) {
+  if (hasRequiredAttributes(route) && hasShowFlag(route) && checkUserAuthorization(route)) {
     let moduleTab = dynamicTabs.find(tab => tab.name === route.meta.moduleName)
     if (!moduleTab) {
       moduleTab = {
@@ -217,6 +239,12 @@ dynamicTabs.forEach((tab) => {
 tabs.value.push(...dynamicTabs)
 tabs.value.sort((a, b) => a.order - b.order)
 
+const isPublicPage = ref(route.path === '/login' || route.path === '/signup')
+
+watch(route, (newRoute) => {
+  isPublicPage.value = newRoute.path === '/login' || newRoute.path === '/signup'
+})
+
 onMounted(() => {
   updateSelectedTab(route.path)
 })
@@ -224,11 +252,28 @@ onMounted(() => {
 watch(route, (newRoute) => {
   updateSelectedTab(newRoute.path)
 })
+
+async function logout() {
+  const { error } = await supabase.auth.signOut()
+  if (error) {
+    console.error('Erro ao deslogar:', error.message)
+  }
+  else {
+    userStore.logout()
+
+    router.push('/login')
+  }
+}
 </script>
 
 <template>
   <ion-app>
-    <ion-split-pane content-id="main-content" :class="showTree ? '' : 'tree-hidden'">
+    <template v-if="isPublicPage">
+      <!-- Router outlet com uma key para forçar re-renderização -->
+      <ion-router-outlet :key="route.fullPath" />
+    </template>
+
+    <ion-split-pane v-if="!isPublicPage" content-id="main-content" :class="showTree ? '' : 'tree-hidden'">
       <ion-buttons class="tree-toggle-btn">
         <ion-button color="primary" @click="toggleTreeView">
           <template #icon-only>
@@ -259,6 +304,9 @@ watch(route, (newRoute) => {
             <div class="bottom-items">
               <ion-item lines="full" button class="vertical-tab-button" router-link="/notifications" :detail="false">
                 <ion-icon :icon="notificationsOutline" />
+              </ion-item>
+              <ion-item lines="full" button class="vertical-tab-button" :detail="false" @click="logout">
+                <ion-icon :icon="logOutOutline" />
               </ion-item>
               <ion-item lines="full" button class="vertical-tab-button" router-link="/profile" :detail="false">
                 <ion-icon :icon="personCircleOutline" />
