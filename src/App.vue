@@ -188,13 +188,13 @@ function hasRequiredAttributes(route: RouteRecordNormalized) {
   return route.meta && route.meta.moduleName && route.meta.moduleIcon && route.meta.requiredRole
 }
 
-function checkUserAuthorization(route: CustomRouteRecordNormalized) {
-  console.log(route.meta.requiredRole?.includes('public'))
-  return route.meta.requiredRole?.includes(user.user_metadata.role) || route.meta.requiredRole?.includes('public')
-}
+// function checkUserAuthorization(route: CustomRouteRecordNormalized) {
+//   console.log(route.meta.requiredRole?.includes('public'))
+//   return route.meta.requiredRole?.includes(user.user_metadata.role) || route.meta.requiredRole?.includes('public')
+// }
 
 router.getRoutes().forEach((route) => {
-  if (hasRequiredAttributes(route) && hasShowFlag(route) && checkUserAuthorization(route)) {
+  if (hasRequiredAttributes(route) && hasShowFlag(route)) {
     let moduleTab = dynamicTabs.find(tab => tab.name === route.meta.moduleName)
     if (!moduleTab) {
       moduleTab = {
