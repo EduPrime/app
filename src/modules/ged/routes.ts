@@ -13,6 +13,7 @@ const routes = [
       icon: cloudUpload,
       name: 'Upload Files',
       order: 4,
+      requiredRole: ['public'],
     },
   },
 ]
