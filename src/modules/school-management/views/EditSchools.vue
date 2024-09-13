@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import type { Database, Tables } from '@/types/database.types'
 import SchoolForm from '../../school-management/components/SchoolForm.vue'
 
 const schoolFormRef = ref<InstanceType<typeof SchoolForm> | null>(null)
 const router = useRouter()
-
 function handleCancel() {
   router.push({ name: 'InstitutionListInstitutions' })
 }
@@ -47,3 +47,14 @@ function handleSave() {
     </template>
   </content-layout>
 </template>
+
+<style scoped>
+ion-label h2 {
+  margin: 0;
+  font-weight: bold;
+}
+
+ion-searchbar {
+  --background: var(--ion-color-light);
+}
+</style>

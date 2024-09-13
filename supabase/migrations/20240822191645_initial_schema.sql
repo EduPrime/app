@@ -179,6 +179,27 @@ CREATE TABLE series
     updated_at   TIMESTAMPTZ
 );
 
+CREATE TABLE school (
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(255),
+    city VARCHAR(100),
+    state CHAR(2),
+    postalcode CHAR(10),
+    school_zone VARCHAR(10),
+    phone VARCHAR(15),
+    email VARCHAR(100),
+    website VARCHAR(255),
+    social_network VARCHAR(255),
+    institution_id uuid NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    abbreviation VARCHAR(255),
+    logourl VARCHAR(255),
+    created_at timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamptz,
+    updated_at timestamptz,
+    user_created UUID DEFAULT auth.uid()
+);
 CREATE TABLE class_session
 (
     id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -193,6 +214,7 @@ CREATE TABLE class_session
     created_at    TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at    TIMESTAMPTZ,
     updated_at    TIMESTAMPTZ
+
 );
 
 CREATE TABLE student

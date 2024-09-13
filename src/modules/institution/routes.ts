@@ -36,32 +36,6 @@ const routes: Array<CustomRouteRecordRaw> = [
     },
   },
   {
-    path: '/Institutions/schools',
-    name: 'InstitutionListInstitutions',
-    component: DashboardSchools,
-    meta: {
-      moduleName: 'Institutions',
-      moduleIcon: school,
-      icon: school,
-      name: 'Escolas',
-      order: 3,
-      requiredRole: ['public'],
-    },
-  },
-  {
-    path: '/Institutions/school/register',
-    name: 'RegisterSchool',
-    component: RegisterSchool,
-    meta: {
-      moduleName: 'Institutions',
-      moduleIcon: school,
-      icon: school,
-      name: 'Cad Escola',
-      order: 4,
-      requiredRole: ['public'],
-    },
-  },
-  {
     path: '/Institutions/academic/years',
     name: 'AcademicYear',
     component: AcademicYear,
@@ -70,8 +44,9 @@ const routes: Array<CustomRouteRecordRaw> = [
       moduleIcon: layers,
       icon: layers,
       name: 'Ano Letivo',
-      order: 5,
+      order: 6,
       requiredRole: ['public'],
+
     },
   },
   {
@@ -83,7 +58,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       moduleIcon: layers,
       icon: layers,
       name: 'Modelo ano letivo',
-      order: 6,
+      order: 7,
       requiredRole: ['public'],
     },
   },
