@@ -22,25 +22,11 @@ const routes = [
     component: EditSchools,
     moduleName: 'Schools',
     moduleIcon: school,
-    meta: {
-      moduleName: 'Schools',
-      moduleIcon: school,
-      icon: pencil,
-      name: 'Escolas EDICAO',
-      order: 1,
-    },
   },
   {
     path: '/Schools/register',
     name: 'RegisterSchool',
     component: RegisterSchool,
-    meta: {
-      moduleName: 'Schools',
-      moduleIcon: school,
-      icon: create,
-      name: 'Cad Escola',
-      order: 5,
-    },
   },
 ]
 
