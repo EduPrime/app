@@ -6,7 +6,6 @@
   "description": "Gestão Pedagógica",
   "scripts": {
     "dev": "ionic serve --browser firefox",
-    "ionic:serve": "vite",
     "build": "vue-tsc && vite build",
     "preview": "vite preview",
     "lint": "eslint .",
