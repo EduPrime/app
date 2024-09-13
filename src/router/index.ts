@@ -2,21 +2,28 @@ import { useUserStore } from '@/store/user'
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { home } from 'ionicons/icons'
 import type { CustomRouteRecordRaw } from '@/router/RouterType'
-import {toArray} from "@antfu/eslint-config";
 
 // Função para carregar dinamicamente todas as rotas dos módulos
 const moduleRoutes: Record<string, any> = import.meta.glob('../modules/**/routes.ts', { eager: true })
 
 const dynamicRoutes: CustomRouteRecordRaw[] = []
 
+// this was an attempt to type the routes to be easier to develop
+// for (const path in moduleRoutes) {
+//   const module: any = moduleRoutes[path]
+//   if (typeof module === 'function') {
+//     const mod = await module()
+//
+//     if (mod.default) {
+//       dynamicRoutes.push(...(mod.default as CustomRouteRecordRaw[]))
+//     }
+//   }
+// }
+
 for (const path in moduleRoutes) {
   const module: any = moduleRoutes[path]
-  if (typeof module === 'function') {
-    const mod = await module()
-
-    if (mod.default) {
-      dynamicRoutes.push(...(mod.default as CustomRouteRecordRaw[]))
-    }
+  if (module.default) {
+    dynamicRoutes.push(...module.default)
   }
 }
 
@@ -147,7 +154,7 @@ router.beforeEach(async (to, from, next) => {
     else {
       const role = user?.user_metadata?.role
 
-      if (to.meta.requiredRoles && !(to.meta.requiredRoles).includes(role)) {
+      if (to.meta.requiredRoles && !to.meta.requiredRoles.includes(role)) {
         return next('/login')
       }
     }

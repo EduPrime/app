@@ -1,12 +1,10 @@
 // src/modules/institution/routes.ts
-import { business, layers, school } from 'ionicons/icons'
+import { business, layers } from 'ionicons/icons'
 import type { CustomRouteRecordRaw } from '@/router/RouterType'
 import AcademicYear from './views/AcademicYear.vue'
 import DashboardInstitution from './views/DashboardInstitution.vue'
-import DashboardSchools from './views/DashboardSchools.vue'
 import RegisterAcademicTemplate from './views/RegisterAcademicTemplate.vue'
 import RegisterInstitution from './views/RegisterInstitution.vue'
-import RegisterSchool from './views/RegisterSchool.vue'
 
 const routes: Array<CustomRouteRecordRaw> = [
   {

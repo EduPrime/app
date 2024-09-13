@@ -1,4 +1,4 @@
-import { create, pencil, school } from 'ionicons/icons'
+import { school } from 'ionicons/icons'
 import DashboardSchools from './views/DashboardSchools.vue'
 import EditSchools from './views/EditSchools.vue'
 import RegisterSchool from './views/RegisterSchool.vue'
@@ -14,6 +14,7 @@ const routes = [
       icon: school,
       name: 'Escolas',
       order: 1,
+      requiredRole: ['public'],
     },
   },
   {
@@ -22,11 +23,17 @@ const routes = [
     component: EditSchools,
     moduleName: 'Schools',
     moduleIcon: school,
+    meta: {
+      requiredRole: ['public'],
+    },
   },
   {
     path: '/Schools/register',
     name: 'RegisterSchool',
     component: RegisterSchool,
+    meta: {
+      requiredRole: ['public'],
+    },
   },
 ]
 
