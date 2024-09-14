@@ -50,45 +50,26 @@ CREATE TABLE institution
     updated_at   TIMESTAMPTZ
 );
 
-CREATE TABLE school
-(
-    id                                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    institution_id                          UUID                                       NOT NULL REFERENCES institution (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    name                                    VARCHAR(100)                               NOT NULL,
-    address                                 VARCHAR(255),
-    city                                    VARCHAR(100),
-    state                                   CHAR(2),
-    postalcode                              CHAR(10),
-    phone                                   VARCHAR(15),
-    active                                  boolean          DEFAULT true              NOT NULL,
-    abbreviation                            VARCHAR(255),
-    longitude                               VARCHAR(255),
-    latitude                                VARCHAR(255),
-    totalarea                               VARCHAR(255),
-    builtarea                               VARCHAR(255),
-    availablearea                           VARCHAR(255),
-    acronym                                 VARCHAR(255),
-    blockdiaryentriesforclosedacademicyears boolean,
-    operationalstatus                       INTEGER,
-    administrativedependency                INTEGER,
-    regulation                              INTEGER,
-    logourl                                 VARCHAR(255),
-    access                                  INTEGER,
-    manager_id                              uuid,
-    managerposition                         VARCHAR(255),
-    operationlocation                       VARCHAR(255),
-    condition                               INTEGER,
-    sharedschoolinepcode                    INTEGER,
-    creationdecree                          VARCHAR(255),
-    numberoffloors                          INTEGER,
-    floortype                               INTEGER,
-    energymeter                             INTEGER,
-    hasexternalarea                         boolean,
-    metadata                                JSONB,
-    user_created                            UUID             DEFAULT auth.uid(),
-    created_at                              TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at                              TIMESTAMPTZ,
-    updated_at                              TIMESTAMPTZ
+CREATE TABLE school (
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(255),
+    city VARCHAR(100),
+    state CHAR(2),
+    postalcode CHAR(10),
+    school_zone VARCHAR(10),
+    phone VARCHAR(15),
+    email VARCHAR(100),
+    website VARCHAR(255),
+    social_network VARCHAR(255),
+    institution_id uuid NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    abbreviation VARCHAR(255),
+    logourl VARCHAR(255),
+    created_at timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamptz,
+    updated_at timestamptz,
+    user_created UUID DEFAULT auth.uid()
 );
 
 CREATE TABLE teacher
@@ -179,27 +160,6 @@ CREATE TABLE series
     updated_at   TIMESTAMPTZ
 );
 
-CREATE TABLE school (
-    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL,
-    address VARCHAR(255),
-    city VARCHAR(100),
-    state CHAR(2),
-    postalcode CHAR(10),
-    school_zone VARCHAR(10),
-    phone VARCHAR(15),
-    email VARCHAR(100),
-    website VARCHAR(255),
-    social_network VARCHAR(255),
-    institution_id uuid NOT NULL,
-    active boolean DEFAULT true NOT NULL,
-    abbreviation VARCHAR(255),
-    logourl VARCHAR(255),
-    created_at timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at timestamptz,
-    updated_at timestamptz,
-    user_created UUID DEFAULT auth.uid()
-);
 CREATE TABLE class_session
 (
     id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
