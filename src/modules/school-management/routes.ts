@@ -2,6 +2,8 @@ import { school } from 'ionicons/icons'
 import DashboardSchools from './views/DashboardSchools.vue'
 import EditSchools from './views/EditSchools.vue'
 import RegisterSchool from './views/RegisterSchool.vue'
+import DashboardClass from './views/DashboardClass.vue'
+import RegisterClass from './views/RegisterClass.vue'
 
 const routes = [
   {
@@ -31,6 +33,27 @@ const routes = [
     path: '/Schools/register',
     name: 'RegisterSchool',
     component: RegisterSchool,
+    meta: {
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Class/list',
+    name: 'ClassListClass',
+    component: DashboardClass,
+    meta: {
+      moduleName: 'Schools',
+      moduleIcon: school,
+      icon: school,
+      name: 'Turmas',
+      order: 1,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Class/register',
+    name: 'RegisterClass',
+    component: RegisterClass,
     meta: {
       requiredRole: ['public'],
     },
