@@ -68,9 +68,6 @@ importers:
       '@uppy/vue':
         specifier: ^2.0.1
         version: 2.0.1(@uppy/core@4.2.0)(@uppy/dashboard@4.1.0(@uppy/core@4.2.0))(@uppy/drag-drop@4.0.2(@uppy/core@4.2.0))(@uppy/file-input@4.0.1(@uppy/core@4.2.0))(@uppy/progress-bar@4.0.0(@uppy/core@4.2.0))(@uppy/status-bar@4.0.3(@uppy/core@4.2.0))(vue@3.5.4(typescript@5.6.2))
-      axios:
-        specifier: ^1.7.7
-        version: 1.7.7
       echarts:
         specifier: ^5.5.1
         version: 5.5.1
@@ -80,6 +77,12 @@ importers:
       moment:
         specifier: ^2.30.1
         version: 2.30.1
+      pinia:
+        specifier: ^2.2.2
+        version: 2.2.2(typescript@5.6.2)(vue@3.5.4(typescript@5.6.2))
+      pinia-plugin-persistedstate-2:
+        specifier: ^2.0.24
+        version: 2.0.24(pinia@2.2.2(typescript@5.6.2)(vue@3.5.4(typescript@5.6.2)))
       swiper:
         specifier: ^11.1.12
         version: 11.1.12
@@ -1811,9 +1814,6 @@ packages:
   aws4@1.13.2:
     resolution: {integrity: sha512-lHe62zvbTB5eEABUVi/AwVh0ZKY9rMMDhmm+eeyuuUQbQ3+J+fONVQOZyj+DdrvD4BY33uYniyRJ4UJIaSKAfw==}
 
-  axios@1.7.7:
-    resolution: {integrity: sha512-S4kL7XrjgBmvdGut0sN3yJxqYzrDOnivkBiN0OFs6hLiUam3UPvswUo0kqGyhqUZGEOytHyumEdXsAkgCOUf3Q==}
-
   b4a@1.6.6:
     resolution: {integrity: sha512-5Tk1HLk6b6ctmjIkAcU/Ujv/1WqiDl0F0JdRCR80VsOcUlHcu7pWeWRlOqQLHfDEsVx9YH/aif5AG4ehoCtTmg==}
 
@@ -2749,15 +2749,6 @@ packages:
 
   flatted@3.3.1:
     resolution: {integrity: sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==}
-
-  follow-redirects@1.15.9:
-    resolution: {integrity: sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==}
-    engines: {node: '>=4.0'}
-    peerDependencies:
-      debug: '*'
-    peerDependenciesMeta:
-      debug:
-        optional: true
 
   foreground-child@3.3.0:
     resolution: {integrity: sha512-Ld2g8rrAyMYFXBhEqMz8ZAHBi4J4uS1i/CxGMDnjyFWddMXLVcDp051DZfu+t7+ab7Wv6SMqpWmyFIj5UbfFvg==}
@@ -3894,6 +3885,23 @@ packages:
     resolution: {integrity: sha512-C3FsVNH1udSEX48gGX1xfvwTWfsYWj5U+8/uK15BGzIGrKoUpghX8hWZwa/OFnakBiiVNmBvemTJR5mcy7iPcg==}
     engines: {node: '>=4'}
 
+  pinia-plugin-persistedstate-2@2.0.24:
+    resolution: {integrity: sha512-pw6NFvw/L4SVPfLnk5RBikdvtfAVD20CLje8k4wDGnBqJG3V+AHe5zQzAenJMFQ87A0bn9geRmmuJz+CgYGhWg==}
+    peerDependencies:
+      pinia: ^2
+
+  pinia@2.2.2:
+    resolution: {integrity: sha512-ja2XqFWZC36mupU4z1ZzxeTApV7DOw44cV4dhQ9sGwun+N89v/XP7+j7q6TanS1u1tdbK4r+1BUx7heMaIdagA==}
+    peerDependencies:
+      '@vue/composition-api': ^1.4.0
+      typescript: '>=4.4.4'
+      vue: ^2.6.14 || ^3.3.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+      typescript:
+        optional: true
+
   pkg-types@1.2.0:
     resolution: {integrity: sha512-+ifYuSSqOQ8CqP4MbZA5hDpb97n3E8SVWdJe+Wms9kj745lmd3b7EZJiqvmLwAlmRfjrI7Hi5z3kdBJ93lFNPA==}
 
@@ -3956,9 +3964,6 @@ packages:
 
   proxy-from-env@1.0.0:
     resolution: {integrity: sha512-F2JHgJQ1iqwnHDcQjVBsq3n/uoaFL+iPW/eAeL7kVxy/2RrWaN4WroKjjvbsoRtv0ftelNyC01bjRhn/bhcf4A==}
-
-  proxy-from-env@1.1.0:
-    resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
 
   psl@1.9.0:
     resolution: {integrity: sha512-E/ZsdU4HLs/68gYzgGTkMicWTLPdAftJLfJFlLUAAKZGkStNU72sZjT66SnMDVOfOWY/YAoiD7Jxa9iHvngcag==}
@@ -4219,6 +4224,9 @@ packages:
   shebang-regex@3.0.0:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
+
+  shvl@3.0.0:
+    resolution: {integrity: sha512-5IomAM3ykE/g9K9L6lhODc+TpCuN03rrhlboegeKyyfh66DDdpRD5JN37DYhNHH+RaYjiIDx64K/Ms/xQYOR5w==}
 
   side-channel@1.0.6:
     resolution: {integrity: sha512-fDW/EZ6Q9RiO8eFG8Hj+7u/oW+XrPTIChwCOM2+th2A6OblDtYYIpve9m+KvI9Z4C9qSEXlaGR6bTEYHReuglA==}
@@ -4776,6 +4784,17 @@ packages:
   vue-component-type-helpers@2.1.6:
     resolution: {integrity: sha512-ng11B8B/ZADUMMOsRbqv0arc442q7lifSubD0v8oDXIFoMg/mXwAPUunrroIDkY+mcD0dHKccdaznSVp8EoX3w==}
 
+  vue-demi@0.14.10:
+    resolution: {integrity: sha512-nMZBOwuzabUO0nLgIcc6rycZEebF6eeUfaiQx9+WSk8e29IbLvPU9feI6tqW4kTo3hvoYAJkMh8n8D0fuISphg==}
+    engines: {node: '>=12'}
+    hasBin: true
+    peerDependencies:
+      '@vue/composition-api': ^1.0.0-rc.1
+      vue: ^3.0.0-0 || ^2.6.0
+    peerDependenciesMeta:
+      '@vue/composition-api':
+        optional: true
+
   vue-eslint-parser@9.4.3:
     resolution: {integrity: sha512-2rYRLWlIpaiN8xbPiDyXZXRgLGOtWxERV7ND5fFAv5qo1D2N9Fu9MNajBNc6o13lZ+24DAWCkQCvj4klgmcITg==}
     engines: {node: ^14.17.0 || >=16.0.0}
@@ -5012,7 +5031,7 @@ snapshots:
       '@eslint-community/eslint-plugin-eslint-comments': 4.4.0(eslint@9.10.0)
       '@eslint/markdown': 6.1.0(eslint@9.10.0)
       '@stylistic/eslint-plugin': 2.8.0(eslint@9.10.0)(typescript@5.6.2)
-      '@typescript-eslint/eslint-plugin': 8.5.0(@typescript-eslint/parser@8.5.0(eslint@9.10.0)(typescript@5.6.2))(eslint@9.10.0)(typescript@5.6.2)
+      '@typescript-eslint/eslint-plugin': 8.5.0(@typescript-eslint/parser@7.18.0(eslint@9.10.0)(typescript@5.6.2))(eslint@9.10.0)(typescript@5.6.2)
       '@typescript-eslint/parser': 8.5.0(eslint@9.10.0)(typescript@5.6.2)
       '@vitest/eslint-plugin': 1.1.0(@typescript-eslint/utils@8.5.0(eslint@9.10.0)(typescript@5.6.2))(eslint@9.10.0)(typescript@5.6.2)(vitest@2.0.5(@types/node@22.5.4)(jsdom@25.0.0)(sass@1.78.0)(terser@5.32.0))
       eslint: 9.10.0
@@ -6558,10 +6577,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/eslint-plugin@8.5.0(@typescript-eslint/parser@8.5.0(eslint@9.10.0)(typescript@5.6.2))(eslint@9.10.0)(typescript@5.6.2)':
+  '@typescript-eslint/eslint-plugin@8.5.0(@typescript-eslint/parser@7.18.0(eslint@9.10.0)(typescript@5.6.2))(eslint@9.10.0)(typescript@5.6.2)':
     dependencies:
       '@eslint-community/regexpp': 4.11.0
-      '@typescript-eslint/parser': 8.5.0(eslint@9.10.0)(typescript@5.6.2)
+      '@typescript-eslint/parser': 7.18.0(eslint@9.10.0)(typescript@5.6.2)
       '@typescript-eslint/scope-manager': 8.5.0
       '@typescript-eslint/type-utils': 8.5.0(eslint@9.10.0)(typescript@5.6.2)
       '@typescript-eslint/utils': 8.5.0(eslint@9.10.0)(typescript@5.6.2)
@@ -7078,14 +7097,6 @@ snapshots:
   aws-sign2@0.7.0: {}
 
   aws4@1.13.2: {}
-
-  axios@1.7.7:
-    dependencies:
-      follow-redirects: 1.15.9
-      form-data: 4.0.0
-      proxy-from-env: 1.1.0
-    transitivePeerDependencies:
-      - debug
 
   b4a@1.6.6: {}
 
@@ -7983,7 +7994,7 @@ snapshots:
     dependencies:
       eslint: 9.10.0
     optionalDependencies:
-      '@typescript-eslint/eslint-plugin': 8.5.0(@typescript-eslint/parser@8.5.0(eslint@9.10.0)(typescript@5.6.2))(eslint@9.10.0)(typescript@5.6.2)
+      '@typescript-eslint/eslint-plugin': 8.5.0(@typescript-eslint/parser@7.18.0(eslint@9.10.0)(typescript@5.6.2))(eslint@9.10.0)(typescript@5.6.2)
 
   eslint-plugin-vue@9.28.0(eslint@9.10.0):
     dependencies:
@@ -8211,8 +8222,6 @@ snapshots:
       keyv: 4.5.4
 
   flatted@3.3.1: {}
-
-  follow-redirects@1.15.9: {}
 
   foreground-child@3.3.0:
     dependencies:
@@ -9474,6 +9483,19 @@ snapshots:
 
   pify@3.0.0: {}
 
+  pinia-plugin-persistedstate-2@2.0.24(pinia@2.2.2(typescript@5.6.2)(vue@3.5.4(typescript@5.6.2))):
+    dependencies:
+      pinia: 2.2.2(typescript@5.6.2)(vue@3.5.4(typescript@5.6.2))
+      shvl: 3.0.0
+
+  pinia@2.2.2(typescript@5.6.2)(vue@3.5.4(typescript@5.6.2)):
+    dependencies:
+      '@vue/devtools-api': 6.6.4
+      vue: 3.5.4(typescript@5.6.2)
+      vue-demi: 0.14.10(vue@3.5.4(typescript@5.6.2))
+    optionalDependencies:
+      typescript: 5.6.2
+
   pkg-types@1.2.0:
     dependencies:
       confbox: 0.1.7
@@ -9542,8 +9564,6 @@ snapshots:
   proto-list@1.2.4: {}
 
   proxy-from-env@1.0.0: {}
-
-  proxy-from-env@1.1.0: {}
 
   psl@1.9.0: {}
 
@@ -9816,6 +9836,8 @@ snapshots:
       shebang-regex: 3.0.0
 
   shebang-regex@3.0.0: {}
+
+  shvl@3.0.0: {}
 
   side-channel@1.0.6:
     dependencies:
@@ -10369,6 +10391,10 @@ snapshots:
   vscode-uri@3.0.8: {}
 
   vue-component-type-helpers@2.1.6: {}
+
+  vue-demi@0.14.10(vue@3.5.4(typescript@5.6.2)):
+    dependencies:
+      vue: 3.5.4(typescript@5.6.2)
 
   vue-eslint-parser@9.4.3(eslint@9.10.0):
     dependencies:
