@@ -1,55 +1,39 @@
 <script setup lang="ts">
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
-import SchoolList from '@/modules/school-management/components/SchoolList.vue'
+import ClassroomList from '@/modules/school-management/components/ClassroomList.vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Database, Enums, Tables } from '@/types/database.types'
-import SchoolService from '../services/SchoolService'
+import ClassroomService from '../services/ClassroomService'
 
 const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
-const schoolService = new SchoolService()
-const schoolData = ref<Array<{ school: Tables<'school'>, courses: Tables<'course'>[], series: Tables<'series'>[] }> | []>([])
+const classroomService = new ClassroomService()
+const dataList = ref< Tables<'classroom'> | []>([])
 const schoolCount = ref(154)
 const classCount = ref(25)
 const approvalRate = ref(48)
 const teacherCount = ref(30)
 const searchQuery = ref('')
 
-const filteredSchool = computed(() => {
+const filteredDataList = computed(() => {
   if (!searchQuery.value) {
-    return schoolData.value
+    return dataList.value
   }
 
-  const result = schoolData.value
-  return result.filter(({ school }) =>
-    school.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-    || (school.address && school.address.toLowerCase().includes(searchQuery.value.toLowerCase())),
+  return dataList.value.filter((classroom: any) =>
+    classroom.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
-async function loadSchools() {
+async function loadClassrooms() {
   try {
-    const schools = await schoolService.getAll()
-    if (schools && schools.length) {
-      const schoolsWithCourses = await Promise.all(schools.map(async (school) => {
-        const data = await schoolService.getBySchoolId(school.id)
-
-        return {
-          school,
-          courses: data?.courses || [],
-          series: data?.series || [],
-          classroom: data?.classroom || [],
-        }
-      }))
-      schoolData.value = schoolsWithCourses
-    }
-  }
-  catch (error) {
-    console.error('Erro ao carregar as escolas:', error)
+    dataList.value = await classroomService.getAll()
+  } catch (error) {
+    console.error('Erro ao carregar as salas de aula:', error)
   }
 }
 
@@ -58,7 +42,7 @@ function navigateToRegister() {
 }
 
 onMounted(() => {
-  loadSchools()
+  loadClassrooms()
 })
 </script>
 
@@ -69,7 +53,7 @@ onMounted(() => {
       :teacher-count="teacherCount"
     />
     <ion-toolbar>
-      <ion-title>Escolas ativas ({{ filteredSchool.length }})</ion-title>
+      <ion-title>Turmas ativas ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
     <ion-row class="ion-align-items-center ion-justify-content-between">
       <ion-col size="10">
@@ -83,7 +67,7 @@ onMounted(() => {
         </ion-button>
       </ion-col>
     </ion-row>
-    <SchoolList :schools="filteredSchool" @update:schools="schoolData = $event" />
+    <ClassroomList :dataList="filteredDataList" />
   </ContentLayout>
 </template>
 

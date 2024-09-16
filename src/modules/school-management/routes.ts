@@ -58,6 +58,14 @@ const routes = [
       requiredRole: ['public'],
     },
   },
+  {
+    path: '/Class/edit/:id',
+    name: 'EditSchools',
+    component: EditSchools,
+    meta: {
+      requiredRole: ['public'],
+    },
+  },
 ]
 
 export default routes
