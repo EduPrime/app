@@ -146,6 +146,7 @@ export interface Database {
           deleted_at: string | null
           id: string
           metadata: Json | null
+          school_id: string
           status: Database['public']['Enums']['attendance_status']
           student_id: string
           updated_at: string | null
@@ -157,6 +158,7 @@ export interface Database {
           deleted_at?: string | null
           id?: string
           metadata?: Json | null
+          school_id: string
           status: Database['public']['Enums']['attendance_status']
           student_id: string
           updated_at?: string | null
@@ -168,6 +170,7 @@ export interface Database {
           deleted_at?: string | null
           id?: string
           metadata?: Json | null
+          school_id?: string
           status?: Database['public']['Enums']['attendance_status']
           student_id?: string
           updated_at?: string | null
@@ -175,7 +178,14 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: 'attendance_studentid_fkey'
+            foreignKeyName: 'attendance_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'attendance_student_id_fkey'
             columns: ['student_id']
             isOneToOne: false
             referencedRelation: 'student'
@@ -192,6 +202,7 @@ export interface Database {
           end_time: string
           id: string
           metadata: Json | null
+          school_id: string
           start_time: string
           timetable_id: string
           updated_at: string | null
@@ -205,6 +216,7 @@ export interface Database {
           end_time: string
           id?: string
           metadata?: Json | null
+          school_id: string
           start_time: string
           timetable_id: string
           updated_at?: string | null
@@ -218,6 +230,7 @@ export interface Database {
           end_time?: string
           id?: string
           metadata?: Json | null
+          school_id?: string
           start_time?: string
           timetable_id?: string
           updated_at?: string | null
@@ -225,14 +238,21 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: 'classsession_disciplineid_fkey'
+            foreignKeyName: 'class_session_discipline_id_fkey'
             columns: ['discipline_id']
             isOneToOne: false
             referencedRelation: 'discipline'
             referencedColumns: ['id']
           },
           {
-            foreignKeyName: 'classsession_timetableid_fkey'
+            foreignKeyName: 'class_session_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'class_session_timetable_id_fkey'
             columns: ['timetable_id']
             isOneToOne: false
             referencedRelation: 'timetable'
@@ -248,6 +268,7 @@ export interface Database {
           metadata: Json | null
           name: string
           period: Database['public']['Enums']['period']
+          school_id: string
           series_id: string
           status: Database['public']['Enums']['status'] | null
           updated_at: string | null
@@ -260,6 +281,7 @@ export interface Database {
           metadata?: Json | null
           name: string
           period?: Database['public']['Enums']['period']
+          school_id: string
           series_id: string
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
@@ -272,12 +294,20 @@ export interface Database {
           metadata?: Json | null
           name?: string
           period?: Database['public']['Enums']['period']
+          school_id?: string
           series_id?: string
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: 'classroom_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
           {
             foreignKeyName: 'classroom_seriesid_fkey'
             columns: ['series_id']
@@ -323,6 +353,13 @@ export interface Database {
         }
         Relationships: [
           {
+            foreignKeyName: 'course_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
             foreignKeyName: 'course_schoolid_fkey'
             columns: ['school_id']
             isOneToOne: false
@@ -338,6 +375,7 @@ export interface Database {
           id: string
           metadata: Json | null
           name: string
+          school_id: string
           status: Database['public']['Enums']['status'] | null
           teacher_id: string
           updated_at: string | null
@@ -349,6 +387,7 @@ export interface Database {
           id?: string
           metadata?: Json | null
           name: string
+          school_id: string
           status?: Database['public']['Enums']['status'] | null
           teacher_id: string
           updated_at?: string | null
@@ -360,12 +399,27 @@ export interface Database {
           id?: string
           metadata?: Json | null
           name?: string
+          school_id?: string
           status?: Database['public']['Enums']['status'] | null
           teacher_id?: string
           updated_at?: string | null
           user_created?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: 'discipline_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'discipline_teacher_id_fkey'
+            columns: ['teacher_id']
+            isOneToOne: false
+            referencedRelation: 'teacher'
+            referencedColumns: ['id']
+          },
           {
             foreignKeyName: 'discipline_teacherid_fkey'
             columns: ['teacher_id']
@@ -440,6 +494,7 @@ export interface Database {
           discipline_id: string
           id: string
           metadata: Json | null
+          school_id: string
           student_id: string
           updated_at: string | null
           user_created: string | null
@@ -452,6 +507,7 @@ export interface Database {
           discipline_id: string
           id?: string
           metadata?: Json | null
+          school_id: string
           student_id: string
           updated_at?: string | null
           user_created?: string | null
@@ -464,6 +520,7 @@ export interface Database {
           discipline_id?: string
           id?: string
           metadata?: Json | null
+          school_id?: string
           student_id?: string
           updated_at?: string | null
           user_created?: string | null
@@ -471,10 +528,31 @@ export interface Database {
         }
         Relationships: [
           {
+            foreignKeyName: 'grade_discipline_id_fkey'
+            columns: ['discipline_id']
+            isOneToOne: false
+            referencedRelation: 'discipline'
+            referencedColumns: ['id']
+          },
+          {
             foreignKeyName: 'grade_disciplineid_fkey'
             columns: ['discipline_id']
             isOneToOne: false
             referencedRelation: 'discipline'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'grade_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'grade_student_id_fkey'
+            columns: ['student_id']
+            isOneToOne: false
+            referencedRelation: 'student'
             referencedColumns: ['id']
           },
           {
@@ -561,120 +639,140 @@ export interface Database {
         }
         Relationships: []
       }
+      role: {
+        Row: {
+          id: string
+          name: string
+          school_id: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          school_id: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          school_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'role_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      role_permission: {
+        Row: {
+          can_delete: boolean
+          can_insert: boolean
+          can_select: boolean
+          can_update: boolean
+          role_id: string
+          school_id: string
+          table: string
+        }
+        Insert: {
+          can_delete: boolean
+          can_insert: boolean
+          can_select: boolean
+          can_update: boolean
+          role_id: string
+          school_id: string
+          table: string
+        }
+        Update: {
+          can_delete?: boolean
+          can_insert?: boolean
+          can_select?: boolean
+          can_update?: boolean
+          role_id?: string
+          school_id?: string
+          table?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'role_permission_role_id_fkey'
+            columns: ['role_id']
+            isOneToOne: false
+            referencedRelation: 'role'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'role_permission_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       school: {
         Row: {
           abbreviation: string | null
-          access: number | null
-          acronym: string | null
           active: boolean
           address: string | null
-          administrativedependency: number | null
-          availablearea: string | null
-          blockdiaryentriesforclosedacademicyears: boolean | null
-          builtarea: string | null
           city: string | null
           created_at: string
-          creationdecree: string | null
           deleted_at: string | null
-          energymeter: number | null
-          floortype: number | null
-          hasexternalarea: boolean | null
+          email: string | null
           id: string
           institution_id: string
-          latitude: string | null
           logourl: string | null
-          longitude: string | null
-          manager_id: string | null
-          managerposition: string | null
-          metadata: Json | null
           name: string
-          numberoffloors: number | null
-          operationalstatus: number | null
-          operationlocation: string | null
           phone: string | null
           postalcode: string | null
-          regulation: number | null
-          sharedschoolinepcode: number | null
+          school_zone: string | null
+          social_network: string | null
           state: string | null
-          totalarea: string | null
           updated_at: string | null
           user_created: string | null
+          website: string | null
         }
         Insert: {
           abbreviation?: string | null
-          access?: number | null
-          acronym?: string | null
           active?: boolean
           address?: string | null
-          administrativedependency?: number | null
-          availablearea?: string | null
-          blockdiaryentriesforclosedacademicyears?: boolean | null
-          builtarea?: string | null
           city?: string | null
           created_at?: string
-          creationdecree?: string | null
           deleted_at?: string | null
-          energymeter?: number | null
-          floortype?: number | null
-          hasexternalarea?: boolean | null
+          email?: string | null
           id?: string
           institution_id: string
-          latitude?: string | null
           logourl?: string | null
-          longitude?: string | null
-          manager_id?: string | null
-          managerposition?: string | null
-          metadata?: Json | null
           name: string
-          numberoffloors?: number | null
-          operationalstatus?: number | null
-          operationlocation?: string | null
           phone?: string | null
           postalcode?: string | null
-          regulation?: number | null
-          sharedschoolinepcode?: number | null
+          school_zone?: string | null
+          social_network?: string | null
           state?: string | null
-          totalarea?: string | null
           updated_at?: string | null
           user_created?: string | null
+          website?: string | null
         }
         Update: {
           abbreviation?: string | null
-          access?: number | null
-          acronym?: string | null
           active?: boolean
           address?: string | null
-          administrativedependency?: number | null
-          availablearea?: string | null
-          blockdiaryentriesforclosedacademicyears?: boolean | null
-          builtarea?: string | null
           city?: string | null
           created_at?: string
-          creationdecree?: string | null
           deleted_at?: string | null
-          energymeter?: number | null
-          floortype?: number | null
-          hasexternalarea?: boolean | null
+          email?: string | null
           id?: string
           institution_id?: string
-          latitude?: string | null
           logourl?: string | null
-          longitude?: string | null
-          manager_id?: string | null
-          managerposition?: string | null
-          metadata?: Json | null
           name?: string
-          numberoffloors?: number | null
-          operationalstatus?: number | null
-          operationlocation?: string | null
           phone?: string | null
           postalcode?: string | null
-          regulation?: number | null
-          sharedschoolinepcode?: number | null
+          school_zone?: string | null
+          social_network?: string | null
           state?: string | null
-          totalarea?: string | null
           updated_at?: string | null
           user_created?: string | null
+          website?: string | null
         }
         Relationships: [
           {
@@ -694,6 +792,7 @@ export interface Database {
           id: string
           metadata: Json | null
           name: string
+          school_id: string
           timetable_id: string | null
           updated_at: string | null
           user_created: string | null
@@ -705,6 +804,7 @@ export interface Database {
           id?: string
           metadata?: Json | null
           name: string
+          school_id: string
           timetable_id?: string | null
           updated_at?: string | null
           user_created?: string | null
@@ -716,16 +816,38 @@ export interface Database {
           id?: string
           metadata?: Json | null
           name?: string
+          school_id?: string
           timetable_id?: string | null
           updated_at?: string | null
           user_created?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: 'series_course_id_fkey'
+            columns: ['course_id']
+            isOneToOne: false
+            referencedRelation: 'course'
+            referencedColumns: ['id']
+          },
+          {
             foreignKeyName: 'series_courseid_fkey'
             columns: ['course_id']
             isOneToOne: false
             referencedRelation: 'course'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'series_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'series_timetable_id_fkey'
+            columns: ['timetable_id']
+            isOneToOne: false
+            referencedRelation: 'timetable'
             referencedColumns: ['id']
           },
           {
@@ -753,6 +875,7 @@ export interface Database {
           name: string
           phone: string | null
           photo: string | null
+          school_id: string
           status: Database['public']['Enums']['status'] | null
           updated_at: string | null
           user_created: string | null
@@ -772,6 +895,7 @@ export interface Database {
           name: string
           phone?: string | null
           photo?: string | null
+          school_id: string
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
@@ -791,16 +915,31 @@ export interface Database {
           name?: string
           phone?: string | null
           photo?: string | null
+          school_id?: string
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
         }
         Relationships: [
           {
+            foreignKeyName: 'student_classroom_id_fkey'
+            columns: ['classroom_id']
+            isOneToOne: false
+            referencedRelation: 'classroom'
+            referencedColumns: ['id']
+          },
+          {
             foreignKeyName: 'student_classroomid_fkey'
             columns: ['classroom_id']
             isOneToOne: false
             referencedRelation: 'classroom'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'student_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
             referencedColumns: ['id']
           },
         ]
@@ -856,10 +995,57 @@ export interface Database {
         }
         Relationships: [
           {
+            foreignKeyName: 'teacher_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
             foreignKeyName: 'teacher_schoolid_fkey'
             columns: ['school_id']
             isOneToOne: false
             referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      teacher_to_timetable: {
+        Row: {
+          school_id: string
+          teacher_id: string
+          timetable_id: string
+        }
+        Insert: {
+          school_id: string
+          teacher_id: string
+          timetable_id: string
+        }
+        Update: {
+          school_id?: string
+          teacher_id?: string
+          timetable_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'teacher_to_timetable_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'teacher_to_timetable_teacher_id_fkey'
+            columns: ['teacher_id']
+            isOneToOne: false
+            referencedRelation: 'teacher'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'teacher_to_timetable_timetable_id_fkey'
+            columns: ['timetable_id']
+            isOneToOne: false
+            referencedRelation: 'timetable'
             referencedColumns: ['id']
           },
         ]
@@ -873,6 +1059,7 @@ export interface Database {
           id: string
           metadata: Json | null
           name: string
+          school_id: string
           updated_at: string | null
           user_created: string | null
         }
@@ -884,6 +1071,7 @@ export interface Database {
           id?: string
           metadata?: Json | null
           name: string
+          school_id: string
           updated_at?: string | null
           user_created?: string | null
         }
@@ -895,10 +1083,18 @@ export interface Database {
           id?: string
           metadata?: Json | null
           name?: string
+          school_id?: string
           updated_at?: string | null
           user_created?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: 'timetable_classroom_id_fkey'
+            columns: ['classroom_id']
+            isOneToOne: false
+            referencedRelation: 'classroom'
+            referencedColumns: ['id']
+          },
           {
             foreignKeyName: 'timetable_classroomid_fkey'
             columns: ['classroom_id']
@@ -907,10 +1103,24 @@ export interface Database {
             referencedColumns: ['id']
           },
           {
+            foreignKeyName: 'timetable_discipline_id_fkey'
+            columns: ['discipline_id']
+            isOneToOne: false
+            referencedRelation: 'discipline'
+            referencedColumns: ['id']
+          },
+          {
             foreignKeyName: 'timetable_disciplineid_fkey'
             columns: ['discipline_id']
             isOneToOne: false
             referencedRelation: 'discipline'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'timetable_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
             referencedColumns: ['id']
           },
         ]
@@ -945,6 +1155,20 @@ export interface Database {
         }
         Relationships: [
           {
+            foreignKeyName: 'timetable_school_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'timetable_school_timetable_id_fkey'
+            columns: ['timetable_id']
+            isOneToOne: false
+            referencedRelation: 'timetable'
+            referencedColumns: ['id']
+          },
+          {
             foreignKeyName: 'timetableschool_schoolid_fkey'
             columns: ['school_id']
             isOneToOne: false
@@ -960,6 +1184,39 @@ export interface Database {
           },
         ]
       }
+      user_role: {
+        Row: {
+          role_id: string
+          school_id: string
+          user_id: string
+        }
+        Insert: {
+          role_id: string
+          school_id: string
+          user_id: string
+        }
+        Update: {
+          role_id?: string
+          school_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'user_role_role_id_fkey'
+            columns: ['role_id']
+            isOneToOne: false
+            referencedRelation: 'role'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'user_role_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -971,6 +1228,56 @@ export interface Database {
           end_date: string
         }
         Returns: number
+      }
+      can_delete: {
+        Args: {
+          p_table: string
+        }
+        Returns: boolean
+      }
+      can_insert: {
+        Args: {
+          p_table: string
+        }
+        Returns: boolean
+      }
+      can_select: {
+        Args: {
+          p_table: string
+        }
+        Returns: boolean
+      }
+      can_update: {
+        Args: {
+          p_table: string
+        }
+        Returns: boolean
+      }
+      current_school: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_header: {
+        Args: {
+          item: string
+        }
+        Returns: string
+      }
+      my_schools: {
+        Args: Record<PropertyKey, never>
+        Returns: string[]
+      }
+      setup_rls_policies: {
+        Args: {
+          ignore_tables?: string[]
+        }
+        Returns: undefined
+      }
+      validate_role: {
+        Args: {
+          role_name: string
+        }
+        Returns: boolean
       }
     }
     Enums: {
@@ -1000,19 +1307,19 @@ export type Tables<
   | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-    Database[PublicTableNameOrOptions['schema']]['Views'])
+      Database[PublicTableNameOrOptions['schema']]['Views'])
     : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-  Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
+    Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
     }
       ? R
       : never
   : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] &
-  PublicSchema['Views'])
+    PublicSchema['Views'])
     ? (PublicSchema['Tables'] &
-    PublicSchema['Views'])[PublicTableNameOrOptions] extends {
+      PublicSchema['Views'])[PublicTableNameOrOptions] extends {
         Row: infer R
       }
         ? R
