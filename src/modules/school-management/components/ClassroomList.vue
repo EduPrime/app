@@ -10,6 +10,7 @@ import ClassroomService from '../services/ClassroomService'
 // Instanciando o serviço da tabela
 const service = new ClassroomService()
 
+const classroom = ref< Tables<'classroom'> | []>([])
 const dataList = ref()
 const props = defineProps<{
   dataList: Tables<'classroom'>
@@ -51,7 +52,7 @@ function toggleDetails(index: number) {
 function editItem(item: any) {
   // Exemplo de navegação para a página de edição
   // Dependendo da sua implementação, ajuste a rota
-  router.push({ name: `Edit${tableName}`, params: { id: item.id.toString() } })
+  router.push({ name: `EditClass`, params: { id: item.id.toString() } })
 }
 
 const isAlertOpen = ref(false)
@@ -130,10 +131,10 @@ const alertButtons = [
         </ion-buttons>
       </ion-item>
       <ion-item-options side="end">
-        <ion-item-option @click="editItem(item)">
+        <ion-item-option @click="editItem(classroom)">
           Editar
         </ion-item-option>
-        <ion-item-option color="danger" @click="openDeleteAlert(item)">
+        <ion-item-option color="danger" @click="openDeleteAlert(classroom)">
           Excluir
         </ion-item-option>
       </ion-item-options>

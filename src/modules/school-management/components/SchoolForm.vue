@@ -143,7 +143,7 @@ async function getSchoolData() {
     if (schoolDbData) {
       setFieldValue('institutionId', schoolDbData.institutionId),
       setFieldValue('name', schoolDbData.name),
-      setFieldValue('phone', schoolDbData.phone),
+      setFieldValue('phone', applyPhoneMask(schoolDbData.phone)),
       setFieldValue('email', schoolDbData.email),
       setFieldValue('website', schoolDbData.website),
       setFieldValue('social_network', schoolDbData.social_network),

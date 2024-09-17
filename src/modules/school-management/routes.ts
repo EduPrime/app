@@ -1,6 +1,7 @@
 import { school } from 'ionicons/icons'
 import DashboardSchools from './views/DashboardSchools.vue'
 import EditSchools from './views/EditSchools.vue'
+import EditClass from './views/EditClass.vue'
 import RegisterSchool from './views/RegisterSchool.vue'
 import DashboardClass from './views/DashboardClass.vue'
 import RegisterClass from './views/RegisterClass.vue'
@@ -60,8 +61,8 @@ const routes = [
   },
   {
     path: '/Class/edit/:id',
-    name: 'EditSchools',
-    component: EditSchools,
+    name: 'EditClass',
+    component: EditClass,
     meta: {
       requiredRole: ['public'],
     },
