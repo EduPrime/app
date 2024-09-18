@@ -34,6 +34,9 @@ const school_Id = ref('')
 const classData = ref< Tables<'classroom'> | []>([])
 const selectedSegment = ref('general-info')
 const classList = ref<{ id: string, name: string }[]>([])
+const periods = ['MORNING', 'AFTERNOON', 'EVENING'];
+const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED'];
+const day_of_week = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
 const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
 const seriesService = new SeriesService()
@@ -48,43 +51,40 @@ const teacherList = ref()
 const courseList = ref()
 const classId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = yup.object({
+  name: yup.string()
+  .required('Nome da turma é obrigatório'),
   year: yup.string()
   .required('Ano é obrigatório'),
   institution: yup.string()
   .required('Instituição é obrigatória'),
-  school: yup.string()
+  school_id: yup.string()
   .required('Escola é obrigatória'),
   course: yup.string()
   .required('Curso é obrigatório'),
-  serie: yup.string()
+  series_id: yup.string()
   .required('Série é obrigatória'),
   teacher: yup.string()
   .optional(),
-  typeClass: yup.string()
+  status: yup.string()
   .required('Tipo de turma é obrigatório'),
-  nameClass: yup.string()
-  .required('Nome da turma é obrigatório'),
   abbreviation: yup.string()
   .optional(),
   maxStudents: yup.number()
-  .required('Máximo de alunos é obrigattório')
+  .required('Máximo de alunos é obrigatório')
   .positive('O número máximo de alunos deve ser positivo')
   .integer('O número máximo de alunos deve ser um número inteiro'),
   startTime: yup.string()
-  .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Hora inicial deve estar no formato hh:mm')
-  .required('Hora inicial é obrigatória'),
+  .matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, 'Hora inicial deve estar no formato hh:mm'),
   startTimeInterval: yup.string()
-  .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Hora inicial do intervalo deve estar no formato hh:mm')
-  .required('Hora inicial do intervalo é obrigatória'),
-  timeEndInterval: yup.string()
-  .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Hora final do intervalo deve estar no formato hh:mm')
-  .required('Hora final do intervalo é obrigatória'),
+  .matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, 'Hora inicial do intervalo deve estar no formato hh:mm'),
+  endTimeInterval: yup.string()
+  .matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, 'Hora final do intervalo deve estar no formato hh:mm'),
   endTime: yup.string()
-  .matches(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Hora final deve estar no formato hh:mm')
-  .required('Hora final é obrigatória'),
-  daysOfWeek: yup.string()
+  .matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, 'Hora final deve estar no formato hh:mm'),
+  day_of_week: yup.array()
+  .of(yup.string())
   .optional(),
-  turn: yup.string()
+  period: yup.string()
   .required('Turno é obrigatório'),
   
 })
@@ -102,23 +102,23 @@ async function registerClass() {
   }
   else {
     const formData = {
-      series_id: series_Id.value,
-      school_id: school_Id.value,
+      name: values.name,
+      series_id: values.series_id,
+      school_id: values.school_id,
       nameClass: values.nameClass,
       abbreviation: values.abbreviation,
       year: values.year,
       institution: values.institution,
-      school: values.school,
       course: values.course,
       teacher: values.teacher,
-      typeClass: values.typeClass,
+      status: values.status,
       maxStudents: values.maxStudents,
       startTime: values.startTime,
       startTimeInterval: values.startTimeInterval,
       endTimeInterval: values.endTimeInterval,
       endTime: values.endTime,
-      daysOfWeek: values.daysOfWeek,
-      turn: values.turn,
+      day_of_week: values.day_of_week,
+      period: values.period,
 
     }
     try {
@@ -205,22 +205,23 @@ async function getClassData() {
   if (classId.value) {
     const classDbData = await classroomService.getById(classId.value)
     if (classDbData) {
-        setFieldValue('nameClass', classDbData.nameClass),
-        setFieldValue('school_Id', classDbData.school_Id),
-        setFieldValue('series_Id', classDbData.series_Id),
-        setFieldValue('abbreviation', classDbData.abbreviation),
-        setFieldValue('year', classDbData.year),
-        setFieldValue('institution', classDbData.institution),
-        setFieldValue('course', classDbData.course),
-        setFieldValue('teacher', classDbData.teacher),
-        setFieldValue('typeClass', classDbData.typeClass),
-        setFieldValue('maxStudents', classDbData.maxStudents),
-        setFieldValue('startTime', classDbData.startTime),
-        setFieldValue('startTimeInterval', classDbData.startTimeInterval),
-        setFieldValue('endTimeInterval', classDbData.endTimeInterval),
-        setFieldValue('endTime', classDbData.endTime),
-        setFieldValue('daysOfWeek', classDbData.daysOfWeek),
-        setFieldValue('turn', classDbData.turn)
+        setFieldValue('name', classDbData.name)
+        setFieldValue('nameClass', classDbData.nameClass)
+        setFieldValue('school_id', classDbData.school_id)
+        setFieldValue('series_id', classDbData.series_id)
+        setFieldValue('abbreviation', classDbData.abbreviation)
+        setFieldValue('year', classDbData.year)
+        setFieldValue('institution', classDbData.institution)
+        setFieldValue('course', classDbData.course)
+        setFieldValue('teacher', classDbData.teacher)
+        setFieldValue('status', classDbData.status)
+        setFieldValue('maxStudents', classDbData.maxStudents)
+        setFieldValue('startTime', classDbData.startTime)
+        setFieldValue('startTimeInterval', classDbData.startTimeInterval)
+        setFieldValue('endTimeInterval', classDbData.endTimeInterval)
+        setFieldValue('endTime', classDbData.endTime)
+        setFieldValue('day_of_week', classDbData.day_of_week)
+        setFieldValue('period', classDbData.period)
     }
     else {
       console.error(`Dados da escola não encontrados para o ID: ${classId.value}`)
@@ -259,25 +260,25 @@ onMounted(async () => {
     </IonSegmentButton>
     <IonSegmentButton value="class-info">
       <IonLabel style="font-size: calc(1rem - 2px);">
-        Infor. de funcionamento da turma
+        Informações da turma
       </IonLabel>
     </IonSegmentButton>
   </IonSegment>
   <div v-show="selectedSegment === 'general-info'">
-    <EpInput v-model="values.nameClass" name="nameClass" label="Nome da Turma*" placeholder="Digite o nome da turma" />
+    <EpInput v-model="values.name" name="name" label="Nome da Turma*" placeholder="Digite o nome da turma" />
     <EpInput v-model="values.abbreviation" name="abbreviation" label="Abreviação" placeholder="Digite a abreviação" />
     <EpInput v-model="values.year" name="year" label="Ano*" type="number" placeholder="Digite o ano" />
     <ion-list id="periodList">
       <ion-item>
         <IonSelect
-          v-model="classId"
+          v-model="values.status"
           justify="space-between"
           label="Tipo de Turma"
           placeholder="Selecione o tipo de turma"
           @ion-change="handleSchoolChange"
         >
-          <IonSelectOption v-for="classroom in classroomList" :key="classroom.id" :value="classroom.id">
-            {{ classroom.status }}
+          <IonSelectOption v-for="status in status" :key="status" :value="status">
+            {{ status }}
           </IonSelectOption>
         </IonSelect>
       </ion-item>
@@ -288,7 +289,7 @@ onMounted(async () => {
     <ion-list id="institutionList">
       <ion-item>
         <IonSelect
-          v-model="classId"
+          v-model="values.institution"
           justify="space-between"
           label="Instituição*"
           placeholder="Selecione a instituição"
@@ -303,7 +304,7 @@ onMounted(async () => {
     <ion-list id="schoolList">
       <ion-item>
         <IonSelect
-          v-model="classId"
+          v-model="values.school_id"
           justify="space-between"
           label="Escola*"
           placeholder="Selecione a escola"
@@ -318,7 +319,7 @@ onMounted(async () => {
     <ion-list id="courseList">
       <ion-item>
         <IonSelect
-          v-model="classId"
+          v-model="values.course"
           justify="space-between"
           label="Curso*"
           placeholder="Selecione o curso"
@@ -333,7 +334,7 @@ onMounted(async () => {
     <ion-list id="courseList">
       <ion-item>
         <IonSelect
-          v-model="classId"
+          v-model="values.series_id"
           justify="space-between"
           label="Série*"
           placeholder="Selecione a série"
@@ -348,7 +349,7 @@ onMounted(async () => {
     <ion-list id="teacherList">
       <ion-item>
         <IonSelect
-          v-model="classId"
+          v-model="values.teacher"
           justify="space-between"
           label="Professor"
           placeholder="Selecione o professor"
@@ -366,18 +367,33 @@ onMounted(async () => {
     <EpInput v-model="values.startTimeInterval" name="startTimeInterval" label="Intervalo Inicial" type="time" placeholder="Digite o intervalo inicial" />
     <EpInput v-model="values.endTimeInterval" name="endTimeInterval" label="Intervalo Final" type="time" placeholder="Digite o intervalo final" />
     <EpInput v-model="values.endTime" name="endTime" label="Hora Final" type="time" placeholder="Digite a hora final" />
-    <EpInput v-model="values.daysOfWeek" name="daysOfWeek" label="Dias da Semana" placeholder="Digite os dias da semana" />
+    <ion-list id="daysOfWeek">
+      <ion-item>
+        <IonSelect
+          v-model="values.day_of_week"
+          multiple
+          justify="space-between"
+          label="Dias da Semana"
+          placeholder="Selecione os dias da semana"
+          @ion-change="handleSchoolChange"
+        >
+          <IonSelectOption v-for="day_of_week in day_of_week" :key="day_of_week" :value="day_of_week">
+            {{ day_of_week }}
+          </IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
     <ion-list id="periodList">
       <ion-item>
         <IonSelect
-          v-model="classId"
+          v-model="values.period"
           justify="space-between"
           label="Turno"
           placeholder="Selecione o turno"
           @ion-change="handleSchoolChange"
         >
-          <IonSelectOption v-for="classroom in classroomList" :key="classroom.id" :value="classroom.id">
-            {{ classroom.period }}
+          <IonSelectOption v-for="period in periods" :key="period" :value="period">
+            {{ period }}
           </IonSelectOption>
         </IonSelect>
       </ion-item>

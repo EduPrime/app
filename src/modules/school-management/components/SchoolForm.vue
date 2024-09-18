@@ -112,7 +112,7 @@ async function registerSchool() {
         if (result) {
           showToast('Escola atualizada com sucesso')
           setTimeout(() => {
-            router.push('/Institutions/schools').then(() => {
+            router.push('/Schools/list').then(() => {
               location.reload()
             })
           }, 2000)
@@ -123,7 +123,7 @@ async function registerSchool() {
         if (result) {
           showToast('Escola cadastrada com sucesso!', 'top', 'success')
           setTimeout(() => {
-            router.push('/Institutions/schools').then(() => {
+            router.push('/Schools/list').then(() => {
               location.reload()
             })
           }, 2000)
@@ -143,7 +143,7 @@ async function getSchoolData() {
     if (schoolDbData) {
       setFieldValue('institutionId', schoolDbData.institutionId),
       setFieldValue('name', schoolDbData.name),
-      setFieldValue('phone', applyPhoneMask(schoolDbData.phone)),
+      setFieldValue('phone', schoolDbData.phone),
       setFieldValue('email', schoolDbData.email),
       setFieldValue('website', schoolDbData.website),
       setFieldValue('social_network', schoolDbData.social_network),

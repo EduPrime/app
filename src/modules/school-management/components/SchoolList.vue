@@ -1,84 +1,105 @@
 <script setup lang="ts">
 import showToast from '@/utils/toast-alert'
+import { onMounted, ref, watch } from 'vue'
 import { IonAlert } from '@ionic/vue'
 import { pencil, trash } from 'ionicons/icons'
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Database, Tables } from '@/types/database.types'
-import SchoolService from '../../institution/services/SchoolService'
+import type { Tables } from '@/types/database.types'
+import SchoolService from '../services/SchoolService'
+
+// Instanciando o serviço da tabela
+const service = new SchoolService()
+
+// Define o tipo dinamicamente com base em tableName
+const school = ref< Tables<'school'> | []>([])
+const dataList = ref()
 
 const props = defineProps<{
-  schools: School[]
+  dataList: Tables<'school'>
 }>()
 
-const emit = defineEmits(['update:schools'])
+watch(
+  () => props.dataList,
+  (newValue) => {
+    dataList.value = newValue;
+    console.log('dataList foi atualizado:', { dataList });
+  },
+  { immediate: true }
+);
+
+
+// Nome da tabela e campos
+const tableName = 'school'
+const fields = ['abbreviation', 'access', 'acronym', 'active', 'address', 'administrativedependency', 'availablearea', 'blockdiaryentriesforclosedacademicyears', 'builtarea', 'city', 'created_at', 'creationdecree', 'deleted_at', 'energymeter', 'floortype', 'hasexternalarea', 'id', 'institution_id', 'latitude', 'logourl', 'longitude', 'manager_id', 'managerposition', 'metadata', 'name', 'numberoffloors', 'operationalstatus', 'operationlocation', 'phone', 'postalcode', 'regulation', 'sharedschoolinepcode', 'state', 'totalarea', 'updated_at', 'user_created']
 const router = useRouter()
-const school = ref< Tables<'school'> | []>([])
-function toggleDetails(index: number) {
-  const updatedSchools = [...props.schools]
-  updatedSchools[index] = {
-    ...updatedSchools[index],
-    showDetails: !updatedSchools[index].showDetails,
+
+// Função que busca os dados da tabela ao montar o componente
+onMounted(async () => {
+  try {
+    dataList.value = await service.getAll()
+  } catch (error) {
+    console.error(`Erro ao buscar dados de ${tableName}:`, error)
   }
-  emit('update:schools', updatedSchools)
+})
+
+// Funções para editar, excluir e detalhes
+function toggleDetails(index: number) {
+  dataList.value[index] = {
+    ...dataList.value[index],
+    showDetails: !dataList.value[index].showDetails,
+  }
 }
 
-function editSchool(school: School) {
-  router.push({ name: 'EditSchools', params: { id: school.school.id.toString() } })
+function editItem(item: any) {
+  // Exemplo de navegação para a página de edição
+  // Dependendo da sua implementação, ajuste a rota
+  router.push({ name: 'EditSchools', params: { id: item.id.toString() } })
 }
 
 const isAlertOpen = ref(false)
-const schoolToDelete = ref<School | null>(null)
-function openDeleteAlert(school: School) {
-  schoolToDelete.value = school
+const itemToDelete = ref<any | null>(null)
+
+function openDeleteAlert(item: any) {
+  itemToDelete.value = item
   isAlertOpen.value = true
 }
+
 function handleAlertDismiss(ev: CustomEvent) {
   const role = ev.detail.role
-  if (role === 'confirm' && schoolToDelete.value) {
-    deleteSchool(schoolToDelete.value)
-  }
-  else {
+  if (role === 'confirm' && itemToDelete.value) {
+    deleteItem(itemToDelete.value)
+  } else {
     handleCancel()
   }
 }
-async function deleteSchool(school: School) {
-  const schoolService = new SchoolService()
 
-  if (school.school.id) {
-    const result = await schoolService.softDelete(school.school.id)
-    if (result) {
-      showToast(`${school.school.name} excluído com sucesso`)
-      setTimeout(() => {
-        router.push('/Institutions/schools').then(() => {
-          location.reload()
-        })
-      }, 2000)
-      emit('update:schools')
-      isAlertOpen.value = false
-      schoolToDelete.value = null
-    }
-  }
-  else {
-    console.error('Erro ao excluir a escola.')
+async function deleteItem(item: any) {
+  try {
+   const result =  await service.softDelete(item.id)
+   if (result) {
+    showToast(`${tableName} excluído com sucesso`)
+    dataList.value = dataList.value.filter(i => i.id !== item.id)
+    isAlertOpen.value = false
+    itemToDelete.value = null
+   }
+  } catch (error) {
+    console.error('Erro ao excluir o item:', error)
   }
 }
 
 function handleCancel() {
-  console.info('Exclusão cancelada')
   isAlertOpen.value = false
-  schoolToDelete.value = null
+  itemToDelete.value = null
 }
+
 const alertButtons = [
   {
     text: 'Cancelar',
     role: 'cancel',
-
   },
   {
     text: 'Excluir',
     role: 'confirm',
-
   },
 ]
 </script>
@@ -92,34 +113,44 @@ const alertButtons = [
     @did-dismiss="handleAlertDismiss"
   />
   <ion-list>
-    <ion-item-sliding v-for="(school, index) in schools" :key="index">
+    <ion-item-sliding v-for="(item, index) in dataList" :key="index">
       <ion-item button @click="toggleDetails(index)">
         <ion-label>
-          <h2>{{ school.school.name }}</h2>
-          <p>{{ school.school.address }}</p>
+          <h2>{{ item.name || 'Item sem nome' }}</h2>
+          <p>{{ item.address || 'Sem endereço' }}</p>
         </ion-label>
         <ion-buttons slot="end">
-          <ion-button @click.stop="editSchool(school)">
+          <ion-button @click.stop="editItem(item)">
             <ion-icon id="present-alert" slot="icon-only" :icon="pencil" />
           </ion-button>
-          <ion-button color="danger" @click.stop="openDeleteAlert(school)">
+          <ion-button color="danger" @click.stop="openDeleteAlert(item)">
             <ion-icon slot="icon-only" :icon="trash" />
           </ion-button>
         </ion-buttons>
       </ion-item>
       <ion-item-options side="end">
-        <ion-item-option @click="editSchool(school)">
+        <ion-item-option @click="editItem(item)">
           Editar
         </ion-item-option>
-        <ion-item-option color="danger" @click="openDeleteAlert(school)">
+        <ion-item-option color="danger" @click="openDeleteAlert(item)">
           Excluir
         </ion-item-option>
       </ion-item-options>
-      <ion-item v-if="school.showDetails">
+      <ion-item v-if="item.showDetails">
         <ion-grid>
-          <ion-row v-for="(serie, sIndex) in school.series" :key="sIndex">
+          <ion-row>
             <ion-col size="12">
-              <strong>{{ serie.name }}</strong>
+              <strong>Detalhes:</strong>
+            </ion-col>
+            <ion-col v-for="(field, fieldIndex) in fields" :key="fieldIndex" size="12">
+              <ion-card>
+                <ion-card-header>
+                  <ion-card-title>{{ field }}</ion-card-title>
+                </ion-card-header>
+                <ion-card-content>
+                  <p><strong>{{ field }}:</strong> {{ item[field] }}</p>
+                </ion-card-content>
+              </ion-card>
             </ion-col>
           </ion-row>
         </ion-grid>

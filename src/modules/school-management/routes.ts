@@ -1,4 +1,4 @@
-import { school } from 'ionicons/icons'
+import { calendar, chatbubbles, create, document, list, person, school, star } from 'ionicons/icons'
 import DashboardSchools from './views/DashboardSchools.vue'
 import EditSchools from './views/EditSchools.vue'
 import EditClass from './views/EditClass.vue'
@@ -27,6 +27,10 @@ const routes = [
     moduleName: 'Schools',
     moduleIcon: school,
     meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Editar escola',
+      order: 2,
       requiredRole: ['public'],
     },
   },
@@ -35,6 +39,10 @@ const routes = [
     name: 'RegisterSchool',
     component: RegisterSchool,
     meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Registrar escola',
+      order: 3,
       requiredRole: ['public'],
     },
   },
@@ -47,7 +55,7 @@ const routes = [
       moduleIcon: school,
       icon: school,
       name: 'Turmas',
-      order: 1,
+      order: 4,
       requiredRole: ['public'],
     },
   },
@@ -56,6 +64,10 @@ const routes = [
     name: 'RegisterClass',
     component: RegisterClass,
     meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Registrar turma',
+      order: 5,
       requiredRole: ['public'],
     },
   },
@@ -64,6 +76,10 @@ const routes = [
     name: 'EditClass',
     component: EditClass,
     meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Editar turma',
+      order: 6,
       requiredRole: ['public'],
     },
   },
