@@ -1,10 +1,13 @@
-import { calendar, chatbubbles, create, document, list, person, school, star } from 'ionicons/icons'
+import { calendar, chatbubbles, create, document, list, person, school, star, people } from 'ionicons/icons'
 import DashboardSchools from './views/DashboardSchools.vue'
 import EditSchools from './views/EditSchools.vue'
 import EditClass from './views/EditClass.vue'
+import EditSeries from './views/EditSeries.vue'
 import RegisterSchool from './views/RegisterSchool.vue'
+import RegisterSeries from './views/RegisterSeries.vue'
 import DashboardClass from './views/DashboardClass.vue'
 import RegisterClass from './views/RegisterClass.vue'
+import DashboardSeries from './views/DashboardSeries.vue'
 
 const routes = [
   {
@@ -53,7 +56,7 @@ const routes = [
     meta: {
       moduleName: 'Schools',
       moduleIcon: school,
-      icon: school,
+      icon: people,
       name: 'Turmas',
       order: 4,
       requiredRole: ['public'],
@@ -80,6 +83,43 @@ const routes = [
       icon: create,
       name: 'Editar turma',
       order: 6,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Series/list',
+    name: 'SeriesListSeries',
+    component: DashboardSeries,
+    meta: {
+      moduleName: 'Schools',
+      moduleIcon: school,
+      icon: list,
+      name: 'Séries',
+      order: 7,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Series/edit/:id',
+    name: 'EditSeries',
+    component: EditSeries,
+    meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Editar série',
+      order: 8,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Series/register',
+    name: 'RegisterSeries',
+    component: RegisterSeries,
+    meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Registrar série',
+      order: 9,
       requiredRole: ['public'],
     },
   },
