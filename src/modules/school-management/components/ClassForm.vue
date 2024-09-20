@@ -29,8 +29,12 @@ defineExpose({
 
 const router = useRouter()
 const route = useRouter()
-const series_Id = ref('')
-const school_Id = ref('')
+const seriesId = ref('')
+const schoolId = ref('')
+const institutionId = ref('')
+const courseId = ref('')
+const teacherId = ref('')
+const school = ref('')
 const classData = ref< Tables<'classroom'> | []>([])
 const selectedSegment = ref('general-info')
 const classList = ref<{ id: string, name: string }[]>([])
@@ -55,18 +59,6 @@ const formSchema = yup.object({
   .required('Nome da turma é obrigatório'),
   year: yup.string()
   .required('Ano é obrigatório'),
-  institution: yup.string()
-  .required('Instituição é obrigatória'),
-  school_id: yup.string()
-  .required('Escola é obrigatória'),
-  course: yup.string()
-  .required('Curso é obrigatório'),
-  series_id: yup.string()
-  .required('Série é obrigatória'),
-  teacher: yup.string()
-  .optional(),
-  status: yup.string()
-  .required('Tipo de turma é obrigatório'),
   abbreviation: yup.string()
   .optional(),
   maxStudents: yup.number()
@@ -84,8 +76,6 @@ const formSchema = yup.object({
   day_of_week: yup.array()
   .of(yup.string())
   .optional(),
-  period: yup.string()
-  .required('Turno é obrigatório'),
   
 })
 
@@ -103,14 +93,14 @@ async function registerClass() {
   else {
     const formData = {
       name: values.name,
-      series_id: values.series_id,
-      school_id: values.school_id,
+      institution_id: institutionId.value,
+      school_id: schoolId.value,
+      course_id: courseId.value,
+      series_id: seriesId.value,
+      teacher_id: teacherId.value,
       nameClass: values.nameClass,
       abbreviation: values.abbreviation,
       year: values.year,
-      institution: values.institution,
-      course: values.course,
-      teacher: values.teacher,
       status: values.status,
       maxStudents: values.maxStudents,
       startTime: values.startTime,
@@ -152,10 +142,7 @@ async function registerClass() {
     }
   }
 }
-const institutionId = computed({
-  get: () => values.institution,
-  set: newValue => setFieldValue('institution', newValue),
-})
+
 function handleSchoolChange(event: { detail: { value: string } }) {
   setFieldValue('name', event.detail.value)
 }
@@ -206,14 +193,14 @@ async function getClassData() {
     const classDbData = await classroomService.getById(classId.value)
     if (classDbData) {
         setFieldValue('name', classDbData.name)
+        setFieldValue('institutionId', classDbData.institutionId),
+        setFieldValue('schoolId', classDbData.schoolId),
+        setFieldValue('courseId', classDbData.courseId),
+        setFieldValue('seriesId', classDbData.seriesId),
+        setFieldValue('teacherId', classDbData.teacherId),
         setFieldValue('nameClass', classDbData.nameClass)
-        setFieldValue('school_id', classDbData.school_id)
-        setFieldValue('series_id', classDbData.series_id)
         setFieldValue('abbreviation', classDbData.abbreviation)
         setFieldValue('year', classDbData.year)
-        setFieldValue('institution', classDbData.institution)
-        setFieldValue('course', classDbData.course)
-        setFieldValue('teacher', classDbData.teacher)
         setFieldValue('status', classDbData.status)
         setFieldValue('maxStudents', classDbData.maxStudents)
         setFieldValue('startTime', classDbData.startTime)
@@ -235,20 +222,16 @@ function applyPhoneMask(phone: string | null): string {
 }
 
 onMounted(async () => {
-  school_Id.value = (await schoolService.getAll())?.at(0)?.id
-  series_Id.value = (await seriesService.getAll())?.at(0)?.id
+  institutionId.value = (await institutionService.getAll())?.at(0)?.id
+  schoolId.value = (await schoolService.getAll())?.at(0)?.id
+  courseId.value = (await courseService.getAll())?.at(0)?.id
+  seriesId.value = (await seriesService.getAll())?.at(0)?.id
+  teacherId.value = (await teacherService.getAll())?.at(0)?.id
   await loadClassroom()
   if (classId.value) {
     await getClassData()
   }
 })
-
-// onMounted(async () => {
-//   await loadClassroom()
-//   if (classId.value) {
-//     await getClassData()
-//   }
-// })
 </script>
 
 <template>
@@ -283,7 +266,7 @@ onMounted(async () => {
         </IonSelect>
       </ion-item>
     </ion-list>
-    <EpInput v-model="values.maxStudents" name="maxStudents" label="Máximo de Alunos" type="number" placeholder="Digite o número máximo de alunos" />
+    <EpInput v-model="values.maxStudents" name="maxStudents" label="Máximo de Alunos*" type="number" placeholder="Digite o número máximo de alunos" />
     
     
     <ion-list id="institutionList">

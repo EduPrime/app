@@ -35,14 +35,18 @@ const seriesService = new SeriesService()
 const courseService = new CourseService()
 const institutionService = new InstitutionService()
 const institutionId = ref('')
-const school_Id = ref('')
-const course_Id = ref('')
+const schoolId = ref('')
+const institutionList = ref()
+const seriesList = ref()
+const courseId = ref('')
 const timetable_Id = ref('')
 const formSchema = yup.object ({
   name: yup
     .string()
     .required('Nome é obrigatório')
     .min(12, 'O nome deve ter pelo menos 12 caracteres'),
+  institution: yup
+    .string(),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<SeriesPartial>({
@@ -58,8 +62,9 @@ async function registerSeries() {
   }
   else {
     const formData = {
-      school_id: school_Id.value,
-      course_id: course_Id.value,
+      school_id: schoolId.value,
+      course_id: courseId.value,
+      institution_id: institutionId.value,
       name: values.name,
     }
     console.log('FormData:', formData);
@@ -68,7 +73,7 @@ async function registerSeries() {
       if (seriesId.value) {
         result = await seriesService.update(seriesId.value, formData)
         if (result) {
-          showToast('Escola atualizada com sucesso')
+          showToast('Série atualizada com sucesso')
           setTimeout(() => {
             router.push('/Series/list').then(() => {
               location.reload()
@@ -79,7 +84,7 @@ async function registerSeries() {
       else {
         result = await seriesService.create(formData)
         if (result) {
-          showToast('Escola cadastrada com sucesso!', 'top', 'success')
+          showToast('Série cadastrada com sucesso!', 'top', 'success')
           setTimeout(() => {
             router.push('/Series/list').then(() => {
               location.reload()
@@ -89,37 +94,58 @@ async function registerSeries() {
       }
     }
     catch (error) {
-      console.error('Erro ao salvar escola:', error)
-      showToast('Erro ao cadastrar escola. Tente novamente.', 'top', 'danger')
+      console.error('Erro ao salvar série:', error)
+      showToast('Erro ao cadastrar série. Tente novamente.', 'top', 'danger')
     }
   }
 }
 
+async function loadSeries() {
+  try {
+    const [institutions, series] = await Promise.all([
+      institutionService.getAll(),
+      seriesService.getAll(),
+    ]);
+
+    console.log('Chegou', institutions);
+
+    // Função auxiliar para mapear os dados
+    const mapData = (data, targetList) => {
+      if (data) {
+        targetList.value = data.map(item => ({
+          id: item.id,
+          name: item.name,
+        }));
+      }
+    };
+
+    mapData(institutions, institutionList);
+    mapData(series, seriesList);
+
+  } catch (error) {
+    console.error('Erro ao carregar dados:', error);
+  }
+}
 async function getSeriesData() {
   if (seriesId.value) {
     const seriesDbData = await seriesService.getById(seriesId.value)
     if (seriesDbData) {
-      setFieldValue('school_Id', seriesDbData.school_Id),
-      setFieldValue('course_Id', seriesDbData.course_Id),
+      setFieldValue('institutionId', seriesDbData.institutionId),
+      setFieldValue('schoolId', seriesDbData.schoolId),
+      setFieldValue('courseId', seriesDbData.courseId),
       setFieldValue('name', seriesDbData.name)
     }
     else {
-      console.error(`Dados da escola não encontrados para o ID: ${seriesId.value}`)
+      console.error(`Dados da série não encontrados para o ID: ${seriesId.value}`)
     }
   }
 }
 
-//* * Mask Inputs
-const managerMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/, /\d/])
-const stateMask = ref([/\w/, /\w/])
-const abbreviationMask = ref([/\w/, /\w/, /\w/, /\w/, /\w/, /\w/, /\w/, /\w/, /\w/, /\w/])
-const postalCodeMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/])
-const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/])
-const areaMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
-
 onMounted(async () => {
-  school_Id.value = (await schoolService.getAll())?.at(0)?.id
-  course_Id.value = (await courseService.getAll())?.at(0)?.id
+  schoolId.value = (await schoolService.getAll())?.at(0)?.id
+  institutionId.value = (await institutionService.getAll())?.at(0)?.id
+  courseId.value = (await courseService.getAll())?.at(0)?.id
+  await loadSeries()
   if (seriesId.value) {
     await getSeriesData()
   }
@@ -142,5 +168,20 @@ onMounted(async () => {
 
   <div v-show="selectedSegment === 'general-info'">
     <EpInput v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome da escola" />
+    <ion-list id="institutionList">
+      <ion-item>
+        <IonSelect
+          v-model="values.institution"
+          justify="space-between"
+          label="Instituição*"
+          placeholder="Selecione a instituição"
+          @ion-change="handleSchoolChange"
+        >
+          <IonSelectOption v-for="institution in institutionList" :key="institution.id" :value="institution.id">
+            {{ institution.name }}
+          </IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
   </div>
 </template>

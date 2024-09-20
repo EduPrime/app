@@ -75,7 +75,7 @@ async function deleteItem(item: any) {
   try {
    const result =  await service.softDelete(item.id)
    if (result) {
-    showToast(`${tableName} excluído com sucesso`)
+    showToast(`${item.name} excluído com sucesso`)
     dataList.value = dataList.value.filter(i => i.id !== item.id)
     isAlertOpen.value = false
     itemToDelete.value = null
