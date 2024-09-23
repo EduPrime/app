@@ -40,7 +40,7 @@ const selectedSegment = ref('general-info')
 const classList = ref<{ id: string, name: string }[]>([])
 const periods = ['MORNING', 'AFTERNOON', 'EVENING'];
 const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED'];
-const day_of_week = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
+const day_of_weeks = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
 const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
 const seriesService = new SeriesService()
@@ -60,22 +60,20 @@ const formSchema = yup.object({
   year: yup.string()
   .required('Ano é obrigatório'),
   abbreviation: yup.string()
-  .optional(),
+  .optional()
+  .nullable(),
   maxStudents: yup.number()
   .required('Máximo de alunos é obrigatório')
   .positive('O número máximo de alunos deve ser positivo')
   .integer('O número máximo de alunos deve ser um número inteiro'),
   startTime: yup.string()
-  .matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, 'Hora inicial deve estar no formato hh:mm'),
+  .nullable(),
   startTimeInterval: yup.string()
-  .matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, 'Hora inicial do intervalo deve estar no formato hh:mm'),
+  .nullable(),
   endTimeInterval: yup.string()
-  .matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, 'Hora final do intervalo deve estar no formato hh:mm'),
+  .nullable(),
   endTime: yup.string()
-  .matches(/^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/, 'Hora final deve estar no formato hh:mm'),
-  day_of_week: yup.array()
-  .of(yup.string())
-  .optional(),
+  .nullable(),
   
 })
 
@@ -258,7 +256,7 @@ onMounted(async () => {
           justify="space-between"
           label="Tipo de Turma"
           placeholder="Selecione o tipo de turma"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => setFieldValue('status', e.target.value)"
         >
           <IonSelectOption v-for="status in status" :key="status" :value="status">
             {{ status }}
@@ -358,9 +356,9 @@ onMounted(async () => {
           justify="space-between"
           label="Dias da Semana"
           placeholder="Selecione os dias da semana"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => setFieldValue('day_of_week', e.target.value)"
         >
-          <IonSelectOption v-for="day_of_week in day_of_week" :key="day_of_week" :value="day_of_week">
+          <IonSelectOption v-for="day_of_week in day_of_weeks" :key="day_of_week" :value="day_of_week">
             {{ day_of_week }}
           </IonSelectOption>
         </IonSelect>
@@ -373,7 +371,7 @@ onMounted(async () => {
           justify="space-between"
           label="Turno"
           placeholder="Selecione o turno"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => setFieldValue('period', e.target.value)"
         >
           <IonSelectOption v-for="period in periods" :key="period" :value="period">
             {{ period }}

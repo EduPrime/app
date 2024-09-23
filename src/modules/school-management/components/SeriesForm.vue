@@ -231,7 +231,7 @@ onMounted(async () => {
           justify="space-between"
           label="Etapa Curso*"
           placeholder="Selecione"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => setFieldValue('course_stage', e.target.value)"
         >
           <IonSelectOption v-for="course_stage in course_stage" :key="course_stage" :value="course_stage">
             {{ course_stage }}
@@ -247,7 +247,7 @@ onMounted(async () => {
           justify="space-between"
           label="Concluinte*"
           placeholder="Selecione"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => setFieldValue('graduate', e.target.value)"
         >
           <IonSelectOption v-for="graduate in graduate" :key="graduate" :value="graduate">
             {{ graduate }}
