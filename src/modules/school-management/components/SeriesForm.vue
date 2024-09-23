@@ -34,10 +34,14 @@ const schoolService = new SchoolService()
 const seriesService = new SeriesService()
 const courseService = new CourseService()
 const institutionService = new InstitutionService()
+const course_stage = ['Etapa 1', 'Etapa 2', 'Etapa 3', 'Etapa 4', 'Etapa 5', 'Etapa 6'];
+const graduate = ['Sim', 'Não'];
 const institutionId = ref('')
 const schoolId = ref('')
 const institutionList = ref()
 const seriesList = ref()
+const serieId = ref('')
+const courseList = ref()
 const courseId = ref('')
 const timetable_Id = ref('')
 const formSchema = yup.object ({
@@ -47,6 +51,16 @@ const formSchema = yup.object ({
     .min(12, 'O nome deve ter pelo menos 12 caracteres'),
   institution: yup
     .string(),
+  course_stage: yup
+    .string(),
+  graduate: yup
+    .string(),
+  workload: yup
+    .string()
+    .required('Carga Horária é obrigatória'),
+  school_days: yup
+    .string()
+    .required('Dias Letivos é obrigatório'),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<SeriesPartial>({
@@ -65,7 +79,11 @@ async function registerSeries() {
       school_id: schoolId.value,
       course_id: courseId.value,
       institution_id: institutionId.value,
+      course_stage: values.course_stage,
+      graduate: values.graduate,
       name: values.name,
+      workload: values.workload,
+      school_days: values.school_days,
     }
     console.log('FormData:', formData);
     try {
@@ -102,9 +120,10 @@ async function registerSeries() {
 
 async function loadSeries() {
   try {
-    const [institutions, series] = await Promise.all([
+    const [institutions, series, courses] = await Promise.all([
       institutionService.getAll(),
       seriesService.getAll(),
+      courseService.getAll(),
     ]);
 
     console.log('Chegou', institutions);
@@ -115,12 +134,17 @@ async function loadSeries() {
         targetList.value = data.map(item => ({
           id: item.id,
           name: item.name,
+          course_stage: item.course_stage,
+          graduate: item.graduate,
+          workload: item.workload,
+          school_days: item.school_days,
         }));
       }
     };
 
     mapData(institutions, institutionList);
     mapData(series, seriesList);
+    mapData(courses, courseList);
 
   } catch (error) {
     console.error('Erro ao carregar dados:', error);
@@ -133,7 +157,11 @@ async function getSeriesData() {
       setFieldValue('institutionId', seriesDbData.institutionId),
       setFieldValue('schoolId', seriesDbData.schoolId),
       setFieldValue('courseId', seriesDbData.courseId),
-      setFieldValue('name', seriesDbData.name)
+      setFieldValue('name', seriesDbData.name),
+      setFieldValue('course_stage', seriesDbData.course_stage),
+      setFieldValue('graduate', seriesDbData.graduate),
+      setFieldValue('workload', seriesDbData.workload),
+      setFieldValue('school_days', seriesDbData.school_days)
     }
     else {
       console.error(`Dados da série não encontrados para o ID: ${seriesId.value}`)
@@ -159,15 +187,9 @@ onMounted(async () => {
         Informações Gerais
       </IonLabel>
     </IonSegmentButton>
-    <IonSegmentButton value="location">
-      <IonLabel style="font-size: calc(1rem - 2px);">
-        Localização
-      </IonLabel>
-    </IonSegmentButton>
   </IonSegment>
 
   <div v-show="selectedSegment === 'general-info'">
-    <EpInput v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome da escola" />
     <ion-list id="institutionList">
       <ion-item>
         <IonSelect
@@ -176,12 +198,65 @@ onMounted(async () => {
           label="Instituição*"
           placeholder="Selecione a instituição"
           @ion-change="handleSchoolChange"
-        >
+          >
           <IonSelectOption v-for="institution in institutionList" :key="institution.id" :value="institution.id">
             {{ institution.name }}
           </IonSelectOption>
         </IonSelect>
       </ion-item>
     </ion-list>
+    
+    <ion-list id="courseList">
+      <ion-item>
+        <IonSelect
+          v-model="values.course"
+          justify="space-between"
+          label="Curso*"
+          placeholder="Selecione o curso"
+          @ion-change="handleSchoolChange"
+        >
+          <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
+            {{ course.name }}
+          </IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
+    
+    <EpInput v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome da série" />
+    
+    <ion-list id="course_stage">
+      <ion-item>
+        <IonSelect
+          v-model="values.course_stage"
+          justify="space-between"
+          label="Etapa Curso*"
+          placeholder="Selecione"
+          @ion-change="handleSchoolChange"
+        >
+          <IonSelectOption v-for="course_stage in course_stage" :key="course_stage" :value="course_stage">
+            {{ course_stage }}
+          </IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
+
+    <ion-list id="graduate">
+      <ion-item>
+        <IonSelect
+          v-model="values.graduate"
+          justify="space-between"
+          label="Concluinte*"
+          placeholder="Selecione"
+          @ion-change="handleSchoolChange"
+        >
+          <IonSelectOption v-for="graduate in graduate" :key="graduate" :value="graduate">
+            {{ graduate }}
+          </IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
+
+    <EpInput v-model="values.workload" name="workload" label="Carga Horária*" placeholder="Digite a carga horária" />
+    <EpInput v-model="values.school_days" name="school_days" label="Dias Letivos*" placeholder="Digite os dias letivos" />
   </div>
 </template>
