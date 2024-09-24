@@ -1,11 +1,11 @@
 import { flame, flameOutline, people } from 'ionicons/icons';
-import StudentRegistration from './views/StudentRegistration.vue';
+import DashboardStudent from './views/DashboardStudent.vue';
 
 const routes = [
   {
-    path: '/student-registration',
+    path: '/student',
     name: 'Student Registration',
-    component: StudentRegistration,
+    component: DashboardStudent,
     meta: {
       moduleName: 'Matricular Aluno',
       moduleIcon: people,
