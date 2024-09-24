@@ -40,7 +40,7 @@ const selectedSegment = ref('general-info')
 const classList = ref<{ id: string, name: string }[]>([])
 const periods = ['MORNING', 'AFTERNOON', 'EVENING'];
 const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED'];
-const day_of_weeks = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta'];
+const day_of_weeks = ['SEGUNDA', 'TERÇA', 'QUARTA', 'QUINTA', 'SEXTA'];
 const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
 const seriesService = new SeriesService()
@@ -57,12 +57,45 @@ const classId = computed(() => route.currentRoute.value.params.id) as { value: s
 const formSchema = yup.object({
   name: yup.string()
   .required('Nome da turma é obrigatório'),
-  year: yup.string()
-  .required('Ano é obrigatório'),
+  institutionId: yup.string()
+    .required('Instituição é obrigatória'),
+  schoolId: yup.string()
+    .required('Escola é obrigatória'),
+  courseId: yup.string()
+    .required('Curso é obrigatório'),
+  seriesId: yup.string()
+    .required('Série é obrigatória'),
+  teacherId: yup.string()
+    .required('Professor é obrigatório'),
+  status: yup.string()
+    .required('Tipo de Turma é obrigatório'),
+  year: yup
+  .number()
+  .transform((value, originalValue) => {
+    // Verifica se o valor original é uma string antes de usar trim
+    if (typeof originalValue === 'string') {
+      return originalValue.trim() === '' ? null : value;
+    }
+    // Se não for uma string (como undefined, null, number), apenas retorna o valor original
+    return originalValue;
+  })
+  .required('Ano é obrigatório')
+  .integer('O ano deve ser um número inteiro')
+  .min(1900, 'O ano deve ser maior ou igual a 1900')
+  .max(new Date().getFullYear(), 'O ano não pode ser maior que o ano atual'),
   abbreviation: yup.string()
   .optional()
   .nullable(),
-  maxStudents: yup.number()
+  maxStudents: yup
+  .number()
+  .transform((value, originalValue) => {
+    // Verifica se o valor original é uma string antes de usar trim
+    if (typeof originalValue === 'string') {
+      return originalValue.trim() === '' ? null : value;
+    }
+    // Se não for uma string (como undefined, null, number), apenas retorna o valor original
+    return originalValue;
+  })
   .required('Máximo de alunos é obrigatório')
   .positive('O número máximo de alunos deve ser positivo')
   .integer('O número máximo de alunos deve ser um número inteiro'),
@@ -141,10 +174,6 @@ async function registerClass() {
   }
 }
 
-function handleSchoolChange(event: { detail: { value: string } }) {
-  setFieldValue('name', event.detail.value)
-}
-
 async function loadClassroom() {
   try {
     const [institutions, schools, courses, teachers, series, classrooms] = await Promise.all([
@@ -166,6 +195,7 @@ async function loadClassroom() {
           name: item.name,
           period: item.period,
           status: item.status,
+          day_of_week: item.day_of_week,
         }));
       }
     };
@@ -190,22 +220,32 @@ async function getClassData() {
   if (classId.value) {
     const classDbData = await classroomService.getById(classId.value)
     if (classDbData) {
-        setFieldValue('name', classDbData.name)
+        institutionId.value = classDbData.institution_id,
+        schoolId.value = classDbData.school_id,
+        courseId.value = classDbData.course_id,
+        seriesId.value = classDbData.series_id,
+        teacherId.value = classDbData.teacher_id,
+        setFieldValue('name', classDbData.name),
         setFieldValue('institutionId', classDbData.institutionId),
+        setFieldValue('institution', classDbData.institution_id),
+        setFieldValue('course', classDbData.course_id),
+        setFieldValue('school_id', classDbData.school_id),
+        setFieldValue('series_id', classDbData.series_id),
+        setFieldValue('teacher', classDbData.teacher_id),
         setFieldValue('schoolId', classDbData.schoolId),
         setFieldValue('courseId', classDbData.courseId),
         setFieldValue('seriesId', classDbData.seriesId),
         setFieldValue('teacherId', classDbData.teacherId),
-        setFieldValue('nameClass', classDbData.nameClass)
-        setFieldValue('abbreviation', classDbData.abbreviation)
-        setFieldValue('year', classDbData.year)
-        setFieldValue('status', classDbData.status)
-        setFieldValue('maxStudents', classDbData.maxStudents)
-        setFieldValue('startTime', classDbData.startTime)
-        setFieldValue('startTimeInterval', classDbData.startTimeInterval)
-        setFieldValue('endTimeInterval', classDbData.endTimeInterval)
-        setFieldValue('endTime', classDbData.endTime)
-        setFieldValue('day_of_week', classDbData.day_of_week)
+        setFieldValue('nameClass', classDbData.nameClass),
+        setFieldValue('abbreviation', classDbData.abbreviation),
+        setFieldValue('year', classDbData.year),
+        setFieldValue('status', classDbData.status),
+        setFieldValue('maxStudents', classDbData.maxStudents),
+        setFieldValue('startTime', classDbData.startTime),
+        setFieldValue('startTimeInterval', classDbData.startTimeInterval),
+        setFieldValue('endTimeInterval', classDbData.endTimeInterval),
+        setFieldValue('endTime', classDbData.endTime),
+        setFieldValue('day_of_week', classDbData.day_of_week),
         setFieldValue('period', classDbData.period)
     }
     else {
@@ -220,11 +260,6 @@ function applyPhoneMask(phone: string | null): string {
 }
 
 onMounted(async () => {
-  institutionId.value = (await institutionService.getAll())?.at(0)?.id
-  schoolId.value = (await schoolService.getAll())?.at(0)?.id
-  courseId.value = (await courseService.getAll())?.at(0)?.id
-  seriesId.value = (await seriesService.getAll())?.at(0)?.id
-  teacherId.value = (await teacherService.getAll())?.at(0)?.id
   await loadClassroom()
   if (classId.value) {
     await getClassData()
@@ -254,7 +289,7 @@ onMounted(async () => {
         <IonSelect
           v-model="values.status"
           justify="space-between"
-          label="Tipo de Turma"
+          label="Tipo de Turma*"
           placeholder="Selecione o tipo de turma"
           @ionChange="(e) => setFieldValue('status', e.target.value)"
         >
@@ -270,11 +305,14 @@ onMounted(async () => {
     <ion-list id="institutionList">
       <ion-item>
         <IonSelect
-          v-model="values.institution"
+          v-model="institutionId"
           justify="space-between"
           label="Instituição*"
           placeholder="Selecione a instituição"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => {
+            setFieldValue('institutionId', e.detail.value)
+          }"
+          
         >
           <IonSelectOption v-for="institution in institutionList" :key="institution.id" :value="institution.id">
             {{ institution.name }}
@@ -285,11 +323,14 @@ onMounted(async () => {
     <ion-list id="schoolList">
       <ion-item>
         <IonSelect
-          v-model="values.school_id"
+          v-model="schoolId"
           justify="space-between"
           label="Escola*"
           placeholder="Selecione a escola"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => {
+            setFieldValue('schoolId', e.detail.value)
+          }"
+          
         >
           <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
             {{ school.name }}
@@ -300,11 +341,14 @@ onMounted(async () => {
     <ion-list id="courseList">
       <ion-item>
         <IonSelect
-          v-model="values.course"
+          v-model="courseId"
           justify="space-between"
           label="Curso*"
           placeholder="Selecione o curso"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => {
+            setFieldValue('courseId', e.detail.value)
+          }"
+          
         >
           <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
             {{ course.name }}
@@ -315,11 +359,14 @@ onMounted(async () => {
     <ion-list id="courseList">
       <ion-item>
         <IonSelect
-          v-model="values.series_id"
+          v-model="seriesId"
           justify="space-between"
           label="Série*"
           placeholder="Selecione a série"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => {
+            setFieldValue('seriesId', e.detail.value)
+          }"
+          
         >
           <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
             {{ series.name }}
@@ -330,11 +377,14 @@ onMounted(async () => {
     <ion-list id="teacherList">
       <ion-item>
         <IonSelect
-          v-model="values.teacher"
+          v-model="teacherId"
           justify="space-between"
-          label="Professor"
+          label="Professor*"
           placeholder="Selecione o professor"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => {
+            setFieldValue('teacherId', e.detail.value)
+          }"
+          
         >
           <IonSelectOption v-for="teacher in teacherList" :key="teacher.id" :value="teacher.id">
             {{ teacher.name }}

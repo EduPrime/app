@@ -49,18 +49,50 @@ const formSchema = yup.object ({
     .string()
     .required('Nome é obrigatório')
     .min(12, 'O nome deve ter pelo menos 12 caracteres'),
-  institution: yup
-    .string(),
+  institutionId: yup.string()
+    .required('Instituição é obrigatória'),
+  courseId: yup.string()
+    .required('Curso é obrigatório'),
   course_stage: yup
-    .string(),
+    .string()
+    .required('Etapa Curso é obrigatório'),
   graduate: yup
-    .string(),
+    .string()
+    .required('Concluinte é obrigatório'),
   workload: yup
-    .string()
-    .required('Carga Horária é obrigatória'),
+  .number()
+  .transform((value, originalValue) => {
+    // Verifica se o originalValue é uma string e tenta convertê-la em número
+    if (typeof originalValue === 'string') {
+      const trimmedValue = originalValue.trim();
+      // Se a string não é vazia e pode ser convertida em um número, retorna o número
+      const parsedValue = Number(trimmedValue);
+      return isNaN(parsedValue) ? null : parsedValue; // Se não for um número, retorna null
+    }
+    // Se não for uma string (como undefined, null, number), apenas retorna o valor original
+    return originalValue;
+  })
+  .required('Carga Horária é obrigatória')
+  .positive('A carga horária deve ser um número positivo')
+  .integer('A carga horária deve ser um número inteiro')
+  .min(1, 'A carga horária deve ser pelo menos 1 hora'),
   school_days: yup
-    .string()
-    .required('Dias Letivos é obrigatório'),
+  .number()
+  .transform((value, originalValue) => {
+    // Verifica se o originalValue é uma string e tenta convertê-la em número
+    if (typeof originalValue === 'string') {
+      const trimmedValue = originalValue.trim();
+      // Se a string não é vazia e pode ser convertida em um número, retorna o número
+      const parsedValue = Number(trimmedValue);
+      return isNaN(parsedValue) ? null : parsedValue; // Se não for um número, retorna null
+    }
+    // Se não for uma string (como undefined, null, number), apenas retorna o valor original
+    return originalValue;
+  })
+  .required('Dias Letivos é obrigatório')
+  .positive('Os dias letivos devem ser um número positivo')
+  .integer('Os dias letivos devem ser um número inteiro')
+  .min(1, 'Os dias letivos devem ser pelo menos 1 dia'),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<SeriesPartial>({
@@ -126,7 +158,7 @@ async function loadSeries() {
       courseService.getAll(),
     ]);
 
-    console.log('Chegou', institutions);
+    console.log('Chegou', institutions, series, courses);
 
     // Função auxiliar para mapear os dados
     const mapData = (data, targetList) => {
@@ -154,9 +186,14 @@ async function getSeriesData() {
   if (seriesId.value) {
     const seriesDbData = await seriesService.getById(seriesId.value)
     if (seriesDbData) {
+      institutionId.value = seriesDbData.institution_id,
+      courseId.value = seriesDbData.course_id,
+      schoolId.value = seriesDbData.school_id,
       setFieldValue('institutionId', seriesDbData.institutionId),
       setFieldValue('schoolId', seriesDbData.schoolId),
       setFieldValue('courseId', seriesDbData.courseId),
+      setFieldValue('institution', seriesDbData.institution_id),
+      setFieldValue('course', seriesDbData.course_id),
       setFieldValue('name', seriesDbData.name),
       setFieldValue('course_stage', seriesDbData.course_stage),
       setFieldValue('graduate', seriesDbData.graduate),
@@ -171,8 +208,6 @@ async function getSeriesData() {
 
 onMounted(async () => {
   schoolId.value = (await schoolService.getAll())?.at(0)?.id
-  institutionId.value = (await institutionService.getAll())?.at(0)?.id
-  courseId.value = (await courseService.getAll())?.at(0)?.id
   await loadSeries()
   if (seriesId.value) {
     await getSeriesData()
@@ -193,11 +228,13 @@ onMounted(async () => {
     <ion-list id="institutionList">
       <ion-item>
         <IonSelect
-          v-model="values.institution"
+          v-model="institutionId"
           justify="space-between"
           label="Instituição*"
           placeholder="Selecione a instituição"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => {
+            setFieldValue('institutionId', e.detail.value)
+          }"
           >
           <IonSelectOption v-for="institution in institutionList" :key="institution.id" :value="institution.id">
             {{ institution.name }}
@@ -209,11 +246,14 @@ onMounted(async () => {
     <ion-list id="courseList">
       <ion-item>
         <IonSelect
-          v-model="values.course"
+          v-model="courseId"
           justify="space-between"
           label="Curso*"
           placeholder="Selecione o curso"
-          @ion-change="handleSchoolChange"
+          @ionChange="(e) => {
+            setFieldValue('courseId', e.detail.value)
+          }"
+          
         >
           <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
             {{ course.name }}
