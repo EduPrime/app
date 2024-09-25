@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import showToast from '@/utils/toast-alert'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { IonAlert } from '@ionic/vue'
 import { pencil, trash } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
@@ -10,9 +10,20 @@ import StudentService from '../services/StudentService'
 // Instanciando o serviço da tabela
 const service = new StudentService()
 
-// Define o tipo dinamicamente com base em tableName
-const dataList = ref<Tables<'student'>[]>([])
+const student = ref< Tables<'student'> | []>([])
+const dataList = ref()
+const props = defineProps<{
+  dataList: Tables<'student'>
+}>()
 
+watch(
+  () => props.dataList,
+  (newValue) => {
+    dataList.value = newValue;
+    console.log('dataList foi atualizado:', { dataList });
+  },
+  { immediate: true }
+);
 // Nome da tabela e campos
 const tableName = 'student'
 const fields = ['address', 'birthdate', 'classroom_id', 'created_at', 'deleted_at', 'email', 'gender', 'guardian_name', 'guardian_phone', 'id', 'metadata', 'name', 'phone', 'photo', 'status', 'updated_at', 'user_created']
@@ -38,7 +49,7 @@ function toggleDetails(index: number) {
 function editItem(item: any) {
   // Exemplo de navegação para a página de edição
   // Dependendo da sua implementação, ajuste a rota
-  router.push({ name: `Edit${tableName}`, params: { id: item.id.toString() } })
+  router.push({ name: `EditStudent`, params: { id: item.id.toString() } })
 }
 
 const isAlertOpen = ref(false)
@@ -62,7 +73,7 @@ async function deleteItem(item: any) {
   try {
    const result =  await service.softDelete(item.id)
    if (result) {
-    showToast(`${tableName} excluído com sucesso`)
+    showToast(`${item.name} excluído com sucesso`)
     dataList.value = dataList.value.filter(i => i.id !== item.id)
     isAlertOpen.value = false
     itemToDelete.value = null
