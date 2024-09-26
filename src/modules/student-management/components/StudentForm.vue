@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { IonLabel, IonSegment, IonSegmentButton, IonSelect, IonSelectOption } from '@ionic/vue'
 import { useForm } from 'vee-validate'
@@ -27,6 +27,17 @@ defineExpose({
 
 const router = useRouter()
 const route = useRouter()
+const responsibleType = ref(null)
+const valuesType = ref({
+  father_name: '',
+  father_cpf: '',
+  father_email: '',
+  father_phone: '',
+  mother_name: '',
+  mother_cpf: '',
+  mother_email: '',
+  mother_phone: '',
+})
 const schoolId = ref('')
 const classroomId = ref('')
 const studentData = ref< Tables<'student'> | []>([])
@@ -44,24 +55,80 @@ const schoolList = ref()
 const studentList = ref()
 const studentId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = yup.object({
-  name: yup.string()
-    .required('Nome da turma é obrigatório'),
+    name: yup.string()
+    .required('Nome do aluno é obrigatório'),
+    father_name: yup.string()
+    .nullable(),
+    father_cpf: yup.string()
+  .nullable()
+  .test('valid-cpf', 'CPF inválido', value => {
+    if (!value) return true; // Ignorar se for nulo
+    return isValidCPF(value);
+  }),
+    father_email: yup.string()
+    .nullable()
+    .email('O email fornecido não é válido')
+    .matches(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 
+        'O email deve seguir o formato padrão (exemplo@dominio.com)'
+    )
+    .max(255, 'O email deve ter no máximo 255 caracteres'),
+    father_phone: yup.string()
+    .nullable()
+    .matches(/^\(\d{2}\)\s\d{4,5}-\d{4}$/, 'Telefone inválido, formato esperado: (XX) XXXXX-XXXX')
+    .test('valid-ddd', 'DDD inválido', value => {
+      if (!value) return true;
+      return isValidDDD(value);
+    }),
+    mother_name: yup.string()
+    .nullable(),
+    mother_cpf: yup.string()
+  .nullable()
+  .test('valid-cpf', 'CPF inválido', value => {
+    if (!value) return true; // Ignorar se for nulo
+    return isValidCPF(value);
+  }),
+    mother_email: yup.string()
+    .nullable()
+    .email('O email fornecido não é válido')
+    .matches(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 
+        'O email deve seguir o formato padrão (exemplo@dominio.com)'
+    )
+    .max(255, 'O email deve ter no máximo 255 caracteres'),
+    mother_phone: yup.string()
+    .nullable()
+    .matches(/^\(\d{2}\)\s\d{4,5}-\d{4}$/, 'Telefone inválido, formato esperado: (XX) XXXXX-XXXX')
+    .test('valid-ddd', 'DDD inválido', value => {
+      if (!value) return true;
+      return isValidDDD(value);
+    }),
     cpf: yup.string()
     .required('CPF é obrigatório')
     .test('valid-cpf', 'CPF inválido', value => isValidCPF(value || '')),
     email: yup
     .string()
-    .email('Email inválido'),
+    .nullable()
+    .email('O email fornecido não é válido')
+    .matches(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 
+        'O email deve seguir o formato padrão (exemplo@dominio.com)'
+    )
+    .max(255, 'O email deve ter no máximo 255 caracteres'),
     address: yup
     .string(),
     complement: yup
-    .string(),
+    .string()
+    .nullable(),
     neighborhood: yup
-    .string(),
+    .string()
+    .nullable(),
     number_address: yup.
-    string(),
+    string()
+    .nullable(),
     city: yup.
-    string(),
+    string()
+    .nullable(),
     status: yup.string()
     .required('Status é obrigatório'),
   gender: yup.string()
@@ -75,8 +142,8 @@ const formSchema = yup.object({
     .required('Telefone é obrigatório')
     .matches(/^\(\d{2}\)\s\d{4,5}-\d{4}$/, 'Telefone inválido, formato esperado: (XX) XXXXX-XXXX')
     .test('valid-ddd', 'DDD inválido', value => isValidDDD(value || '')),
-  place_of_birth: yup.string(),
-    // .required('Naturalidade é obrigatória'),
+  // place_of_birth: yup.string(),
+  //   // .required('Naturalidade é obrigatória'),
     postalcode: yup
     .string()
     .required('CEP é obrigatório')
@@ -87,6 +154,8 @@ const formSchema = yup.object({
     .required('Escola é obrigatória'),
   classroomId: yup.string()
     .required('Turma é obrigatória'),
+    responsibleType: yup.string()
+    .required('Tipo de responsável é obrigatório'),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<StudentPartial>({
@@ -120,6 +189,15 @@ async function registerStudent() {
       neighborhood: values.neighborhood,
       city: values.city,
       cpf: values.cpf,
+      father_name: values.father_name,
+      father_cpf: values.father_cpf,
+      father_email: values.father_email,
+      father_phone: values.father_phone,
+      mother_name: values.mother_name,
+      mother_cpf: values.mother_cpf,
+      mother_email: values.mother_email,
+      mother_phone: values.mother_phone,
+      responsibleType: values.responsibleType,
 
     }
     try {
@@ -216,7 +294,16 @@ async function getStudentData() {
         setFieldValue('school_id', studentDbData.school_id),
         setFieldValue('schoolId', studentDbData.schoolId),
         setFieldValue('classroom_id', studentDbData.classroom_id),
-        setFieldValue('classroomId', studentDbData.classroomId)
+        setFieldValue('classroomId', studentDbData.classroomId),
+        setFieldValue('father_name', studentDbData.father_name),
+        setFieldValue('father_cpf', studentDbData.father_cpf),
+        setFieldValue('father_email', studentDbData.father_email),
+        setFieldValue('father_phone', studentDbData.father_phone),
+        setFieldValue('mother_name', studentDbData.mother_name),
+        setFieldValue('mother_cpf', studentDbData.mother_cpf),
+        setFieldValue('mother_email', studentDbData.mother_email),
+        setFieldValue('mother_phone', studentDbData.mother_phone),
+        setFieldValue('responsibleType', studentDbData.responsibleType)
     }
     else {
       console.error(`Dados do aluno não encontrados para o ID: ${studentId.value}`)
@@ -228,6 +315,22 @@ function applyPhoneMask(phone: string | null): string {
     return ''
   return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
 }
+
+watch(responsibleType, (newValue, oldValue) => {
+  // Se necessário, você pode limpar ou atualizar os campos
+  if (newValue === 'Pai') {
+    valuesType.value.mother_name = '';
+    valuesType.value.mother_cpf = '';
+    valuesType.value.mother_email = '';
+    valuesType.value.mother_phone = '';
+  } else if (newValue === 'Mãe') {
+    valuesType.value.father_name = '';
+    valuesType.value.father_cpf = '';
+    valuesType.value.father_email = '';
+    valuesType.value.father_phone = '';
+  } else if (newValue === 'Ambos') {
+  }
+});
 
 onMounted(async () => {
   await loadStudent()
@@ -258,7 +361,7 @@ onMounted(async () => {
   <div v-show="selectedSegment === 'general-info'">
     <EpInput v-model="values.name" name="name" label="Nome do Aluno*" placeholder="Digite o nome do Aluno" />
     <EpInput v-model="values.cpf" name="cpf" :mask="cpfMask" inputmode="numeric" label="CPF*" placeholder="000.000.000-00" />
-    <EpInput v-model="values.email" name="email" label="Email*" type="email" placeholder="Digite o email" />
+    <EpInput v-model="values.email" name="email" label="Email" type="email" placeholder="Digite o email" />
     <EpInput v-model="values.birthdate" name="birthdate" label="Data de Nascimento*" type="date" placeholder="Digite a data de nascimento" />
     <EpInput v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone*" placeholder="(99) 99999-9999" />
     
@@ -299,6 +402,89 @@ onMounted(async () => {
         </IonSelect>
       </ion-item>
     </ion-list>
+
+    <ion-list id="responsibleType">
+      <ion-item>
+        <IonSelect
+          v-model="values.responsibleType"
+          label="Responsável*"
+          placeholder="Escolha o responsável"
+          @ionChange="(e) => {
+            setFieldValue('responsibleType', e.detail.value)
+          }"
+        >
+          <IonSelectOption value="Pai">Pai</IonSelectOption>
+          <IonSelectOption value="Mãe">Mãe</IonSelectOption>
+          <IonSelectOption value="Ambos">Ambos</IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
+
+    <!-- Campos do Pai -->
+    <div v-if="values.responsibleType === 'Pai' || values.responsibleType === 'Ambos'">
+      <EpInput
+        v-model="values.father_name"
+        name="father_name"
+        label="Nome do Pai"
+        placeholder="Digite o nome do pai"
+      />
+      <EpInput
+        v-model="values.father_cpf"
+        name="father_cpf"
+        :mask="cpfMask"
+        label="CPF do Pai"
+        placeholder="000.000.000-00"
+        inputmode="numeric"
+      />
+      <EpInput
+        v-model="values.father_email"
+        name="father_email"
+        type="email"
+        label="Email do Pai"
+        placeholder="Digite o email do pai"
+      />
+      <EpInput
+        v-model="values.father_phone"
+        name="father_phone"
+        :mask="phoneMask"
+        inputmode="tel"
+        label="Telefone do Pai"
+        placeholder="(99) 99999-9999"
+      />
+    </div>
+
+    <!-- Campos da Mãe -->
+    <div v-if="values.responsibleType === 'Mãe' || values.responsibleType === 'Ambos'">
+      <EpInput
+        v-model="values.mother_name"
+        name="mother_name"
+        label="Nome da Mãe"
+        placeholder="Digite o nome da mãe"
+      />
+      <EpInput
+        v-model="values.mother_cpf"
+        name="mother_cpf"
+        :mask="cpfMask"
+        label="CPF da Mãe"
+        placeholder="000.000.000-00"
+        inputmode="numeric"
+      />
+      <EpInput
+        v-model="values.mother_email"
+        name="mother_email"
+        type="email"
+        label="Email da Mãe"
+        placeholder="Digite o email da mãe"
+      />
+      <EpInput
+        v-model="values.mother_phone"
+        name="mother_phone"
+        :mask="phoneMask"
+        inputmode="tel"
+        label="Telefone da Mãe"
+        placeholder="(99) 99999-9999"
+      />
+    </div>
 
 </div>
 
