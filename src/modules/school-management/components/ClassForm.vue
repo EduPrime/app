@@ -356,7 +356,7 @@ onMounted(async () => {
         </IonSelect>
       </ion-item>
     </ion-list>
-    <ion-list id="courseList">
+    <ion-list id="seriesList">
       <ion-item>
         <IonSelect
           v-model="seriesId"

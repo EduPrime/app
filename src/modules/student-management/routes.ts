@@ -1,5 +1,6 @@
-import { flame, flameOutline, people } from 'ionicons/icons';
+import { flame, flameOutline, people, book, pencil, clipboard, document, folder, list, create } from 'ionicons/icons';
 import DashboardStudent from './views/DashboardStudent.vue';
+import DashboardEnrollment from './views/DashboardEnrollment.vue';
 import RegisterStudent from './views/RegisterStudent.vue';
 import EditStudent from './views/EditStudent.vue'
 
@@ -10,8 +11,8 @@ const routes = [
     component: DashboardStudent,
     meta: {
       moduleName: 'Matricula',
-      moduleIcon: people,
-      icon: people,
+      moduleIcon: create,
+      icon: create,
       name: 'Matricula',
       order: 1,
       requiredRole: ['public', 'admin'],
@@ -23,7 +24,7 @@ const routes = [
     component: RegisterStudent,
     meta: {
       moduleName: 'Realizar Matricula',
-      icon: people,
+      icon: folder,
       name: 'Realizar Matricula',
       order: 2,
       requiredRole: ['public', 'admin'],
