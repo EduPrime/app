@@ -6,6 +6,7 @@ import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import ClassroomService from '@/modules/school-management/services/ClassroomService'
 import SchoolService from '@/modules/school-management/services/SchoolService'
+import SeriesService from '@/modules/school-management/services/SeriesService'
 import StudentService from '../services/StudentService'
 import { hundredYearsAgo } from '@/utils/hundred-years-ago'
 import { isValidDDD } from '@/utils/ddd-validator'
@@ -39,6 +40,7 @@ const valuesType = ref({
   mother_phone: '',
 })
 const schoolId = ref('')
+const seriesId = ref('')
 const classroomId = ref('')
 const studentData = ref< Tables<'student'> | []>([])
 const gender = ['Masculino', 'Feminino']
@@ -50,9 +52,11 @@ const selectedSegment = ref('general-info')
 const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
 const studentService = new StudentService()
+const seriesService = new SeriesService()
 const classroomList = ref()
 const schoolList = ref()
 const studentList = ref()
+const seriesList = ref()
 const studentId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = yup.object({
     name: yup.string()
@@ -154,6 +158,8 @@ const formSchema = yup.object({
     .required('Escola é obrigatória'),
   classroomId: yup.string()
     .required('Turma é obrigatória'),
+  seriesId: yup.string()
+    .required('Série é obrigatória'),
     responsibleType: yup.string()
     .required('Tipo de responsável é obrigatório'),
 })
@@ -174,6 +180,7 @@ async function registerStudent() {
       name: values.name,
       school_id: schoolId.value,
       classroom_id: classroomId.value,
+      series_id: seriesId.value,
       gender: values.gender,
       status: values.status,
       address: values.address,
@@ -234,10 +241,11 @@ async function registerStudent() {
 
 async function loadStudent() {
   try {
-    const [schools, classrooms, students] = await Promise.all([
+    const [schools, classrooms, students, series] = await Promise.all([
       schoolService.getAll(),
       classroomService.getAll(),
       studentService.getAll(),
+      seriesService.getAll(),
     ]);
 
     console.log('Chegou', students);
@@ -255,6 +263,7 @@ async function loadStudent() {
     mapData(schools, schoolList);
     mapData(classrooms, classroomList);
     mapData(students, studentList);
+    mapData(series, seriesList);
 
   } catch (error) {
     console.error('Erro ao carregar dados:', error);
@@ -275,6 +284,7 @@ async function getStudentData() {
     if (studentDbData) {
         schoolId.value = studentDbData.school_id,
         classroomId.value = studentDbData.classroom_id,
+        seriesId.value = studentDbData.series_id,
         setFieldValue('name', studentDbData.name),
         setFieldValue('birthdate', studentDbData.birthdate),
         setFieldValue('gender', studentDbData.gender),
@@ -293,6 +303,7 @@ async function getStudentData() {
         setFieldValue('cpf', studentDbData.cpf),
         setFieldValue('school_id', studentDbData.school_id),
         setFieldValue('schoolId', studentDbData.schoolId),
+        setFieldValue('seriesId', studentDbData.seriesId),
         setFieldValue('classroom_id', studentDbData.classroom_id),
         setFieldValue('classroomId', studentDbData.classroomId),
         setFieldValue('father_name', studentDbData.father_name),
@@ -421,7 +432,7 @@ onMounted(async () => {
     </ion-list>
 
     <!-- Campos do Pai -->
-    <div v-if="values.responsibleType === 'Pai' || values.responsibleType === 'Ambos'">
+    <div v-show="values.responsibleType === 'Pai' || values.responsibleType === 'Ambos'">
       <EpInput
         v-model="values.father_name"
         name="father_name"
@@ -454,7 +465,7 @@ onMounted(async () => {
     </div>
 
     <!-- Campos da Mãe -->
-    <div v-if="values.responsibleType === 'Mãe' || values.responsibleType === 'Ambos'">
+    <div v-show="values.responsibleType === 'Mãe' || values.responsibleType === 'Ambos'">
       <EpInput
         v-model="values.mother_name"
         name="mother_name"
@@ -537,6 +548,25 @@ onMounted(async () => {
           </IonSelect>
         </ion-item>
       </ion-list>
+      
+      <ion-list id="seriesList">
+      <ion-item>
+        <IonSelect
+          v-model="seriesId"
+          justify="space-between"
+          label="Série*"
+          placeholder="Selecione a série"
+          @ionChange="(e) => {
+            setFieldValue('seriesId', e.detail.value)
+          }"
+          
+        >
+          <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
+            {{ series.name }}
+          </IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
       
       <ion-list id="classroomList">
         <ion-item>
