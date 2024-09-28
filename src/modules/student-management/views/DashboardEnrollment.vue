@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
-import StudentList from '@/modules/student-management/components/StudentList.vue'
+import EnrollmentList from '@/modules/student-management/components/EnrollmentList.vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Database, Enums, Tables } from '@/types/database.types'
-import StudentService from '../services/StudentService'
+import EnrollmentService from '../services/EnrollmentService'
 
 const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
-const studentService = new StudentService()
-const dataList = ref< Tables<'student'> | []>([])
+const enrollmentService = new EnrollmentService()
+const dataList = ref< Tables<'enrollment'> | []>([])
 const schoolCount = ref(154)
 const classCount = ref(25)
 const approvalRate = ref(48)
@@ -24,25 +24,25 @@ const filteredDataList = computed(() => {
     return dataList.value
   }
 
-  return dataList.value.filter((student: any) =>
-    student.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  return dataList.value.filter((enrollment: any) =>
+    enrollment.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
-async function loadStudent() {
+async function loadEnrollment() {
   try {
-    dataList.value = await studentService.getAll()
+    dataList.value = await enrollmentService.getAll()
   } catch (error) {
     console.error('Erro ao carregar os alunos:', error)
   }
 }
 
 function navigateToRegister() {
-  router.push({ name: 'RegisterStudent' })
+  router.push({ name: 'RegisterEnrollment' })
 }
 
 onMounted(() => {
-  loadStudent()
+  loadEnrollment()
 })
 </script>
 
@@ -67,7 +67,7 @@ onMounted(() => {
         </ion-button>
       </ion-col>
     </ion-row>
-    <StudentList :dataList="filteredDataList" />
+    <EnrollmentList :dataList="filteredDataList" />
   </ContentLayout>
 </template>
 

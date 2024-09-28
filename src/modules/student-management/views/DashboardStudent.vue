@@ -53,7 +53,7 @@ onMounted(() => {
       :teacher-count="teacherCount"
     />
     <ion-toolbar>
-      <ion-title>Alunos Matriculados ({{ filteredDataList.length }})</ion-title>
+      <ion-title>Alunos Cadastrados ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
     <ion-row class="ion-align-items-center ion-justify-content-between">
       <ion-col size="10">

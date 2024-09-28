@@ -2,7 +2,9 @@ import { flame, flameOutline, people, book, pencil, clipboard, document, folder,
 import DashboardStudent from './views/DashboardStudent.vue';
 import DashboardEnrollment from './views/DashboardEnrollment.vue';
 import RegisterStudent from './views/RegisterStudent.vue';
+import RegisterEnrollment from './views/RegisterEnrollment.vue';
 import EditStudent from './views/EditStudent.vue'
+import EditEnrollment from './views/EditEnrollment.vue'
 
 const routes = [
   {
@@ -10,10 +12,10 @@ const routes = [
     name: 'Student Registration',
     component: DashboardStudent,
     meta: {
-      moduleName: 'Matricula',
-      moduleIcon: create,
-      icon: create,
-      name: 'Matricula',
+      moduleName: 'Student',
+      moduleIcon: folder,
+      icon: folder,
+      name: 'Cadastro de Aluno',
       order: 1,
       requiredRole: ['public', 'admin'],
     },
@@ -23,9 +25,9 @@ const routes = [
     name: 'RegisterStudent',
     component: RegisterStudent,
     meta: {
-      moduleName: 'Realizar Matricula',
+      moduleName: 'Student',
       icon: folder,
-      name: 'Realizar Matricula',
+      name: 'Cadastrar Aluno',
       order: 2,
       requiredRole: ['public', 'admin'],
     },
@@ -35,10 +37,47 @@ const routes = [
     name: 'EditStudent',
     component: EditStudent,
     meta: {
-      moduleName: 'Editar Matricula',
-      icon: people,
-      name: 'Editar Matricula',
+      moduleName: 'Student',
+      icon: folder,
+      name: 'Editar Cadastro',
       order: 3,
+      requiredRole: ['public', 'admin'],
+    },
+  },
+  {
+    path: '/Student/enrollment',
+    name: 'DashboardEnrollment',
+    component: DashboardEnrollment,
+    meta: {
+      moduleName: 'Student',
+      moduleIcon: create,
+      icon: create,
+      name: 'Matricula de Aluno',
+      order: 2,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Student/enrollment/register',
+    name: 'RegisterEnrollment',
+    component: RegisterEnrollment,
+    meta: {
+      moduleName: 'Student',
+      icon: folder,
+      name: 'Matricular Aluno',
+      order: 3,
+      requiredRole: ['public', 'admin'],
+    },
+  },
+  {
+    path: '/Student/enrollment/edit/:id',
+    name: 'EditEnrollment',
+    component: EditEnrollment,
+    meta: {
+      moduleName: 'Student',
+      icon: folder,
+      name: 'Editar Matricula',
+      order: 4,
       requiredRole: ['public', 'admin'],
     },
   },
