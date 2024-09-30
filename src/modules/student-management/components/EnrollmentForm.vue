@@ -52,7 +52,6 @@ const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED'];
 const residence_zone = ['Urbana', 'Rural'];
 const marital_status = ['Solteiro', 'Casado', 'Divorciado', 'Viúvo', 'Separado', 'União Estável', 'Não Informado'];
 const selectedSegment = ref('general-info')
-// const studentList = ref<{ id: string, name: string }[]>([])
 const classroomService = new ClassroomService()
 const enrollmentService = new EnrollmentService()
 const schoolService = new SchoolService()
@@ -62,12 +61,11 @@ const courseService = new CourseService()
 const classroomList = ref()
 const schoolList = ref()
 const studentList = ref()
+const enrollmentCode = ref('')
 const seriesList = ref()
 const courseList = ref()
 const enrollmentId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = yup.object({
-    // name: yup.string()
-    // .required('Nome do aluno é obrigatório'),
     year_enrollment: yup
   .number()
   .transform((value, originalValue) => {
@@ -82,12 +80,13 @@ const formSchema = yup.object({
   .integer('O ano deve ser um número inteiro')
   .min(1900, 'O ano deve ser maior ou igual a 1900')
   .max(new Date().getFullYear(), 'O ano não pode ser maior que o ano atual'),
-    date_enrollment: yup.date()
+  date_enrollment: yup.date()
     .required('Data de matrícula é obrigatória')
     .typeError('Data de matrícula inválida'),
-    observations: yup.string(),
-    // status: yup.string()
-    // .required('Status é obrigatório'),
+  observations: yup.string()
+  .nullable(),
+  enrollmentCode: yup.string()
+  .nullable(),
   schoolId: yup.string()
     .required('Escola é obrigatória'),
   classroomId: yup.string()
@@ -96,6 +95,8 @@ const formSchema = yup.object({
     .required('Série é obrigatória'),
   studentId: yup.string()
     .required('Aluno é obrigatória'),
+  courseId: yup.string()
+    .required('Curso é obrigatório'),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<EnrollmentPartial>({
@@ -111,18 +112,15 @@ async function registerEnrollment() {
   }
   else {
     const formData = {
-      name: values.name,
       school_id: schoolId.value,
       classroom_id: classroomId.value,
       series_id: seriesId.value,
       student_id: studentId.value,
       course_id: courseId.value,
-      status: values.status,
       date_enrollment: values.date_enrollment,
       observations: values.observations,
       year_enrollment: values.year_enrollment,
-
-
+      enrollmentCode: enrollmentCode.value,
 
     }
     try {
@@ -207,8 +205,7 @@ async function getEnrollmentData() {
         seriesId.value = enrollmentDbData.series_id,
         studentId.value = enrollmentDbData.student_id,
         courseId.value = enrollmentDbData.course_id,
-        setFieldValue('name', enrollmentDbData.name),
-        setFieldValue('status', enrollmentDbData.status),
+        enrollmentCode.value = enrollmentDbData.enrollmentCode,
         setFieldValue('date_enrollment', enrollmentDbData.date_enrollment),
         setFieldValue('year_enrollment', enrollmentDbData.year_enrollment),
         setFieldValue('observations', enrollmentDbData.observations),
@@ -218,13 +215,38 @@ async function getEnrollmentData() {
         setFieldValue('classroom_id', enrollmentDbData.classroom_id),
         setFieldValue('classroomId', enrollmentDbData.classroomId),
         setFieldValue('studentId', enrollmentDbData.studentId),
-        setFieldValue('courseId', enrollmentDbData.courseId)
+        setFieldValue('courseId', enrollmentDbData.courseId),
+        setFieldValue('enrollmentCode', enrollmentDbData.enrollmentCode)
     }
     else {
       console.error(`Dados da matricula não encontrados para o ID: ${enrollmentId.value}`)
     }
   }
 }
+
+const generateCodeEnrollment = () => {
+  // Verifica se o código de matrícula já foi gerado
+  if (enrollmentCode.value) {
+    return; // Se já existir, não gera um novo
+  }
+
+  if (!studentId.value) {
+    alert('Por favor, selecione o nome do aluno.');
+    return;
+  }
+
+  // Gera um código de matrícula caso não exista
+  const numbersRandom = Array.from({ length: 5 }, () => Math.floor(Math.random() * 10)).join('');
+  enrollmentCode.value = `MAT-${numbersRandom}`;
+};
+
+
+watch(studentId, (newValue) => {
+  if (!enrollmentCode.value && !enrollmentId.value) {
+  generateCodeEnrollment()
+  }
+})
+
 function applyPhoneMask(phone: string | null): string {
   if (!phone)
     return ''
@@ -258,6 +280,7 @@ onMounted(async () => {
             placeholder="Selecione o aluno"
             @ionChange="(e) => {
               setFieldValue('studentId', e.detail.value)
+              generateCodeEnrollment()
             }"
             
           >
@@ -267,6 +290,16 @@ onMounted(async () => {
           </IonSelect>
         </ion-item>
       </ion-list>
+      
+      <ion-item>
+      <ion-input
+      label="Código do Aluno:"
+      v-model="enrollmentCode"
+      type="text"
+      placeholder="Código gerado automaticamente"
+      readonly
+    />
+    </ion-item>
 
       <EpInput v-model="values.year_enrollment" name="year_enrollment" label="Ano*" type="number" placeholder="Digite o ano da Matricula" />
 
@@ -347,5 +380,7 @@ onMounted(async () => {
       </ion-list>
       
       <EpInput v-model="values.date_enrollment" name="date_enrollment" label="Data da Matrícula*" type="date" placeholder="Digite a data de matrícula" />
+      <EpInput v-model="values.observations" name="observations" label="Observações" type="textarea" placeholder="Digite observações sobre a matrícula" />
+
     </div>
 </template>

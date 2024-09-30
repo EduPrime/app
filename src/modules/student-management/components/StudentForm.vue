@@ -48,7 +48,6 @@ const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED'];
 const residence_zone = ['Urbana', 'Rural'];
 const marital_status = ['Solteiro', 'Casado', 'Divorciado', 'Viúvo', 'Separado', 'União Estável', 'Não Informado'];
 const selectedSegment = ref('general-info')
-// const studentList = ref<{ id: string, name: string }[]>([])
 const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
 const studentService = new StudentService()
@@ -154,12 +153,6 @@ const formSchema = yup.object({
     .matches(/^\d{5}-\d{3}$/, 'Código postal deve estar no formato 00000-000'),
   residence_zone: yup.string()
     .required('Zona de residência é obrigatória'),
-  schoolId: yup.string()
-    .required('Escola é obrigatória'),
-  classroomId: yup.string()
-    .required('Turma é obrigatória'),
-  seriesId: yup.string()
-    .required('Série é obrigatória'),
     responsibleType: yup.string()
     .required('Tipo de responsável é obrigatório'),
 })
@@ -528,65 +521,6 @@ onMounted(async () => {
 </div>
 
 <div v-show="selectedSegment === 'school-info'">
-
-    
-    <ion-list id="schoolList">
-        <ion-item>
-            <IonSelect
-            v-model="schoolId"
-            justify="space-between"
-            label="Escola*"
-            placeholder="Selecione a escola"
-            @ionChange="(e) => {
-              setFieldValue('schoolId', e.detail.value)
-            }"
-            
-          >
-            <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
-              {{ school.name }}
-            </IonSelectOption>
-          </IonSelect>
-        </ion-item>
-      </ion-list>
-      
-      <ion-list id="seriesList">
-      <ion-item>
-        <IonSelect
-          v-model="seriesId"
-          justify="space-between"
-          label="Série*"
-          placeholder="Selecione a série"
-          @ionChange="(e) => {
-            setFieldValue('seriesId', e.detail.value)
-          }"
-          
-        >
-          <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
-            {{ series.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
-    </ion-list>
-      
-      <ion-list id="classroomList">
-        <ion-item>
-            <IonSelect
-            v-model="classroomId"
-            justify="space-between"
-            label="Turma*"
-            placeholder="Selecione a turma"
-            @ionChange="(e) => {
-              setFieldValue('classroomId', e.detail.value)
-            }"
-            
-          >
-            <IonSelectOption v-for="classroom in classroomList" :key="classroom.id" :value="classroom.id">
-              {{ classroom.name }}
-            </IonSelectOption>
-          </IonSelect>
-        </ion-item>
-      </ion-list>
-      
       <ion-list id="status">
         <ion-item>
           <IonSelect
