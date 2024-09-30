@@ -1,8 +1,12 @@
 // src/modules/institution/routes.ts
-import { business, layers } from 'ionicons/icons'
+import { addCircle, business, layers, lockClosedOutline, pencil, peopleCircle } from 'ionicons/icons'
 import type { CustomRouteRecordRaw } from '@/router/RouterType'
 import AcademicYear from './views/AcademicYear.vue'
 import DashboardInstitution from './views/DashboardInstitution.vue'
+import CreateUser from './views/institute-users/CreateUser.vue'
+import UpdateUser from './views/institute-users/UpdateUser.vue'
+import UserPermissions from './views/institute-users/UserPermissions.vue'
+import UsersList from './views/institute-users/UsersList.vue'
 import RegisterAcademicTemplate from './views/RegisterAcademicTemplate.vue'
 import RegisterInstitution from './views/RegisterInstitution.vue'
 
@@ -57,6 +61,52 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: layers,
       name: 'Modelo ano letivo',
       order: 7,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Institutions/users',
+    name: 'UsersList',
+    component: UsersList,
+    meta: {
+      moduleName: 'Institutions',
+      moduleIcon: layers,
+      icon: peopleCircle,
+      name: 'Users',
+      order: 8,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Institutions/users/create',
+    name: 'CreateUser',
+    component: CreateUser,
+    meta: {
+      icon: addCircle,
+      name: 'Create Users',
+      order: 9,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Institutions/users/update/:userid',
+    name: 'UpdateUser',
+    component: UpdateUser,
+    meta: {
+      icon: pencil,
+      name: 'Update Users',
+      order: 10,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Institutions/users/permissions/:userid',
+    name: 'UserPermissions',
+    component: UserPermissions,
+    meta: {
+      icon: lockClosedOutline,
+      name: 'User Permission',
+      order: 11,
       requiredRole: ['public'],
     },
   },
