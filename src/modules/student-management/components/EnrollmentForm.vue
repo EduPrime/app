@@ -59,6 +59,8 @@ const studentService = new StudentService()
 const seriesService = new SeriesService()
 const courseService = new CourseService()
 const classroomList = ref()
+const filteredStudents = ref([])
+const searchQuery = ref('')
 const schoolList = ref()
 const studentList = ref()
 const enrollmentCode = ref('')
@@ -93,10 +95,14 @@ const formSchema = yup.object({
     .required('Turma é obrigatória'),
   seriesId: yup.string()
     .required('Série é obrigatória'),
-  studentId: yup.string()
-    .required('Aluno é obrigatória'),
+    status: yup.string()
+    .required('Status é obrigatório'),
+  // studentId: yup.string()
+  //   .required('Aluno é obrigatória'),
   courseId: yup.string()
     .required('Curso é obrigatório'),
+    name: yup.string()
+    .required('Aluno não selecionado ou não cadastrado'),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<EnrollmentPartial>({
@@ -120,7 +126,10 @@ async function registerEnrollment() {
       date_enrollment: values.date_enrollment,
       observations: values.observations,
       year_enrollment: values.year_enrollment,
+      name: values.name,
+      status: values.status,
       enrollmentCode: enrollmentCode.value,
+
 
     }
     try {
@@ -155,15 +164,46 @@ async function registerEnrollment() {
   }
 }
 
+async function loadStudents() {
+  const students = await studentService.getAll();
+  studentList.value = students;
+  filteredStudents.value = students; // Inicialmente, todos os alunos estão filtrados
+}
+
+function filterStudents() {
+  const query = searchQuery.value.toLowerCase();
+  if (query) {
+    filteredStudents.value = studentList.value.filter(student =>
+      student.name.toLowerCase().includes(query)
+    );
+  } else {
+    filteredStudents.value = []; // Se a consulta estiver vazia, limpa a lista filtrada
+  }
+}
+
+function selectStudent(student) {
+  studentId.value = student.id; // Define o ID do aluno selecionado
+  enrollmentCode.value = ''; // Limpa o código de matrícula ao selecionar um aluno
+  searchQuery.value = ''
+  setFieldValue('name', student.name)
+  generateCodeEnrollment(); // Gera um código de matrícula
+  filteredStudents.value = []
+}
+
 async function loadEnrollment() {
   try {
-    const [schools, classrooms, students, series, courses] = await Promise.all([
+    const [schools, classrooms, students, series, courses, enrollments] = await Promise.all([
       schoolService.getAll(),
       classroomService.getAll(),
       studentService.getAll(),
       seriesService.getAll(),
       courseService.getAll(),
+      enrollmentService.getAll(),
     ]);
+    
+    // const enrolledStudentIds = enrollments.map(enrollment => enrollment.student_id)
+
+    // const availableStudents = students.filter(student => !enrolledStudentIds.includes(student.id))
 
     console.log('Chegou', students);
 
@@ -182,6 +222,7 @@ async function loadEnrollment() {
     mapData(students, studentList);
     mapData(series, seriesList);
     mapData(courses, courseList);
+    // mapData(availableStudents, studentList);
 
   } catch (error) {
     console.error('Erro ao carregar dados:', error);
@@ -216,7 +257,15 @@ async function getEnrollmentData() {
         setFieldValue('classroomId', enrollmentDbData.classroomId),
         setFieldValue('studentId', enrollmentDbData.studentId),
         setFieldValue('courseId', enrollmentDbData.courseId),
+        setFieldValue('name', enrollmentDbData.name),
+        setFieldValue('status', enrollmentDbData.status),
         setFieldValue('enrollmentCode', enrollmentDbData.enrollmentCode)
+
+        const student = await studentService.getById(enrollmentDbData.student_id)
+        if (student) {
+          setFieldValue('name', student.name)
+          searchQuery.value = student.name
+        }
     }
     else {
       console.error(`Dados da matricula não encontrados para o ID: ${enrollmentId.value}`)
@@ -255,6 +304,7 @@ function applyPhoneMask(phone: string | null): string {
 
 onMounted(async () => {
   await loadEnrollment()
+  await loadStudents()
   if (enrollmentId.value) {
     await getEnrollmentData()
   }
@@ -270,26 +320,37 @@ onMounted(async () => {
     </IonSegmentButton>
   </IonSegment>
   <div v-show="selectedSegment === 'general-info'">
-    
-    <ion-list id="studentList">
-        <ion-item>
-            <IonSelect
-            v-model="studentId"
-            justify="space-between"
-            label="Aluno*"
-            placeholder="Selecione o aluno"
-            @ionChange="(e) => {
-              setFieldValue('studentId', e.detail.value)
-              generateCodeEnrollment()
-            }"
-            
-          >
-            <IonSelectOption v-for="student in studentList" :key="student.id" :value="student.id">
-              {{ student.name }}
-            </IonSelectOption>
-          </IonSelect>
-        </ion-item>
-      </ion-list>
+    <ion-list id="studentList" v-if="!enrollmentId">
+      <ion-item>
+        <ion-input
+          v-model="searchQuery"
+          placeholder="Pesquise o aluno..."
+          @input="filterStudents"
+        />
+      </ion-item>
+    </ion-list>
+
+    <!-- Renderiza a lista de alunos apenas se houver resultados -->
+    <ion-list v-if="!enrollmentId && filteredStudents.length > 0 && searchQuery">
+      <ion-item
+        v-for="student in filteredStudents"
+        :key="student.id"
+        button
+        @click="selectStudent(student)"
+      >
+        {{ student.name }}
+      </ion-item>
+    </ion-list>
+
+    <ion-item>
+      <ion-input
+      label="Nome do Aluno:"
+      v-model="values.name"
+      type="text"
+      placeholder="Aluno Matriculado"
+      readonly
+    />
+    </ion-item>
       
       <ion-item>
       <ion-input
@@ -380,6 +441,26 @@ onMounted(async () => {
       </ion-list>
       
       <EpInput v-model="values.date_enrollment" name="date_enrollment" label="Data da Matrícula*" type="date" placeholder="Digite a data de matrícula" />
+
+      <ion-list id="status">
+        <ion-item>
+          <IonSelect
+            v-model="values.status"
+            justify="space-between"
+            label="Status da Matricula*"
+            placeholder="Selecione o status"
+            @ionChange="(e) => {
+              setFieldValue('status', e.detail.value)
+            }"
+            
+          >
+            <IonSelectOption v-for="status in status" :key="status" :value="status">
+              {{ status }}
+            </IonSelectOption>
+          </IonSelect>
+        </ion-item>
+      </ion-list>
+
       <EpInput v-model="values.observations" name="observations" label="Observações" type="textarea" placeholder="Digite observações sobre a matrícula" />
 
     </div>

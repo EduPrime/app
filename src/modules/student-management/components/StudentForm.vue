@@ -132,8 +132,8 @@ const formSchema = yup.object({
     city: yup.
     string()
     .nullable(),
-    status: yup.string()
-    .required('Status é obrigatório'),
+    // status: yup.string()
+    // .required('Status é obrigatório'),
   gender: yup.string()
     .required('Gênero é obrigatório'),
   marital_status: yup.string()
@@ -171,9 +171,9 @@ async function registerStudent() {
   else {
     const formData = {
       name: values.name,
-      school_id: schoolId.value,
-      classroom_id: classroomId.value,
-      series_id: seriesId.value,
+      // school_id: schoolId.value,
+      // classroom_id: classroomId.value,
+      // series_id: seriesId.value,
       gender: values.gender,
       status: values.status,
       address: values.address,
@@ -356,11 +356,11 @@ onMounted(async () => {
         Informações de Endereço
       </IonLabel>
     </IonSegmentButton>
-    <IonSegmentButton value="school-info">
+    <!-- <IonSegmentButton value="school-info">
       <IonLabel style="font-size: calc(1rem - 2px);">
         Informações Escolar
       </IonLabel>
-    </IonSegmentButton>
+    </IonSegmentButton> -->
   </IonSegment>
   <div v-show="selectedSegment === 'general-info'">
     <EpInput v-model="values.name" name="name" label="Nome do Aluno*" placeholder="Digite o nome do Aluno" />
@@ -520,7 +520,7 @@ onMounted(async () => {
       </ion-list>
 </div>
 
-<div v-show="selectedSegment === 'school-info'">
+<!-- <div v-show="selectedSegment === 'school-info'">
       <ion-list id="status">
         <ion-item>
           <IonSelect
@@ -539,5 +539,5 @@ onMounted(async () => {
           </IonSelect>
         </ion-item>
       </ion-list>
-  </div>
+  </div> -->
 </template>

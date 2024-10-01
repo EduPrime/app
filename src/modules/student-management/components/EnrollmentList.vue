@@ -26,6 +26,22 @@ watch(
 );
 // Nome da tabela e campos
 const tableName = 'enrollment'
+const fieldLabels = {
+  id: 'ID',
+  classroom_id: 'ID da Turma',
+  school_id: 'ID da Escola',
+  institution_id: 'ID da Instituição',
+  student_id: 'ID do Aluno',
+  course_id: 'ID do Curso',
+  series_id: 'ID da Série',
+  year_enrollment: 'Ano de Matrícula',
+  date_enrollment: 'Data da Matrícula',
+  observations: 'Observações',
+  created_at: 'Criado Em',
+  deleted_at: 'Deletado Em',
+  status: 'Status',
+  updated_at: 'Atualizado Em',
+}
 const fields = ['id', 'classroom_id', 'school_id', 'institution_id', 'student_id', 'course_id', 'series_id', 'year_enrollment', 'date_enrollment', 'observations', 'created_at', 'deleted_at', 'status', 'updated_at']
 const router = useRouter()
 
@@ -141,10 +157,10 @@ const alertButtons = [
             <ion-col v-for="(field, fieldIndex) in fields" :key="fieldIndex" size="12">
               <ion-card>
                 <ion-card-header>
-                  <ion-card-title>{{ field }}</ion-card-title>
+                  <ion-card-title>{{ fieldLabels[field] }}</ion-card-title>
                 </ion-card-header>
                 <ion-card-content>
-                  <p><strong>{{ field }}:</strong> {{ item[field] }}</p>
+                  <p><strong>{{ fieldLabels[field] }}:</strong> {{ item[field] }}</p>
                 </ion-card-content>
               </ion-card>
             </ion-col>
