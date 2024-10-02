@@ -29,7 +29,9 @@ defineExpose({
 const router = useRouter()
 const route = useRouter()
 const responsibleType = ref(null)
-const valuesType = ref({
+const docsType = ref(null)
+
+const valuesResponsibles = ref({
   father_name: '',
   father_cpf: '',
   father_email: '',
@@ -39,14 +41,24 @@ const valuesType = ref({
   mother_email: '',
   mother_phone: '',
 })
+
+const valuesDocs = ref({
+  rg_number: '',
+  rg_state: '',
+  rg_issue_date: '',
+  rg_issuer: '',
+  new_birth_cert_number: '',
+  old_birth_cert_term: '',
+  old_birth_cert_book: '',
+  old_birth_cert_sheet: '',
+})
 const schoolId = ref('')
 const seriesId = ref('')
 const classroomId = ref('')
 const studentData = ref< Tables<'student'> | []>([])
 const gender = ['Masculino', 'Feminino']
-const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED'];
-const residence_zone = ['Urbana', 'Rural'];
-const marital_status = ['Solteiro', 'Casado', 'Divorciado', 'Viúvo', 'Separado', 'União Estável', 'Não Informado'];
+const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED']
+const residence_zone = ['Urbana', 'Rural']
 const selectedSegment = ref('general-info')
 const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
@@ -109,6 +121,12 @@ const formSchema = yup.object({
     cpf: yup.string()
     .required('CPF é obrigatório')
     .test('valid-cpf', 'CPF inválido', value => isValidCPF(value || '')),
+    rg_number: yup.string(),
+    rg_state: yup.string(),
+    rg_issue_date: yup.date()
+    .required('Data de emissão é obrigatória')
+    .typeError('Data de emissão inválida'),
+    rg_issuer: yup.string(),
     email: yup
     .string()
     .nullable()
@@ -136,8 +154,6 @@ const formSchema = yup.object({
     // .required('Status é obrigatório'),
   gender: yup.string()
     .required('Gênero é obrigatório'),
-  marital_status: yup.string()
-    .required('Estado civil é obrigatório'),
   birthdate: yup.date()
     .required('Data de nascimento é obrigatória')
     .typeError('Data de nascimento inválida'),
@@ -155,6 +171,8 @@ const formSchema = yup.object({
     .required('Zona de residência é obrigatória'),
     responsibleType: yup.string()
     .required('Tipo de responsável é obrigatório'),
+    docsType: yup.string()
+    .required('Tipo de documento é obrigatório'),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<StudentPartial>({
@@ -180,7 +198,6 @@ async function registerStudent() {
       phone: values.phone,
       email: values.email,
       birthdate: values.birthdate,
-      marital_status: values.marital_status,
       place_of_birth: values.place_of_birth,
       postalcode: values.postalcode,
       residence_zone: values.residence_zone,
@@ -189,6 +206,10 @@ async function registerStudent() {
       neighborhood: values.neighborhood,
       city: values.city,
       cpf: values.cpf,
+      rg_number: values.rg_number,
+      rg_state: values.rg_state,
+      rg_issue_date: values.rg_issue_date,
+      rg_issuer: values.rg_issuer,
       father_name: values.father_name,
       father_cpf: values.father_cpf,
       father_email: values.father_email,
@@ -198,6 +219,7 @@ async function registerStudent() {
       mother_email: values.mother_email,
       mother_phone: values.mother_phone,
       responsibleType: values.responsibleType,
+      docsType: values.docsType,
 
     }
     try {
@@ -286,7 +308,6 @@ async function getStudentData() {
         setFieldValue('address', studentDbData.address),
         setFieldValue('number_address', studentDbData.number_address),
         setFieldValue('status', studentDbData.status),
-        setFieldValue('marital_status', studentDbData.marital_status),
         setFieldValue('place_of_birth', studentDbData.place_of_birth),
         setFieldValue('complement', studentDbData.complement),
         setFieldValue('neighborhood', studentDbData.neighborhood),
@@ -307,7 +328,19 @@ async function getStudentData() {
         setFieldValue('mother_cpf', studentDbData.mother_cpf),
         setFieldValue('mother_email', studentDbData.mother_email),
         setFieldValue('mother_phone', studentDbData.mother_phone),
-        setFieldValue('responsibleType', studentDbData.responsibleType)
+        setFieldValue('responsibleType', studentDbData.responsibleType),
+        setFieldValue('docsType', studentDbData.docsType),
+        setFieldValue('old_birth_cert_book', studentDbData.old_birth_cert_book),
+        setFieldValue('old_birth_cert_sheet', studentDbData.old_birth_cert_sheet),
+        setFieldValue('old_birth_cert_term', studentDbData.old_birth_cert_term),
+        setFieldValue('new_birth_cert_number', studentDbData.new_birth_cert_number),
+        setFieldValue('rg_number', studentDbData.rg_number),
+        setFieldValue('rg_state', studentDbData.rg_state),
+        setFieldValue('rg_issue_date', studentDbData.rg_issue_date),
+        setFieldValue('rg_issuer', studentDbData.rg_issuer)
+
+    
+        
     }
     else {
       console.error(`Dados do aluno não encontrados para o ID: ${studentId.value}`)
@@ -323,15 +356,32 @@ function applyPhoneMask(phone: string | null): string {
 watch(responsibleType, (newValue, oldValue) => {
   // Se necessário, você pode limpar ou atualizar os campos
   if (newValue === 'Pai') {
-    valuesType.value.mother_name = '';
-    valuesType.value.mother_cpf = '';
-    valuesType.value.mother_email = '';
-    valuesType.value.mother_phone = '';
+    valuesResponsibles.value.mother_name = '';
+    valuesResponsibles.value.mother_cpf = '';
+    valuesResponsibles.value.mother_email = '';
+    valuesResponsibles.value.mother_phone = '';
   } else if (newValue === 'Mãe') {
-    valuesType.value.father_name = '';
-    valuesType.value.father_cpf = '';
-    valuesType.value.father_email = '';
-    valuesType.value.father_phone = '';
+    valuesResponsibles.value.father_name = '';
+    valuesResponsibles.value.father_cpf = '';
+    valuesResponsibles.value.father_email = '';
+    valuesResponsibles.value.father_phone = '';
+  } else if (newValue === 'Ambos') {
+  }
+});
+
+watch(docsType, (newValue, oldValue) => {
+  // Se necessário, você pode limpar ou atualizar os campos
+  if (newValue === 'RG') {
+    valuesDocs.value.rg_number = '';
+    valuesDocs.value.rg_state = '';
+    valuesDocs.value.rg_issue_date = '';
+    valuesDocs.value.rg_issuer = '';
+  } else if (newValue === 'Certidão de Nascimento (Novo Formato)') {
+    valuesDocs.value.new_birth_cert_number = '';
+  } else if (newValue === 'Certidão de Nascimento (Antigo Formato)') {
+    valuesDocs.value.old_birth_cert_book = '';
+    valuesDocs.value.old_birth_cert_sheet = '';
+    valuesDocs.value.old_birth_cert_term = '';
   } else if (newValue === 'Ambos') {
   }
 });
@@ -364,7 +414,67 @@ onMounted(async () => {
   </IonSegment>
   <div v-show="selectedSegment === 'general-info'">
     <EpInput v-model="values.name" name="name" label="Nome do Aluno*" placeholder="Digite o nome do Aluno" />
-    <EpInput v-model="values.cpf" name="cpf" :mask="cpfMask" inputmode="numeric" label="CPF*" placeholder="000.000.000-00" />
+    
+
+    <ion-list id="docsType">
+      <ion-item>
+        <IonSelect
+          v-model="values.docsType"
+          label="Documentos*"
+          placeholder="Escolha o documento"
+          @ionChange="(e) => {
+            setFieldValue('docsType', e.detail.value)
+          }"
+        >
+          <IonSelectOption value="RG">RG</IonSelectOption>
+          <IonSelectOption value="CPF">CPF</IonSelectOption>
+          <IonSelectOption value="Certidão de Nascimento (Novo Formato)">
+            Certidão de Nascimento (Novo Formato)</IonSelectOption>
+          <IonSelectOption value="Certidão de Nascimento (Antigo Formato)">
+            Certidão de Nascimento (Antigo Formato)</IonSelectOption>
+          <IonSelectOption value="Ambos">Ambos</IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
+
+     <!-- Campos do RG -->
+     <div v-show="values.docsType === 'RG' || values.docsType === 'Ambos'">
+      <EpInput
+        v-model="values.rg_number"
+        name="rg_number"
+        label="Número do RG"
+        placeholder="Digite o número do RG"
+      />
+      <EpInput
+        v-model="values.rg_state"
+        name="rg_state"
+        :mask="cpfMask"
+        label="Estado de Emissão"
+        placeholder="Selecione o estado"
+        inputmode="numeric"
+      />
+      <EpInput
+        v-model="values.rg_issue_date"
+        name="rg_issue_date"
+        type="email"
+        label="Data de Emissão"
+        placeholder="Selecione a data de emissão"
+      />
+      <EpInput
+        v-model="values.rg_issuer"
+        name="rg_issuer"
+        :mask="phoneMask"
+        inputmode="tel"
+        label="Órgão Emissor"
+        placeholder="Digite o órgão emissor"
+      />
+    </div>
+
+    <!-- Campos de CPF -->
+    <div v-show="values.docsType === 'CPF' || values.docsType === 'Ambos'">
+      <EpInput v-model="values.cpf" name="cpf" :mask="cpfMask" inputmode="numeric" label="CPF*" placeholder="000.000.000-00" />
+    </div>
+
     <EpInput v-model="values.email" name="email" label="Email" type="email" placeholder="Digite o email" />
     <EpInput v-model="values.birthdate" name="birthdate" label="Data de Nascimento*" type="date" placeholder="Digite a data de nascimento" />
     <EpInput v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone*" placeholder="(99) 99999-9999" />
@@ -388,24 +498,6 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
 
-    <ion-list id="marital_status">
-      <ion-item>
-        <IonSelect
-          v-model="values.marital_status"
-          justify="space-between"
-          label="Estado Civil*"
-          placeholder="Selecione o estado civil"
-          @ionChange="(e) => {
-            setFieldValue('marital_status', e.detail.value)
-          }"
-          
-        >
-          <IonSelectOption v-for="marital_status in marital_status" :key="marital_status" :value="marital_status">
-            {{ marital_status }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
-    </ion-list>
 
     <ion-list id="responsibleType">
       <ion-item>
@@ -519,6 +611,7 @@ onMounted(async () => {
         </ion-item>
       </ion-list>
 </div>
+
 
 <!-- <div v-show="selectedSegment === 'school-info'">
       <ion-list id="status">
