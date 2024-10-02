@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
-import SchoolList from '@/modules/school-management/components/SchoolList.vue'
+import SeriesList from '@/modules/school-management/components/SeriesList.vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Database, Enums, Tables } from '@/types/database.types'
-import SchoolService from '../services/SchoolService'
+import SeriesService from '../services/SeriesService'
 
 const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
-const schoolService = new SchoolService()
-const dataList = ref< Tables<'school'> | []>([])
-const schoolData = ref<Array<{ school: Tables<'school'>, courses: Tables<'course'>[], series: Tables<'series'>[] }> | []>([])
+const seriesService = new SeriesService()
+const dataList = ref< Tables<'series'> | []>([])
 const schoolCount = ref(154)
 const classCount = ref(25)
 const approvalRate = ref(48)
@@ -25,25 +24,25 @@ const filteredDataList = computed(() => {
     return dataList.value
   }
 
-  return dataList.value.filter((classroom: any) =>
-    classroom.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+  return dataList.value.filter((series: any) =>
+    series.name.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
-async function loadSchools() {
+async function loadSeries() {
   try {
-    dataList.value = await schoolService.getAll()
+    dataList.value = await seriesService.getAll()
   } catch (error) {
-    console.error('Erro ao carregar as salas de aula:', error)
+    console.error('Erro ao carregar as séries:', error)
   }
 }
 
 function navigateToRegister() {
-  router.push({ name: 'RegisterSchool' })
+  router.push({ name: 'RegisterSeries' })
 }
 
 onMounted(() => {
-  loadSchools()
+  loadSeries()
 })
 </script>
 
@@ -54,7 +53,7 @@ onMounted(() => {
       :teacher-count="teacherCount"
     />
     <ion-toolbar>
-      <ion-title>Escolas ativas ({{ filteredDataList.length }})</ion-title>
+      <ion-title>Séries ativas ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
     <ion-row class="ion-align-items-center ion-justify-content-between">
       <ion-col size="10">
@@ -68,7 +67,7 @@ onMounted(() => {
         </ion-button>
       </ion-col>
     </ion-row>
-    <SchoolList :dataList="filteredDataList" />
+    <SeriesList :dataList="filteredDataList" />
   </ContentLayout>
 </template>
 

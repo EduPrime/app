@@ -1,2 +1,2 @@
 // src/modules/class-registration/index.ts
-export { default as ClassRegistration } from './views/ClassRegistration.vue'
+export { default as DashboardSchools } from './views/DashboardSchools.vue'
