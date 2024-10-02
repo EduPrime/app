@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import ContentLayout from '@/components/theme/ContentLayout.vue'
+import TeacherCards from '@/modules/school-teacher-management/components/TeacherCards.vue'
+import TeacherList from '@/modules/school-teacher-management/components/TeacherList.vue'
 import { add } from 'ionicons/icons'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import TeacherService from '../services/TeacherService'
+import type { Tables } from '@/types/database.types'
 import SchoolService from '../services/SchoolService'
 import SeriesService from '../services/SeriesService'
 import StudentService from '../services/StudentService'
-import ContentLayout from '@/components/theme/ContentLayout.vue'
-import TeacherList from '@/modules/school-teacher-management/components/TeacherList.vue'
-import TeacherCards from '@/modules/school-teacher-management/components/TeacherCards.vue'
-import type { Tables } from '@/types/database.types'
+import TeacherService from '../services/TeacherService'
 
 const router = useRouter()
 const route = useRoute()
@@ -53,6 +53,7 @@ async function loadTeachers() {
   try {
     const teachers: any = await teacherService.getAll('created_at', true)
     teacherData.value = teachers || []
+    console.log('Professores carregados:', teachers)
   }
   catch (error) {
     console.error('Erro ao carregar os professores:', error)

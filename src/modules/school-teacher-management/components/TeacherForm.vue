@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { IonLabel, IonSegment, IonSegmentButton, IonSelect, IonSelectOption } from '@ionic/vue'
-import { useForm } from 'vee-validate'
-import { date, object, string } from 'yup'
-import TeacherService from '../services/TeacherService'
-import SchoolService from '../services/SchoolService'
-import QualificationForm from './QualificationForm.vue'
-import { hundredYearsAgo } from '@/utils/hundred-years-ago'
-import { isValidDDD } from '@/utils/ddd-validator'
 import EpInput from '@/components/EpInput.vue'
 import EpTextarea from '@/components/EpTextarea.vue'
-
-import type { Tables } from '@/types/database.types'
+import { isValidDDD } from '@/utils/ddd-validator'
+import { hundredYearsAgo } from '@/utils/hundred-years-ago'
 import showToast from '@/utils/toast-alert'
+import { IonLabel, IonSegment, IonSegmentButton, IonSelect, IonSelectOption } from '@ionic/vue'
+import { useForm } from 'vee-validate'
+import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { date, object, string } from 'yup'
+import type { Tables } from '@/types/database.types'
+import SchoolService from '../services/SchoolService'
+
+import TeacherService from '../services/TeacherService'
+import QualificationForm from './QualificationForm.vue'
 
 type TeacherPartial = Omit<Pick<Tables<'teacher'>, 'name' | 'birthdate' | 'email' | 'phone' | 'address' | 'qualifications' | 'school_id'>, 'birthdate'> & {
   birthdate: Date | string // Redefinindo o campo birthdate para ser do tipo Date
