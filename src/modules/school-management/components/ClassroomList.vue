@@ -5,17 +5,15 @@ import { IonAlert } from '@ionic/vue'
 import { pencil, trash } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
 import type { Tables } from '@/types/database.types'
-import SchoolService from '../services/SchoolService'
+import ClassroomService from '../services/ClassroomService'
 
 // Instanciando o serviço da tabela
-const service = new SchoolService()
+const service = new ClassroomService()
 
-// Define o tipo dinamicamente com base em tableName
-const school = ref< Tables<'school'> | []>([])
+const classroom = ref< Tables<'classroom'> | []>([])
 const dataList = ref()
-
 const props = defineProps<{
-  dataList: Tables<'school'>
+  dataList: Tables<'classroom'>
 }>()
 
 watch(
@@ -29,8 +27,8 @@ watch(
 
 
 // Nome da tabela e campos
-const tableName = 'school'
-const fields = ['abbreviation', 'access', 'acronym', 'active', 'address', 'administrativedependency', 'availablearea', 'blockdiaryentriesforclosedacademicyears', 'builtarea', 'city', 'created_at', 'creationdecree', 'deleted_at', 'energymeter', 'floortype', 'hasexternalarea', 'id', 'institution_id', 'latitude', 'logourl', 'longitude', 'manager_id', 'managerposition', 'metadata', 'name', 'numberoffloors', 'operationalstatus', 'operationlocation', 'phone', 'postalcode', 'regulation', 'sharedschoolinepcode', 'state', 'totalarea', 'updated_at', 'user_created']
+const tableName = 'classroom'
+const fields = ['created_at', 'deleted_at', 'id', 'metadata', 'name', 'period', 'series_id', 'status', 'updated_at', 'user_created']
 const router = useRouter()
 
 // Função que busca os dados da tabela ao montar o componente
@@ -40,6 +38,7 @@ onMounted(async () => {
   } catch (error) {
     console.error(`Erro ao buscar dados de ${tableName}:`, error)
   }
+
 })
 
 // Funções para editar, excluir e detalhes
@@ -53,7 +52,7 @@ function toggleDetails(index: number) {
 function editItem(item: any) {
   // Exemplo de navegação para a página de edição
   // Dependendo da sua implementação, ajuste a rota
-  router.push({ name: 'EditSchools', params: { id: item.id.toString() } })
+  router.push({ name: `EditClass`, params: { id: item.id.toString() } })
 }
 
 const isAlertOpen = ref(false)
@@ -105,6 +104,9 @@ const alertButtons = [
 </script>
 
 <template>
+  <!-- <pre>
+    {{ dataList }}
+  </pre> -->
   <IonAlert
     :is-open="isAlertOpen"
     header="Confirmar Exclusão"
@@ -129,10 +131,10 @@ const alertButtons = [
         </ion-buttons>
       </ion-item>
       <ion-item-options side="end">
-        <ion-item-option @click="editItem(item)">
+        <ion-item-option @click="editItem(classroom)">
           Editar
         </ion-item-option>
-        <ion-item-option color="danger" @click="openDeleteAlert(item)">
+        <ion-item-option color="danger" @click="openDeleteAlert(classroom)">
           Excluir
         </ion-item-option>
       </ion-item-options>

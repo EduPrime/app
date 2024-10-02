@@ -5,17 +5,15 @@ import { IonAlert } from '@ionic/vue'
 import { pencil, trash } from 'ionicons/icons'
 import { useRouter } from 'vue-router'
 import type { Tables } from '@/types/database.types'
-import SchoolService from '../services/SchoolService'
+import SeriesService from '../services/SeriesService'
 
 // Instanciando o serviço da tabela
-const service = new SchoolService()
+const service = new SeriesService()
 
-// Define o tipo dinamicamente com base em tableName
-const school = ref< Tables<'school'> | []>([])
+const series = ref< Tables<'series'> | []>([])
 const dataList = ref()
-
 const props = defineProps<{
-  dataList: Tables<'school'>
+  dataList: Tables<'series'>
 }>()
 
 watch(
@@ -29,8 +27,8 @@ watch(
 
 
 // Nome da tabela e campos
-const tableName = 'school'
-const fields = ['abbreviation', 'access', 'acronym', 'active', 'address', 'administrativedependency', 'availablearea', 'blockdiaryentriesforclosedacademicyears', 'builtarea', 'city', 'created_at', 'creationdecree', 'deleted_at', 'energymeter', 'floortype', 'hasexternalarea', 'id', 'institution_id', 'latitude', 'logourl', 'longitude', 'manager_id', 'managerposition', 'metadata', 'name', 'numberoffloors', 'operationalstatus', 'operationlocation', 'phone', 'postalcode', 'regulation', 'sharedschoolinepcode', 'state', 'totalarea', 'updated_at', 'user_created']
+const tableName = 'series'
+const fields = ['course_id', 'created_at', 'deleted_at', 'id', 'metadata', 'name', 'timetable_id', 'updated_at', 'user_created']
 const router = useRouter()
 
 // Função que busca os dados da tabela ao montar o componente
@@ -53,7 +51,7 @@ function toggleDetails(index: number) {
 function editItem(item: any) {
   // Exemplo de navegação para a página de edição
   // Dependendo da sua implementação, ajuste a rota
-  router.push({ name: 'EditSchools', params: { id: item.id.toString() } })
+  router.push({ name: `EditSeries`, params: { id: item.id.toString() } })
 }
 
 const isAlertOpen = ref(false)
@@ -77,7 +75,7 @@ async function deleteItem(item: any) {
   try {
    const result =  await service.softDelete(item.id)
    if (result) {
-    showToast(`${tableName} excluído com sucesso`)
+    showToast(`${item.name} excluído com sucesso`)
     dataList.value = dataList.value.filter(i => i.id !== item.id)
     isAlertOpen.value = false
     itemToDelete.value = null
