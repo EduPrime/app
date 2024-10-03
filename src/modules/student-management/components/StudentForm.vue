@@ -51,11 +51,45 @@ const valuesDocs = ref({
   old_birth_cert_term: '',
   old_birth_cert_book: '',
   old_birth_cert_sheet: '',
+  old_birth_cert_date_issue: '',
+  old_birth_cert_state: '',
+
 })
 const schoolId = ref('')
 const seriesId = ref('')
 const classroomId = ref('')
 const studentData = ref< Tables<'student'> | []>([])
+const states = [
+  "AC", // Acre
+  "AL", // Alagoas
+  "AP", // Amapá
+  "AM", // Amazonas
+  "BA", // Bahia
+  "CE", // Ceará
+  "DF", // Distrito Federal
+  "ES", // Espírito Santo
+  "GO", // Goiás
+  "MA", // Maranhão
+  "MT", // Mato Grosso
+  "MS", // Mato Grosso do Sul
+  "MG", // Minas Gerais
+  "PA", // Pará
+  "PB", // Paraíba
+  "PR", // Paraná
+  "PE", // Pernambuco
+  "PI", // Piauí
+  "RJ", // Rio de Janeiro
+  "RN", // Rio Grande do Norte
+  "RS", // Rio Grande do Sul
+  "RO", // Rondônia
+  "RR", // Roraima
+  "SC", // Santa Catarina
+  "SP", // São Paulo
+  "SE", // Sergipe
+  "TO"  // Tocantins
+]
+const old_birth_cert_state = [...states]
+const rg_state = [...states]
 const gender = ['Masculino', 'Feminino']
 const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED']
 const residence_zone = ['Urbana', 'Rural']
@@ -119,14 +153,18 @@ const formSchema = yup.object({
       return isValidDDD(value);
     }),
     cpf: yup.string()
-    .required('CPF é obrigatório')
+    .nullable()
     .test('valid-cpf', 'CPF inválido', value => isValidCPF(value || '')),
-    rg_number: yup.string(),
-    rg_state: yup.string(),
+    rg_number: yup.string()
+    .nullable()
+    .max(30, 'O RG deve ter no máximo 25 caracteres'),
+    rg_state: yup.string()
+    .nullable(),
     rg_issue_date: yup.date()
-    .required('Data de emissão é obrigatória')
+    .nullable()
     .typeError('Data de emissão inválida'),
-    rg_issuer: yup.string(),
+    rg_issuer: yup.string()
+    .nullable(),
     email: yup
     .string()
     .nullable()
@@ -137,7 +175,8 @@ const formSchema = yup.object({
     )
     .max(255, 'O email deve ter no máximo 255 caracteres'),
     address: yup
-    .string(),
+    .string()
+    .nullable(),
     complement: yup
     .string()
     .nullable(),
@@ -150,8 +189,6 @@ const formSchema = yup.object({
     city: yup.
     string()
     .nullable(),
-    // status: yup.string()
-    // .required('Status é obrigatório'),
   gender: yup.string()
     .required('Gênero é obrigatório'),
   birthdate: yup.date()
@@ -173,6 +210,23 @@ const formSchema = yup.object({
     .required('Tipo de responsável é obrigatório'),
     docsType: yup.string()
     .required('Tipo de documento é obrigatório'),
+    new_birth_cert_number: yup.string()
+    .nullable()
+    .min(32, 'O número da matrícula deve ter no mínimo 32 caracteres')
+    .max(32, 'O número da matrícula deve ter no máximo 32 caracteres'),
+    old_birth_cert_term: yup.string()
+    .nullable()
+    .max(30, 'O termo deve ter no máximo 30 caracteres'),
+    old_birth_cert_sheet: yup.string()
+    .nullable()
+    .max(30, 'A folha deve ter no máximo 30 caracteres'),
+    old_birth_cert_date_issue: yup.string()
+    .nullable(),
+    old_birth_cert_book: yup.string()
+    .nullable()
+    .max(30, 'O livro deve ter no máximo 30 caracteres'),
+    old_birth_cert_state: yup.string()
+    .nullable(),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<StudentPartial>({
@@ -210,6 +264,12 @@ async function registerStudent() {
       rg_state: values.rg_state,
       rg_issue_date: values.rg_issue_date,
       rg_issuer: values.rg_issuer,
+      new_birth_cert_number: values.new_birth_cert_number,
+      old_birth_cert_book: values.old_birth_cert_book,
+      old_birth_cert_date_issue: values.old_birth_cert_date_issue,
+      old_birth_cert_sheet: values.old_birth_cert_sheet,
+      old_birth_cert_state: values.old_birth_cert_state,
+      old_birth_cert_term: values.old_birth_cert_term,
       father_name: values.father_name,
       father_cpf: values.father_cpf,
       father_email: values.father_email,
@@ -333,6 +393,8 @@ async function getStudentData() {
         setFieldValue('old_birth_cert_book', studentDbData.old_birth_cert_book),
         setFieldValue('old_birth_cert_sheet', studentDbData.old_birth_cert_sheet),
         setFieldValue('old_birth_cert_term', studentDbData.old_birth_cert_term),
+        setFieldValue('old_birth_cert_date_issue', studentDbData.old_birth_cert_date_issue),
+        setFieldValue('old_birth_cert_state', studentDbData.old_birth_cert_state),
         setFieldValue('new_birth_cert_number', studentDbData.new_birth_cert_number),
         setFieldValue('rg_number', studentDbData.rg_number),
         setFieldValue('rg_state', studentDbData.rg_state),
@@ -382,7 +444,8 @@ watch(docsType, (newValue, oldValue) => {
     valuesDocs.value.old_birth_cert_book = '';
     valuesDocs.value.old_birth_cert_sheet = '';
     valuesDocs.value.old_birth_cert_term = '';
-  } else if (newValue === 'Ambos') {
+    valuesDocs.value.old_birth_cert_date_issue = '';
+    valuesDocs.value.old_birth_cert_state = '';
   }
 });
 
@@ -403,78 +466,17 @@ onMounted(async () => {
     </IonSegmentButton>
     <IonSegmentButton value="address-info">
       <IonLabel style="font-size: calc(1rem - 2px);">
-        Informações de Endereço
+        Endereço
       </IonLabel>
     </IonSegmentButton>
-    <!-- <IonSegmentButton value="school-info">
+    <IonSegmentButton value="docs-info">
       <IonLabel style="font-size: calc(1rem - 2px);">
-        Informações Escolar
+        Documentos
       </IonLabel>
-    </IonSegmentButton> -->
+    </IonSegmentButton>
   </IonSegment>
   <div v-show="selectedSegment === 'general-info'">
     <EpInput v-model="values.name" name="name" label="Nome do Aluno*" placeholder="Digite o nome do Aluno" />
-    
-
-    <ion-list id="docsType">
-      <ion-item>
-        <IonSelect
-          v-model="values.docsType"
-          label="Documentos*"
-          placeholder="Escolha o documento"
-          @ionChange="(e) => {
-            setFieldValue('docsType', e.detail.value)
-          }"
-        >
-          <IonSelectOption value="RG">RG</IonSelectOption>
-          <IonSelectOption value="CPF">CPF</IonSelectOption>
-          <IonSelectOption value="Certidão de Nascimento (Novo Formato)">
-            Certidão de Nascimento (Novo Formato)</IonSelectOption>
-          <IonSelectOption value="Certidão de Nascimento (Antigo Formato)">
-            Certidão de Nascimento (Antigo Formato)</IonSelectOption>
-          <IonSelectOption value="Ambos">Ambos</IonSelectOption>
-        </IonSelect>
-      </ion-item>
-    </ion-list>
-
-     <!-- Campos do RG -->
-     <div v-show="values.docsType === 'RG' || values.docsType === 'Ambos'">
-      <EpInput
-        v-model="values.rg_number"
-        name="rg_number"
-        label="Número do RG"
-        placeholder="Digite o número do RG"
-      />
-      <EpInput
-        v-model="values.rg_state"
-        name="rg_state"
-        :mask="cpfMask"
-        label="Estado de Emissão"
-        placeholder="Selecione o estado"
-        inputmode="numeric"
-      />
-      <EpInput
-        v-model="values.rg_issue_date"
-        name="rg_issue_date"
-        type="email"
-        label="Data de Emissão"
-        placeholder="Selecione a data de emissão"
-      />
-      <EpInput
-        v-model="values.rg_issuer"
-        name="rg_issuer"
-        :mask="phoneMask"
-        inputmode="tel"
-        label="Órgão Emissor"
-        placeholder="Digite o órgão emissor"
-      />
-    </div>
-
-    <!-- Campos de CPF -->
-    <div v-show="values.docsType === 'CPF' || values.docsType === 'Ambos'">
-      <EpInput v-model="values.cpf" name="cpf" :mask="cpfMask" inputmode="numeric" label="CPF*" placeholder="000.000.000-00" />
-    </div>
-
     <EpInput v-model="values.email" name="email" label="Email" type="email" placeholder="Digite o email" />
     <EpInput v-model="values.birthdate" name="birthdate" label="Data de Nascimento*" type="date" placeholder="Digite a data de nascimento" />
     <EpInput v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone*" placeholder="(99) 99999-9999" />
@@ -517,18 +519,18 @@ onMounted(async () => {
     </ion-list>
 
     <!-- Campos do Pai -->
-    <div v-show="values.responsibleType === 'Pai' || values.responsibleType === 'Ambos'">
+    <div v-show="values.responsibleType === 'Pai' && values.responsibleType !== 'Ambos'">
       <EpInput
         v-model="values.father_name"
         name="father_name"
-        label="Nome do Pai"
+        label="Nome"
         placeholder="Digite o nome do pai"
       />
       <EpInput
         v-model="values.father_cpf"
         name="father_cpf"
         :mask="cpfMask"
-        label="CPF do Pai"
+        label="CPF"
         placeholder="000.000.000-00"
         inputmode="numeric"
       />
@@ -536,7 +538,7 @@ onMounted(async () => {
         v-model="values.father_email"
         name="father_email"
         type="email"
-        label="Email do Pai"
+        label="Email"
         placeholder="Digite o email do pai"
       />
       <EpInput
@@ -544,24 +546,24 @@ onMounted(async () => {
         name="father_phone"
         :mask="phoneMask"
         inputmode="tel"
-        label="Telefone do Pai"
+        label="Telefone"
         placeholder="(99) 99999-9999"
       />
     </div>
 
     <!-- Campos da Mãe -->
-    <div v-show="values.responsibleType === 'Mãe' || values.responsibleType === 'Ambos'">
+    <div v-show="values.responsibleType === 'Mãe' && values.responsibleType !== 'Ambos'">
       <EpInput
         v-model="values.mother_name"
         name="mother_name"
-        label="Nome da Mãe"
+        label="Nome"
         placeholder="Digite o nome da mãe"
       />
       <EpInput
         v-model="values.mother_cpf"
         name="mother_cpf"
         :mask="cpfMask"
-        label="CPF da Mãe"
+        label="CPF"
         placeholder="000.000.000-00"
         inputmode="numeric"
       />
@@ -569,7 +571,7 @@ onMounted(async () => {
         v-model="values.mother_email"
         name="mother_email"
         type="email"
-        label="Email da Mãe"
+        label="Email"
         placeholder="Digite o email da mãe"
       />
       <EpInput
@@ -577,11 +579,87 @@ onMounted(async () => {
         name="mother_phone"
         :mask="phoneMask"
         inputmode="tel"
-        label="Telefone da Mãe"
+        label="Telefone"
+        placeholder="(99) 99999-9999"
+      />
+
+      
+    </div>
+    <!-- Container flex para Pai e Mãe quando "Ambos" for selecionado -->
+  <div v-show="values.responsibleType === 'Ambos'" class="responsible-container">
+    <!-- Campos do Pai -->
+     <ion-item>
+    <div class="responsible-section">
+      <h3>Pai</h3>
+      <EpInput
+        v-model="values.father_name"
+        name="father_name"
+        label="Nome"
+        placeholder="Digite o nome do pai"
+      />
+      <EpInput
+        v-model="values.father_cpf"
+        name="father_cpf"
+        :mask="cpfMask"
+        label="CPF"
+        placeholder="000.000.000-00"
+        inputmode="numeric"
+      />
+      <EpInput
+        v-model="values.father_email"
+        name="father_email"
+        type="email"
+        label="Email"
+        placeholder="Digite o email do pai"
+      />
+      <EpInput
+        v-model="values.father_phone"
+        name="father_phone"
+        :mask="phoneMask"
+        inputmode="tel"
+        label="Telefone"
         placeholder="(99) 99999-9999"
       />
     </div>
+    </ion-item>
 
+    <!-- Separador visual -->
+    <div class="separator"></div>
+
+    <!-- Campos da Mãe -->
+    <div class="responsible-section">
+      <h3>Mãe</h3>
+      <EpInput
+        v-model="values.mother_name"
+        name="mother_name"
+        label="Nome"
+        placeholder="Digite o nome da mãe"
+      />
+      <EpInput
+        v-model="values.mother_cpf"
+        name="mother_cpf"
+        :mask="cpfMask"
+        label="CPF"
+        placeholder="000.000.000-00"
+        inputmode="numeric"
+      />
+      <EpInput
+        v-model="values.mother_email"
+        name="mother_email"
+        type="email"
+        label="Email"
+        placeholder="Digite o email da mãe"
+      />
+      <EpInput
+        v-model="values.mother_phone"
+        name="mother_phone"
+        :mask="phoneMask"
+        inputmode="tel"
+        label="Telefone"
+        placeholder="(99) 99999-9999"
+      />
+    </div>
+  </div>
 </div>
 
 <div v-show="selectedSegment === 'address-info'">
@@ -612,25 +690,135 @@ onMounted(async () => {
       </ion-list>
 </div>
 
+<div v-show="selectedSegment === 'docs-info'">
+<ion-list id="docsType">
+      <ion-item>
+        <IonSelect
+          v-model="values.docsType"
+          label="Documentos*"
+          placeholder="Escolha o documento"
+          @ionChange="(e) => {
+            setFieldValue('docsType', e.detail.value)
+          }"
+        >
+          <IonSelectOption value="RG">RG</IonSelectOption>
+          <IonSelectOption value="CPF">CPF</IonSelectOption>
+          <IonSelectOption value="Certidão de Nascimento (Novo Formato)">
+            Certidão de Nascimento (Novo Formato)</IonSelectOption>
+          <IonSelectOption value="Certidão de Nascimento (Antigo Formato)">
+            Certidão de Nascimento (Antigo Formato)</IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
 
-<!-- <div v-show="selectedSegment === 'school-info'">
-      <ion-list id="status">
-        <ion-item>
-          <IonSelect
-            v-model="values.status"
-            justify="space-between"
-            label="Status da Matricula*"
-            placeholder="Selecione o status"
-            @ionChange="(e) => {
-              setFieldValue('status', e.detail.value)
-            }"
-            
-          >
-            <IonSelectOption v-for="status in status" :key="status" :value="status">
-              {{ status }}
-            </IonSelectOption>
-          </IonSelect>
-        </ion-item>
-      </ion-list>
-  </div> -->
+     <!-- Campos do RG -->
+     <div v-show="values.docsType === 'RG'">
+      <EpInput
+        v-model="values.rg_number"
+        name="rg_number"
+        label="RG"
+        placeholder="Digite o número do RG"
+      />
+      <ion-list id="rg_state">
+      <ion-item>
+        <IonSelect
+          v-model="values.rg_state"
+          justify="space-between"
+          label="Estado de Emissão"
+          placeholder="Selecione o estado"
+          @ionChange="(e) => {
+            setFieldValue('rg_state', e.detail.value)
+          }"
+          
+        >
+          <IonSelectOption v-for="rg_state in rg_state" :key="rg_state" :value="rg_state">
+            {{ rg_state }}
+          </IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
+    <EpInput v-model="values.rg_issue_date" name="rg_issue_date" label="Data de Emissão" type="date" placeholder="Selecione a data de emissão" />
+      <EpInput
+        v-model="values.rg_issuer"
+        name="rg_issuer"
+        label="Órgão Emissor"
+        placeholder="Digite o órgão emissor"
+      />
+    </div>
+
+    <!-- Campos de CPF -->
+    <div v-show="values.docsType === 'CPF'">
+      <EpInput v-model="values.cpf" name="cpf" :mask="cpfMask" inputmode="numeric" label="CPF" placeholder="000.000.000-00" />
+    </div>
+
+    <!-- Campos da Certidão de Nascimento (Novo Formato) -->
+    <div v-show="values.docsType === 'Certidão de Nascimento (Novo Formato)'">
+      <EpInput
+        v-model="values.new_birth_cert_number"
+        name="new_birth_cert_number"
+        label="Matrícula"
+        placeholder="Digite a Matrícula da Certidão"
+      />
+    </div>
+
+    <!-- Campos da Certidão de Nascimento (Antigo Formato) -->
+    <div v-show="values.docsType === 'Certidão de Nascimento (Antigo Formato)'">
+      <EpInput
+        v-model="values.old_birth_cert_term"
+        name="old_birth_cert_term"
+        label="Termo"
+        placeholder="Digite o número do termo da certidão"
+      />
+      <EpInput
+        v-model="values.old_birth_cert_book"
+        name="old_birth_cert_book"
+        label="Livro"
+        placeholder="Informe o número do livro do registro"
+      />
+      <EpInput
+        v-model="values.old_birth_cert_sheet"
+        name="old_birth_cert_sheet"
+        label="Folha"
+        placeholder="Indique a folha do livro onde está o registro"
+      />
+      <ion-list id="old_birth_cert_state">
+      <ion-item>
+        <IonSelect
+          v-model="values.old_birth_cert_state"
+          justify="space-between"
+          label="Estado de Emissão"
+          placeholder="Selecione o estado onde a certidão foi emitida"
+          @ionChange="(e) => {
+            setFieldValue('old_birth_cert_state', e.detail.value)
+          }"
+          
+        >
+          <IonSelectOption v-for="old_birth_cert_state in old_birth_cert_state" :key="old_birth_cert_state" :value="old_birth_cert_state">
+            {{ old_birth_cert_state }}
+          </IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
+      <EpInput v-model="values.old_birth_cert_date_issue" name="old_birth_cert_date_issue" label="Data de Emissão" type="date" placeholder="Selecione a data de emissão da certidão" />
+    </div>
+  </div>
 </template>
+
+<style lang="css">
+.responsible-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px; /* Espaço entre Pai e Mãe */
+}
+
+.responsible-section {
+  flex: 1;
+  min-width: 45%; /* Garante que cada coluna ocupe 45% do espaço */
+}
+
+.separator {
+  width: 2px;
+  background-color: #ccc;
+  height: 100%; /* Altura total da seção para atuar como divisória visual */
+}
+</style>
