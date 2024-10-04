@@ -63,7 +63,7 @@ const routes = [
     component: RegisterEnrollment,
     meta: {
       moduleName: 'Student',
-      icon: folder,
+      icon: create,
       name: 'Matricular Aluno',
       order: 3,
       requiredRole: ['public', 'admin'],
@@ -75,7 +75,7 @@ const routes = [
     component: EditEnrollment,
     meta: {
       moduleName: 'Student',
-      icon: folder,
+      icon: create,
       name: 'Editar Matricula',
       order: 4,
       requiredRole: ['public', 'admin'],

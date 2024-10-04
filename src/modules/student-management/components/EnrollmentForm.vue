@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { IonLabel, IonSegment, IonSegmentButton, IonSelect, IonSelectOption } from '@ionic/vue'
+import { IonLabel, IonSegment, IonSegmentButton, IonSelect, IonSelectOption, IonIcon, IonSearchbar } from '@ionic/vue'
+import { lockClosed } from 'ionicons/icons'
 import { useForm } from 'vee-validate'
 import * as yup from 'yup'
 import ClassroomService from '@/modules/school-management/services/ClassroomService'
@@ -60,6 +61,15 @@ const seriesService = new SeriesService()
 const courseService = new CourseService()
 const classroomList = ref()
 const filteredStudents = ref([])
+const currentYear = 2025
+const minDate = `${currentYear}-01-01`
+const maxDate = `${currentYear}-12-31`
+const enforceYear = () => {
+  const selectedDate = new Date(values.date_enrollment)
+  if (selectedDate.getFullYear() !== currentYear) {
+    setFieldValue('date_enrollment', `${currentYear}-01-01`)
+  }
+}
 const searchQuery = ref('')
 const schoolList = ref()
 const studentList = ref()
@@ -68,20 +78,6 @@ const seriesList = ref()
 const courseList = ref()
 const enrollmentId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = yup.object({
-    year_enrollment: yup
-  .number()
-  .transform((value, originalValue) => {
-    // Verifica se o valor original é uma string antes de usar trim
-    if (typeof originalValue === 'string') {
-      return originalValue.trim() === '' ? null : value;
-    }
-    // Se não for uma string (como undefined, null, number), apenas retorna o valor original
-    return originalValue;
-  })
-  .required('Ano é obrigatório')
-  .integer('O ano deve ser um número inteiro')
-  .min(1900, 'O ano deve ser maior ou igual a 1900')
-  .max(new Date().getFullYear(), 'O ano não pode ser maior que o ano atual'),
   date_enrollment: yup.date()
     .required('Data de matrícula é obrigatória')
     .typeError('Data de matrícula inválida'),
@@ -125,7 +121,6 @@ async function registerEnrollment() {
       course_id: courseId.value,
       date_enrollment: values.date_enrollment,
       observations: values.observations,
-      year_enrollment: values.year_enrollment,
       name: values.name,
       status: values.status,
       enrollmentCode: enrollmentCode.value,
@@ -248,7 +243,6 @@ async function getEnrollmentData() {
         courseId.value = enrollmentDbData.course_id,
         enrollmentCode.value = enrollmentDbData.enrollmentCode,
         setFieldValue('date_enrollment', enrollmentDbData.date_enrollment),
-        setFieldValue('year_enrollment', enrollmentDbData.year_enrollment),
         setFieldValue('observations', enrollmentDbData.observations),
         setFieldValue('school_id', enrollmentDbData.school_id),
         setFieldValue('schoolId', enrollmentDbData.schoolId),
@@ -303,6 +297,8 @@ function applyPhoneMask(phone: string | null): string {
 }
 
 onMounted(async () => {
+  const defaultDate = `${currentYear}-01-01`
+  setFieldValue('date_enrollment', defaultDate)
   await loadEnrollment()
   await loadStudents()
   if (enrollmentId.value) {
@@ -321,13 +317,15 @@ onMounted(async () => {
   </IonSegment>
   <div v-show="selectedSegment === 'general-info'">
     <ion-list id="studentList" v-if="!enrollmentId">
-      <ion-item>
-        <ion-input
+
+        <ion-searchbar
           v-model="searchQuery"
           placeholder="Pesquise o aluno..."
-          @input="filterStudents"
-        />
-      </ion-item>
+          @ionInput="filterStudents"
+          animated="true"
+          debounce="500" 
+        ></ion-searchbar>
+
     </ion-list>
 
     <!-- Renderiza a lista de alunos apenas se houver resultados -->
@@ -342,27 +340,21 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
 
-    <ion-item>
-      <ion-input
-      label="Nome do Aluno:"
-      v-model="values.name"
-      type="text"
-      placeholder="Aluno Matriculado"
-      readonly
-    />
-    </ion-item>
-      
-      <ion-item>
-      <ion-input
-      label="Código do Aluno:"
-      v-model="enrollmentCode"
-      type="text"
-      placeholder="Código gerado automaticamente"
-      readonly
-    />
-    </ion-item>
+    <ion-item class="readonly-item">
+  <ion-icon slot="start" :icon="lockClosed" style="color: #000000; font-size: 20px;"></ion-icon>
+  <ion-label position="stacked" color="medium">Nome do Aluno (Somente Leitura):</ion-label>
+  <ion-input
+    v-model="values.name"
+    type="text"
+    placeholder="Aluno Matriculado"
+    readonly
+    class="readonly-input"
+  />
+</ion-item>
 
-      <EpInput v-model="values.year_enrollment" name="year_enrollment" label="Ano*" type="number" placeholder="Digite o ano da Matricula" />
+    
+      
+
 
     <ion-list id="schoolList">
         <ion-item>
@@ -440,28 +432,66 @@ onMounted(async () => {
         </ion-item>
       </ion-list>
       
-      <EpInput v-model="values.date_enrollment" name="date_enrollment" label="Data da Matrícula*" type="date" placeholder="Digite a data de matrícula" />
-
-      <ion-list id="status">
-        <ion-item>
-          <IonSelect
-            v-model="values.status"
-            justify="space-between"
-            label="Status da Matricula*"
-            placeholder="Selecione o status"
-            @ionChange="(e) => {
-              setFieldValue('status', e.detail.value)
-            }"
+      <EpInput
+      v-model="values.date_enrollment"
+      name="date_enrollment"
+      label="Data da Matrícula*"
+      type="date"
+      :max="maxDate"
+      :min="minDate"
+      placeholder="Digite a data de matrícula"
+      @change="enforceYear"
+    />
+    
+    <ion-list id="status">
+      <ion-item>
+        <IonSelect
+        v-model="values.status"
+        justify="space-between"
+        label="Status da Matricula*"
+        placeholder="Selecione o status"
+        @ionChange="(e) => {
+          setFieldValue('status', e.detail.value)
+        }"
             
-          >
+            >
             <IonSelectOption v-for="status in status" :key="status" :value="status">
               {{ status }}
             </IonSelectOption>
           </IonSelect>
         </ion-item>
       </ion-list>
-
+      
+      <ion-item class="readonly-item">
+      <ion-icon slot="start" :icon="lockClosed" style="color: #000000; font-size: 20px;"></ion-icon>
+      <ion-label position="stacked" color="medium">Código de Matrícula (Somente Leitura):</ion-label>
+      <ion-input
+      v-model="enrollmentCode"
+      type="text"
+      placeholder="Código gerado automaticamente"
+      readonly
+      class="readonly-input"
+      />
+      </ion-item>
+      
       <EpInput v-model="values.observations" name="observations" label="Observações" type="textarea" placeholder="Digite observações sobre a matrícula" />
 
     </div>
 </template>
+
+<style scoped>
+.readonly-item {
+  --background: #e0e0e0; /* Cor de fundo mais clara para o item */
+  border: 1px solid #d1d1d1; /* Borda para destacar */
+  border-radius: 8px; /* Bordas arredondadas */
+}
+
+.readonly-input {
+  --background: transparent;
+  pointer-events: none; /* Desativa interações no campo */
+}
+
+ion-searchbar {
+  --background: var(--ion-color-light);
+}
+</style>
