@@ -104,7 +104,7 @@ VALUES
 
 -- Inserção de Cursos
 INSERT INTO
-    course (id, name, school_id, created_at)
+    course (id, name, school_id, status, created_at)
 VALUES
     (
         gen_random_uuid (),
@@ -117,6 +117,7 @@ VALUES
             WHERE
                 name = 'Escola Fundamental Alfa'
         ),
+        'Ativo',
         NOW ()
     ),
     (
@@ -130,6 +131,7 @@ VALUES
             WHERE
                 name = 'Colégio Beta'
         ),
+        'Ativo',
         NOW ()
     );
 
@@ -142,7 +144,7 @@ VALUES
         (
             SELECT id 
             FROM school 
-            WHERE name = 'Nome da Escola 1'  -- Substitua pelo nome da escola que deseja referenciar
+            WHERE name = 'Escola Fundamental Alfa'  -- Nome atualizado da escola
         ),
         (
             SELECT id 
@@ -152,15 +154,15 @@ VALUES
         (
             SELECT id 
             FROM institution 
-            WHERE name = 'Nome da Instituição'  -- Substitua pelo nome da instituição que deseja referenciar
+            WHERE name = 'Instituição Educacional Alfa'
         ),
         NULL,  -- Supondo que você não tenha um timetable_id a ser referenciado, caso contrário, substitua por um UUID correspondente.
         '1º Ano',
         'Etapa 1',  -- Altere de acordo com o seu enum `course_stage_type`
         'Sim',  -- Ou 'NÃO', dependendo do status de graduação
         '40',  -- Substitua pelo valor correto da carga horária
-        'Segunda',  -- Substitua pelos dias da escola
-        NULL,  -- Pode incluir um objeto JSON se necessário, ou deixar como NULL
+        'Sexta',  -- Substitua pelos dias da escola
+        '{}'::JSONB,  -- Pode incluir um objeto JSON se necessário
         auth.uid(),  -- Se você tem uma função de autenticação configurada que retorna o ID do usuário
         NOW()
     ),
@@ -169,7 +171,7 @@ VALUES
         (
             SELECT id 
             FROM school 
-            WHERE name = 'Nome da Escola 2'  -- Substitua pelo nome da escola que deseja referenciar
+            WHERE name = 'Colégio Beta'  -- Nome atualizado da escola
         ),
         (
             SELECT id 
@@ -179,7 +181,7 @@ VALUES
         (
             SELECT id 
             FROM institution 
-            WHERE name = 'Nome da Instituição'  -- Substitua pelo nome da instituição que deseja referenciar
+            WHERE name = 'Instituição Educacional Alfa'
         ),
         NULL,  -- Novamente, se você não tiver um timetable_id
         '2º Ano',
@@ -187,13 +189,13 @@ VALUES
         'Sim',  -- Ou 'NÃO', dependendo do status de graduação
         '40',  -- Substitua pelo valor correto da carga horária
         'Segunda',  -- Substitua pelos dias da escola
-        NULL,  -- Ou um objeto JSON se necessário
+        '{}'::JSONB,  -- Pode incluir um objeto JSON se necessário
         auth.uid(),  -- Se você tem uma função de autenticação configurada
         NOW()
     );
 
 
--- Inserção de Turmas
+-- Inserção de Turmas (com novos campos)
 INSERT INTO classroom (
     id,
     school_id,
@@ -217,94 +219,30 @@ INSERT INTO classroom (
 (
     gen_random_uuid(),
     (
-        SELECT id FROM school WHERE name = 'Nome da Escola'
+        SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
     ),
     (
         SELECT id FROM series WHERE name = '1º Ano'
     ),
     (
-        SELECT id FROM institution WHERE name = 'Nome da Instituição'
+        SELECT id FROM institution WHERE name = 'Instituição Educacional Alfa'
     ),
     (
-        SELECT id FROM course WHERE name = 'Nome do Curso'
+        SELECT id FROM course WHERE name = 'Ensino Fundamental I'
     ),
     (
-        SELECT id FROM teacher WHERE name = 'Nome do Professor'
+        SELECT id FROM teacher WHERE name = 'Prof. João Pereira'
     ),
     (
-        SELECT id FROM class_session WHERE name = 'Nome da Sessão'
+        SELECT id FROM class_session WHERE day_of_week = 'Segunda'
     ),
     30, -- Exemplo de número máximo de alunos
     '08:00:00', -- Hora de início
-    '08:00:00', -- Intervalo de hora de início
-    '12:00:00', -- Intervalo de hora de término
+    '08:10:00', -- Intervalo de hora de início
+    '11:50:00', -- Intervalo de hora de término
     '12:00:00', -- Hora de término
     'Segunda', -- Dia da semana
     'Turma A',
-    'Manhã',
-    2024, -- Ano
-    '{}'::JSONB, -- Metadados
-    NOW()
-),
-(
-    gen_random_uuid(),
-    (
-        SELECT id FROM school WHERE name = 'Nome da Escola'
-    ),
-    (
-        SELECT id FROM series WHERE name = '1º Ano'
-    ),
-    (
-        SELECT id FROM institution WHERE name = 'Nome da Instituição'
-    ),
-    (
-        SELECT id FROM course WHERE name = 'Nome do Curso'
-    ),
-    (
-        SELECT id FROM teacher WHERE name = 'Nome do Professor'
-    ),
-    (
-        SELECT id FROM class_session WHERE name = 'Nome da Sessão'
-    ),
-    30, -- Exemplo de número máximo de alunos
-    '13:00:00', -- Hora de início
-    '13:00:00', -- Intervalo de hora de início
-    '17:00:00', -- Intervalo de hora de término
-    '17:00:00', -- Hora de término
-    'Terça', -- Dia da semana
-    'Turma B',
-    'Tarde',
-    2024, -- Ano
-    '{}'::JSONB, -- Metadados
-    NOW()
-),
-(
-    gen_random_uuid(),
-    (
-        SELECT id FROM school WHERE name = 'Nome da Escola'
-    ),
-    (
-        SELECT id FROM series WHERE name = '2º Ano'
-    ),
-    (
-        SELECT id FROM institution WHERE name = 'Nome da Instituição'
-    ),
-    (
-        SELECT id FROM course WHERE name = 'Nome do Curso'
-    ),
-    (
-        SELECT id FROM teacher WHERE name = 'Nome do Professor'
-    ),
-    (
-        SELECT id FROM class_session WHERE name = 'Nome da Sessão'
-    ),
-    30, -- Exemplo de número máximo de alunos
-    '18:00:00', -- Hora de início
-    '18:00:00', -- Intervalo de hora de início
-    '21:00:00', -- Intervalo de hora de término
-    '21:00:00', -- Hora de término
-    'Quarta', -- Dia da semana
-    'Turma C',
     'Manhã',
     2024, -- Ano
     '{}'::JSONB, -- Metadados
@@ -322,7 +260,6 @@ INSERT INTO
         name,
         birthdate,
         gender,
-        marital_status,
         place_of_birth,
         postalcode,
         residence_zone,
@@ -344,8 +281,6 @@ INSERT INTO
         email,
         phone,
         address,
-        guardian_name,
-        guardian_phone,
         status,
         photo,
         metadata,
@@ -357,7 +292,7 @@ VALUES
     (
         gen_random_uuid(),
         (
-            SELECT id FROM school WHERE name = 'Escola Exemplo'
+            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
         ),
         (
             SELECT id FROM classroom WHERE name = 'Turma A'
@@ -365,7 +300,6 @@ VALUES
         'Ana Silva',
         '2005-03-10',
         'Feminino',
-        'Solteiro',
         'São Paulo',
         '01000-000',
         'Urbana',
@@ -384,7 +318,7 @@ VALUES
         '(11) 98765-4321',
         'Pai',
         (
-            SELECT id FROM series WHERE name = '1ª Série'
+            SELECT id FROM series WHERE name = '1º Ano'
         ),
         'ana.silva@example.com',
         '(11) 99876-5432',
@@ -393,7 +327,7 @@ VALUES
         '(11) 91234-5678',
         'Ativo',
         NULL,
-        NULL,
+        '{}'::JSONB,
         auth.uid(),
         NOW(),
         NOW()
@@ -401,15 +335,14 @@ VALUES
     (
         gen_random_uuid(),
         (
-            SELECT id FROM school WHERE name = 'Escola Exemplo'
+            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
         ),
         (
-            SELECT id FROM classroom WHERE name = 'Turma A'
+            SELECT id FROM classroom WHERE name = 'Turma B'
         ),
         'Bruno Souza',
         '2004-07-22',
         'Masculino',
-        'Solteiro',
         'Rio de Janeiro',
         '02000-000',
         'Urbana',
@@ -428,7 +361,7 @@ VALUES
         '(21) 98765-4321',
         'Pai',
         (
-            SELECT id FROM series WHERE name = '1ª Série'
+            SELECT id FROM series WHERE name = '2º Ano'
         ),
         'bruno.souza@example.com',
         '(21) 99876-5432',
@@ -437,7 +370,7 @@ VALUES
         '(21) 91234-5678',
         'Ativo',
         NULL,
-        NULL,
+        '{}'::JSONB,
         auth.uid(),
         NOW(),
         NOW()
@@ -445,15 +378,14 @@ VALUES
     (
         gen_random_uuid(),
         (
-            SELECT id FROM school WHERE name = 'Escola Exemplo'
+            SELECT id FROM school WHERE name = 'Colégio Beta'
         ),
         (
-            SELECT id FROM classroom WHERE name = 'Turma B'
+            SELECT id FROM classroom WHERE name = 'Turma C'
         ),
         'Carla Mendes',
         '2006-01-15',
         'Feminino',
-        'Solteiro',
         'Belo Horizonte',
         '03000-000',
         'Urbana',
@@ -472,7 +404,7 @@ VALUES
         '(31) 98765-4321',
         'Pai',
         (
-            SELECT id FROM series WHERE name = '1ª Série'
+            SELECT id FROM series WHERE name = '2º Ano'
         ),
         'carla.mendes@example.com',
         '(31) 99876-5432',
@@ -481,7 +413,7 @@ VALUES
         '(31) 91234-5678',
         'Ativo',
         NULL,
-        NULL,
+        '{}'::JSONB,
         auth.uid(),
         NOW(),
         NOW()
@@ -489,15 +421,14 @@ VALUES
     (
         gen_random_uuid(),
         (
-            SELECT id FROM school WHERE name = 'Escola Exemplo'
+            SELECT id FROM school WHERE name = 'Colégio Beta'
         ),
         (
-            SELECT id FROM classroom WHERE name = 'Turma B'
+            SELECT id FROM classroom WHERE name = 'Turma C'
         ),
         'Daniel Oliveira',
         '2003-05-30',
         'Masculino',
-        'Solteiro',
         'Curitiba',
         '04000-000',
         'Urbana',
@@ -516,7 +447,7 @@ VALUES
         '(41) 98765-4321',
         'Pai',
         (
-            SELECT id FROM series WHERE name = '1ª Série'
+            SELECT id FROM series WHERE name = '2º Ano'
         ),
         'daniel.oliveira@example.com',
         '(41) 99876-5432',
@@ -525,95 +456,7 @@ VALUES
         '(41) 91234-5678',
         'Ativo',
         NULL,
-        NULL,
-        auth.uid(),
-        NOW(),
-        NOW()
-    ),
-    (
-        gen_random_uuid(),
-        (
-            SELECT id FROM school WHERE name = 'Escola Exemplo'
-        ),
-        (
-            SELECT id FROM classroom WHERE name = 'Turma C'
-        ),
-        'Elaine Costa',
-        '2002-11-09',
-        'Feminino',
-        'Casado',
-        'Porto Alegre',
-        '05000-000',
-        'Urbana',
-        '654',
-        '89012345678',
-        'Moinhos de Vento',
-        'Porto Alegre',
-        '',
-        'Ricardo Costa',
-        'ricardo.costa@example.com',
-        '89012345678',
-        '(51) 91234-5678',
-        'Ana Costa',
-        'ana.costa@example.com',
-        '90123456789',
-        '(51) 98765-4321',
-        'Pai',
-        (
-            SELECT id FROM series WHERE name = '1ª Série'
-        ),
-        'elaine.costa@example.com',
-        '(51) 99876-5432',
-        'Rua Exemplo, 654',
-        'Juliana Costa',
-        '(51) 91234-5678',
-        'Ativo',
-        NULL,
-        NULL,
-        auth.uid(),
-        NOW(),
-        NOW()
-    ),
-    (
-        gen_random_uuid(),
-        (
-            SELECT id FROM school WHERE name = 'Escola Exemplo'
-        ),
-        (
-            SELECT id FROM classroom WHERE name = 'Turma C'
-        ),
-        'Felipe Lima',
-        '2001-02-28',
-        'Masculino',
-        'Solteiro',
-        'Salvador',
-        '06000-000',
-        'Urbana',
-        '987',
-        '12345678901',
-        'Bahia',
-        'Salvador',
-        '',
-        'Roberto Lima',
-        'roberto.lima@example.com',
-        '23456789012',
-        '(71) 91234-5678',
-        'Sofia Lima',
-        'sofia.lima@example.com',
-        '34567890123',
-        '(71) 98765-4321',
-        'Pai',
-        (
-            SELECT id FROM series WHERE name = '1ª Série'
-        ),
-        'felipe.lima@example.com',
-        '(71) 99876-5432',
-        'Avenida Modelo, 987',
-        'Maria Lima',
-        '(71) 91234-5678',
-        'Ativo',
-        NULL,
-        NULL,
+        '{}'::JSONB,
         auth.uid(),
         NOW(),
         NOW()
