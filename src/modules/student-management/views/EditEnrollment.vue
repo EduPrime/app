@@ -7,7 +7,7 @@ import EnrollmentForm from '../../student-management/components/EnrollmentForm.v
 const enrollmentFormRef = ref<InstanceType<typeof EnrollmentForm> | null>(null)
 const router = useRouter()
 function handleCancel() {
-  router.push({ name: 'DashboardEnrollment' })
+  router.push({ name: 'EnrollmentList' })
 }
 
 function handleSave() {

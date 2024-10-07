@@ -65,7 +65,7 @@ function toggleDetails(index: number) {
 function editItem(item: any) {
   // Exemplo de navegação para a página de edição
   // Dependendo da sua implementação, ajuste a rota
-  router.push({ name: `EditEnrollment`, params: { id: item.id.toString() } })
+  router.push({ name: `EnrollmentEdit`, params: { id: item.id.toString() } })
 }
 
 const isAlertOpen = ref(false)

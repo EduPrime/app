@@ -194,275 +194,6 @@ VALUES
         NOW()
     );
 
-
--- Inserção de Turmas (com novos campos)
-INSERT INTO classroom (
-    id,
-    school_id,
-    series_id,
-    institution_id,
-    course_id,
-    teacher_id,
-    class_session,
-    maxStudents,
-    startTime,
-    startTimeInterval,
-    endTimeInterval,
-    endTime,
-    day_of_week,
-    name,
-    period,
-    year,
-    metadata,
-    created_at
-) VALUES
-(
-    gen_random_uuid(),
-    (
-        SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
-    ),
-    (
-        SELECT id FROM series WHERE name = '1º Ano'
-    ),
-    (
-        SELECT id FROM institution WHERE name = 'Instituição Educacional Alfa'
-    ),
-    (
-        SELECT id FROM course WHERE name = 'Ensino Fundamental I'
-    ),
-    (
-        SELECT id FROM teacher WHERE name = 'Prof. João Pereira'
-    ),
-    (
-        SELECT id FROM class_session WHERE day_of_week = 'Segunda'
-    ),
-    30, -- Exemplo de número máximo de alunos
-    '08:00:00', -- Hora de início
-    '08:10:00', -- Intervalo de hora de início
-    '11:50:00', -- Intervalo de hora de término
-    '12:00:00', -- Hora de término
-    'Segunda', -- Dia da semana
-    'Turma A',
-    'Manhã',
-    2024, -- Ano
-    '{}'::JSONB, -- Metadados
-    NOW()
-);
-
-
-
--- Inserção de Estudantes
-INSERT INTO
-    student (
-        id,
-        school_id,
-        classroom_id,
-        name,
-        birthdate,
-        gender,
-        place_of_birth,
-        postalcode,
-        residence_zone,
-        number_address,
-        cpf,
-        neighborhood,
-        city,
-        complement,
-        father_name,
-        father_email,
-        father_cpf,
-        father_phone,
-        mother_name,
-        mother_email,
-        mother_cpf,
-        mother_phone,
-        responsibleType,
-        series_id,
-        email,
-        phone,
-        address,
-        status,
-        photo,
-        metadata,
-        user_created,
-        created_at,
-        updated_at
-    )
-VALUES
-    (
-        gen_random_uuid(),
-        (
-            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
-        ),
-        (
-            SELECT id FROM classroom WHERE name = 'Turma A'
-        ),
-        'Ana Silva',
-        '2005-03-10',
-        'Feminino',
-        'São Paulo',
-        '01000-000',
-        'Urbana',
-        '123',
-        '12345678901',
-        'Centro',
-        'São Paulo',
-        '',
-        'Carlos Silva',
-        'carlos.silva@example.com',
-        '12345678900',
-        '(11) 91234-5678',
-        'Maria Silva',
-        'maria.silva@example.com',
-        '09876543210',
-        '(11) 98765-4321',
-        'Pai',
-        (
-            SELECT id FROM series WHERE name = '1º Ano'
-        ),
-        'ana.silva@example.com',
-        '(11) 99876-5432',
-        'Rua Exemplo, 123',
-        'João Silva',
-        '(11) 91234-5678',
-        'Ativo',
-        NULL,
-        '{}'::JSONB,
-        auth.uid(),
-        NOW(),
-        NOW()
-    ),
-    (
-        gen_random_uuid(),
-        (
-            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
-        ),
-        (
-            SELECT id FROM classroom WHERE name = 'Turma B'
-        ),
-        'Bruno Souza',
-        '2004-07-22',
-        'Masculino',
-        'Rio de Janeiro',
-        '02000-000',
-        'Urbana',
-        '456',
-        '23456789012',
-        'Botafogo',
-        'Rio de Janeiro',
-        '',
-        'Ricardo Souza',
-        'ricardo.souza@example.com',
-        '23456789001',
-        '(21) 91234-5678',
-        'Laura Souza',
-        'laura.souza@example.com',
-        '34567890123',
-        '(21) 98765-4321',
-        'Pai',
-        (
-            SELECT id FROM series WHERE name = '2º Ano'
-        ),
-        'bruno.souza@example.com',
-        '(21) 99876-5432',
-        'Avenida Exemplo, 456',
-        'Ana Souza',
-        '(21) 91234-5678',
-        'Ativo',
-        NULL,
-        '{}'::JSONB,
-        auth.uid(),
-        NOW(),
-        NOW()
-    ),
-    (
-        gen_random_uuid(),
-        (
-            SELECT id FROM school WHERE name = 'Colégio Beta'
-        ),
-        (
-            SELECT id FROM classroom WHERE name = 'Turma C'
-        ),
-        'Carla Mendes',
-        '2006-01-15',
-        'Feminino',
-        'Belo Horizonte',
-        '03000-000',
-        'Urbana',
-        '789',
-        '45678901234',
-        'Centro',
-        'Belo Horizonte',
-        '',
-        'Fernando Mendes',
-        'fernando.mendes@example.com',
-        '45678901234',
-        '(31) 91234-5678',
-        'Patrícia Mendes',
-        'patricia.mendes@example.com',
-        '56789012345',
-        '(31) 98765-4321',
-        'Pai',
-        (
-            SELECT id FROM series WHERE name = '2º Ano'
-        ),
-        'carla.mendes@example.com',
-        '(31) 99876-5432',
-        'Rua Modelo, 789',
-        'Marcos Mendes',
-        '(31) 91234-5678',
-        'Ativo',
-        NULL,
-        '{}'::JSONB,
-        auth.uid(),
-        NOW(),
-        NOW()
-    ),
-    (
-        gen_random_uuid(),
-        (
-            SELECT id FROM school WHERE name = 'Colégio Beta'
-        ),
-        (
-            SELECT id FROM classroom WHERE name = 'Turma C'
-        ),
-        'Daniel Oliveira',
-        '2003-05-30',
-        'Masculino',
-        'Curitiba',
-        '04000-000',
-        'Urbana',
-        '321',
-        '56789012345',
-        'Batel',
-        'Curitiba',
-        '',
-        'Jorge Oliveira',
-        'jorge.oliveira@example.com',
-        '67890123456',
-        '(41) 91234-5678',
-        'Clara Oliveira',
-        'clara.oliveira@example.com',
-        '78901234567',
-        '(41) 98765-4321',
-        'Pai',
-        (
-            SELECT id FROM series WHERE name = '2º Ano'
-        ),
-        'daniel.oliveira@example.com',
-        '(41) 99876-5432',
-        'Rua Central, 321',
-        'Rita Oliveira',
-        '(41) 91234-5678',
-        'Ativo',
-        NULL,
-        '{}'::JSONB,
-        auth.uid(),
-        NOW(),
-        NOW()
-    );
-
-
 -- Inserção de Professores
 -- Inserção de Professores com novos campos
 INSERT INTO teacher (
@@ -550,257 +281,504 @@ VALUES
         NOW()
     );
 
--- Inserção de Disciplinas
+-- Inserção de Turmas (com novos campos)
+-- Adicionando corretamente as turmas
+INSERT INTO classroom (
+    id,
+    school_id,
+    series_id,
+    institution_id,
+    course_id,
+    teacher_id,
+    maxStudents,
+    startTime,
+    startTimeInterval,
+    endTimeInterval,
+    endTime,
+    day_of_week,
+    name,
+    period,
+    year,
+    metadata,
+    created_at
+) VALUES
+(
+    gen_random_uuid(),
+    (
+        SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
+    ),
+    (
+        SELECT id FROM series WHERE name = '1º Ano'
+    ),
+    (
+        SELECT id FROM institution WHERE name = 'Instituição Educacional Alfa'
+    ),
+    (
+        SELECT id FROM course WHERE name = 'Ensino Fundamental I'
+    ),
+    (
+        SELECT id FROM teacher WHERE name = 'Prof. João Pereira'
+    ),
+    30, -- Exemplo de número máximo de alunos
+    '08:00:00', -- Hora de início
+    '08:10:00', -- Intervalo de hora de início
+    '11:50:00', -- Intervalo de hora de término
+    '12:00:00', -- Hora de término
+    'Segunda', -- Dia da semana
+    'Turma A',
+    'Manhã',
+    2024, -- Ano
+    '{}'::JSONB, -- Metadados
+    NOW()
+),
+(
+    gen_random_uuid(),
+    (
+        SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
+    ),
+    (
+        SELECT id FROM series WHERE name = '2º Ano'
+    ),
+    (
+        SELECT id FROM institution WHERE name = 'Instituição Educacional Alfa'
+    ),
+    (
+        SELECT id FROM course WHERE name = 'Ensino Fundamental I'
+    ),
+    (
+        SELECT id FROM teacher WHERE name = 'Prof. João Pereira'
+    ),
+    30,
+    '08:00:00',
+    '08:10:00',
+    '11:50:00',
+    '12:00:00',
+    'Terça',
+    'Turma B',
+    'Manhã',
+    2024,
+    '{}'::JSONB,
+    NOW()
+),
+(
+    gen_random_uuid(),
+    (
+        SELECT id FROM school WHERE name = 'Colégio Beta'
+    ),
+    (
+        SELECT id FROM series WHERE name = '2º Ano'
+    ),
+    (
+        SELECT id FROM institution WHERE name = 'Instituição Educacional Alfa'
+    ),
+    (
+        SELECT id FROM course WHERE name = 'Ensino Médio'
+    ),
+    (
+        SELECT id FROM teacher WHERE name = 'Prof. Paulo Santos'
+    ),
+    30,
+    '08:00:00',
+    '08:10:00',
+    '11:50:00',
+    '12:00:00',
+    'Quarta',
+    'Turma C',
+    'Tarde',
+    2024,
+    '{}'::JSONB,
+    NOW()
+);
+
+-- Inserção de Estudantes
+-- Adicionando corretamente os estudantes
+INSERT INTO student (
+    id,
+    school_id,
+    classroom_id,
+    name,
+    birthdate,
+    gender,
+    place_of_birth,
+    postalcode,
+    residence_zone,
+    number_address,
+    cpf,
+    neighborhood,
+    city,
+    complement,
+    father_name,
+    father_email,
+    father_cpf,
+    father_phone,
+    mother_name,
+    mother_email,
+    mother_cpf,
+    mother_phone,
+    rg_number,
+    rg_state,
+    rg_issue_date,
+    rg_issuer,
+    new_birth_cert_number,
+    old_birth_cert_term,
+    old_birth_cert_book,
+    old_birth_cert_sheet,
+    docsType,
+    old_birth_cert_date_issue,
+    old_birth_cert_state,
+    responsibleType,
+    series_id,
+    email,
+    phone,
+    address,
+    status,
+    photo,
+    metadata,
+    user_created,
+    created_at,
+    updated_at
+) VALUES
+    (
+        gen_random_uuid(),
+        (
+            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
+        ),
+        (
+            SELECT id FROM classroom WHERE name = 'Turma A'
+        ),
+        'Ana Silva',
+        '2005-03-10',
+        'Feminino',
+        'São Paulo',
+        '01000-000',
+        'Urbana',
+        '123',
+        '12345678901',
+        'Centro',
+        'São Paulo',
+        '',
+        'Carlos Silva',
+        'carlos.silva@example.com',
+        '12345678900',
+        '(11) 91234-5678',
+        'Maria Silva',
+        'maria.silva@example.com',
+        '09876543210',
+        '(11) 98765-4321',
+        NULL,           -- rg_number
+        NULL,           -- rg_state
+        NULL,           -- rg_issue_date
+        NULL,           -- rg_issuer
+        NULL,           -- new_birth_cert_number
+        NULL,           -- old_birth_cert_term
+        NULL,           -- old_birth_cert_book
+        NULL,           -- old_birth_cert_sheet
+        NULL,           -- docsType
+        NULL,           -- old_birth_cert_date_issue
+        NULL,           -- old_birth_cert_state
+        'Pai',
+        (
+            SELECT id FROM series WHERE name = '1º Ano'
+        ),
+        'ana.silva@example.com',
+        '(11) 99876-5432',
+        'Rua Exemplo, 123',
+        'Ativo',
+        NULL,
+        '{}'::JSONB,
+        auth.uid(),
+        NOW(),
+        NOW()
+    ),
+    (
+        gen_random_uuid(),
+        (
+            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
+        ),
+        (
+            SELECT id FROM classroom WHERE name = 'Turma B'
+        ),
+        'Bruno Souza',
+        '2004-07-22',
+        'Masculino',
+        'Rio de Janeiro',
+        '02000-000',
+        'Urbana',
+        '456',
+        '23456789012',
+        'Botafogo',
+        'Rio de Janeiro',
+        '',
+        'Ricardo Souza',
+        'ricardo.souza@example.com',
+        '23456789001',
+        '(21) 91234-5678',
+        'Laura Souza',
+        'laura.souza@example.com',
+        '34567890123',
+        '(21) 98765-4321',
+        NULL,           -- rg_number
+        NULL,           -- rg_state
+        NULL,           -- rg_issue_date
+        NULL,           -- rg_issuer
+        NULL,           -- new_birth_cert_number
+        NULL,           -- old_birth_cert_term
+        NULL,           -- old_birth_cert_book
+        NULL,           -- old_birth_cert_sheet
+        NULL,           -- docsType
+        NULL,           -- old_birth_cert_date_issue
+        NULL,           -- old_birth_cert_state
+        'Pai',
+        (
+            SELECT id FROM series WHERE name = '2º Ano'
+        ),
+        'bruno.souza@example.com',
+        '(21) 99876-5432',
+        'Avenida Exemplo, 456',
+        'Ativo',
+        NULL,
+        '{}'::JSONB,
+        auth.uid(),
+        NOW(),
+        NOW()
+    );
+
+
+-- Inserção de Disciplinas (com correção de school_id)
 INSERT INTO
-    discipline (id, name, teacher_id, created_at)
+    discipline (id, name, teacher_id, school_id, created_at)
 VALUES
     (
-        gen_random_uuid (),
+        gen_random_uuid(),
         'Matemática',
         (
-            SELECT
-                id
-            FROM
-                teacher
-            WHERE
-                name = 'Prof. João Pereira'
+            SELECT id FROM teacher WHERE name = 'Prof. João Pereira'
         ),
-        NOW ()
+        (
+            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
+        ),
+        NOW()
     ),
     (
-        gen_random_uuid (),
+        gen_random_uuid(),
         'Ciências',
         (
-            SELECT
-                id
-            FROM
-                teacher
-            WHERE
-                name = 'Profª. Maria Fernandes'
+            SELECT id FROM teacher WHERE name = 'Profª. Maria Fernandes'
         ),
-        NOW ()
+        (
+            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
+        ),
+        NOW()
     ),
     (
-        gen_random_uuid (),
+        gen_random_uuid(),
         'História',
         (
-            SELECT
-                id
-            FROM
-                teacher
-            WHERE
-                name = 'Prof. Paulo Santos'
+            SELECT id FROM teacher WHERE name = 'Prof. Paulo Santos'
         ),
-        NOW ()
+        (
+            SELECT id FROM school WHERE name = 'Colégio Beta'
+        ),
+        NOW()
     ),
     (
-        gen_random_uuid (),
+        gen_random_uuid(),
         'Geografia',
         (
-            SELECT
-                id
-            FROM
-                teacher
-            WHERE
-                name = 'Profª. Rita Oliveira'
+            SELECT id FROM teacher WHERE name = 'Profª. Rita Oliveira'
         ),
-        NOW ()
+        (
+            SELECT id FROM school WHERE name = 'Colégio Beta'
+        ),
+        NOW()
     );
 
--- Inserção de Horários
+
+-- Inserção de Horários (com correção para school_id)
 INSERT INTO
-    timetable (id, name, classroom_id, created_at)
+    timetable (id, name, classroom_id, school_id, created_at)
 VALUES
     (
-        gen_random_uuid (),
+        gen_random_uuid(),
         'Horário da Turma A',
         (
-            SELECT
-                id
-            FROM
-                classroom
-            WHERE
-                name = 'Turma A'
+            SELECT id FROM classroom WHERE name = 'Turma A'
         ),
-        NOW ()
+        (
+            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
+        ),
+        NOW()
     ),
     (
-        gen_random_uuid (),
+        gen_random_uuid(),
         'Horário da Turma B',
         (
-            SELECT
-                id
-            FROM
-                classroom
-            WHERE
-                name = 'Turma B'
+            SELECT id FROM classroom WHERE name = 'Turma B'
         ),
-        NOW ()
+        (
+            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
+        ),
+        NOW()
     ),
     (
-        gen_random_uuid (),
+        gen_random_uuid(),
         'Horário da Turma C',
         (
-            SELECT
-                id
-            FROM
-                classroom
-            WHERE
-                name = 'Turma C'
+            SELECT id FROM classroom WHERE name = 'Turma C'
         ),
-        NOW ()
+        (
+            SELECT id FROM school WHERE name = 'Colégio Beta'
+        ),
+        NOW()
     );
 
--- Inserção de Sessões de Aula
+
+-- Inserção de Sessões de Aula (com correção para school_id)
 INSERT INTO
     class_session (
         id,
+        school_id,  -- Adicionando o campo school_id
+        timetable_id,
+        discipline_id,
         day_of_week,
         start_time,
         end_time,
-        discipline_id,
-        timetable_id,
         created_at
     )
 VALUES
     (
-        gen_random_uuid (),
-        'MONDAY',
+        gen_random_uuid(),
+        (
+            SELECT school_id 
+            FROM timetable 
+            WHERE name = 'Horário da Turma A'
+        ), -- Pegando o school_id da tabela timetable
+        (
+            SELECT id
+            FROM timetable
+            WHERE name = 'Horário da Turma A'
+        ),
+        (
+            SELECT id
+            FROM discipline
+            WHERE name = 'Matemática'
+        ),
+        'Segunda',
         '08:00',
         '09:00',
-        (
-            SELECT
-                id
-            FROM
-                discipline
-            WHERE
-                name = 'Matemática'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                timetable
-            WHERE
-                name = 'Horário da Turma A'
-        ),
-        NOW ()
+        NOW()
     ),
     (
-        gen_random_uuid (),
-        'TUESDAY',
+        gen_random_uuid(),
+        (
+            SELECT school_id 
+            FROM timetable 
+            WHERE name = 'Horário da Turma A'
+        ),
+        (
+            SELECT id
+            FROM timetable
+            WHERE name = 'Horário da Turma A'
+        ),
+        (
+            SELECT id
+            FROM discipline
+            WHERE name = 'Ciências'
+        ),
+        'Terça',
         '09:00',
         '10:00',
-        (
-            SELECT
-                id
-            FROM
-                discipline
-            WHERE
-                name = 'Ciências'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                timetable
-            WHERE
-                name = 'Horário da Turma A'
-        ),
-        NOW ()
+        NOW()
     ),
     (
-        gen_random_uuid (),
-        'WEDNESDAY',
+        gen_random_uuid(),
+        (
+            SELECT school_id 
+            FROM timetable 
+            WHERE name = 'Horário da Turma B'
+        ),
+        (
+            SELECT id
+            FROM timetable
+            WHERE name = 'Horário da Turma B'
+        ),
+        (
+            SELECT id
+            FROM discipline
+            WHERE name = 'Matemática'
+        ),
+        'Quarta',
         '08:00',
         '09:00',
-        (
-            SELECT
-                id
-            FROM
-                discipline
-            WHERE
-                name = 'Matemática'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                timetable
-            WHERE
-                name = 'Horário da Turma B'
-        ),
-        NOW ()
+        NOW()
     ),
     (
-        gen_random_uuid (),
-        'THURSDAY',
+        gen_random_uuid(),
+        (
+            SELECT school_id 
+            FROM timetable 
+            WHERE name = 'Horário da Turma B'
+        ),
+        (
+            SELECT id
+            FROM timetable
+            WHERE name = 'Horário da Turma B'
+        ),
+        (
+            SELECT id
+            FROM discipline
+            WHERE name = 'Ciências'
+        ),
+        'Quinta',
         '09:00',
         '10:00',
-        (
-            SELECT
-                id
-            FROM
-                discipline
-            WHERE
-                name = 'Ciências'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                timetable
-            WHERE
-                name = 'Horário da Turma B'
-        ),
-        NOW ()
+        NOW()
     ),
     (
-        gen_random_uuid (),
-        'MONDAY',
+        gen_random_uuid(),
+        (
+            SELECT school_id 
+            FROM timetable 
+            WHERE name = 'Horário da Turma C'
+        ),
+        (
+            SELECT id
+            FROM timetable
+            WHERE name = 'Horário da Turma C'
+        ),
+        (
+            SELECT id
+            FROM discipline
+            WHERE name = 'História'
+        ),
+        'Sexta',
         '10:00',
         '11:00',
-        (
-            SELECT
-                id
-            FROM
-                discipline
-            WHERE
-                name = 'História'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                timetable
-            WHERE
-                name = 'Horário da Turma C'
-        ),
-        NOW ()
+        NOW()
     ),
     (
-        gen_random_uuid (),
-        'TUESDAY',
+        gen_random_uuid(),
+        (
+            SELECT school_id 
+            FROM timetable 
+            WHERE name = 'Horário da Turma C'
+        ),
+        (
+            SELECT id
+            FROM timetable
+            WHERE name = 'Horário da Turma C'
+        ),
+        (
+            SELECT id
+            FROM discipline
+            WHERE name = 'Geografia'
+        ),
+        'Sábado',
         '11:00',
         '12:00',
-        (
-            SELECT
-                id
-            FROM
-                discipline
-            WHERE
-                name = 'Geografia'
-        ),
-        (
-            SELECT
-                id
-            FROM
-                timetable
-            WHERE
-                name = 'Horário da Turma C'
-        ),
-        NOW ()
+        NOW()
     );
+
 
 -- Inserção de Horários de Escola
 -- Inserção de Horários de Escola
@@ -865,56 +843,124 @@ VALUES
         NOW ()
     );
 
------ Criar manual, usuário migration sem permissão, substituir ids na user_roles
+-- Inserção de papéis (roles) com school_id dinâmico
 INSERT INTO public.role (id, school_id, name)
-VALUES ('2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid, '79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'Professor'),
-       ('bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid, '79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'Gestor');
+VALUES 
+(
+    '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'Professor'
+),
+(
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'Gestor'
+);
 
+
+-- Inserção de user_roles com school_id correto
 INSERT INTO public.user_role (school_id, role_id, user_id)
-VALUES ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
-        '2ff53f52-cdd9-4b04-80c4-02d146b653e7'::uuid),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
-        '905096b1-ad84-46c2-a309-29a0501470f7'::uuid);
+VALUES 
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid, -- ID do role Professor
+    '2ff53f52-cdd9-4b04-80c4-02d146b653e7'::uuid  -- ID do usuário professor
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid, -- ID do role Gestor
+    '905096b1-ad84-46c2-a309-29a0501470f7'::uuid  -- ID do usuário gestor
+);
 
--- permissões para Professor
-INSERT INTO public.role_permission (school_id, role_id, can_select, can_insert, can_update, can_delete,
-                                    "table")
-VALUES ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
-        true, false, false, false, 'student'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
-        true, true, true, false, 'attendance'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
-        true, true, true, false, 'grade'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
-        true, false, false, false, 'classroom'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
-        true, false, false, false, 'discipline'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
-        true, false, false, false, 'class_session');
 
--- permissões para Gestor
-INSERT INTO public.role_permission (school_id, role_id, can_select, can_insert, can_update, can_delete,
-                                    "table")
-VALUES ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
-        true, true, true, true, 'student'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
-        true, true, true, true, 'teacher'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
-        true, true, true, true, 'classroom'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
-        true, true, true, true, 'discipline'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
-        true, true, true, true, 'course'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
-        true, true, true, true, 'series'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
-        true, true, true, true, 'timetable'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
-        true, true, true, true, 'class_session'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
-        true, true, true, true, 'attendance'),
-       ('79b51357-d87c-49c2-a61d-ecbff0ae1df0'::uuid, 'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
-        true, true, true, true, 'grade');
+-- Inserção de permissões para Professor com school_id dinâmico
+INSERT INTO public.role_permission (school_id, role_id, can_select, can_insert, can_update, can_delete, "table")
+VALUES 
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,  -- ID do role Professor
+    true, false, false, false, 'student'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+    true, true, true, false, 'attendance'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+    true, true, true, false, 'grade'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+    true, false, false, false, 'classroom'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+    true, false, false, false, 'discipline'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    '2137ba0e-eb65-4ef9-882a-51032ab1f1d3'::uuid,
+    true, false, false, false, 'class_session'
+);
+
+-- Inserção de permissões para Gestor com school_id dinâmico
+INSERT INTO public.role_permission (school_id, role_id, can_select, can_insert, can_update, can_delete, "table")
+VALUES 
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,  -- ID do role Gestor
+    true, true, true, true, 'student'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+    true, true, true, true, 'teacher'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+    true, true, true, true, 'classroom'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+    true, true, true, true, 'discipline'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+    true, true, true, true, 'course'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+    true, true, true, true, 'series'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+    true, true, true, true, 'timetable'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+    true, true, true, true, 'class_session'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+    true, true, true, true, 'attendance'
+),
+(
+    (SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'),
+    'bdb42af9-3ccf-431e-b1f3-af2440261cb4'::uuid,
+    true, true, true, true, 'grade'
+);
+
 
 ----- Criar manual, usuário migration sem permissão, substituir ids na user_roles
 -- 2ff - professor

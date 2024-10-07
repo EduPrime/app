@@ -38,7 +38,7 @@ async function loadEnrollment() {
 }
 
 function navigateToRegister() {
-  router.push({ name: 'RegisterEnrollment' })
+  router.push({ name: 'EnrollmentRegister' })
 }
 
 onMounted(() => {

@@ -98,6 +98,8 @@ const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
 const studentService = new StudentService()
 const seriesService = new SeriesService()
+const districts = ref([])
+const loading = ref(true)
 const classroomList = ref()
 const schoolList = ref()
 const studentList = ref()
@@ -153,8 +155,11 @@ const formSchema = yup.object({
       return isValidDDD(value);
     }),
     cpf: yup.string()
-    .nullable()
-    .test('valid-cpf', 'CPF inválido', value => isValidCPF(value || '')),
+  .nullable()
+  .test('valid-cpf', 'CPF inválido', value => {
+    if (!value) return true; // Ignorar se for nulo
+    return isValidCPF(value);
+  }),
     rg_number: yup.string()
     .nullable()
     .max(30, 'O RG deve ter no máximo 25 caracteres'),
@@ -198,8 +203,8 @@ const formSchema = yup.object({
     .required('Telefone é obrigatório')
     .matches(/^\(\d{2}\)\s\d{4,5}-\d{4}$/, 'Telefone inválido, formato esperado: (XX) XXXXX-XXXX')
     .test('valid-ddd', 'DDD inválido', value => isValidDDD(value || '')),
-  // place_of_birth: yup.string(),
-  //   // .required('Naturalidade é obrigatória'),
+  place_of_birth: yup.string()
+    .required('Naturalidade é obrigatória'),
     postalcode: yup
     .string()
     .required('CEP é obrigatório')
@@ -415,6 +420,20 @@ function applyPhoneMask(phone: string | null): string {
   return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
 }
 
+const loadDistricts = async () => {
+  try {
+    const response = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/distritos')
+    if (!response.ok) {
+      throw new Error('Erro na requisição')
+    }
+    const data = await response.json()
+    districts.value = data
+  } catch (error) {
+    console.error('Erro ao carregar distritos:', error)
+  } finally {
+    loading.value = false
+  }
+}
 watch(responsibleType, (newValue, oldValue) => {
   // Se necessário, você pode limpar ou atualizar os campos
   if (newValue === 'Pai') {
@@ -430,6 +449,7 @@ watch(responsibleType, (newValue, oldValue) => {
   } else if (newValue === 'Ambos') {
   }
 });
+
 
 watch(docsType, (newValue, oldValue) => {
   // Se necessário, você pode limpar ou atualizar os campos
@@ -449,7 +469,9 @@ watch(docsType, (newValue, oldValue) => {
   }
 });
 
+
 onMounted(async () => {
+  loadDistricts()
   await loadStudent()
   if (studentId.value) {
     await getStudentData()
@@ -664,10 +686,11 @@ onMounted(async () => {
 
 <div v-show="selectedSegment === 'address-info'">
     <EpInput v-model="values.postalcode" name="postalcode" :mask="postalCodeMask" inputmode="number" label="CEP*" placeholder="00000-000" />
-    <EpInput v-model="values.city" name="city" label="Cidade" placeholder="Digite a cidade" />
-    <EpInput v-model="values.address" name="address" label="Endereço" placeholder="Digite o endereço" />
-    <EpInput v-model="values.number_address" name="number_address" :mask="numberAddressMask" label="Número" placeholder="Digite o número" />
-    <EpInput v-model="values.complement" name="complement" label="Complemento" placeholder="Digite o complemento" />
+    <EpInput v-model="values.city" name="city" label="Cidade" placeholder="Ex: São Paulo, Rio de Janeiro" />
+    <EpInput v-model="values.place_of_birth" name="place_of_birth" label="Naturalidade*" placeholder="Digite o local de nascimento" />
+    <EpInput v-model="values.address" name="address" label="Endereço" placeholder="Digite o nome da rua ou avenida" />
+    <EpInput v-model="values.number_address" name="number_address" label="Número" placeholder="Digite o número da residência" />
+    <EpInput v-model="values.complement" name="complement" label="Complemento" placeholder="Apartamento, bloco, etc." />
     <EpInput v-model="values.neighborhood" name="neighborhood" label="Bairro" placeholder="Digite o bairro" />
 
     <ion-list id="residence_zone">

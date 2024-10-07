@@ -8,21 +8,21 @@ import EditEnrollment from './views/EditEnrollment.vue'
 
 const routes = [
   {
-    path: '/Student',
-    name: 'Student Registration',
+    path: '/student',
+    name: 'StudentList',
     component: DashboardStudent,
     meta: {
       moduleName: 'Student',
       moduleIcon: folder,
       icon: folder,
-      name: 'Aluno',
+      name: 'Alunos',
       order: 1,
       requiredRole: ['public', 'admin'],
     },
   },
   {
-    path: '/Student/register',
-    name: 'RegisterStudent',
+    path: '/student/register',
+    name: 'StudentRegister',
     component: RegisterStudent,
     meta: {
       moduleName: 'Student',
@@ -33,33 +33,33 @@ const routes = [
     },
   },
   {
-    path: '/Student/edit/:id',
-    name: 'EditStudent',
+    path: '/student/edit/:id',
+    name: 'StudentEdit',
     component: EditStudent,
     meta: {
       moduleName: 'Student',
       icon: folder,
-      name: 'Editar Cadastro',
+      name: 'Editar Aluno',
       order: 3,
       requiredRole: ['public', 'admin'],
     },
   },
   {
-    path: '/Student/enrollment',
-    name: 'DashboardEnrollment',
+    path: '/student/enrollment',
+    name: 'EnrollmentList',
     component: DashboardEnrollment,
     meta: {
       moduleName: 'Student',
       moduleIcon: create,
       icon: create,
-      name: 'Matrícula',
+      name: 'Matrículas',
       order: 2,
       requiredRole: ['public'],
     },
   },
   {
-    path: '/Student/enrollment/register',
-    name: 'RegisterEnrollment',
+    path: '/student/enrollment/register',
+    name: 'EnrollmentRegister',
     component: RegisterEnrollment,
     meta: {
       moduleName: 'Student',
@@ -70,13 +70,13 @@ const routes = [
     },
   },
   {
-    path: '/Student/enrollment/edit/:id',
-    name: 'EditEnrollment',
+    path: '/student/enrollment/edit/:id',
+    name: 'EnrollmentEdit',
     component: EditEnrollment,
     meta: {
       moduleName: 'Student',
       icon: create,
-      name: 'Editar Matricula',
+      name: 'Editar Matrícula',
       order: 4,
       requiredRole: ['public', 'admin'],
     },

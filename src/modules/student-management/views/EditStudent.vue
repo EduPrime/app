@@ -7,7 +7,7 @@ import StudentForm from '../../student-management/components/StudentForm.vue'
 const studentFormRef = ref<InstanceType<typeof StudentForm> | null>(null)
 const router = useRouter()
 function handleCancel() {
-  router.push({ name: 'Student Registration' })
+  router.push({ name: 'StudentList' })
 }
 
 function handleSave() {

@@ -10,6 +10,18 @@ CREATE TYPE status AS ENUM (
     'Transferido'
     );
 
+CREATE TYPE situation_type AS ENUM (
+    'Pendente',
+    'Cursando',
+    'Aprovado',
+    'Aprovado pelo Conselho',
+    'Aprovado com Dependência',
+    'Reprovado',
+    'Transferido',
+    'Abandono',
+    'Falecido'
+    );
+
 CREATE TYPE attendance_status AS ENUM (
     'PRESENT',
     'ABSENT',
@@ -90,29 +102,27 @@ CREATE TABLE institution
     updated_at   TIMESTAMPTZ
 );
 
-CREATE TABLE school
-(
-    id                                      UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    institution_id                          UUID                                       NOT NULL REFERENCES institution (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    name                                    VARCHAR(100)                               NOT NULL,
-    address                                 VARCHAR(255) NOT NULL,
-    city                                    VARCHAR(100) NOT NULL,
-    state                                   CHAR(2) NOT NULL,
-    postalcode                              CHAR(10) NOT NULL,
-    school_zone                             VARCHAR(20) NOT NULL,
-    phone                                   VARCHAR(15) NOT NULL,
+CREATE TABLE school (
+    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+    name VARCHAR(100) NOT NULL,
+    address VARCHAR(255),
+    city VARCHAR(100),
+    state CHAR(2),
+    postalcode CHAR(10),
+    school_zone VARCHAR(10),
+    phone VARCHAR(15),
     email VARCHAR(100),
-    website VARCHAR(100),
-    social_network VARCHAR(100),
-    active                                  boolean          DEFAULT true              NOT NULL,
-    abbreviation                            VARCHAR(255) NOT NULL,
-    logourl                                 VARCHAR(255),
-    user_created                            UUID             DEFAULT auth.uid(),
-    created_at                              TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at                              TIMESTAMPTZ,
-    updated_at                              TIMESTAMPTZ
+    website VARCHAR(255),
+    social_network VARCHAR(255),
+    institution_id uuid NOT NULL,
+    active boolean DEFAULT true NOT NULL,
+    abbreviation VARCHAR(255),
+    logourl VARCHAR(255),
+    created_at timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at timestamptz,
+    updated_at timestamptz,
+    user_created UUID DEFAULT auth.uid()
 );
-
 CREATE TABLE teacher
 (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -166,7 +176,6 @@ CREATE TABLE classroom
     institution_id    UUID                                       NOT NULL REFERENCES institution (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     course_id    UUID                                       NOT NULL REFERENCES course (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     teacher_id    UUID                                       NOT NULL REFERENCES teacher (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    class_session    UUID                                       NOT NULL REFERENCES class_session (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     maxStudents INTEGER NOT NULL,
     startTime TIME NOT NULL,
     startTimeInterval TIME NOT NULL,
@@ -184,7 +193,6 @@ CREATE TABLE classroom
     deleted_at   TIMESTAMPTZ,
     updated_at   TIMESTAMPTZ
 );
-
 CREATE TABLE timetable
 (
     id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -197,47 +205,6 @@ CREATE TABLE timetable
     created_at    TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
     deleted_at    TIMESTAMPTZ,
     updated_at    TIMESTAMPTZ
-);
-
-CREATE TABLE series
-(
-    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    course_id    UUID                                       NOT NULL REFERENCES course (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    institution_id UUID                                       REFERENCES institution (id) ON UPDATE CASCADE ON DELETE SET NULL,
-    timetable_id UUID                                       REFERENCES timetable (id) ON UPDATE CASCADE ON DELETE SET NULL,
-    name         VARCHAR(100)                               NOT NULL,
-    course_stage course_stage_type DEFAULT 'NULL' NOT NULL,
-    graduate graduate_status DEFAULT 'Sim' NOT NULL,
-    workload VARCHAR(100) NOT NULL,
-    school_days VARCHAR(100) NOT NULL,
-    metadata     JSONB,
-    user_created UUID             DEFAULT auth.uid(),
-    created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at   TIMESTAMPTZ,
-    updated_at   TIMESTAMPTZ
-);
-
-CREATE TABLE school (
-    id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
-    name VARCHAR(100) NOT NULL,
-    address VARCHAR(255),
-    city VARCHAR(100),
-    state CHAR(2),
-    postalcode CHAR(10),
-    school_zone VARCHAR(10),
-    phone VARCHAR(15),
-    email VARCHAR(100),
-    website VARCHAR(255),
-    social_network VARCHAR(255),
-    institution_id uuid NOT NULL,
-    active boolean DEFAULT true NOT NULL,
-    abbreviation VARCHAR(255),
-    logourl VARCHAR(255),
-    created_at timestamptz DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at timestamptz,
-    updated_at timestamptz,
-    user_created UUID DEFAULT auth.uid()
 );
 CREATE TABLE class_session
 (
@@ -256,6 +223,28 @@ CREATE TABLE class_session
 
 );
 
+
+
+CREATE TABLE series
+(
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    school_id    UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    course_id    UUID                                       NOT NULL REFERENCES course (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    institution_id UUID                                       REFERENCES institution (id) ON UPDATE CASCADE ON DELETE SET NULL,
+    timetable_id UUID                                       REFERENCES timetable (id) ON UPDATE CASCADE ON DELETE SET NULL,
+    name         VARCHAR(100)                               NOT NULL,
+    course_stage course_stage_type DEFAULT 'Etapa 1' NOT NULL,
+    graduate graduate_status DEFAULT 'Sim' NOT NULL,
+    workload VARCHAR(100) NOT NULL,
+    school_days VARCHAR(100) NOT NULL,
+    metadata     JSONB,
+    user_created UUID             DEFAULT auth.uid(),
+    created_at   TIMESTAMPTZ      DEFAULT CURRENT_TIMESTAMP NOT NULL,
+    deleted_at   TIMESTAMPTZ,
+    updated_at   TIMESTAMPTZ
+);
+
+
 CREATE TABLE student
 (
     id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -263,10 +252,10 @@ CREATE TABLE student
     classroom_id   UUID                                       NOT NULL REFERENCES classroom (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     name           VARCHAR(100)                               NOT NULL,
     birthdate      DATE                                       NOT NULL,
-    gender         gender_type DEFAULT 'NULL',
+    gender         gender_type DEFAULT 'Masculino',
     place_of_birth VARCHAR(100),
     postalcode VARCHAR(100),
-    residence_zone residence_zone_type DEFAULT 'NULL',
+    residence_zone residence_zone_type DEFAULT 'Urbana',
     number_address VARCHAR(100),
     cpf VARCHAR(100) NOT NULL,
     neighborhood VARCHAR(100),
@@ -291,7 +280,7 @@ CREATE TABLE student
     docsType VARCHAR (100),
     old_birth_cert_date_issue DATE,
     old_birth_cert_state VARCHAR (100),
-    responsibleType responsibleType DEFAULT 'NULL',
+    responsibleType responsibleType DEFAULT 'Pai',
     series_id   UUID                                       NOT NULL REFERENCES series (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     email          VARCHAR(255),
     phone          VARCHAR(15) NOT NULL,
@@ -320,8 +309,9 @@ CREATE TABLE enrollment (
     date_enrollment DATE NOT NULL,
     observations VARCHAR(200),
     status         status           DEFAULT 'Ativo',
-    enrollmentCode VARCHAR(100)
-)
+    situation situation_type DEFAULT NULL,
+    enrollmentCode VARCHAR(100) UNIQUE
+);
 
 CREATE TABLE attendance
 (

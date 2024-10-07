@@ -49,7 +49,9 @@ const classroomId = ref('')
 const courseId = ref('')
 const enrollmentData = ref< Tables<'enrollment'> | []>([])
 const gender = ['Masculino', 'Feminino']
-const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED'];
+const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED']
+const situation = ['Pendente', 'Cursando', 'Aprovado', 'Aprovado pelo Conselho',
+ 'Aprovado com Dependência', 'Reprovado', 'Transferido', 'Abandono', 'Falecido']
 const residence_zone = ['Urbana', 'Rural'];
 const marital_status = ['Solteiro', 'Casado', 'Divorciado', 'Viúvo', 'Separado', 'União Estável', 'Não Informado'];
 const selectedSegment = ref('general-info')
@@ -93,6 +95,8 @@ const formSchema = yup.object({
     .required('Série é obrigatória'),
     status: yup.string()
     .required('Status é obrigatório'),
+    situation: yup.string()
+    .required('Situação é obrigatória'),
   // studentId: yup.string()
   //   .required('Aluno é obrigatória'),
   courseId: yup.string()
@@ -123,6 +127,7 @@ async function registerEnrollment() {
       observations: values.observations,
       name: values.name,
       status: values.status,
+      situation: values.situation,
       enrollmentCode: enrollmentCode.value,
 
 
@@ -253,6 +258,7 @@ async function getEnrollmentData() {
         setFieldValue('courseId', enrollmentDbData.courseId),
         setFieldValue('name', enrollmentDbData.name),
         setFieldValue('status', enrollmentDbData.status),
+        setFieldValue('situation', enrollmentDbData.situation),
         setFieldValue('enrollmentCode', enrollmentDbData.enrollmentCode)
 
         const student = await studentService.getById(enrollmentDbData.student_id)
@@ -448,7 +454,7 @@ onMounted(async () => {
         <IonSelect
         v-model="values.status"
         justify="space-between"
-        label="Status da Matricula*"
+        label="Status da Matrícula*"
         placeholder="Selecione o status"
         @ionChange="(e) => {
           setFieldValue('status', e.detail.value)
@@ -457,6 +463,25 @@ onMounted(async () => {
             >
             <IonSelectOption v-for="status in status" :key="status" :value="status">
               {{ status }}
+            </IonSelectOption>
+          </IonSelect>
+        </ion-item>
+      </ion-list>
+
+      <ion-list id="situation">
+      <ion-item>
+        <IonSelect
+        v-model="values.situation"
+        justify="space-between"
+        label="Situação da Matrícula*"
+        placeholder="Selecione a situação"
+        @ionChange="(e) => {
+          setFieldValue('situation', e.detail.value)
+        }"
+            
+            >
+            <IonSelectOption v-for="situation in situation" :key="situation" :value="situation">
+              {{ situation }}
             </IonSelectOption>
           </IonSelect>
         </ion-item>
