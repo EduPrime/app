@@ -394,8 +394,6 @@ INSERT INTO classroom (
 -- Adicionando corretamente os estudantes
 INSERT INTO student (
     id,
-    school_id,
-    classroom_id,
     name,
     birthdate,
     gender,
@@ -427,7 +425,6 @@ INSERT INTO student (
     old_birth_cert_date_issue,
     old_birth_cert_state,
     responsibleType,
-    series_id,
     email,
     phone,
     address,

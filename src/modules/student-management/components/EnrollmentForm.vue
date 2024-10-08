@@ -49,7 +49,7 @@ const classroomId = ref('')
 const courseId = ref('')
 const enrollmentData = ref< Tables<'enrollment'> | []>([])
 const gender = ['Masculino', 'Feminino']
-const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED']
+const status = ['Ativo', 'Inativo', 'Graduado', 'Suspenso', 'Transferido']
 const situation = ['Pendente', 'Cursando', 'Aprovado', 'Aprovado pelo Conselho',
  'Aprovado com Dependência', 'Reprovado', 'Transferido', 'Abandono', 'Falecido']
 const residence_zone = ['Urbana', 'Rural'];
@@ -115,8 +115,11 @@ async function registerEnrollment() {
   if (!validationResult.valid) {
     const displayErrors = Object.values(errors.value).join(', ')
     showToast(displayErrors, 'top', 'warning')
-  }
-  else {
+  } else {
+    try {
+    // Garante que o código de matrícula seja único antes de salvar
+    await ensureUniqueEnrollmentCode()
+
     const formData = {
       school_id: schoolId.value,
       classroom_id: classroomId.value,
@@ -129,26 +132,23 @@ async function registerEnrollment() {
       status: values.status,
       situation: values.situation,
       enrollmentCode: enrollmentCode.value,
-
-
     }
-    try {
+
       let result
       if (enrollmentId.value) {
         result = await enrollmentService.update(enrollmentId.value, formData)
         if (result) {
-          showToast('Matricula atualizada com sucesso')
+          showToast('Matrícula atualizada com sucesso')
           setTimeout(() => {
             router.push('/Student/enrollment').then(() => {
               location.reload()
             })
           }, 2000)
         }
-      }
-      else {
-        result = await enrollmentService.create(formData)
+      } else {
+        result = await tryCreateEnrollment(formData)
         if (result) {
-          showToast('Matricula realizada com sucesso!', 'top', 'success')
+          showToast('Matrícula realizada com sucesso!', 'top', 'success')
           setTimeout(() => {
             router.push('/Student/enrollment').then(() => {
               location.reload()
@@ -156,18 +156,60 @@ async function registerEnrollment() {
           }, 2000)
         }
       }
-    }
-    catch (error) {
-      console.error('Erro ao salvar matricula(a):', error)
-      showToast('Erro ao realizar matricula. Tente novamente.', 'top', 'danger')
+    } catch (error) {
+      console.error('Erro ao salvar matrícula:', error)
+      showToast('Erro ao realizar matrícula. Tente novamente.', 'top', 'danger')
     }
   }
 }
 
+// Função que tenta criar a matrícula, garantindo unicidade do código
+async function tryCreateEnrollment(formData: any) {
+  try {
+    return await enrollmentService.create(formData)
+  } catch (error: any) {
+    // Se o erro for de duplicidade de código, tenta gerar um novo código
+    if (error.code === '23505' && error.details?.includes('enrollmentCode')) {
+      console.warn('Código de matrícula duplicado detectado. Tentando gerar um novo código...')
+      await ensureUniqueEnrollmentCode() // Gera um novo código
+      formData.enrollmentCode = enrollmentCode.value // Atualiza o código no formData
+      return tryCreateEnrollment(formData) // Tenta novamente
+    }
+    throw error // Se for outro erro, lança o erro original
+  }
+}
+
+// Função que garante que o código seja único ANTES de tentar salvar no banco
+async function ensureUniqueEnrollmentCode() {
+  let isUnique = false
+  let attempts = 0 // Limitar o número de tentativas para evitar loops infinitos
+
+  while (!isUnique && attempts < 10) {
+    // Gera um novo código aleatório
+    await generateCodeEnrollment()
+    // Verifica se o código já existe
+    isUnique = await enrollmentService.isUniqueEnrollmentCode(enrollmentCode.value)
+    attempts++
+  }
+
+  if (!isUnique) {
+    throw new Error("Não foi possível gerar um código de matrícula único após várias tentativas.")
+  }
+}
+
 async function loadStudents() {
-  const students = await studentService.getAll();
-  studentList.value = students;
-  filteredStudents.value = students; // Inicialmente, todos os alunos estão filtrados
+  try {
+    const [students, enrollments] = await Promise.all([
+      studentService.getAll(),
+      enrollmentService.getAll(),
+    ]);
+
+    const enrolledStudentIds = enrollments.map((enrollment) => enrollment.student_id)
+    studentList.value = students.filter(student => !enrolledStudentIds.includes(student.id))
+    filteredStudents.value = studentList.value // Inicialmente, todos os alunos estão filtrados
+  } catch (error) {
+    console.error('Erro ao carregar os alunos:', error)
+  }
 }
 
 function filterStudents() {
@@ -182,11 +224,11 @@ function filterStudents() {
 }
 
 function selectStudent(student) {
-  studentId.value = student.id; // Define o ID do aluno selecionado
-  enrollmentCode.value = ''; // Limpa o código de matrícula ao selecionar um aluno
+  studentId.value = student.id // Define o ID do aluno selecionado
+  enrollmentCode.value = '' // Limpa o código de matrícula ao selecionar um aluno
   searchQuery.value = ''
   setFieldValue('name', student.name)
-  generateCodeEnrollment(); // Gera um código de matrícula
+  // generateCodeEnrollment() // Gera um código de matrícula
   filteredStudents.value = []
 }
 
@@ -200,11 +242,6 @@ async function loadEnrollment() {
       courseService.getAll(),
       enrollmentService.getAll(),
     ]);
-    
-    // const enrolledStudentIds = enrollments.map(enrollment => enrollment.student_id)
-
-    // const availableStudents = students.filter(student => !enrolledStudentIds.includes(student.id))
-
     console.log('Chegou', students);
 
     // Função auxiliar para mapear os dados
@@ -222,7 +259,6 @@ async function loadEnrollment() {
     mapData(students, studentList);
     mapData(series, seriesList);
     mapData(courses, courseList);
-    // mapData(availableStudents, studentList);
 
   } catch (error) {
     console.error('Erro ao carregar dados:', error);
@@ -273,28 +309,25 @@ async function getEnrollmentData() {
   }
 }
 
-const generateCodeEnrollment = () => {
-  // Verifica se o código de matrícula já foi gerado
-  if (enrollmentCode.value) {
-    return; // Se já existir, não gera um novo
-  }
-
+// Gera um código de matrícula único
+const generateCodeEnrollment = async () => {
   if (!studentId.value) {
-    alert('Por favor, selecione o nome do aluno.');
-    return;
+    alert('Por favor, selecione o nome do aluno.')
+    return
   }
 
-  // Gera um código de matrícula caso não exista
-  const numbersRandom = Array.from({ length: 5 }, () => Math.floor(Math.random() * 10)).join('');
-  enrollmentCode.value = `MAT-${numbersRandom}`;
-};
+  const lettersRandom = Array.from({ length: 3}, () => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
+  const numbersRandom = Array.from({ length: 3 }, () => Math.floor(Math.random() * 10)).join('')
+  const currentYear = new Date().getFullYear()
+  enrollmentCode.value = `MAT-${lettersRandom}${numbersRandom}-${currentYear}`
+}
 
 
-watch(studentId, (newValue) => {
-  if (!enrollmentCode.value && !enrollmentId.value) {
-  generateCodeEnrollment()
-  }
-})
+// watch(studentId, (newValue) => {
+//   if (!enrollmentCode.value && !enrollmentId.value) {
+//   generateCodeEnrollment()
+//   }
+// })
 
 function applyPhoneMask(phone: string | null): string {
   if (!phone)
@@ -493,7 +526,7 @@ onMounted(async () => {
       <ion-input
       v-model="enrollmentCode"
       type="text"
-      placeholder="Código gerado automaticamente"
+      placeholder="Código gerado após finalizar a matrícula"
       readonly
       class="readonly-input"
       />
