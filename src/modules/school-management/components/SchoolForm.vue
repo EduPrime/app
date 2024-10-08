@@ -28,6 +28,7 @@ const selectedSegment = ref('general-info')
 const router = useRouter()
 const route = useRouter()
 const schoolData = ref< Tables<'school'> | []>([])
+const school_zone = ['Urbana', 'Rural'];
 const schoolId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const schoolService = new SchoolService()
 const institutionService = new InstitutionService()
@@ -76,6 +77,8 @@ const formSchema = yup.object ({
     .string()
     .required('Abreviação é obrigatório')
     .max(10, 'Abreviação deve ter no máximo 10 caracteres'),
+  school_zone: yup.string()
+    .required('Zona Escolar é obrigatória'),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<SchoolPartial>({
@@ -153,6 +156,7 @@ async function getSchoolData() {
       setFieldValue('postalcode', schoolDbData.postalcode),
       setFieldValue('school_zone', schoolDbData.school_zone),
       setFieldValue('logourl', schoolDbData.logourl),
+      setFieldValue('school_zone', schoolDbData.school_zone),
       setFieldValue('abbreviation', schoolDbData.abbreviation)
     }
     else {
@@ -204,7 +208,24 @@ onMounted(async () => {
   <div v-show="selectedSegment === 'location'">
     <EpInput v-model="values.address" name="address" label="Endereço*" placeholder="Digite o endereço" />
     <EpInput v-model="values.city" name="city" label="Cidade*" placeholder="Digite a cidade" />
-    <EpInput v-model="values.school_zone" name="school_zone" label="Zona Escolar*" placeholder="Digite a zona escolar" />
+    <ion-list id="school_zone">
+        <ion-item>
+            <IonSelect
+            v-model="values.school_zone"
+            justify="space-between"
+            label="Zona Escolar*"
+            placeholder="Selecione a zona escolar"
+            @ionChange="(e) => {
+              setFieldValue('school_zone', e.detail.value)
+            }"
+            
+          >
+            <IonSelectOption v-for="school_zone in school_zone" :key="school_zone" :value="school_zone">
+              {{ school_zone }}
+            </IonSelectOption>
+          </IonSelect>
+        </ion-item>
+      </ion-list>
     <EpInput v-model="values.state" :maxlength="2" name="state" :mask="stateMask" label="Estado*" placeholder="Digite o estado" />
     <EpInput v-model="values.postalcode" name="postalcode" :mask="postalCodeMask" inputmode="number" label="CEP*" placeholder="00000-000" />
   </div>
