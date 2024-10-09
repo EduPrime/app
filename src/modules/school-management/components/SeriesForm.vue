@@ -47,8 +47,7 @@ const timetable_Id = ref('')
 const formSchema = yup.object ({
   name: yup
     .string()
-    .required('Nome é obrigatório')
-    .min(12, 'O nome deve ter pelo menos 12 caracteres'),
+    .required('Nome é obrigatório'),
   institutionId: yup.string()
     .required('Instituição é obrigatória'),
   courseId: yup.string()
@@ -211,6 +210,8 @@ onMounted(async () => {
   await loadSeries()
   if (seriesId.value) {
     await getSeriesData()
+    if (institutionId.value) setFieldValue('institutionId', institutionId.value)
+    if (courseId.value) setFieldValue('courseId', courseId.value)
   }
 })
 </script>

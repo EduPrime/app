@@ -263,6 +263,11 @@ onMounted(async () => {
   await loadClassroom()
   if (classId.value) {
     await getClassData()
+    if (institutionId.value) setFieldValue('institutionId', institutionId.value)
+    if (schoolId.value) setFieldValue('schoolId', schoolId.value)
+    if (courseId.value) setFieldValue('courseId', courseId.value)
+    if (seriesId.value) setFieldValue('seriesId', seriesId.value)
+    if (teacherId.value) setFieldValue('teacherId', teacherId.value)
   }
 })
 </script>

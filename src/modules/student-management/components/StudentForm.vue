@@ -8,6 +8,9 @@ import ClassroomService from '@/modules/school-management/services/ClassroomServ
 import SchoolService from '@/modules/school-management/services/SchoolService'
 import SeriesService from '@/modules/school-management/services/SeriesService'
 import StudentService from '../services/StudentService'
+import FileUpload from '@/modules/ged/components/FileUpload.vue'
+import FilesList from '@/modules/ged/components/FilesList.vue'
+import GedService from '@/modules/ged/services/GedService'
 import { hundredYearsAgo } from '@/utils/hundred-years-ago'
 import { isValidDDD } from '@/utils/ddd-validator'
 import { isValidCPF } from '@/utils/cpf-validator'
@@ -30,7 +33,9 @@ const router = useRouter()
 const route = useRouter()
 const responsibleType = ref(null)
 const docsType = ref(null)
-
+const documentFiles = ref<Tables<'document'>[]>([])
+const gedService = new GedService()
+const bucketName = 'ged'
 const valuesResponsibles = ref({
   father_name: '',
   father_cpf: '',
@@ -420,6 +425,17 @@ function applyPhoneMask(phone: string | null): string {
   return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
 }
 
+function handleUploadSuccess(file: any) {
+  if (file && file.storage_path) {
+    gedService.create(file)
+    documentFiles.value.push(file)
+  }
+}
+
+async function loadDocumentFiles() {
+  documentFiles.value = await gedService.getAll() as Tables<'document'>[]
+}
+
 const loadDistricts = async () => {
   try {
     const response = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/distritos')
@@ -475,6 +491,7 @@ onMounted(async () => {
   await loadStudent()
   if (studentId.value) {
     await getStudentData()
+    await loadDocumentFiles()
   }
 })
 </script>
@@ -713,7 +730,7 @@ onMounted(async () => {
       </ion-list>
 </div>
 
-<div v-show="selectedSegment === 'docs-info'">
+<div v-show="selectedSegment === 'docs-info'" class="upload-container">
 <ion-list id="docsType">
       <ion-item>
         <IonSelect
@@ -824,6 +841,18 @@ onMounted(async () => {
     </ion-list>
       <EpInput v-model="values.old_birth_cert_date_issue" name="old_birth_cert_date_issue" label="Data de Emissão" type="date" placeholder="Selecione a data de emissão da certidão" />
     </div>
+    <ion-item>
+    <div v-if="values.docsType">
+    <div class="file-upload-container">
+    <FileUpload
+      :bucket-name="bucketName"
+      :max-file-size="500"
+      @upload-success="handleUploadSuccess"
+      />
+      </div>
+      <FilesList :files="documentFiles" />
+      </div>
+      </ion-item>
   </div>
 </template>
 
@@ -844,4 +873,53 @@ onMounted(async () => {
   background-color: #ccc;
   height: 100%; /* Altura total da seção para atuar como divisória visual */
 }
+
+.file-upload-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%; 
+  margin-top: 8px; /* Diminui o espaço superior */
+}
+
+.file-upload-container .uppy-Dashboard {
+  width: 100%;
+  max-width: 300px; /* Largura reduzida */
+  height: 180px; /* Altura mínima reduzida */
+  padding: 0; /* Remove preenchimento extra */
+}
+
+.file-upload-container .uppy-Dashboard-inner {
+  height: 100px; /* Reduz a altura da área interna */
+  padding: 4px; /* Diminui o preenchimento para deixar compacto */
+}
+
+.file-upload-container .uppy-Dashboard-tabs {
+  display: none; /* Remove as abas desnecessárias */
+}
+
+.file-upload-container .uppy-Dashboard-dropFilesHereHint {
+  display: none; /* Remove o texto de "arrastar arquivos" */
+}
+
+.file-upload-container .uppy-DashboardStatusBar {
+  height: 18px; /* Reduz ainda mais a barra de status */
+  font-size: 10px; /* Fonte menor para a barra de status */
+  display: flex;
+  justify-content: flex-start;
+}
+
+.upload-container ion-item {
+  width: 100%;
+  margin-bottom: 8px; /* Reduz a margem inferior */
+}
+
+.upload-container ion-select {
+  width: 100%;
+}
+
+.upload-container .file-list-container {
+  margin-top: 8px; /* Reduz o espaço acima da lista de arquivos */
+}
+
 </style>

@@ -49,7 +49,7 @@ const classroomId = ref('')
 const courseId = ref('')
 const enrollmentData = ref< Tables<'enrollment'> | []>([])
 const gender = ['Masculino', 'Feminino']
-const status = ['Ativo', 'Inativo', 'Graduado', 'Suspenso', 'Transferido']
+const status = ['Ativo', 'Inativo']
 const situation = ['Pendente', 'Cursando', 'Aprovado', 'Aprovado pelo Conselho',
  'Aprovado com Dependência', 'Reprovado', 'Transferido', 'Abandono', 'Falecido']
 const residence_zone = ['Urbana', 'Rural'];
@@ -62,7 +62,6 @@ const studentService = new StudentService()
 const seriesService = new SeriesService()
 const courseService = new CourseService()
 const classroomList = ref()
-const filteredStudents = ref([])
 const currentYear = 2025
 const minDate = `${currentYear}-01-01`
 const maxDate = `${currentYear}-12-31`
@@ -93,8 +92,8 @@ const formSchema = yup.object({
     .required('Turma é obrigatória'),
   seriesId: yup.string()
     .required('Série é obrigatória'),
-    status: yup.string()
-    .required('Status é obrigatório'),
+    // status: yup.string()
+    // .required('Status é obrigatório'),
     situation: yup.string()
     .required('Situação é obrigatória'),
   // studentId: yup.string()
@@ -118,7 +117,9 @@ async function registerEnrollment() {
   } else {
     try {
     // Garante que o código de matrícula seja único antes de salvar
-    await ensureUniqueEnrollmentCode()
+    if (!enrollmentId.value) {
+        await ensureUniqueEnrollmentCode()
+      }
 
     const formData = {
       school_id: schoolId.value,
@@ -212,23 +213,24 @@ async function loadStudents() {
   }
 }
 
-function filterStudents() {
-  const query = searchQuery.value.toLowerCase();
-  if (query) {
-    filteredStudents.value = studentList.value.filter(student =>
+const filteredStudents = computed(() => {
+  const query = searchQuery.value.toLowerCase()
+  if (query.length >= 3) {
+    return studentList.value.filter(student =>
       student.name.toLowerCase().includes(query)
-    );
-  } else {
-    filteredStudents.value = []; // Se a consulta estiver vazia, limpa a lista filtrada
+    ).slice(0, 5) // Limita a 5 resultados
   }
-}
+  return [] // Se a consulta estiver vazia, limpa a lista filtrada
+})
 
 function selectStudent(student) {
-  studentId.value = student.id // Define o ID do aluno selecionado
-  enrollmentCode.value = '' // Limpa o código de matrícula ao selecionar um aluno
+  studentId.value = student.id
+  if (!enrollmentId.value) { // Somente limpa o código de matrícula se for uma nova matrícula
+    enrollmentCode.value = '' // Limpa o código de matrícula
+    // generateCodeEnrollment()  // Gera um novo código de matrícula
+  }
   searchQuery.value = ''
   setFieldValue('name', student.name)
-  // generateCodeEnrollment() // Gera um código de matrícula
   filteredStudents.value = []
 }
 
@@ -262,6 +264,7 @@ async function loadEnrollment() {
 
   } catch (error) {
     console.error('Erro ao carregar dados:', error);
+    showToast('Erro ao carregar dados. Verifique sua conexão e tente novamente.', 'top', 'danger');
   }
 }
 
@@ -322,12 +325,11 @@ const generateCodeEnrollment = async () => {
   enrollmentCode.value = `MAT-${lettersRandom}${numbersRandom}-${currentYear}`
 }
 
-
-// watch(studentId, (newValue) => {
-//   if (!enrollmentCode.value && !enrollmentId.value) {
-//   generateCodeEnrollment()
-//   }
-// })
+watch(studentId, (newValue) => {
+  if (!enrollmentCode.value && !enrollmentId.value) { // Gera código apenas para novas matrículas
+    // generateCodeEnrollment()
+  }
+})
 
 function applyPhoneMask(phone: string | null): string {
   if (!phone)
@@ -342,6 +344,10 @@ onMounted(async () => {
   await loadStudents()
   if (enrollmentId.value) {
     await getEnrollmentData()
+    if (schoolId.value) setFieldValue('schoolId', schoolId.value)
+    if (courseId.value) setFieldValue('courseId', courseId.value)
+    if (seriesId.value) setFieldValue('seriesId', seriesId.value)
+    if (classroomId.value) setFieldValue('classroomId', classroomId.value)
   }
 })
 </script>
@@ -360,24 +366,25 @@ onMounted(async () => {
         <ion-searchbar
           v-model="searchQuery"
           placeholder="Pesquise o aluno..."
-          @ionInput="filterStudents"
           animated="true"
-          debounce="500" 
+          debounce="400" 
         ></ion-searchbar>
 
     </ion-list>
 
     <!-- Renderiza a lista de alunos apenas se houver resultados -->
-    <ion-list v-if="!enrollmentId && filteredStudents.length > 0 && searchQuery">
-      <ion-item
+    <div v-if="searchQuery.length >= 3 && filteredStudents.length > 0">
+      <ul class="list-container">
+        <li
         v-for="student in filteredStudents"
         :key="student.id"
-        button
         @click="selectStudent(student)"
+        class="list-item"
       >
         {{ student.name }}
-      </ion-item>
-    </ion-list>
+        </li>
+      </ul>
+    </div>
 
     <ion-item class="readonly-item">
   <ion-icon slot="start" :icon="lockClosed" style="color: #000000; font-size: 20px;"></ion-icon>
@@ -482,7 +489,7 @@ onMounted(async () => {
       @change="enforceYear"
     />
     
-    <ion-list id="status">
+    <!-- <ion-list id="status">
       <ion-item>
         <IonSelect
         v-model="values.status"
@@ -499,7 +506,7 @@ onMounted(async () => {
             </IonSelectOption>
           </IonSelect>
         </ion-item>
-      </ion-list>
+      </ion-list> -->
 
       <ion-list id="situation">
       <ion-item>
@@ -551,5 +558,34 @@ onMounted(async () => {
 
 ion-searchbar {
   --background: var(--ion-color-light);
+}
+
+/* Contêiner da lista */
+.list-container {
+  max-height: 200px; /* Altura máxima da lista */
+  overflow-y: auto; /* Adiciona rolagem quando necessário */
+  background-color: var(--ion-color-light); /* Cor de fundo */
+  border: 1px solid #d1d1d1; /* Borda para definir a lista */
+  border-radius: 8px; /* Bordas arredondadas */
+  padding: 0;
+  margin-top: 8px; /* Pequeno espaço entre a searchbar e a lista */
+}
+
+/* Cada item da lista */
+.list-item {
+  padding: 10px;
+  cursor: pointer;
+  border-bottom: 1px solid #d1d1d1; /* Linha separadora entre os itens */
+}
+
+/* Efeito de hover para os itens */
+.list-item:hover {
+  background-color: var(--ion-color-primary);
+  color: white;
+}
+
+/* Remove a borda do último item */
+.list-item:last-child {
+  border-bottom: none;
 }
 </style>
