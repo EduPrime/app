@@ -86,20 +86,14 @@ const formSchema = yup.object({
   .nullable(),
   enrollmentCode: yup.string()
   .nullable(),
-  schoolId: yup.string()
-    .required('Escola é obrigatória'),
   classroomId: yup.string()
     .required('Turma é obrigatória'),
-  seriesId: yup.string()
-    .required('Série é obrigatória'),
     // status: yup.string()
     // .required('Status é obrigatório'),
     situation: yup.string()
     .required('Situação é obrigatória'),
   // studentId: yup.string()
   //   .required('Aluno é obrigatória'),
-  courseId: yup.string()
-    .required('Curso é obrigatório'),
     name: yup.string()
     .required('Aluno não selecionado ou não cadastrado'),
 })
@@ -397,63 +391,6 @@ onMounted(async () => {
     class="readonly-input"
   />
 </ion-item>
-
-    <ion-list id="schoolList">
-        <ion-item>
-            <IonSelect
-            v-model="schoolId"
-            justify="space-between"
-            label="Escola*"
-            placeholder="Selecione a escola"
-            @ionChange="(e) => {
-              setFieldValue('schoolId', e.detail.value)
-            }"
-            
-          >
-            <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
-              {{ school.name }}
-            </IonSelectOption>
-          </IonSelect>
-        </ion-item>
-      </ion-list>
-
-      <ion-list id="courseList">
-        <ion-item>
-            <IonSelect
-            v-model="courseId"
-            justify="space-between"
-            label="Curso*"
-            placeholder="Selecione o curso"
-            @ionChange="(e) => {
-              setFieldValue('courseId', e.detail.value)
-            }"
-            
-          >
-            <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
-              {{ course.name }}
-            </IonSelectOption>
-          </IonSelect>
-        </ion-item>
-      </ion-list>
-      
-      <ion-list id="seriesList">
-      <ion-item>
-        <IonSelect
-          v-model="seriesId"
-          justify="space-between"
-          label="Série*"
-          placeholder="Selecione a série"
-          @ionChange="(e) => {
-            setFieldValue('seriesId', e.detail.value)
-          }"
-          
-        >
-          <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
-            {{ series.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
-    </ion-list>
       
       <ion-list id="classroomList">
         <ion-item>
@@ -477,51 +414,13 @@ onMounted(async () => {
       <EpInput
       v-model="values.date_enrollment"
       name="date_enrollment"
-      label="Data da Matrícula*"
+      label="Data da Enturmação*"
       type="date"
       :max="maxDate"
       :min="minDate"
-      placeholder="Digite a data de matrícula"
+      placeholder="Digite a data de enturmação"
       @change="enforceYear"
     />
-    
-    <!-- <ion-list id="status">
-      <ion-item>
-        <IonSelect
-        v-model="values.status"
-        justify="space-between"
-        label="Status da Matrícula*"
-        placeholder="Selecione o status"
-        @ionChange="(e) => {
-          setFieldValue('status', e.detail.value)
-        }"
-            
-            >
-            <IonSelectOption v-for="status in status" :key="status" :value="status">
-              {{ status }}
-            </IonSelectOption>
-          </IonSelect>
-        </ion-item>
-      </ion-list> -->
-
-      <ion-list id="situation">
-      <ion-item>
-        <IonSelect
-        v-model="values.situation"
-        justify="space-between"
-        label="Situação da Matrícula*"
-        placeholder="Selecione a situação"
-        @ionChange="(e) => {
-          setFieldValue('situation', e.detail.value)
-        }"
-            
-            >
-            <IonSelectOption v-for="situation in situation" :key="situation" :value="situation">
-              {{ situation }}
-            </IonSelectOption>
-          </IonSelect>
-        </ion-item>
-      </ion-list>
       
       <ion-item class="readonly-item">
       <ion-icon slot="start" :icon="lockClosed" style="color: #000000; font-size: 20px;"></ion-icon>

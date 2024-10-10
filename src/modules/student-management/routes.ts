@@ -1,10 +1,11 @@
-import { flame, flameOutline, people, book, pencil, clipboard, document, folder, list, create } from 'ionicons/icons';
+import { flame, flameOutline, people, book, pencil, clipboard, document, folder, list, create, swapHorizontal } from 'ionicons/icons';
 import DashboardStudent from './views/DashboardStudent.vue';
 import DashboardEnrollment from './views/DashboardEnrollment.vue';
 import RegisterStudent from './views/RegisterStudent.vue';
 import RegisterEnrollment from './views/RegisterEnrollment.vue';
 import EditStudent from './views/EditStudent.vue'
 import EditEnrollment from './views/EditEnrollment.vue'
+import MoveStudent from './views/MoveStudent.vue'
 
 const routes = [
   {
@@ -78,6 +79,18 @@ const routes = [
       icon: create,
       name: 'Editar Matrícula',
       order: 4,
+      requiredRole: ['public', 'admin'],
+    },
+  },
+  {
+    path: '/student/enrollment/move/:id',
+    name: 'StudentMove',
+    component: MoveStudent,
+    meta: {
+      moduleName: 'Student',
+      icon: swapHorizontal,
+      name: 'Enturmar Aluno',
+      order: 5,
       requiredRole: ['public', 'admin'],
     },
   },

@@ -52,14 +52,14 @@ async function deleteFile(file: Tables<'document'>) {
   try {
     const result = await gedService.softDelete(file.id) // Altere para o método correto no seu serviço
     if (result) {
-      showToast(`Arquivo excluído com sucesso`)
+      showToast(`Documento excluído com sucesso`)
       filesList.value = filesList.value.filter(f => f.id !== file.id)
       emit('update:files', filesList.value)
       isAlertOpen.value = false
       fileToDelete.value = null
     }
   } catch (error) {
-    console.error('Erro ao excluir o arquivo:', error)
+    console.error('Erro ao excluir o documento:', error)
   }
 }
 
@@ -91,7 +91,7 @@ const alertButtons = [
 
   <IonList>
     <IonListHeader color="light">
-      Uploaded Files
+      Documentos enviados
     </IonListHeader>
     <ion-item-sliding v-for="(file, index) in filesList" :key="index">
       <IonItem button @click="toggleDetails(index)">

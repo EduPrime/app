@@ -33,7 +33,7 @@ onMounted(async () => {
       </ion-buttons>
     </template>
     <template #description>
-      Upload File documents
+      Fazer upload de arquivos de documentos
     </template>
     <h3 class="ion-text-end">
       GED

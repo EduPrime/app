@@ -110,7 +110,7 @@ onMounted(() => {
     <Dashboard :uppy="uppy" inline="true" />
     <div v-if="fileItems?.length">
       <IonListHeader color="primary">
-        New Uploaded Files
+        Novos documentos enviados
       </IonListHeader>
       <div v-for="(item, index) in fileItems" :key="index" class="file-item">
         <ion-item>

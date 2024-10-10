@@ -103,7 +103,6 @@ const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
 const studentService = new StudentService()
 const seriesService = new SeriesService()
-const districts = ref([])
 const loading = ref(true)
 const classroomList = ref()
 const schoolList = ref()
@@ -435,21 +434,6 @@ function handleUploadSuccess(file: any) {
 async function loadDocumentFiles() {
   documentFiles.value = await gedService.getAll() as Tables<'document'>[]
 }
-
-const loadDistricts = async () => {
-  try {
-    const response = await fetch('https://servicodados.ibge.gov.br/api/v1/localidades/distritos')
-    if (!response.ok) {
-      throw new Error('Erro na requisição')
-    }
-    const data = await response.json()
-    districts.value = data
-  } catch (error) {
-    console.error('Erro ao carregar distritos:', error)
-  } finally {
-    loading.value = false
-  }
-}
 watch(responsibleType, (newValue, oldValue) => {
   // Se necessário, você pode limpar ou atualizar os campos
   if (newValue === 'Pai') {
@@ -487,7 +471,6 @@ watch(docsType, (newValue, oldValue) => {
 
 
 onMounted(async () => {
-  loadDistricts()
   await loadStudent()
   if (studentId.value) {
     await getStudentData()
