@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Database, Tables } from '@/types/database.types'
 import EnrollmentForm from '../../student-management/components/EnrollmentForm.vue'
 
 const enrollmentFormRef = ref<InstanceType<typeof EnrollmentForm> | null>(null)

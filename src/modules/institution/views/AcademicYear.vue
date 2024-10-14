@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import type { Tables } from '@/types/database.types'
 import { IonBackButton, IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonGrid, IonItem, IonLabel, IonRow, IonSelect, IonSelectOption } from '@ionic/vue'
 
-// Serviços
-import SchoolService from '../services/SchoolService'
+import { onMounted, ref, watch } from 'vue'
 import AcademicTemplateService from '../services/AcademicTemplateService'
 import AcademicYearService from '../services/AcademicYearService'
-import type { Tables } from '@/types/database.types'
+// Serviços
+import SchoolService from '../services/SchoolService'
 
 const schoolService = new SchoolService()
 const academicTemplateService = new AcademicTemplateService()

@@ -1,13 +1,13 @@
-import { calendar, chatbubbles, create, document, list, person, school, star, people } from 'ionicons/icons'
+import { create, list, people, school } from 'ionicons/icons'
+import DashboardClass from './views/DashboardClass.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
-import EditSchools from './views/EditSchools.vue'
+import DashboardSeries from './views/DashboardSeries.vue'
 import EditClass from './views/EditClass.vue'
+import EditSchools from './views/EditSchools.vue'
 import EditSeries from './views/EditSeries.vue'
+import RegisterClass from './views/RegisterClass.vue'
 import RegisterSchool from './views/RegisterSchool.vue'
 import RegisterSeries from './views/RegisterSeries.vue'
-import DashboardClass from './views/DashboardClass.vue'
-import RegisterClass from './views/RegisterClass.vue'
-import DashboardSeries from './views/DashboardSeries.vue'
 
 const routes = [
   {

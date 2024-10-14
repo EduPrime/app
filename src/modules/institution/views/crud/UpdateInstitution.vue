@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonInput, IonItem, IonLabel } from '@ionic/vue'
-import InstitutionService from '../../services/InstitutionService'
 import type { Database, Tables } from '@/types/database.types'
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonInput, IonItem, IonLabel } from '@ionic/vue'
+import { computed } from 'vue'
+import InstitutionService from '../../services/InstitutionService'
 
 const props = defineProps<{
   institution: Tables<'institution'>

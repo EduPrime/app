@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Database, Tables } from '@/types/database.types'
 import MoveStudentForm from '../../student-management/components/MoveStudentForm.vue'
 
 const movestudentFormRef = ref<InstanceType<typeof MoveStudentForm> | null>(null)

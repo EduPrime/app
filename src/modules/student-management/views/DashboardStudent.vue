@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import type { Tables } from '@/types/database.types'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import StudentList from '@/modules/student-management/components/StudentList.vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Database, Enums, Tables } from '@/types/database.types'
 import StudentService from '../services/StudentService'
 
 const router = useRouter()
@@ -25,14 +25,15 @@ const filteredDataList = computed(() => {
   }
 
   return dataList.value.filter((student: any) =>
-    student.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    student.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 
 async function loadStudent() {
   try {
     dataList.value = await studentService.getAll()
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar os alunos:', error)
   }
 }
@@ -67,7 +68,7 @@ onMounted(() => {
         </ion-button>
       </ion-col>
     </ion-row>
-    <StudentList :dataList="filteredDataList" />
+    <StudentList :data-list="filteredDataList" />
   </ContentLayout>
 </template>
 

@@ -16,9 +16,10 @@ export default class EnrollmentService extends BaseService<TabelaType> {
 
       // Verifica se algum código de matrícula coincide com o código fornecido
       return !existingEnrollments.some(
-        (enrollment: any) => enrollment.enrollmentCode === enrollmentCode
+        (enrollment: any) => enrollment.enrollmentCode === enrollmentCode,
       )
-    } catch (error) {
+    }
+    catch (error) {
       console.error('Erro ao verificar unicidade do código de matrícula:', error)
       return false // Retorna false em caso de erro
     }

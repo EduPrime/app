@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import type { TextFieldTypes } from '@ionic/core'
 import { IonInput, IonItem } from '@ionic/vue'
+import { maskitoTransform } from '@maskito/core'
+import { maskito as vMaskito } from '@maskito/vue'
 import { useField } from 'vee-validate'
 import { onMounted, ref, watch } from 'vue'
-import { maskito as vMaskito } from '@maskito/vue'
-import { maskitoTransform } from '@maskito/core'
-import type { TextFieldTypes } from '@ionic/core'
 
 const props: any = defineProps({
   name: { type: String, required: true },

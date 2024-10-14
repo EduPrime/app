@@ -1,22 +1,23 @@
 <script setup lang="ts">
-import { IonItem, IonLabel, IonList, IonListHeader, IonAlert } from '@ionic/vue'
-import { documentAttach, trash } from 'ionicons/icons'
-import { ref, watch } from 'vue'
 import type { Tables } from '@/types/database.types'
 import GedService from '@/modules/ged/services/GedService'
 import showToast from '@/utils/toast-alert'
-
-// Serviço para lidar com a exclusão no backend
-const gedService = new GedService()
+import { IonAlert, IonItem, IonLabel, IonList, IonListHeader } from '@ionic/vue'
+import { documentAttach, trash } from 'ionicons/icons'
+import { ref, watch } from 'vue'
 
 const props = defineProps<{
   files: Tables<'document'>[] | []
 }>()
 
+const emit = defineEmits(['update:files'])
+
+// Serviço para lidar com a exclusão no backend
+const gedService = new GedService()
+
 const tableName = 'document'
 const fields = ['id', 'file_name', 'mime_type', 'size', 'is_current_version', 'file_hash', 'storage_path', 'version', 'compression_applied', 'metadata', 'is_deleted', 'created_at', 'updated_at', 'deleted_at', 'user_created']
 
-const emit = defineEmits(['update:files'])
 const filesList = ref([...props.files])
 
 watch(() => props.files, (newFiles) => {
@@ -43,7 +44,8 @@ function handleAlertDismiss(ev: CustomEvent) {
   const role = ev.detail.role
   if (role === 'confirm' && fileToDelete.value) {
     deleteFile(fileToDelete.value)
-  } else {
+  }
+  else {
     handleCancel()
   }
 }
@@ -58,7 +60,8 @@ async function deleteFile(file: Tables<'document'>) {
       isAlertOpen.value = false
       fileToDelete.value = null
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao excluir o documento:', error)
   }
 }
@@ -87,7 +90,7 @@ const alertButtons = [
     message="Tem certeza de que deseja excluir este arquivo?"
     :buttons="alertButtons"
     @did-dismiss="handleAlertDismiss"
-    />
+  />
 
   <IonList>
     <IonListHeader color="light">

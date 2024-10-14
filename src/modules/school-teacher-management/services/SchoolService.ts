@@ -1,5 +1,5 @@
-import BaseService from '@/services/BaseService'
 import type { Tables } from '@/types/database.types'
+import BaseService from '@/services/BaseService'
 
 const table = 'school' as const
 

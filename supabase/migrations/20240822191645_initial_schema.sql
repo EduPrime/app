@@ -84,6 +84,26 @@ CREATE TYPE residence_zone_type AS ENUM (
     'Rural'
 );
 
+CREATE TYPE race_type AS ENUM (
+    'Branco',
+    'Preta',
+    'Parda',
+    'Amarela',
+    'Indígena',
+    'Não Declarada'
+);
+
+CREATE TYPE deficiency_type AS ENUM (
+    'Visual',
+    'Auditiva',
+    'Física',
+    'Intelectual',
+    'Mental',
+    'Múltipla',
+    'Outros',
+    'Não possui'
+);
+
 CREATE TABLE institution
 (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -109,7 +129,7 @@ CREATE TABLE school (
     city VARCHAR(100),
     state CHAR(2),
     postalcode CHAR(10),
-    school_zone VARCHAR(10),
+    school_zone residence_zone_type,
     phone VARCHAR(15),
     email VARCHAR(100),
     website VARCHAR(255),
@@ -248,8 +268,6 @@ CREATE TABLE series
 CREATE TABLE student
 (
     id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    school_id      UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    classroom_id   UUID                                       NOT NULL REFERENCES classroom (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     name           VARCHAR(100)                               NOT NULL,
     birthdate      DATE                                       NOT NULL,
     gender         gender_type DEFAULT 'Masculino',
@@ -281,7 +299,8 @@ CREATE TABLE student
     old_birth_cert_date_issue DATE,
     old_birth_cert_state VARCHAR (100),
     responsibleType responsibleType DEFAULT 'Pai',
-    series_id   UUID                                       NOT NULL REFERENCES series (id) ON UPDATE CASCADE ON DELETE RESTRICT,
+    deficiency deficiency_type DEFAULT 'Não possui',
+    race race_type DEFAULT 'Não Declarada',
     email          VARCHAR(255),
     phone          VARCHAR(15) NOT NULL,
     address        VARCHAR(255),
@@ -298,7 +317,6 @@ CREATE TABLE enrollment (
     id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     school_id     UUID                                       NOT NULL REFERENCES school (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     student_id   UUID                                       NOT NULL REFERENCES student (id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    institution_id     UUID                                       NOT NULL REFERENCES institution (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     course_id     UUID                                       NOT NULL REFERENCES course (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     classroom_id     UUID                                       NOT NULL REFERENCES classroom (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     series_id     UUID                                       NOT NULL REFERENCES series (id) ON UPDATE CASCADE ON DELETE RESTRICT,

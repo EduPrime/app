@@ -81,7 +81,7 @@ VALUES
         'Cidade Beta',
         'RJ',
         '98765-432',
-        'Zona 2', -- Exemplo de valor para school_zone
+        'Urbana', -- Exemplo de valor para school_zone
         '(21) 2345-6789',
         'contato@colegiobeta.edu.br', -- Exemplo de e-mail
         'http://colegiobeta.edu.br', -- Exemplo de website
@@ -394,6 +394,8 @@ INSERT INTO classroom (
 -- Adicionando corretamente os estudantes
 INSERT INTO student (
     id,
+    school_id,
+    classroom_id,
     name,
     birthdate,
     gender,
@@ -425,6 +427,7 @@ INSERT INTO student (
     old_birth_cert_date_issue,
     old_birth_cert_state,
     responsibleType,
+    series_id,
     email,
     phone,
     address,

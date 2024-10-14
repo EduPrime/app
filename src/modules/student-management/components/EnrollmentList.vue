@@ -1,29 +1,28 @@
 <script setup lang="ts">
-import showToast from '@/utils/toast-alert'
-import { onMounted, ref, watch } from 'vue'
-import { IonAlert } from '@ionic/vue'
-import { pencil, trash, swapHorizontal } from 'ionicons/icons'
-import { useRouter } from 'vue-router'
 import type { Tables } from '@/types/database.types'
+import { IonAlert } from '@ionic/vue'
+import { pencil, swapHorizontal } from 'ionicons/icons'
+import { onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import EnrollmentService from '../services/EnrollmentService'
+
+const props = defineProps<{
+  dataList: Tables<'enrollment'>
+}>()
 
 // Instanciando o serviço da tabela
 const service = new EnrollmentService()
 
 const enrollment = ref< Tables<'enrollment'> | []>([])
 const dataList = ref()
-const props = defineProps<{
-  dataList: Tables<'enrollment'>
-}>()
-
 watch(
   () => props.dataList,
   (newValue) => {
-    dataList.value = newValue;
-    console.log('dataList foi atualizado:', { dataList });
+    dataList.value = newValue
+    console.log('dataList foi atualizado:', { dataList })
   },
-  { immediate: true }
-);
+  { immediate: true },
+)
 // Nome da tabela e campos
 const tableName = 'enrollment'
 const fieldLabels = {
@@ -49,7 +48,8 @@ const router = useRouter()
 onMounted(async () => {
   try {
     dataList.value = await service.getAll()
-  } catch (error) {
+  }
+  catch (error) {
     console.error(`Erro ao buscar dados de ${tableName}:`, error)
   }
 })
@@ -122,7 +122,7 @@ function handleFitInDismiss(ev: CustomEvent) {
   const role = ev.detail.role
   if (role === 'confirm' && studentToMove.value) {
     moveStudent(studentToMove.value)
-  } 
+  }
   handleCancelFitIn()
 }
 
@@ -130,7 +130,7 @@ function handleCancelFitIn() {
   isFitInAlertOpen.value = false
   studentToMove.value = null
 }
- 
+
 const alertButtons = [
   {
     text: 'Cancelar',

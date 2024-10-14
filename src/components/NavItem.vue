@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
 import { IonAccordion, IonAccordionGroup, IonIcon, IonItem, IonLabel, menuController } from '@ionic/vue'
+import { ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 interface MenuItem {
@@ -30,29 +30,29 @@ watch(
 
 function handleClick() {
   // isDisabled.value = true
-  isActive.value = true;
-  props.item.children?.length == 0 ? menuController.close() : '';
+  isActive.value = true
+  props.item.children?.length == 0 ? menuController.close() : ''
   router.push(props.item.url)
 }
 </script>
 
 <template>
   <div>
-    <ion-accordion-group v-if="item.children && item.children.length" multiple>
-      <ion-accordion>
-        <ion-item slot="header" button lines="none" :disabled="isDisabled"  :class="isActive ? 'menu-active' : '' " @click="handleClick">
-          <ion-icon slot="start" :color="item.color" :icon="item.icon" />
-          <ion-label>{{ item.name }}</ion-label>
-        </ion-item>
+    <IonAccordionGroup v-if="item.children && item.children.length" multiple>
+      <IonAccordion>
+        <IonItem slot="header" button lines="none" :disabled="isDisabled" :class="isActive ? 'menu-active' : '' " @click="handleClick">
+          <IonIcon slot="start" :color="item.color" :icon="item.icon" />
+          <IonLabel>{{ item.name }}</IonLabel>
+        </IonItem>
         <div slot="content">
           <nav-item v-for="(child, index) in item.children" :key="index" :item="child" />
         </div>
-      </ion-accordion>
-    </ion-accordion-group>
-    <ion-item v-else button lines="none" :router-link="item.url" :disabled="isDisabled" :class="isActive ? 'menu-active' : '' " @click="handleClick">
-      <ion-icon slot="start" :color="item.color" :icon="item.icon" />
-      <ion-label>{{ item.name }}</ion-label>
-    </ion-item>
+      </IonAccordion>
+    </IonAccordionGroup>
+    <IonItem v-else button lines="none" :router-link="item.url" :disabled="isDisabled" :class="isActive ? 'menu-active' : '' " @click="handleClick">
+      <IonIcon slot="start" :color="item.color" :icon="item.icon" />
+      <IonLabel>{{ item.name }}</IonLabel>
+    </IonItem>
   </div>
 </template>
 

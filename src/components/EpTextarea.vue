@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { IonItem, IonTextarea } from '@ionic/vue'
-import { useField } from 'vee-validate'
-import type { Ref } from 'vue'
-import { ref } from 'vue'
-import { maskito as vMaskito } from '@maskito/vue'
-
 import type { TextFieldTypes } from '@ionic/core'
+import type { Ref } from 'vue'
+import { IonItem, IonTextarea } from '@ionic/vue'
+import { maskito as vMaskito } from '@maskito/vue'
+import { useField } from 'vee-validate'
+
+import { ref } from 'vue'
 
 const props: any = defineProps({
   name: { type: String, required: true },

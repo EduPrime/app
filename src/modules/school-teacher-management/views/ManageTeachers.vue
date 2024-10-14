@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import type { Tables } from '@/types/database.types'
+import ContentLayout from '@/components/theme/ContentLayout.vue'
+import TeacherCards from '@/modules/school-teacher-management/components/TeacherCards.vue'
+import TeacherList from '@/modules/school-teacher-management/components/TeacherList.vue'
 import { add } from 'ionicons/icons'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import TeacherService from '../services/TeacherService'
 import SchoolService from '../services/SchoolService'
 import SeriesService from '../services/SeriesService'
 import StudentService from '../services/StudentService'
-import ContentLayout from '@/components/theme/ContentLayout.vue'
-import TeacherList from '@/modules/school-teacher-management/components/TeacherList.vue'
-import TeacherCards from '@/modules/school-teacher-management/components/TeacherCards.vue'
-import type { Tables } from '@/types/database.types'
+import TeacherService from '../services/TeacherService'
 
 const router = useRouter()
 const route = useRoute()

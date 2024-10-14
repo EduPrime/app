@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import type { Meta, UppyFile } from '@uppy/core'
 import { IonChip, IonListHeader, IonThumbnail } from '@ionic/vue'
 import Uppy from '@uppy/core'
 import Tus from '@uppy/tus'
 import { Dashboard } from '@uppy/vue'
 import { documentOutline } from 'ionicons/icons'
 import { onMounted, ref } from 'vue'
-import type { Meta, UppyFile } from '@uppy/core'
 import '@uppy/core/dist/style.css'
 import '@uppy/dashboard/dist/style.css'
 

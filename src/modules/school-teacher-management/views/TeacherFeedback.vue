@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-
-import SchoolService from '../services/SchoolService'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
+
+import { onMounted, ref } from 'vue'
+import SchoolService from '../services/SchoolService'
 
 const schoolService = new SchoolService()
 
