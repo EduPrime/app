@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Tables } from '@/types/database.types'
 import EpInput from '@/components/EpInput.vue'
 import ClassroomService from '@/modules/school-management/services/ClassroomService'
 import CourseService from '@/modules/school-management/services/CourseService'
@@ -12,6 +11,7 @@ import { useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
+import type { Tables } from '@/types/database.types'
 import StudentService from '../services/StudentService'
 
 defineEmits<{
