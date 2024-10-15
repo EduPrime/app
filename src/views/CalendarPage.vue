@@ -1,9 +1,6 @@
 <script lang="ts" setup>
-import type { Ref } from 'vue'
-import { computed, ref } from 'vue'
-import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
 import type { Moment } from 'moment'
-import moment from 'moment'
+import type { Ref } from 'vue'
 import {
   IonButton,
   IonButtons,
@@ -18,7 +15,10 @@ import {
   IonModal,
   IonToolbar,
 } from '@ionic/vue'
+import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
+import moment from 'moment'
 import { Swiper, SwiperSlide } from 'swiper/vue'
+import { computed, ref } from 'vue'
 import 'swiper/css'
 
 const getSwiper: Ref<any> = ref(null)
@@ -184,10 +184,10 @@ loadVisibleMonth()
       <template #end>
         <IonButtons>
           <IonButton @click="prevMonth">
-              <IonIcon slot="icon-only" :icon="arrowBackOutline" />
+            <IonIcon slot="icon-only" :icon="arrowBackOutline" />
           </IonButton>
           <IonButton @click="nextMonth">
-              <IonIcon slot="icon-only" :icon="arrowForwardOutline" />
+            <IonIcon slot="icon-only" :icon="arrowForwardOutline" />
           </IonButton>
         </IonButtons>
       </template>

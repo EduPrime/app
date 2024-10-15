@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import type { Tables } from '@/types/database.types'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import SchoolList from '@/modules/school-management/components/SchoolList.vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Database, Enums, Tables } from '@/types/database.types'
 import SchoolService from '../services/SchoolService'
 
 const router = useRouter()

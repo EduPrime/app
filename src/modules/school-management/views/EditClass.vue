@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Database, Tables } from '@/types/database.types'
 import ClassForm from '../../school-management/components/ClassForm.vue'
 
 const classFormRef = ref<InstanceType<typeof ClassForm> | null>(null)

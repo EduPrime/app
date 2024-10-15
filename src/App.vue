@@ -19,16 +19,16 @@ import {
   personCircleOutline,
   videocam,
 } from 'ionicons/icons'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-//import type CustomUser from '@/router/CustomUser'
+// import type CustomUser from '@/router/CustomUser'
 import type { RouteRecordNormalized } from 'vue-router'
 import NavItem from './components/NavItem.vue'
 import { useUserStore } from './store/user'
 import { supabase } from './supabaseClient'
 
 const userStore = useUserStore()
-//const user: CustomUser = userStore.user as CustomUser
+// const user: CustomUser = userStore.user as CustomUser
 
 const tabs = ref([
   {
@@ -179,6 +179,10 @@ const router = useRouter()
 const route = useRoute()
 const dynamicTabs: any[] = []
 
+const currentRouteName = computed(() => {
+  return route.meta.name || 'EduPrime'
+})
+
 function hasShowFlag(route: RouteRecordNormalized) {
   return route.meta.showInTab ?? true
 }
@@ -315,7 +319,7 @@ async function logout() {
           <div class="tree-view">
             <!-- v-if="showTree" -->
             <ion-item lines="none" class="app-title-item">
-              EduPrime
+              {{ currentRouteName }}
               <!-- Mobile Screen Menu close button -->
               <template #end>
                 <ion-menu-button color="primary" @click="toggleTreeView">
