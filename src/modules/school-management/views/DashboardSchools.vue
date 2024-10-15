@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import type { Tables } from '@/types/database.types'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import SchoolList from '@/modules/school-management/components/SchoolList.vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Database, Enums, Tables } from '@/types/database.types'
 import SchoolService from '../services/SchoolService'
 
 const router = useRouter()
@@ -26,14 +26,15 @@ const filteredDataList = computed(() => {
   }
 
   return dataList.value.filter((classroom: any) =>
-    classroom.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    classroom.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 
 async function loadSchools() {
   try {
     dataList.value = await schoolService.getAll()
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar as salas de aula:', error)
   }
 }
@@ -68,7 +69,7 @@ onMounted(() => {
         </ion-button>
       </ion-col>
     </ion-row>
-    <SchoolList :dataList="filteredDataList" />
+    <SchoolList :data-list="filteredDataList" />
   </ContentLayout>
 </template>
 

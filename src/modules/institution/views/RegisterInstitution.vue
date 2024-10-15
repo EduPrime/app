@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { IonBackButton } from '@ionic/vue'
+import { ref } from 'vue'
 
 const form = ref({
   cnpj: '',

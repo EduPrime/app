@@ -1,6 +1,6 @@
+import type { Plugin } from 'vite'
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import type { Plugin } from 'vite'
 
 function loadRoutes(): Plugin {
   return {

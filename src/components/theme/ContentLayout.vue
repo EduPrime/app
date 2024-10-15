@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
 import { IonButtons, IonFooter, IonHeader, IonIcon, IonMenuButton, IonNote, IonTitle, IonToolbar } from '@ionic/vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 const props = defineProps({

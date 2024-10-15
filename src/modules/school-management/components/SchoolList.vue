@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import type { Tables } from '@/types/database.types'
 import showToast from '@/utils/toast-alert'
-import { onMounted, ref, watch } from 'vue'
 import { IonAlert } from '@ionic/vue'
 import { pencil, trash } from 'ionicons/icons'
+import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Tables } from '@/types/database.types'
 import SchoolService from '../services/SchoolService'
+
+const props = defineProps<{
+  dataList: Tables<'school'>
+}>()
 
 // Instanciando o serviço da tabela
 const service = new SchoolService()
@@ -14,19 +18,14 @@ const service = new SchoolService()
 const school = ref< Tables<'school'> | []>([])
 const dataList = ref()
 
-const props = defineProps<{
-  dataList: Tables<'school'>
-}>()
-
 watch(
   () => props.dataList,
   (newValue) => {
-    dataList.value = newValue;
-    console.log('dataList foi atualizado:', { dataList });
+    dataList.value = newValue
+    console.log('dataList foi atualizado:', { dataList })
   },
-  { immediate: true }
-);
-
+  { immediate: true },
+)
 
 // Nome da tabela e campos
 const tableName = 'school'
@@ -37,7 +36,8 @@ const router = useRouter()
 onMounted(async () => {
   try {
     dataList.value = await service.getAll()
-  } catch (error) {
+  }
+  catch (error) {
     console.error(`Erro ao buscar dados de ${tableName}:`, error)
   }
 })
@@ -68,21 +68,23 @@ function handleAlertDismiss(ev: CustomEvent) {
   const role = ev.detail.role
   if (role === 'confirm' && itemToDelete.value) {
     deleteItem(itemToDelete.value)
-  } else {
+  }
+  else {
     handleCancel()
   }
 }
 
 async function deleteItem(item: any) {
   try {
-   const result =  await service.softDelete(item.id)
-   if (result) {
-    showToast(`${tableName} excluído com sucesso`)
-    dataList.value = dataList.value.filter(i => i.id !== item.id)
-    isAlertOpen.value = false
-    itemToDelete.value = null
-   }
-  } catch (error) {
+    const result = await service.softDelete(item.id)
+    if (result) {
+      showToast(`${tableName} excluído com sucesso`)
+      dataList.value = dataList.value.filter(i => i.id !== item.id)
+      isAlertOpen.value = false
+      itemToDelete.value = null
+    }
+  }
+  catch (error) {
     console.error('Erro ao excluir o item:', error)
   }
 }

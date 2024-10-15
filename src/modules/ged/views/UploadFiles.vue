@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { IonToast } from '@ionic/vue'
-import { onMounted, ref } from 'vue'
 import type { Tables } from '@/types/database.types'
 import type { Ref } from 'vue'
+import { IonToast } from '@ionic/vue'
+import { onMounted, ref } from 'vue'
 import FilesList from '../components/FilesList.vue'
 import FileUpload from '../components/FileUpload.vue'
 import GedService from '../services/GedService'
@@ -33,7 +33,7 @@ onMounted(async () => {
       </ion-buttons>
     </template>
     <template #description>
-      Upload File documents
+      Fazer upload de arquivos de documentos
     </template>
     <h3 class="ion-text-end">
       GED
