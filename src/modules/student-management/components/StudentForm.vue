@@ -4,9 +4,6 @@ import EpInput from '@/components/EpInput.vue'
 import FilesList from '@/modules/ged/components/FilesList.vue'
 import FileUpload from '@/modules/ged/components/FileUpload.vue'
 import GedService from '@/modules/ged/services/GedService'
-import ClassroomService from '@/modules/school-management/services/ClassroomService'
-import SchoolService from '@/modules/school-management/services/SchoolService'
-import SeriesService from '@/modules/school-management/services/SeriesService'
 import { isValidCPF } from '@/utils/cpf-validator'
 import { isValidDDD } from '@/utils/ddd-validator'
 import showToast from '@/utils/toast-alert'
@@ -62,9 +59,6 @@ const valuesDocs = ref({
   old_birth_cert_state: '',
 
 })
-const schoolId = ref('')
-const seriesId = ref('')
-const classroomId = ref('')
 const studentData = ref< Tables<'student'> | []>([])
 const states = [
   'AC', // Acre
@@ -103,15 +97,8 @@ const residence_zone = ['Urbana', 'Rural']
 const race = ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena', 'Não declarada']
 const deficiency = ['Visual', 'Auditiva', 'Física', 'Intelectual', 'Mental', 'Múltipla', 'Outros', 'Não possui']
 const selectedSegment = ref('general-info')
-const classroomService = new ClassroomService()
-const schoolService = new SchoolService()
 const studentService = new StudentService()
-const seriesService = new SeriesService()
-const loading = ref(true)
-const classroomList = ref()
-const schoolList = ref()
 const studentList = ref()
-const seriesList = ref()
 const studentId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = yup.object({
   name: yup.string()
@@ -269,9 +256,6 @@ async function registerStudent() {
   else {
     const formData = {
       name: values.name,
-      // school_id: schoolId.value,
-      // classroom_id: classroomId.value,
-      // series_id: seriesId.value,
       gender: values.gender,
       status: values.status,
       address: values.address,
@@ -345,11 +329,8 @@ async function registerStudent() {
 
 async function loadStudent() {
   try {
-    const [schools, classrooms, students, series] = await Promise.all([
-      schoolService.getAll(),
-      classroomService.getAll(),
+    const [students] = await Promise.all([
       studentService.getAll(),
-      seriesService.getAll(),
     ])
 
     console.log('Chegou', students)
@@ -364,10 +345,7 @@ async function loadStudent() {
       }
     }
 
-    mapData(schools, schoolList)
-    mapData(classrooms, classroomList)
     mapData(students, studentList)
-    mapData(series, seriesList)
   }
   catch (error) {
     console.error('Erro ao carregar dados:', error)
@@ -377,58 +355,49 @@ async function loadStudent() {
 //* * Mask Inputs
 const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/])
 const postalCodeMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/])
-const numberAddressMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
 const cpfMask = ref([/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/])
 
 async function getStudentData() {
   if (studentId.value) {
     const studentDbData = await studentService.getById(studentId.value)
     if (studentDbData) {
-      schoolId.value = studentDbData.school_id,
-      classroomId.value = studentDbData.classroom_id,
-      seriesId.value = studentDbData.series_id,
-      setFieldValue('name', studentDbData.name),
-      setFieldValue('birthdate', studentDbData.birthdate),
-      setFieldValue('gender', studentDbData.gender),
-      setFieldValue('email', studentDbData.email),
-      setFieldValue('phone', studentDbData.phone),
-      setFieldValue('address', studentDbData.address),
-      setFieldValue('number_address', studentDbData.number_address),
-      setFieldValue('status', studentDbData.status),
-      setFieldValue('place_of_birth', studentDbData.place_of_birth),
-      setFieldValue('complement', studentDbData.complement),
-      setFieldValue('neighborhood', studentDbData.neighborhood),
-      setFieldValue('postalcode', studentDbData.postalcode),
-      setFieldValue('residence_zone', studentDbData.residence_zone),
-      setFieldValue('city', studentDbData.city),
-      setFieldValue('cpf', studentDbData.cpf),
-      setFieldValue('school_id', studentDbData.school_id),
-      setFieldValue('schoolId', studentDbData.schoolId),
-      setFieldValue('seriesId', studentDbData.seriesId),
-      setFieldValue('classroom_id', studentDbData.classroom_id),
-      setFieldValue('classroomId', studentDbData.classroomId),
-      setFieldValue('father_name', studentDbData.father_name),
-      setFieldValue('father_cpf', studentDbData.father_cpf),
-      setFieldValue('father_email', studentDbData.father_email),
-      setFieldValue('father_phone', studentDbData.father_phone),
-      setFieldValue('mother_name', studentDbData.mother_name),
-      setFieldValue('mother_cpf', studentDbData.mother_cpf),
-      setFieldValue('mother_email', studentDbData.mother_email),
-      setFieldValue('mother_phone', studentDbData.mother_phone),
-      setFieldValue('responsibleType', studentDbData.responsibleType),
-      setFieldValue('docsType', studentDbData.docsType),
-      setFieldValue('old_birth_cert_book', studentDbData.old_birth_cert_book),
-      setFieldValue('old_birth_cert_sheet', studentDbData.old_birth_cert_sheet),
-      setFieldValue('old_birth_cert_term', studentDbData.old_birth_cert_term),
-      setFieldValue('old_birth_cert_date_issue', studentDbData.old_birth_cert_date_issue),
-      setFieldValue('old_birth_cert_state', studentDbData.old_birth_cert_state),
-      setFieldValue('new_birth_cert_number', studentDbData.new_birth_cert_number),
-      setFieldValue('rg_number', studentDbData.rg_number),
-      setFieldValue('rg_state', studentDbData.rg_state),
-      setFieldValue('rg_issue_date', studentDbData.rg_issue_date),
-      setFieldValue('rg_issuer', studentDbData.rg_issuer),
-      setFieldValue('race', studentDbData.race),
-      setFieldValue('deficiency', studentDbData.deficiency),
+      setFieldValue('name', studentDbData.name)
+      setFieldValue('birthdate', studentDbData.birthdate)
+      setFieldValue('gender', studentDbData.gender)
+      setFieldValue('email', studentDbData.email)
+      setFieldValue('phone', studentDbData.phone)
+      setFieldValue('address', studentDbData.address)
+      setFieldValue('number_address', studentDbData.number_address)
+      setFieldValue('status', studentDbData.status)
+      setFieldValue('place_of_birth', studentDbData.place_of_birth)
+      setFieldValue('complement', studentDbData.complement)
+      setFieldValue('neighborhood', studentDbData.neighborhood)
+      setFieldValue('postalcode', studentDbData.postalcode)
+      setFieldValue('residence_zone', studentDbData.residence_zone)
+      setFieldValue('city', studentDbData.city)
+      setFieldValue('cpf', studentDbData.cpf)
+      setFieldValue('father_name', studentDbData.father_name)
+      setFieldValue('father_cpf', studentDbData.father_cpf)
+      setFieldValue('father_email', studentDbData.father_email)
+      setFieldValue('father_phone', studentDbData.father_phone)
+      setFieldValue('mother_name', studentDbData.mother_name)
+      setFieldValue('mother_cpf', studentDbData.mother_cpf)
+      setFieldValue('mother_email', studentDbData.mother_email)
+      setFieldValue('mother_phone', studentDbData.mother_phone)
+      setFieldValue('responsibleType', studentDbData.responsibleType)
+      setFieldValue('docsType', studentDbData.docsType)
+      setFieldValue('old_birth_cert_book', studentDbData.old_birth_cert_book)
+      setFieldValue('old_birth_cert_sheet', studentDbData.old_birth_cert_sheet)
+      setFieldValue('old_birth_cert_term', studentDbData.old_birth_cert_term)
+      setFieldValue('old_birth_cert_date_issue', studentDbData.old_birth_cert_date_issue)
+      setFieldValue('old_birth_cert_state', studentDbData.old_birth_cert_state)
+      setFieldValue('new_birth_cert_number', studentDbData.new_birth_cert_number)
+      setFieldValue('rg_number', studentDbData.rg_number)
+      setFieldValue('rg_state', studentDbData.rg_state)
+      setFieldValue('rg_issue_date', studentDbData.rg_issue_date)
+      setFieldValue('rg_issuer', studentDbData.rg_issuer)
+      setFieldValue('race', studentDbData.race)
+      setFieldValue('deficiency', studentDbData.deficiency)
       setFieldValue('deficiency_description', studentDbData.deficiency_description)
     }
     else {

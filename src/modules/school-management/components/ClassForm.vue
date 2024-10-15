@@ -5,7 +5,7 @@ import TeacherService from '@/modules/school-teacher-management/services/Teacher
 import showToast from '@/utils/toast-alert'
 import { IonLabel, IonSegment, IonSegmentButton, IonSelect, IonSelectOption } from '@ionic/vue'
 import { useForm } from 'vee-validate'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
 import ClassroomService from '../services/ClassroomService'
@@ -35,7 +35,7 @@ const classData = ref< Tables<'classroom'> | []>([])
 const selectedSegment = ref('general-info')
 const classList = ref<{ id: string, name: string }[]>([])
 const periods = ['Manhã', 'Tarde', 'Noite']
-const status = ['Ativo', 'Inativo', 'Graduado', 'Suspenso', 'Transferido']
+const status = ['Ativo', 'Inativo']
 const day_of_weeks = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta']
 const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
@@ -208,39 +208,36 @@ async function loadClassroom() {
   }
 }
 
-//* * Mask Inputs
-const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/])
-
 async function getClassData() {
   if (classId.value) {
     const classDbData = await classroomService.getById(classId.value)
     if (classDbData) {
-      institutionId.value = classDbData.institution_id,
-      schoolId.value = classDbData.school_id,
-      courseId.value = classDbData.course_id,
-      seriesId.value = classDbData.series_id,
-      teacherId.value = classDbData.teacher_id,
-      setFieldValue('name', classDbData.name),
-      setFieldValue('institutionId', classDbData.institutionId),
-      setFieldValue('institution', classDbData.institution_id),
-      setFieldValue('course', classDbData.course_id),
-      setFieldValue('school_id', classDbData.school_id),
-      setFieldValue('series_id', classDbData.series_id),
-      setFieldValue('teacher', classDbData.teacher_id),
-      setFieldValue('schoolId', classDbData.schoolId),
-      setFieldValue('courseId', classDbData.courseId),
-      setFieldValue('seriesId', classDbData.seriesId),
-      setFieldValue('teacherId', classDbData.teacherId),
-      setFieldValue('nameClass', classDbData.nameClass),
-      setFieldValue('abbreviation', classDbData.abbreviation),
-      setFieldValue('year', classDbData.year),
-      setFieldValue('status', classDbData.status),
-      setFieldValue('maxStudents', classDbData.maxStudents),
-      setFieldValue('startTime', classDbData.startTime),
-      setFieldValue('startTimeInterval', classDbData.startTimeInterval),
-      setFieldValue('endTimeInterval', classDbData.endTimeInterval),
-      setFieldValue('endTime', classDbData.endTime),
-      setFieldValue('day_of_week', classDbData.day_of_week),
+      institutionId.value = classDbData.institution_id
+      schoolId.value = classDbData.school_id
+      courseId.value = classDbData.course_id
+      seriesId.value = classDbData.series_id
+      teacherId.value = classDbData.teacher_id
+      setFieldValue('name', classDbData.name)
+      setFieldValue('institutionId', classDbData.institutionId)
+      setFieldValue('institution', classDbData.institution_id)
+      setFieldValue('course', classDbData.course_id)
+      setFieldValue('school_id', classDbData.school_id)
+      setFieldValue('series_id', classDbData.series_id)
+      setFieldValue('teacher', classDbData.teacher_id)
+      setFieldValue('schoolId', classDbData.schoolId)
+      setFieldValue('courseId', classDbData.courseId)
+      setFieldValue('seriesId', classDbData.seriesId)
+      setFieldValue('teacherId', classDbData.teacherId)
+      setFieldValue('nameClass', classDbData.nameClass)
+      setFieldValue('abbreviation', classDbData.abbreviation)
+      setFieldValue('year', classDbData.year)
+      setFieldValue('status', classDbData.status)
+      setFieldValue('maxStudents', classDbData.maxStudents)
+      setFieldValue('startTime', classDbData.startTime)
+      setFieldValue('startTimeInterval', classDbData.startTimeInterval)
+      setFieldValue('endTimeInterval', classDbData.endTimeInterval)
+      setFieldValue('endTime', classDbData.endTime)
+      setFieldValue('day_of_week', classDbData.day_of_week)
       setFieldValue('period', classDbData.period)
     }
     else {
@@ -248,11 +245,28 @@ async function getClassData() {
     }
   }
 }
-function applyPhoneMask(phone: string | null): string {
-  if (!phone)
-    return ''
-  return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
-}
+
+// Carregamento diferido para professores, turmas, séries e cursos
+watch(schoolId, async (newSchoolId) => {
+  if (newSchoolId) {
+    try {
+      teacherList.value = await teacherService.getBySchoolId(newSchoolId)
+      classroomList.value = await classroomService.getBySchoolId(newSchoolId)
+      seriesList.value = await seriesService.getBySchoolId(newSchoolId)
+      courseList.value = await courseService.getBySchoolId(newSchoolId)
+    }
+    catch (error) {
+      console.error('Erro ao carregar turmas e séries para o escritório:', error)
+      showToast('Erro ao carregar dados. Tente novamente.', 'top', 'danger')
+    }
+  }
+  else {
+    teacherList.value = []
+    classroomList.value = []
+    seriesList.value = []
+    courseList.value = []
+  }
+})
 
 onMounted(async () => {
   await loadClassroom()
@@ -340,7 +354,7 @@ onMounted(async () => {
         </IonSelect>
       </ion-item>
     </ion-list>
-    <ion-list id="courseList">
+    <ion-list v-if="schoolId" id="courseList">
       <ion-item>
         <IonSelect
           v-model="courseId"
@@ -357,7 +371,7 @@ onMounted(async () => {
         </IonSelect>
       </ion-item>
     </ion-list>
-    <ion-list id="seriesList">
+    <ion-list v-if="schoolId" id="seriesList">
       <ion-item>
         <IonSelect
           v-model="seriesId"
@@ -374,7 +388,7 @@ onMounted(async () => {
         </IonSelect>
       </ion-item>
     </ion-list>
-    <ion-list id="teacherList">
+    <ion-list v-if="schoolId" id="teacherList">
       <ion-item>
         <IonSelect
           v-model="teacherId"

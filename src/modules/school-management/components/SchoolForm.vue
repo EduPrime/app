@@ -140,19 +140,19 @@ async function getSchoolData() {
   if (schoolId.value) {
     const schoolDbData = await schoolService.getById(schoolId.value)
     if (schoolDbData) {
-      setFieldValue('institutionId', schoolDbData.institutionId),
-      setFieldValue('name', schoolDbData.name),
-      setFieldValue('phone', schoolDbData.phone),
-      setFieldValue('email', schoolDbData.email),
-      setFieldValue('website', schoolDbData.website),
-      setFieldValue('social_network', schoolDbData.social_network),
-      setFieldValue('address', schoolDbData.address),
-      setFieldValue('city', schoolDbData.city),
-      setFieldValue('state', schoolDbData.state),
-      setFieldValue('postalcode', schoolDbData.postalcode),
-      setFieldValue('school_zone', schoolDbData.school_zone),
-      setFieldValue('logourl', schoolDbData.logourl),
-      setFieldValue('school_zone', schoolDbData.school_zone),
+      setFieldValue('institutionId', schoolDbData.institutionId)
+      setFieldValue('name', schoolDbData.name)
+      setFieldValue('phone', schoolDbData.phone)
+      setFieldValue('email', schoolDbData.email)
+      setFieldValue('website', schoolDbData.website)
+      setFieldValue('social_network', schoolDbData.social_network)
+      setFieldValue('address', schoolDbData.address)
+      setFieldValue('city', schoolDbData.city)
+      setFieldValue('state', schoolDbData.state)
+      setFieldValue('postalcode', schoolDbData.postalcode)
+      setFieldValue('school_zone', schoolDbData.school_zone)
+      setFieldValue('logourl', schoolDbData.logourl)
+      setFieldValue('school_zone', schoolDbData.school_zone)
       setFieldValue('abbreviation', schoolDbData.abbreviation)
     }
     else {
@@ -198,7 +198,7 @@ onMounted(async () => {
     <EpInput v-model="values.email" name="email" label="Email" placeholder="educacao@email.com" />
     <EpInput v-model="values.website" name="website" label="Site" placeholder="escolaeducacao.com.br" />
     <EpInput v-model="values.social_network" name="social_network" label="Rede Social" placeholder="Digite o link da rede social" />
-    <EpInput v-model="values.logourl" name="logourl" label="URL do Logo*" placeholder="Digite a URL do logo" />
+    <EpInput v-model="values.logourl" name="logourl" label="URL do Logo" placeholder="Digite a URL do logo" />
   </div>
 
   <div v-show="selectedSegment === 'location'">

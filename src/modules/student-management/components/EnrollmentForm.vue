@@ -271,34 +271,28 @@ async function loadEnrollment() {
   }
 }
 
-//* * Mask Inputs
-const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/])
-const postalCodeMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/])
-const numberAddressMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
-const cpfMask = ref([/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/])
-
 async function getEnrollmentData() {
   if (enrollmentId.value) {
     const enrollmentDbData = await enrollmentService.getById(enrollmentId.value)
     if (enrollmentDbData) {
-      schoolId.value = enrollmentDbData.school_id,
-      classroomId.value = enrollmentDbData.classroom_id,
-      seriesId.value = enrollmentDbData.series_id,
-      studentId.value = enrollmentDbData.student_id,
-      courseId.value = enrollmentDbData.course_id,
-      enrollmentCode.value = enrollmentDbData.enrollmentCode,
-      setFieldValue('date_enrollment', enrollmentDbData.date_enrollment),
-      setFieldValue('observations', enrollmentDbData.observations),
-      setFieldValue('school_id', enrollmentDbData.school_id),
-      setFieldValue('schoolId', enrollmentDbData.schoolId),
-      setFieldValue('seriesId', enrollmentDbData.seriesId),
-      setFieldValue('classroom_id', enrollmentDbData.classroom_id),
-      setFieldValue('classroomId', enrollmentDbData.classroomId),
-      setFieldValue('studentId', enrollmentDbData.studentId),
-      setFieldValue('courseId', enrollmentDbData.courseId),
-      setFieldValue('name', enrollmentDbData.name),
-      setFieldValue('status', enrollmentDbData.status),
-      setFieldValue('situation', enrollmentDbData.situation),
+      schoolId.value = enrollmentDbData.school_id
+      classroomId.value = enrollmentDbData.classroom_id
+      seriesId.value = enrollmentDbData.series_id
+      studentId.value = enrollmentDbData.student_id
+      courseId.value = enrollmentDbData.course_id
+      enrollmentCode.value = enrollmentDbData.enrollmentCode
+      setFieldValue('date_enrollment', enrollmentDbData.date_enrollment)
+      setFieldValue('observations', enrollmentDbData.observations)
+      setFieldValue('school_id', enrollmentDbData.school_id)
+      setFieldValue('schoolId', enrollmentDbData.schoolId)
+      setFieldValue('seriesId', enrollmentDbData.seriesId)
+      setFieldValue('classroom_id', enrollmentDbData.classroom_id)
+      setFieldValue('classroomId', enrollmentDbData.classroomId)
+      setFieldValue('studentId', enrollmentDbData.studentId)
+      setFieldValue('courseId', enrollmentDbData.courseId)
+      setFieldValue('name', enrollmentDbData.name)
+      setFieldValue('status', enrollmentDbData.status)
+      setFieldValue('situation', enrollmentDbData.situation)
       setFieldValue('enrollmentCode', enrollmentDbData.enrollmentCode)
 
       const student = await studentService.getById(enrollmentDbData.student_id)
@@ -332,11 +326,25 @@ watch(studentId, (newValue) => {
   }
 })
 
-function applyPhoneMask(phone: string | null): string {
-  if (!phone)
-    return ''
-  return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
-}
+// Carregamento diferido para séries, turmas e cursos
+watch(schoolId, async (newSchoolId) => {
+  if (newSchoolId) {
+    try {
+      classroomList.value = await classroomService.getBySchoolId(newSchoolId)
+      seriesList.value = await seriesService.getBySchoolId(newSchoolId)
+      courseList.value = await courseService.getBySchoolId(newSchoolId)
+    }
+    catch (error) {
+      console.error('Erro ao carregar turmas e séries para o escritório:', error)
+      showToast('Erro ao carregar dados. Tente novamente.', 'top', 'danger')
+    }
+  }
+  else {
+    classroomList.value = []
+    seriesList.value = []
+    courseList.value = []
+  }
+})
 
 onMounted(async () => {
   const defaultDate = `${currentYear}-01-01`
@@ -424,7 +432,7 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
 
-    <ion-list id="courseList">
+    <ion-list v-if="schoolId" id="courseList">
       <ion-item>
         <IonSelect
           v-model="courseId"
@@ -442,7 +450,7 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
 
-    <ion-list id="seriesList">
+    <ion-list v-if="schoolId" id="seriesList">
       <ion-item>
         <IonSelect
           v-model="seriesId"
@@ -460,7 +468,7 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
 
-    <ion-list id="classroomList">
+    <ion-list v-if="schoolId" id="classroomList">
       <ion-item>
         <IonSelect
           v-model="classroomId"
