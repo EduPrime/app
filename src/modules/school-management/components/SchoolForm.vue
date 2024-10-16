@@ -77,7 +77,7 @@ const formSchema = yup.object ({
     .required('Zona Escolar é obrigatória'),
 })
 
-const { values, errors, validate, setFieldValue } = useForm<SchoolPartial>({
+const { values, errors, validate, setFieldValue } = useForm<any>({
   validationSchema: formSchema,
 })
 

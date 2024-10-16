@@ -97,7 +97,7 @@ const formSchema = yup.object({
     .required('Aluno não selecionado ou não cadastrado'),
 })
 
-const { values, errors, validate, setFieldValue } = useForm<EnrollmentPartial>({
+const { values, errors, validate, setFieldValue } = useForm<any>({
   validationSchema: formSchema,
 })
 
@@ -284,12 +284,12 @@ async function getEnrollmentData() {
       setFieldValue('date_enrollment', enrollmentDbData.date_enrollment)
       setFieldValue('observations', enrollmentDbData.observations)
       setFieldValue('school_id', enrollmentDbData.school_id)
-      setFieldValue('schoolId', enrollmentDbData.schoolId)
-      setFieldValue('seriesId', enrollmentDbData.seriesId)
+      setFieldValue('schoolId', enrollmentDbData.school_id)
+      setFieldValue('seriesId', enrollmentDbData.series_id)
       setFieldValue('classroom_id', enrollmentDbData.classroom_id)
-      setFieldValue('classroomId', enrollmentDbData.classroomId)
-      setFieldValue('studentId', enrollmentDbData.studentId)
-      setFieldValue('courseId', enrollmentDbData.courseId)
+      setFieldValue('classroomId', enrollmentDbData.classroom_id)
+      setFieldValue('studentId', enrollmentDbData.student_id)
+      setFieldValue('courseId', enrollmentDbData.course_id)
       setFieldValue('name', enrollmentDbData.name)
       setFieldValue('status', enrollmentDbData.status)
       setFieldValue('situation', enrollmentDbData.situation)
@@ -548,7 +548,7 @@ onMounted(async () => {
       />
     </ion-item>
 
-    <EpInput v-model="values.observations" name="observations" label="Observações" type="textarea" placeholder="Digite observações sobre a matrícula" />
+    <EpInput v-model="values.observations" name="observations" label="Observações" placeholder="Digite observações sobre a matrícula" />
   </div>
 </template>
 

@@ -242,7 +242,7 @@ const formSchema = yup.object({
     .nullable(),
 })
 
-const { values, errors, validate, setFieldValue } = useForm<StudentPartial>({
+const { values, errors, validate, setFieldValue } = useForm<any>({
   validationSchema: formSchema,
 })
 

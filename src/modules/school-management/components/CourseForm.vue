@@ -89,7 +89,7 @@ const formSchema = yup.object ({
     .min(1, 'A carga horária deve ser pelo menos 1 hora'),
 })
 
-const { values, errors, validate, setFieldValue } = useForm<CoursePartial>({
+const { values, errors, validate, setFieldValue } = useForm<any>({
   validationSchema: formSchema,
 })
 

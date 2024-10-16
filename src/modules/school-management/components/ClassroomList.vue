@@ -72,12 +72,13 @@ function handleAlertDismiss(ev: CustomEvent) {
   }
 }
 
-async function deleteItem(item: any) {
+async function deleteItem(item: Tables<'classroom'>) {
   try {
     const result = await service.softDelete(item.id)
     if (result) {
-      showToast(`${tableName} excluído com sucesso`)
-      dataList.value = dataList.value.filter(i => i.id !== item.id)
+      showToast(`${item.name} excluído com sucesso`)
+      // Tipagem explícita para o item no filter
+      dataList.value = dataList.value.filter((i: Tables<'classroom'>) => i.id !== item.id)
       isAlertOpen.value = false
       itemToDelete.value = null
     }

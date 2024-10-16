@@ -90,7 +90,7 @@ const formSchema = yup.object ({
     .min(1, 'Os dias letivos devem ser pelo menos 1 dia'),
 })
 
-const { values, errors, validate, setFieldValue } = useForm<SeriesPartial>({
+const { values, errors, validate, setFieldValue } = useForm<any>({
   validationSchema: formSchema,
 })
 

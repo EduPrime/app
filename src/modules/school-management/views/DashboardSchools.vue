@@ -12,7 +12,7 @@ const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
 const schoolService = new SchoolService()
-const dataList = ref< Tables<'school'> | []>([])
+const dataList = ref<Tables<'school'>[]>([])
 const schoolData = ref<Array<{ school: Tables<'school'>, courses: Tables<'course'>[], series: Tables<'series'>[] }> | []>([])
 const schoolCount = ref(154)
 const classCount = ref(25)
@@ -25,17 +25,18 @@ const filteredDataList = computed(() => {
     return dataList.value
   }
 
-  return dataList.value.filter((classroom: any) =>
+  return dataList.value.filter((classroom: Tables<'school'>) =>
     classroom.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 
 async function loadSchools() {
   try {
-    dataList.value = await schoolService.getAll()
+    const schools = await schoolService.getAll() // getAll() pode retornar null
+    dataList.value = schools ?? [] // Se retornar null, atribuímos um array vazio
   }
   catch (error) {
-    console.error('Erro ao carregar as salas de aula:', error)
+    console.error('Erro ao carregar as escolas:', error)
   }
 }
 

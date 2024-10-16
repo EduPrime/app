@@ -12,7 +12,7 @@ const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
 const classroomService = new ClassroomService()
-const dataList = ref< Tables<'classroom'> | []>([])
+const dataList = ref<Tables<'classroom'>[]>([])
 const schoolCount = ref(154)
 const classCount = ref(25)
 const approvalRate = ref(48)
@@ -24,14 +24,15 @@ const filteredDataList = computed(() => {
     return dataList.value
   }
 
-  return dataList.value.filter((classroom: any) =>
+  return dataList.value.filter((classroom: Tables<'classroom'>) =>
     classroom.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 
 async function loadClassrooms() {
   try {
-    dataList.value = await classroomService.getAll()
+    const classrooms = await classroomService.getAll() // getAll() pode retornar null
+    dataList.value = classrooms ?? [] // Se retornar null, atribuímos um array vazio
   }
   catch (error) {
     console.error('Erro ao carregar as salas de aula:', error)

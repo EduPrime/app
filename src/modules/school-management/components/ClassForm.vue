@@ -34,9 +34,9 @@ const school = ref('')
 const classData = ref< Tables<'classroom'> | []>([])
 const selectedSegment = ref('general-info')
 const classList = ref<{ id: string, name: string }[]>([])
-const periods = ['Manhã', 'Tarde', 'Noite']
-const status = ['Ativo', 'Inativo']
-const day_of_weeks = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta']
+const period = ['Manhã', 'Tarde', 'Noite']
+const status = ['Ativo', 'Inativo', 'Graduado', 'Suspenso', 'Transferido']
+const day_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
 const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
 const seriesService = new SeriesService()
@@ -106,7 +106,7 @@ const formSchema = yup.object({
 
 })
 
-const { values, errors, validate, setFieldValue } = useForm<ClassPartial>({
+const { values, errors, validate, setFieldValue } = useForm<any>({
   validationSchema: formSchema,
 })
 
@@ -125,7 +125,6 @@ async function registerClass() {
       course_id: courseId.value,
       series_id: seriesId.value,
       teacher_id: teacherId.value,
-      nameClass: values.nameClass,
       abbreviation: values.abbreviation,
       year: values.year,
       status: values.status,
@@ -228,7 +227,6 @@ async function getClassData() {
       setFieldValue('courseId', classDbData.courseId)
       setFieldValue('seriesId', classDbData.seriesId)
       setFieldValue('teacherId', classDbData.teacherId)
-      setFieldValue('nameClass', classDbData.nameClass)
       setFieldValue('abbreviation', classDbData.abbreviation)
       setFieldValue('year', classDbData.year)
       setFieldValue('status', classDbData.status)
@@ -250,10 +248,10 @@ async function getClassData() {
 watch(schoolId, async (newSchoolId) => {
   if (newSchoolId) {
     try {
+      courseList.value = await courseService.getBySchoolId(newSchoolId)
+      seriesList.value = await seriesService.getBySchoolId(newSchoolId)
       teacherList.value = await teacherService.getBySchoolId(newSchoolId)
       classroomList.value = await classroomService.getBySchoolId(newSchoolId)
-      seriesList.value = await seriesService.getBySchoolId(newSchoolId)
-      courseList.value = await courseService.getBySchoolId(newSchoolId)
     }
     catch (error) {
       console.error('Erro ao carregar turmas e séries para o escritório:', error)
@@ -261,10 +259,10 @@ watch(schoolId, async (newSchoolId) => {
     }
   }
   else {
-    teacherList.value = []
-    classroomList.value = []
-    seriesList.value = []
     courseList.value = []
+    seriesList.value = []
+    classroomList.value = []
+    teacherList.value = []
   }
 })
 
@@ -421,7 +419,7 @@ onMounted(async () => {
           placeholder="Selecione os dias da semana"
           @ion-change="(e) => setFieldValue('day_of_week', e.target.value)"
         >
-          <IonSelectOption v-for="day_of_week in day_of_weeks" :key="day_of_week" :value="day_of_week">
+          <IonSelectOption v-for="day_of_week in day_of_week" :key="day_of_week" :value="day_of_week">
             {{ day_of_week }}
           </IonSelectOption>
         </IonSelect>
@@ -436,7 +434,7 @@ onMounted(async () => {
           placeholder="Selecione o turno"
           @ion-change="(e) => setFieldValue('period', e.target.value)"
         >
-          <IonSelectOption v-for="period in periods" :key="period" :value="period">
+          <IonSelectOption v-for="period in period" :key="period" :value="period">
             {{ period }}
           </IonSelectOption>
         </IonSelect>
