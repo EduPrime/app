@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import type { Tables } from '@/types/database.types'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import SeriesList from '@/modules/school-management/components/SeriesList.vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Database, Enums, Tables } from '@/types/database.types'
 import SeriesService from '../services/SeriesService'
 
 const router = useRouter()
@@ -25,14 +25,15 @@ const filteredDataList = computed(() => {
   }
 
   return dataList.value.filter((series: any) =>
-    series.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+    series.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 
 async function loadSeries() {
   try {
     dataList.value = await seriesService.getAll()
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar as séries:', error)
   }
 }
@@ -67,7 +68,7 @@ onMounted(() => {
         </ion-button>
       </ion-col>
     </ion-row>
-    <SeriesList :dataList="filteredDataList" />
+    <SeriesList :data-list="filteredDataList" />
   </ContentLayout>
 </template>
 

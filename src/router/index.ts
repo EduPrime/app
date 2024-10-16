@@ -1,7 +1,7 @@
+import type { CustomRouteRecordRaw } from '@/router/RouterType'
 import { useUserStore } from '@/store/user'
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { home } from 'ionicons/icons'
-import type { CustomRouteRecordRaw } from '@/router/RouterType'
 
 // Função para carregar dinamicamente todas as rotas dos módulos
 const moduleRoutes: Record<string, any> = import.meta.glob('../modules/**/routes.ts', { eager: true })

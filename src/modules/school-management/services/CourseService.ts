@@ -8,7 +8,4 @@ export default class CourseService extends BaseService<CourseTable> {
   constructor() {
     super(table) // Passando o nome da tabela para a classe base
   }
-
-
-
 }

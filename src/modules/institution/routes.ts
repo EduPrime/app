@@ -1,6 +1,6 @@
+import type { CustomRouteRecordRaw } from '@/router/RouterType'
 // src/modules/institution/routes.ts
 import { business, layers } from 'ionicons/icons'
-import type { CustomRouteRecordRaw } from '@/router/RouterType'
 import AcademicYear from './views/AcademicYear.vue'
 import DashboardInstitution from './views/DashboardInstitution.vue'
 import RegisterAcademicTemplate from './views/RegisterAcademicTemplate.vue'

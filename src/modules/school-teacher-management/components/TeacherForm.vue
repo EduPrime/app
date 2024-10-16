@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Tables } from '@/types/database.types'
 import EpInput from '@/components/EpInput.vue'
 import EpTextarea from '@/components/EpTextarea.vue'
 import { isValidDDD } from '@/utils/ddd-validator'
@@ -9,7 +10,6 @@ import { useForm } from 'vee-validate'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { date, object, string } from 'yup'
-import type { Tables } from '@/types/database.types'
 import SchoolService from '../services/SchoolService'
 
 import TeacherService from '../services/TeacherService'

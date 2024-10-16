@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import ContentLayout from '@/components/theme/ContentLayout.vue'
 import * as echarts from 'echarts'
 import { nextTick, onMounted, ref } from 'vue'
-import ContentLayout from '@/components/theme/ContentLayout.vue'
 
 const chartsInitialized = ref(false)
 

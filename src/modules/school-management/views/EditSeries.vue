@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Database, Tables } from '@/types/database.types'
 import SeriesForm from '../../school-management/components/SeriesForm.vue'
 
 const seriesFormRef = ref<InstanceType<typeof SeriesForm> | null>(null)

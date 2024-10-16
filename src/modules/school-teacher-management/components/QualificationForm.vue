@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
-import { IonAccordion, IonAccordionGroup, IonFab, IonFabButton, IonIcon, IonInput, IonItem, IonLabel, IonList } from '@ionic/vue'
+import { IonAccordion, IonAccordionGroup, IonIcon, IonInput, IonItem, IonLabel, IonList } from '@ionic/vue'
 import { add } from 'ionicons/icons'
+import { ref, watch } from 'vue'
 
 const props = defineProps<{
   modelValue: { institution: string, course: string, start: string | number | undefined, end: string | number | undefined }[]

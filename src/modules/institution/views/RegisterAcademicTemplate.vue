@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import type { Tables } from '@/types/database.types'
+import { debounce } from '@/utils/debounce'
+import showToast from '@/utils/toast-alert'
 import { IonAccordion, IonAccordionGroup, IonBackButton, IonButton, IonCol, IonGrid, IonInput, IonItem, IonLabel, IonList, IonRow } from '@ionic/vue'
+
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import AcademicTemplateService from '../services/AcademicTemplateService'
-
-import showToast from '@/utils/toast-alert'
-import { debounce } from '@/utils/debounce'
-import type { Tables } from '@/types/database.types'
 
 const router = useRouter()
 const academicTemplateService = new AcademicTemplateService()

@@ -79,20 +79,14 @@ const formSchema = yup.object({
     .nullable(),
   enrollmentCode: yup.string()
     .nullable(),
-  schoolId: yup.string()
-    .required('Escola é obrigatória'),
   classroomId: yup.string()
     .required('Turma é obrigatória'),
-  seriesId: yup.string()
-    .required('Série é obrigatória'),
   // status: yup.string()
   // .required('Status é obrigatório'),
   situation: yup.string()
     .required('Situação é obrigatória'),
   // studentId: yup.string()
   //   .required('Aluno é obrigatória'),
-  courseId: yup.string()
-    .required('Curso é obrigatório'),
   name: yup.string()
     .required('Aluno não selecionado ou não cadastrado'),
 })
@@ -203,11 +197,7 @@ async function loadStudents() {
     ])
 
     const enrolledStudentIds = enrollments.map(enrollment => enrollment.student_id)
-
-    studentList.value = students.map(student => ({
-      ...student,
-      enrolled: enrolledStudentIds.includes(student.id),
-    }))
+    studentList.value = students.filter(student => !enrolledStudentIds.includes(student.id))
     filteredStudents.value = studentList.value // Inicialmente, todos os alunos estão filtrados
   }
   catch (error) {
@@ -227,7 +217,6 @@ const filteredStudents = computed(() => {
 
 function selectStudent(student) {
   studentId.value = student.id
-
   if (!enrollmentId.value) { // Somente limpa o código de matrícula se for uma nova matrícula
     enrollmentCode.value = '' // Limpa o código de matrícula
     // generateCodeEnrollment()  // Gera um novo código de matrícula
@@ -304,7 +293,7 @@ async function getEnrollmentData() {
       const student = await studentService.getById(enrollmentDbData.student_id)
       if (student) {
         setFieldValue('name', student.name)
-        searchQuery.value = ''
+        searchQuery.value = student.name
       }
     }
     else {
@@ -382,12 +371,9 @@ onMounted(async () => {
           v-for="student in filteredStudents"
           :key="student.id"
           class="list-item"
-          :class="{ 'enrolled-item': student.enrolled }"
-          :title="student.enrolled ? 'Aluno já matriculado' : ''"
-          @click="!student.enrolled && selectStudent(student)"
+          @click="selectStudent(student)"
         >
           {{ student.name }}
-          <span v-if="student.enrolled" class="enrolled-label">(Já matriculado)</span>
         </li>
       </ul>
     </div>
@@ -405,60 +391,6 @@ onMounted(async () => {
         class="readonly-input"
       />
     </ion-item>
-
-    <ion-list id="schoolList">
-      <ion-item>
-        <IonSelect
-          v-model="schoolId"
-          justify="space-between"
-          label="Escola*"
-          placeholder="Selecione a escola"
-          @ion-change="(e) => {
-            setFieldValue('schoolId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
-            {{ school.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
-    </ion-list>
-
-    <ion-list id="courseList">
-      <ion-item>
-        <IonSelect
-          v-model="courseId"
-          justify="space-between"
-          label="Curso*"
-          placeholder="Selecione o curso"
-          @ion-change="(e) => {
-            setFieldValue('courseId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
-            {{ course.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
-    </ion-list>
-
-    <ion-list id="seriesList">
-      <ion-item>
-        <IonSelect
-          v-model="seriesId"
-          justify="space-between"
-          label="Série*"
-          placeholder="Selecione a série"
-          @ion-change="(e) => {
-            setFieldValue('seriesId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
-            {{ series.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
-    </ion-list>
 
     <ion-list id="classroomList">
       <ion-item>
@@ -481,50 +413,13 @@ onMounted(async () => {
     <EpInput
       v-model="values.date_enrollment"
       name="date_enrollment"
-      label="Data da Matrícula*"
+      label="Data da Enturmação*"
       type="date"
       :max="maxDate"
       :min="minDate"
-      placeholder="Digite a data de matrícula"
+      placeholder="Digite a data de enturmação"
       @change="enforceYear"
     />
-
-    <!-- <ion-list id="status">
-      <ion-item>
-        <IonSelect
-        v-model="values.status"
-        justify="space-between"
-        label="Status da Matrícula*"
-        placeholder="Selecione o status"
-        @ionChange="(e) => {
-          setFieldValue('status', e.detail.value)
-        }"
-
-            >
-            <IonSelectOption v-for="status in status" :key="status" :value="status">
-              {{ status }}
-            </IonSelectOption>
-          </IonSelect>
-        </ion-item>
-      </ion-list> -->
-
-    <ion-list id="situation">
-      <ion-item>
-        <IonSelect
-          v-model="values.situation"
-          justify="space-between"
-          label="Situação da Matrícula*"
-          placeholder="Selecione a situação"
-          @ion-change="(e) => {
-            setFieldValue('situation', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="situation in situation" :key="situation" :value="situation">
-            {{ situation }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
-    </ion-list>
 
     <ion-item>
       <IonLabel position="stacked" color="medium">
@@ -534,8 +429,8 @@ onMounted(async () => {
         v-model="enrollmentCode"
         type="text"
         placeholder="Código gerado após finalizar a matrícula"
-        :disabled="true"
         readonly
+        :disabled="true"
         class="readonly-input"
       />
     </ion-item>
@@ -587,18 +482,5 @@ ion-searchbar {
 /* Remove a borda do último item */
 .list-item:last-child {
   border-bottom: none;
-}
-
-/* Estilo para os alunos matriculados */
-.enrolled-item {
-  background-color: #e0e0e0; /* Cor de fundo diferente */
-  color: #757575; /* Cor de texto desabilitada */
-  cursor: not-allowed; /* Cursor de n�o permitido */
-}
-
-.enrolled-label {
-  font-size: 0.85rem;
-  color: red; /* Texto em vermelho para indicar a matr�cula */
-  margin-left: 8px;
 }
 </style>

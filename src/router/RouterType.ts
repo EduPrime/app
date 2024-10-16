@@ -1,4 +1,4 @@
-import type {RouteRecordNormalized, RouteRecordRaw} from 'vue-router'
+import type { RouteRecordNormalized, RouteRecordRaw } from 'vue-router'
 
 interface CustomRouteMeta {
   requiresAuth?: boolean

@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import SchoolForm from '../../school-management/components/SchoolForm.vue'
+import CourseForm from '../../school-management/components/CourseForm.vue'
 
-const schoolFormRef = ref<InstanceType<typeof SchoolForm> | null>(null)
+const courseFormRef = ref<InstanceType<typeof CourseForm> | null>(null)
 const router = useRouter()
 function handleCancel() {
-  router.push({ name: 'InstitutionListInstitutions' })
+  router.push({ name: 'CourseListCourse' })
 }
 
 function handleSave() {
-  schoolFormRef.value?.registerSchool()
+  courseFormRef.value?.registerCourse()
 }
 </script>
 
@@ -24,8 +24,8 @@ function handleSave() {
     <template #description>
       Todos os campos são obrigatórios, a menos que indicado de outra forma.
     </template>
-    <div id="school-form">
-      <SchoolForm ref="schoolFormRef" @cancel="handleCancel" @save="handleSave" />
+    <div id="course-form">
+      <CourseForm ref="courseFormRef" @cancel="handleCancel" @save="handleSave" />
     </div>
 
     <template #footer>

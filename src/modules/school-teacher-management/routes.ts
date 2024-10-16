@@ -1,5 +1,5 @@
-import { calendar, chatbubbles, create, document, list, person, school, star } from 'ionicons/icons'
 import type { CustomRouteRecordRaw } from '@/router/RouterType'
+import { calendar, chatbubbles, create, document, list, person, school, star } from 'ionicons/icons'
 import EditTeacher from './views/EditTeacher.vue'
 import ManageTeachers from './views/ManageTeachers.vue'
 import RegisterTeacher from './views/RegisterTeacher.vue'

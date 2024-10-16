@@ -1,7 +1,7 @@
 import type { App } from 'vue'
-import RegisterInstitution from './views/RegisterInstitution.vue'
-import InstitutionService from './services/InstitutionService'
 import routes from './routes'
+import InstitutionService from './services/InstitutionService'
+import RegisterInstitution from './views/RegisterInstitution.vue'
 
 export default {
   install(app: App) {

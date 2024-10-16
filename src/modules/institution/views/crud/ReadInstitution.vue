@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import type { Tables } from '@/types/database.types'
 import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon } from '@ionic/vue'
 import { pencil } from 'ionicons/icons'
-import type { Tables } from '@/types/database.types'
+import { computed, ref } from 'vue'
 
 const props = defineProps<{
   institution: Tables<'institution'> | undefined
@@ -26,7 +26,7 @@ function editBtn() {
         <IonCardTitle>{{ institution?.name }}</IonCardTitle>
         <IonButtons>
           <IonButton fill="clear" @click="editBtn">
-              <IonIcon slot="icon-only" :icon="pencil" />
+            <IonIcon slot="icon-only" :icon="pencil" />
           </IonButton>
         </IonButtons>
       </div>

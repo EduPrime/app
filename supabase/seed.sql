@@ -82,7 +82,7 @@ VALUES
         'Cidade Beta',
         'RJ',
         '98765-432',
-        'Zona 2', -- Exemplo de valor para school_zone
+        'Urbana', -- Exemplo de valor para school_zone
         '(21) 2345-6789',
         'contato@colegiobeta.edu.br', -- Exemplo de e-mail
         'http://colegiobeta.edu.br', -- Exemplo de website

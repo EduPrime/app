@@ -1,29 +1,28 @@
 <script setup lang="ts">
-import showToast from '@/utils/toast-alert'
-import { onMounted, ref, watch } from 'vue'
-import { IonAlert } from '@ionic/vue'
-import { pencil, trash } from 'ionicons/icons'
-import { useRouter } from 'vue-router'
 import type { Tables } from '@/types/database.types'
+import { IonAlert } from '@ionic/vue'
+import { pencil, swapHorizontal } from 'ionicons/icons'
+import { onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import EnrollmentService from '../services/EnrollmentService'
+
+const props = defineProps<{
+  dataList: Tables<'enrollment'>
+}>()
 
 // Instanciando o serviço da tabela
 const service = new EnrollmentService()
 
 const enrollment = ref< Tables<'enrollment'> | []>([])
 const dataList = ref()
-const props = defineProps<{
-  dataList: Tables<'enrollment'>
-}>()
-
 watch(
   () => props.dataList,
   (newValue) => {
-    dataList.value = newValue;
-    console.log('dataList foi atualizado:', { dataList });
+    dataList.value = newValue
+    console.log('dataList foi atualizado:', { dataList })
   },
-  { immediate: true }
-);
+  { immediate: true },
+)
 // Nome da tabela e campos
 const tableName = 'enrollment'
 const fieldLabels = {
@@ -49,7 +48,8 @@ const router = useRouter()
 onMounted(async () => {
   try {
     dataList.value = await service.getAll()
-  } catch (error) {
+  }
+  catch (error) {
     console.error(`Erro ao buscar dados de ${tableName}:`, error)
   }
 })
@@ -68,40 +68,67 @@ function editItem(item: any) {
   router.push({ name: `EnrollmentEdit`, params: { id: item.id.toString() } })
 }
 
-const isAlertOpen = ref(false)
-const itemToDelete = ref<any | null>(null)
-
-function openDeleteAlert(item: any) {
-  itemToDelete.value = item
-  isAlertOpen.value = true
+// Função para mover o aluno
+function moveStudent(item: any) {
+  // Exemplo de navegação para a página de troca de sala
+  router.push({ name: `StudentMove`, params: { id: item.id.toString() } })
 }
 
-function handleAlertDismiss(ev: CustomEvent) {
+// const isAlertOpen = ref(false)
+// const itemToDelete = ref<any | null>(null)
+
+// function openDeleteAlert(item: any) {
+//   itemToDelete.value = item
+//   isAlertOpen.value = true
+// }
+
+// function handleAlertDismiss(ev: CustomEvent) {
+//   const role = ev.detail.role
+//   if (role === 'confirm' && itemToDelete.value) {
+//     deleteItem(itemToDelete.value)
+//   } else {
+//     handleCancel()
+//   }
+// }
+
+// async function deleteItem(item: any) {
+//   try {
+//    const result =  await service.softDelete(item.id)
+//    if (result) {
+//     showToast(`${item.name} excluído com sucesso`)
+//     dataList.value = dataList.value.filter(i => i.id !== item.id)
+//     isAlertOpen.value = false
+//     itemToDelete.value = null
+//    }
+//   } catch (error) {
+//     console.error('Erro ao excluir o item:', error)
+//   }
+// }
+
+// function handleCancel() {
+//   isAlertOpen.value = false
+//   itemToDelete.value = null
+// }
+
+const isFitInAlertOpen = ref(false)
+const studentToMove = ref<any | null>(null)
+
+function openFitInAlert(item: any) {
+  studentToMove.value = item
+  isFitInAlertOpen.value = true
+}
+
+function handleFitInDismiss(ev: CustomEvent) {
   const role = ev.detail.role
-  if (role === 'confirm' && itemToDelete.value) {
-    deleteItem(itemToDelete.value)
-  } else {
-    handleCancel()
+  if (role === 'confirm' && studentToMove.value) {
+    moveStudent(studentToMove.value)
   }
+  handleCancelFitIn()
 }
 
-async function deleteItem(item: any) {
-  try {
-   const result =  await service.softDelete(item.id)
-   if (result) {
-    showToast(`${item.name} excluído com sucesso`)
-    dataList.value = dataList.value.filter(i => i.id !== item.id)
-    isAlertOpen.value = false
-    itemToDelete.value = null
-   }
-  } catch (error) {
-    console.error('Erro ao excluir o item:', error)
-  }
-}
-
-function handleCancel() {
-  isAlertOpen.value = false
-  itemToDelete.value = null
+function handleCancelFitIn() {
+  isFitInAlertOpen.value = false
+  studentToMove.value = null
 }
 
 const alertButtons = [
@@ -110,7 +137,7 @@ const alertButtons = [
     role: 'cancel',
   },
   {
-    text: 'Excluir',
+    text: 'Enturmar',
     role: 'confirm',
   },
 ]
@@ -118,11 +145,11 @@ const alertButtons = [
 
 <template>
   <IonAlert
-    :is-open="isAlertOpen"
-    header="Confirmar Exclusão"
-    message="Tem certeza de que deseja excluir este item?"
+    :is-open="isFitInAlertOpen"
+    header="Confirmar Enturmação"
+    message="Tem certeza de que deseja enturmar este aluno?"
     :buttons="alertButtons"
-    @did-dismiss="handleAlertDismiss"
+    @did-dismiss="handleFitInDismiss"
   />
   <ion-list>
     <ion-item-sliding v-for="(item, index) in dataList" :key="index">
@@ -135,18 +162,24 @@ const alertButtons = [
           <ion-button @click.stop="editItem(item)">
             <ion-icon id="present-alert" slot="icon-only" :icon="pencil" />
           </ion-button>
-          <ion-button color="danger" @click.stop="openDeleteAlert(item)">
-            <ion-icon slot="icon-only" :icon="trash" />
+          <ion-button color="tertiary" @click.stop="openFitInAlert(item)">
+            <ion-icon slot="icon-only" :icon="swapHorizontal" />
           </ion-button>
+          <!-- <ion-button color="danger" @click.stop="openDeleteAlert(item)">
+            <ion-icon slot="icon-only" :icon="trash" />
+          </ion-button> -->
         </ion-buttons>
       </ion-item>
       <ion-item-options side="end">
         <ion-item-option @click="editItem(item)">
           Editar
         </ion-item-option>
-        <ion-item-option color="danger" @click="openDeleteAlert(item)">
-          Excluir
+        <ion-item-option color="tertiary" @click="openFitInAlert(item)">
+          Enturmar
         </ion-item-option>
+        <!-- <ion-item-option color="danger" @click="openDeleteAlert(item)">
+          Excluir
+        </ion-item-option> -->
       </ion-item-options>
       <ion-item v-if="item.showDetails">
         <ion-grid>

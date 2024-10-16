@@ -1,7 +1,7 @@
 import type { App } from 'vue'
-import RegisterTeacher from './views/RegisterTeacher.vue'
-import TeacherService from './services/TeacherService'
 import routes from './routes'
+import TeacherService from './services/TeacherService'
+import RegisterTeacher from './views/RegisterTeacher.vue'
 
 export default {
   install(app: App) {
