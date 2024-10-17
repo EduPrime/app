@@ -242,18 +242,18 @@ export interface Database {
           created_at: string
           day_of_week: Database['public']['Enums']['day_of_week']
           deleted_at: string | null
-          endTime: string
-          endTimeInterval: string
+          endtime: string
+          endtimeinterval: string
           id: string
           institution_id: string
-          maxStudents: number
+          maxstudents: number
           metadata: Json | null
           name: string
           period: Database['public']['Enums']['period']
           school_id: string
           series_id: string
-          startTime: string
-          startTimeInterval: string
+          starttime: string
+          starttimeinterval: string
           status: Database['public']['Enums']['status']
           teacher_id: string
           updated_at: string | null
@@ -266,18 +266,18 @@ export interface Database {
           created_at?: string
           day_of_week: Database['public']['Enums']['day_of_week']
           deleted_at?: string | null
-          endTime: string
-          endTimeInterval: string
+          endtime: string
+          endtimeinterval: string
           id?: string
           institution_id: string
-          maxStudents: number
+          maxstudents: number
           metadata?: Json | null
           name: string
           period?: Database['public']['Enums']['period']
           school_id: string
           series_id: string
-          startTime: string
-          startTimeInterval: string
+          starttime: string
+          starttimeinterval: string
           status?: Database['public']['Enums']['status']
           teacher_id: string
           updated_at?: string | null
@@ -290,18 +290,18 @@ export interface Database {
           created_at?: string
           day_of_week?: Database['public']['Enums']['day_of_week']
           deleted_at?: string | null
-          endTime?: string
-          endTimeInterval?: string
+          endtime?: string
+          endtimeinterval?: string
           id?: string
           institution_id?: string
-          maxStudents?: number
+          maxstudents?: number
           metadata?: Json | null
           name?: string
           period?: Database['public']['Enums']['period']
           school_id?: string
           series_id?: string
-          startTime?: string
-          startTimeInterval?: string
+          starttime?: string
+          starttimeinterval?: string
           status?: Database['public']['Enums']['status']
           teacher_id?: string
           updated_at?: string | null
@@ -1048,6 +1048,7 @@ export interface Database {
           metadata: Json | null
           name: string
           school_days: string
+          school_id: string
           timetable_id: string | null
           updated_at: string | null
           user_created: string | null
@@ -1064,6 +1065,7 @@ export interface Database {
           metadata?: Json | null
           name: string
           school_days: string
+          school_id: string
           timetable_id?: string | null
           updated_at?: string | null
           user_created?: string | null

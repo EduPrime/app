@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router'
 import StudentService from '../services/StudentService'
 
 const props = defineProps<{
-  dataList: Tables<'student'>
+  dataList: Tables<'student'>[]
 }>()
 
 // Instanciando o serviço da tabela
@@ -71,12 +71,13 @@ function handleAlertDismiss(ev: CustomEvent) {
   }
 }
 
-async function deleteItem(item: any) {
+async function deleteItem(item: Tables<'student'>) {
   try {
     const result = await service.softDelete(item.id)
     if (result) {
       showToast(`${item.name} excluído com sucesso`)
-      dataList.value = dataList.value.filter(i => i.id !== item.id)
+      // Tipagem explícita para o item no filter
+      dataList.value = dataList.value.filter((i: Tables<'student'>) => i.id !== item.id)
       isAlertOpen.value = false
       itemToDelete.value = null
     }

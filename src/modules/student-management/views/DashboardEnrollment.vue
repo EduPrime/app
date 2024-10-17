@@ -12,7 +12,7 @@ const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
 const enrollmentService = new EnrollmentService()
-const dataList = ref< Tables<'enrollment'> | []>([])
+const dataList = ref<Tables<'enrollment'>[]>([])
 const schoolCount = ref(154)
 const classCount = ref(25)
 const approvalRate = ref(48)
@@ -24,17 +24,18 @@ const filteredDataList = computed(() => {
     return dataList.value
   }
 
-  return dataList.value.filter((enrollment: any) =>
-    enrollment.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  return dataList.value.filter((enrollment: Tables<'enrollment'>) =>
+    enrollment.name && enrollment.name.toLowerCase().includes(searchQuery.value.toLowerCase()), // Verifica se enrollment.name existe antes de usar toLowerCase()
   )
 })
 
 async function loadEnrollment() {
   try {
-    dataList.value = await enrollmentService.getAll()
+    const enrollments = await enrollmentService.getAll() // getAll() pode retornar null
+    dataList.value = enrollments ?? [] // Se for null, atribuímos um array vazio
   }
   catch (error) {
-    console.error('Erro ao carregar os alunos:', error)
+    console.error('Erro ao carregar as matrículas:', error)
   }
 }
 

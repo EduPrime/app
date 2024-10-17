@@ -3,7 +3,7 @@ import DashboardEnrollment from './views/DashboardEnrollment.vue'
 import DashboardStudent from './views/DashboardStudent.vue'
 import EditEnrollment from './views/EditEnrollment.vue'
 import EditStudent from './views/EditStudent.vue'
-import MoveStudent from './views/MoveStudent.vue'
+/* import MoveStudent from './views/MoveStudent.vue' */
 import RegisterEnrollment from './views/RegisterEnrollment.vue'
 import RegisterStudent from './views/RegisterStudent.vue'
 
@@ -82,7 +82,7 @@ const routes = [
       requiredRole: ['public', 'admin'],
     },
   },
-  {
+/*   {
     path: '/student/enrollment/move/:id',
     name: 'StudentMove',
     component: MoveStudent,
@@ -93,7 +93,7 @@ const routes = [
       order: 5,
       requiredRole: ['public', 'admin'],
     },
-  },
+  }, */
 ]
 
 export default routes

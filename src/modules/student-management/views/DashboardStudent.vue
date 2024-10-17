@@ -12,7 +12,7 @@ const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
 const studentService = new StudentService()
-const dataList = ref< Tables<'student'> | []>([])
+const dataList = ref<Tables<'student'>[]>([])
 const schoolCount = ref(154)
 const classCount = ref(25)
 const approvalRate = ref(48)
@@ -24,14 +24,15 @@ const filteredDataList = computed(() => {
     return dataList.value
   }
 
-  return dataList.value.filter((student: any) =>
+  return dataList.value.filter((student: Tables<'student'>) =>
     student.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 
 async function loadStudent() {
   try {
-    dataList.value = await studentService.getAll()
+    const students = await studentService.getAll() // getAll() pode retornar null
+    dataList.value = students ?? [] // Se students for null, atribuímos um array vazio
   }
   catch (error) {
     console.error('Erro ao carregar os alunos:', error)

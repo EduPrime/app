@@ -16,12 +16,34 @@ const schools = ref<Tables<'school'>[] | null>(null)
 const selectedSchoolId = ref<string | null>(null)
 const templates = ref<Tables<'academic_year_template'>[] | null>(null)
 const selectedTemplate = ref<string | null>(null)
-const templateDetails = ref<Tables<'academic_year_template'> | null>(null)
+interface Stage {
+  stageNumber: number
+  startDate: string
+  endDate: string
+  teachingDays: number
+}
+
+interface AcademicYearTemplate {
+  id: string
+  name: string
+  ref_year: number
+  stages: Stage[]
+}
+
+const templateDetails = ref<AcademicYearTemplate | null>(null)
 
 // Função para carregar detalhes do template selecionado
 async function loadTemplateDetails() {
-  if (selectedTemplate.value) {
-    const foundTemplate: any = selectedTemplate.value ? templates.value?.find(template => template.id === selectedTemplate.value) || null : null
+  if (selectedTemplate.value && templates.value) {
+    // Passo 1: Criar uma refer�ncia tempor�ria � lista de templates
+    const templatesList = templates.value as Array<any>
+
+    // Passo 2: Fazer a busca no array de templates
+    const foundTemplate = templatesList.find((template) => {
+      return template.id === selectedTemplate.value
+    })
+
+    // Passo 3: Atribuir o template encontrado a templateDetails
     templateDetails.value = foundTemplate || null
   }
   else {
