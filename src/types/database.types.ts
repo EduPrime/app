@@ -345,6 +345,7 @@ export interface Database {
             referencedColumns: ['id']
           },
         ]
+        
       }
       course: {
         Row: {
