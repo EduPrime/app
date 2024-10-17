@@ -24,7 +24,7 @@ const filteredDataList = computed(() => {
     return dataList.value
   }
 
-  return dataList.value.filter((classroom: Tables<'classroom'>) =>
+  return dataList.value.filter((classroom: any) =>
     classroom.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
