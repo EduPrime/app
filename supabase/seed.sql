@@ -25,6 +25,7 @@ VALUES
     );
 
 -- Inserção de Escolas
+-- Inserção de Escolas
 INSERT INTO
     school (
         id,
@@ -194,7 +195,6 @@ VALUES
         NOW()
     );
 
--- Inserção de Professores
 -- Inserção de Professores com novos campos
 INSERT INTO teacher (
     id, 
@@ -780,7 +780,6 @@ VALUES
     );
 
 
--- Inserção de Horários de Escola
 -- Inserção de Horários de Escola
 INSERT INTO
     timetable_school (timetable_id, school_id, created_at)
