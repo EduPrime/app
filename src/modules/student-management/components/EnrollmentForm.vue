@@ -314,7 +314,7 @@ async function getEnrollmentData() {
 // Gera um código de matrícula único
 async function generateCodeEnrollment() {
   if (!studentId.value) {
-    alert('Por favor, selecione o nome do aluno.')
+    alert('Por favor, selecione o nome do aluno..')
     return
   }
 
