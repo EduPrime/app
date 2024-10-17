@@ -156,7 +156,7 @@ async function loadCourse() {
     console.log('Chegou', institutions, series, courses)
 
     // Função auxiliar para mapear os dados
-    const mapData = (data, targetList) => {
+    const mapData = (data: any[], targetList: any) => {
       if (data) {
         targetList.value = data.map(item => ({
           id: item.id,
@@ -168,9 +168,15 @@ async function loadCourse() {
       }
     }
 
-    mapData(institutions, institutionList)
-    mapData(series, seriesList)
-    mapData(courses, courseList)
+    if (institutions) {
+      mapData(institutions, institutionList)
+    }
+    if (series) {
+      mapData(series, seriesList)
+    }
+    if (courses) {
+      mapData(courses, courseList)
+    }
   }
   catch (error) {
     console.error('Erro ao carregar dados:', error)
@@ -180,16 +186,16 @@ async function getCourseData() {
   if (courseId.value) {
     const courseDbData = await courseService.getById(courseId.value)
     if (courseDbData) {
-      institutionId.value = courseDbData.institution_id
-      courseId.value = courseDbData.course_id
-      setFieldValue('institutionId', courseDbData.institutionId)
-      setFieldValue('schoolId', courseDbData.schoolId)
-      setFieldValue('courseId', courseDbData.courseId)
+      institutionId.value = courseDbData.institution_id ?? ''
+      /*  courseId.value = courseDbData.course_id */
+      setFieldValue('institutionId', courseDbData.institution_id)
+      /* setFieldValue('schoolId', courseDbData.school_id) */
+      /* setFieldValue('courseId', courseDbData.courseId) */
       setFieldValue('institution', courseDbData.institution_id)
-      setFieldValue('course', courseDbData.course_id)
+      /*       setFieldValue('course', courseDbData.course_id) */
       setFieldValue('name', courseDbData.name)
       setFieldValue('course_stage', courseDbData.course_stage)
-      setFieldValue('graduate', courseDbData.graduate)
+      /* setFieldValue('graduate', courseDbData.graduate) */
       setFieldValue('workload', courseDbData.workload)
       setFieldValue('teaching_type', courseDbData.teaching_type)
       setFieldValue('regime_type', courseDbData.regime_type)
@@ -202,7 +208,7 @@ async function getCourseData() {
 }
 
 onMounted(async () => {
-  schoolId.value = (await schoolService.getAll())?.at(0)?.id
+/*   schoolId.value = (await schoolService.getAll())?.at(0)?.id */
   await loadCourse()
   if (courseId.value) {
     await getCourseData()

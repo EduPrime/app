@@ -202,9 +202,9 @@ async function loadStudents() {
       enrollmentService.getAll(),
     ])
 
-    const enrolledStudentIds = enrollments.map(enrollment => enrollment.student_id)
+    const enrolledStudentIds = enrollments ? enrollments.map(enrollment => enrollment.student_id) : []
 
-    studentList.value = students.map(student => ({
+    studentList.value = (students ?? []).map(student => ({
       ...student,
       enrolled: enrolledStudentIds.includes(student.id),
     }))
@@ -215,17 +215,21 @@ async function loadStudents() {
   }
 }
 
-const filteredStudents = computed(() => {
-  const query = searchQuery.value.toLowerCase()
+const filteredStudents = ref<{ id: string, name: string, enrolled: boolean }[]>([])
+
+watch(searchQuery, (newQuery) => {
+  const query = newQuery.toLowerCase()
   if (query.length >= 3) {
-    return studentList.value.filter(student =>
+    filteredStudents.value = studentList.value.filter((student: any) =>
       student.name.toLowerCase().includes(query),
     ).slice(0, 5) // Limita a 5 resultados
   }
-  return [] // Se a consulta estiver vazia, limpa a lista filtrada
+  else {
+    filteredStudents.value = [] // Se a consulta estiver vazia, limpa a lista filtrada
+  }
 })
 
-function selectStudent(student) {
+function selectStudent(student: any) {
   studentId.value = student.id
 
   if (!enrollmentId.value) { // Somente limpa o código de matrícula se for uma nova matrícula
@@ -234,12 +238,12 @@ function selectStudent(student) {
   }
   searchQuery.value = ''
   setFieldValue('name', student.name)
-  filteredStudents.value = []
+  searchQuery.value = ''
 }
 
 async function loadEnrollment() {
   try {
-    const [schools, classrooms, students, series, courses, enrollments] = await Promise.all([
+    const [schools, classrooms, students, series, courses] = await Promise.all([
       schoolService.getAll(),
       classroomService.getAll(),
       studentService.getAll(),
@@ -250,9 +254,9 @@ async function loadEnrollment() {
     console.log('Chegou', students)
 
     // Função auxiliar para mapear os dados
-    const mapData = (data, targetList) => {
+    const mapData = (data: any, targetList: any) => {
       if (data) {
-        targetList.value = data.map(item => ({
+        targetList.value = data.map((item: any) => ({
           id: item.id,
           name: item.name,
         }))
@@ -280,7 +284,7 @@ async function getEnrollmentData() {
       seriesId.value = enrollmentDbData.series_id
       studentId.value = enrollmentDbData.student_id
       courseId.value = enrollmentDbData.course_id
-      enrollmentCode.value = enrollmentDbData.enrollmentCode
+      enrollmentCode.value = enrollmentDbData.enrollmentCode ?? ''
       setFieldValue('date_enrollment', enrollmentDbData.date_enrollment)
       setFieldValue('observations', enrollmentDbData.observations)
       setFieldValue('school_id', enrollmentDbData.school_id)
@@ -378,8 +382,8 @@ onMounted(async () => {
       <IonSearchbar
         v-model="searchQuery"
         placeholder="Pesquise o aluno..."
-        animated="true"
-        debounce="400"
+        :animated="true"
+        :debounce="400"
       />
     </ion-list>
 

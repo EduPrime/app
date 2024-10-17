@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router'
 import EnrollmentService from '../services/EnrollmentService'
 
 const props = defineProps<{
-  dataList: Tables<'enrollment'>
+  dataList: Tables<'enrollment'>[]
 }>()
 
 // Instanciando o serviço da tabela

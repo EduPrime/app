@@ -53,10 +53,10 @@ const formSchema = yup.object ({
     .required('Endereço é obrigatório'),
   city: yup
     .string()
-    .required('Cidade é obrigatório'),
+    .required('Cidade é obrigatória'),
   school_zone: yup
     .string()
-    .required('Zona da Escola é obrigatório'),
+    .required('Zona da Escola é obrigatória'),
   state: yup
     .string()
     .max(2)
@@ -73,8 +73,6 @@ const formSchema = yup.object ({
     .string()
     .required('Abreviação é obrigatório')
     .max(10, 'Abreviação deve ter no máximo 10 caracteres'),
-  school_zone: yup.string()
-    .required('Zona Escolar é obrigatória'),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<any>({
@@ -140,7 +138,7 @@ async function getSchoolData() {
   if (schoolId.value) {
     const schoolDbData = await schoolService.getById(schoolId.value)
     if (schoolDbData) {
-      setFieldValue('institutionId', schoolDbData.institutionId)
+      setFieldValue('institutionId', schoolDbData.institution_id)
       setFieldValue('name', schoolDbData.name)
       setFieldValue('phone', schoolDbData.phone)
       setFieldValue('email', schoolDbData.email)
@@ -170,7 +168,7 @@ const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, 
 const areaMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
 
 onMounted(async () => {
-  institutionId.value = (await institutionService.getAll())?.at(0)?.id
+  /* institutionId.value = (await institutionService.getAll())?.at(0)?.id */
   if (schoolId.value) {
     await getSchoolData()
   }

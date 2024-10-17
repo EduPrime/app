@@ -336,7 +336,7 @@ async function loadStudent() {
     console.log('Chegou', students)
 
     // Função auxiliar para mapear os dados
-    const mapData = (data, targetList) => {
+    const mapData = (data: any[], targetList: any) => {
       if (data) {
         targetList.value = data.map(item => ({
           id: item.id,
@@ -345,7 +345,9 @@ async function loadStudent() {
       }
     }
 
-    mapData(students, studentList)
+    if (students) {
+      mapData(students, studentList)
+    }
   }
   catch (error) {
     console.error('Erro ao carregar dados:', error)

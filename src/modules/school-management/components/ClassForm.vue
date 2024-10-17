@@ -183,9 +183,9 @@ async function loadClassroom() {
     console.log('Chegou', institutions)
 
     // Função auxiliar para mapear os dados
-    const mapData = (data, targetList) => {
+    const mapData = (data: any, targetList: { value: any[] }) => {
       if (data) {
-        targetList.value = data.map(item => ({
+        targetList.value = data.map((item: any) => ({
           id: item.id,
           name: item.name,
           period: item.period,
@@ -217,16 +217,16 @@ async function getClassData() {
       seriesId.value = classDbData.series_id
       teacherId.value = classDbData.teacher_id
       setFieldValue('name', classDbData.name)
-      setFieldValue('institutionId', classDbData.institutionId)
+      setFieldValue('institutionId', classDbData.institution_id)
       setFieldValue('institution', classDbData.institution_id)
       setFieldValue('course', classDbData.course_id)
       setFieldValue('school_id', classDbData.school_id)
       setFieldValue('series_id', classDbData.series_id)
       setFieldValue('teacher', classDbData.teacher_id)
-      setFieldValue('schoolId', classDbData.schoolId)
-      setFieldValue('courseId', classDbData.courseId)
-      setFieldValue('seriesId', classDbData.seriesId)
-      setFieldValue('teacherId', classDbData.teacherId)
+      setFieldValue('schoolId', classDbData.school_id)
+      setFieldValue('courseId', classDbData.course_id)
+      setFieldValue('seriesId', classDbData.series_id)
+      setFieldValue('teacherId', classDbData.teacher_id)
       setFieldValue('abbreviation', classDbData.abbreviation)
       setFieldValue('year', classDbData.year)
       setFieldValue('status', classDbData.status)

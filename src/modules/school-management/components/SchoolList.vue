@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router'
 import SchoolService from '../services/SchoolService'
 
 const props = defineProps<{
-  dataList: Tables<'school'>
+  dataList: Tables<'school'>[]
 }>()
 
 // Instanciando o serviço da tabela

@@ -252,7 +252,7 @@ export interface Database {
           period: Database['public']['Enums']['period']
           school_id: string
           series_id: string
-          starTime: string
+          startTime: string
           startTimeInterval: string
           status: Database['public']['Enums']['status']
           teacher_id: string
@@ -1048,7 +1048,6 @@ export interface Database {
           metadata: Json | null
           name: string
           school_days: string
-          school_id: string
           timetable_id: string | null
           updated_at: string | null
           user_created: string | null
@@ -1065,7 +1064,6 @@ export interface Database {
           metadata?: Json | null
           name: string
           school_days: string
-          school_id: string
           timetable_id?: string | null
           updated_at?: string | null
           user_created?: string | null

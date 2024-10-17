@@ -8,7 +8,7 @@ import { useRouter } from 'vue-router'
 import SeriesService from '../services/SeriesService'
 
 const props = defineProps<{
-  dataList: Tables<'series'>
+  dataList: Tables<'series'>[]
 }>()
 
 // Instanciando o serviço da tabela

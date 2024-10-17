@@ -103,7 +103,7 @@ async function registerSeries() {
   }
   else {
     const formData = {
-      school_id: schoolId.value,
+      /* school_id: schoolId.value, */
       course_id: courseId.value,
       institution_id: institutionId.value,
       course_stage: values.course_stage,
@@ -156,9 +156,9 @@ async function loadSeries() {
     console.log('Chegou', institutions, series, courses)
 
     // Função auxiliar para mapear os dados
-    const mapData = (data, targetList) => {
+    const mapData = (data: any, targetList: any) => {
       if (data) {
-        targetList.value = data.map(item => ({
+        targetList.value = data.map((item: any) => ({
           id: item.id,
           name: item.name,
           course_stage: item.course_stage,
@@ -181,18 +181,18 @@ async function getSeriesData() {
   if (seriesId.value) {
     const seriesDbData = await seriesService.getById(seriesId.value)
     if (seriesDbData) {
-      institutionId.value = seriesDbData.institution_id,
-      courseId.value = seriesDbData.course_id,
-      schoolId.value = seriesDbData.school_id,
-      setFieldValue('institutionId', seriesDbData.institutionId),
-      setFieldValue('schoolId', seriesDbData.schoolId),
-      setFieldValue('courseId', seriesDbData.courseId),
-      setFieldValue('institution', seriesDbData.institution_id),
-      setFieldValue('course', seriesDbData.course_id),
-      setFieldValue('name', seriesDbData.name),
-      setFieldValue('course_stage', seriesDbData.course_stage),
-      setFieldValue('graduate', seriesDbData.graduate),
-      setFieldValue('workload', seriesDbData.workload),
+      institutionId.value = seriesDbData.institution_id || ''
+      courseId.value = seriesDbData.course_id
+      /* schoolId.value = seriesDbData.school_id */
+      setFieldValue('institutionId', seriesDbData.institution_id)
+      /* setFieldValue('schoolId', seriesDbData.school_id) */
+      setFieldValue('courseId', seriesDbData.course_id)
+      setFieldValue('institution', seriesDbData.institution_id)
+      setFieldValue('course', seriesDbData.course_id)
+      setFieldValue('name', seriesDbData.name)
+      setFieldValue('course_stage', seriesDbData.course_stage)
+      setFieldValue('graduate', seriesDbData.graduate)
+      setFieldValue('workload', seriesDbData.workload)
       setFieldValue('school_days', seriesDbData.school_days)
     }
     else {
@@ -202,7 +202,7 @@ async function getSeriesData() {
 }
 
 onMounted(async () => {
-  schoolId.value = (await schoolService.getAll())?.at(0)?.id
+  /* schoolId.value = (await schoolService.getAll())?.at(0)?.id */
   await loadSeries()
   if (seriesId.value) {
     await getSeriesData()
