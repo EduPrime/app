@@ -15,6 +15,9 @@ export default class EnrollmentService extends BaseService<TabelaType> {
       const existingEnrollments = await this.getAll() // Obtém todas as matrículas
 
       // Verifica se algum código de matrícula coincide com o código fornecido
+      if (!existingEnrollments) {
+        return false
+      }
       return !existingEnrollments.some(
         (enrollment: any) => enrollment.enrollmentCode === enrollmentCode,
       )

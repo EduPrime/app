@@ -1,54 +1,52 @@
-<script>
-import { useUserStore } from '@/store/user.ts'
-import { supabase } from '../supabaseClient.ts'
+<script setup lang="ts">
+import { useUserStore } from '@/store/user'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { supabase } from '../supabaseClient'
 
-export default {
-  data() {
-    return {
-      email: '',
-      password: '',
-      role: '',
-      validRoles: ['adm', 'teacher', 'aluno'],
+const email = ref('')
+const password = ref('')
+const role = ref('')
+const validRoles = ['adm', 'teacher', 'aluno']
+const router = useRouter()
+const userStore = useUserStore()
+
+function onRoleChange(event: CustomEvent) {
+  role.value = event.detail.value
+}
+
+async function signUp() {
+  if (!role.value || !validRoles.includes(role.value)) {
+    console.error(`Role is required and must be one of: ${validRoles.join(', ')}`)
+    return
+  }
+
+  const { data, error } = await supabase.auth.signUp({
+    email: email.value,
+    password: password.value,
+    options: {
+      data: {
+        role: role.value,
+      },
+    },
+  })
+
+  if (error) {
+    console.error('Error creating user:', error.message)
+  }
+  else {
+    const { user, session } = data
+    if (user && session) {
+      userStore.setUser(user)
+      localStorage.setItem('user', JSON.stringify(user))
+
+      router.replace(`/dashboard/${user.id}`)
     }
-  },
-  methods: {
-    onRoleChange(event) {
-      this.role = event.detail.value
-    },
-    async signUp() {
-      if (!this.role || !this.validRoles.includes(this.role)) {
-        console.error(`Role is required and must be one of: ${this.validRoles.join(', ')}`)
-        return
-      }
+  }
+}
 
-      const { data, error } = await supabase.auth.signUp({
-        email: this.email,
-        password: this.password,
-        options: {
-          data: {
-            role: this.role,
-          },
-        },
-      })
-
-      if (error) {
-        console.error('Error creating user:', error.message)
-      }
-      else {
-        const { user, session } = data
-        if (user && session) {
-          const userStore = useUserStore()
-          userStore.setUser(user)
-          localStorage.setItem('user', JSON.stringify(user))
-
-          this.$router.replace(`/dashboard/${user.id}`)
-        }
-      }
-    },
-    goToLogin() {
-      this.$router.replace('/login')
-    },
-  },
+function goToLogin() {
+  router.replace('/login')
 }
 </script>
 
@@ -57,10 +55,10 @@ export default {
     <ion-grid class="signup-grid">
       <ion-row class="ion-justify-content-center ion-align-items-center full-height">
         <ion-col size="12" size-md="6" size-lg="4" class="signup-form">
-          <!-- Imagem acima do formulário -->
+          <!-- Imagem acima do formul�rio -->
           <ion-img src="/assets/logo.png" alt="Logo" class="signup-logo" />
 
-          <!-- Formulário de cadastro -->
+          <!-- Formul�rio de cadastro -->
           <ion-item>
             <ion-input v-model="email" placeholder="Email" />
           </ion-item>
@@ -81,12 +79,12 @@ export default {
             </ion-select>
           </ion-item>
 
-          <!-- Botão de Sign Up -->
+          <!-- Bot�o de Sign Up -->
           <ion-button expand="block" @click="signUp">
             Sign Up
           </ion-button>
 
-          <!-- Botão de Voltar para Login -->
+          <!-- Bot�o de Voltar para Login -->
           <ion-button expand="block" fill="outline" @click="goToLogin">
             Voltar para Login
           </ion-button>

@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import type { Tables } from '@/types/database.types'
 import showToast from '@/utils/toast-alert'
 import { IonAlert } from '@ionic/vue'
 import { pencil, trash } from 'ionicons/icons'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import type { Tables } from '@/types/database.types'
 import TeacherService from '../services/TeacherService'
 
 const props = defineProps<{
@@ -23,13 +23,13 @@ function toggleDetails(index: number) {
   emit('update:teachers')
 }
 
-function editTeacher(teacher: Teacher) {
+function editTeacher(teacher: any) {
   router.push({ name: 'EditTeacher', params: { id: teacher.id.toString() } })
 }
 
 const isAlertOpen = ref(false)
-const teacherToDelete = ref<Teacher | null>(null)
-function openDeleteAlert(teacher: Teacher) {
+const teacherToDelete = ref<any | null>(null)
+function openDeleteAlert(teacher: any) {
   teacherToDelete.value = teacher
   isAlertOpen.value = true
 }
@@ -42,7 +42,7 @@ function handleAlertDismiss(ev: CustomEvent) {
     handleCancel()
   }
 }
-async function deleteTeacher(teacher: Teacher) {
+async function deleteTeacher(teacher: any) {
   const teacherService = new TeacherService()
 
   if (teacher.id) {
@@ -111,7 +111,7 @@ const alertButtons = [
       </ion-item-options>
       <ion-item v-if="teacher.showDetails">
         <ion-grid>
-          <ion-row v-for="(serie, sIndex) in teacher.series" :key="sIndex">
+          <!--     <ion-row v-for="(serie, sIndex) in teacher.series" :key="sIndex">
             <ion-col size="12">
               <strong>{{ serie.name }}</strong>
             </ion-col>
@@ -127,7 +127,7 @@ const alertButtons = [
                 </ion-card-content>
               </ion-card>
             </ion-col>
-          </ion-row>
+          </ion-row> -->
         </ion-grid>
       </ion-item>
     </ion-item-sliding>

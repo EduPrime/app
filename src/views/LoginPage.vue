@@ -1,39 +1,38 @@
-<script>
-import { useUserStore } from '../store/user.ts'
-import { supabase } from '../supabaseClient.ts'
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useUserStore } from '../store/user'
+import { supabase } from '../supabaseClient'
 
-export default {
-  data() {
-    return {
-      email: '',
-      password: '',
-      user: null,
-    }
-  },
-  async mounted() {
-    const { data: { user } } = await supabase.auth.getSession()
-    this.user = user
-  },
-  methods: {
-    async signIn() {
-      const { error, data } = await supabase.auth.signInWithPassword({
-        email: this.email,
-        password: this.password,
-      })
-      if (error) {
-        console.error('Erro ao fazer login:', error.message)
-      }
-      else {
-        const userStore = useUserStore()
-        userStore.setUser(data.session?.user)
+const email = ref<string>('')
+const password = ref<string>('')
+const user = ref<any>(null)
+const router = useRouter()
+const userStore = useUserStore()
 
-        this.$router.push(`/dashboard/${data.session?.user.id}`)
-      }
-    },
-    goToSignUp() {
-      this.$router.replace('/signup')
-    },
-  },
+onMounted(async () => {
+  const { data: { session } } = await supabase.auth.getSession()
+  user.value = session?.user || null
+  user.value = session?.user
+})
+
+async function signIn() {
+  const { error, data } = await supabase.auth.signInWithPassword({
+    email: email.value,
+    password: password.value,
+  })
+
+  if (error) {
+    console.error('Erro ao fazer login:', error.message)
+  }
+  else {
+    userStore.setUser(data.session?.user)
+    router.push(`/dashboard/${data.session?.user?.id}`)
+  }
+}
+
+function goToSignUp() {
+  router.replace('/signup')
 }
 </script>
 

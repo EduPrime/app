@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import type { Tables } from '@/types/database.types'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
+import CourseList from '@/modules/school-management/components/CourseList.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
-import SeriesList from '@/modules/school-management/components/SeriesList.vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import SeriesService from '../services/SeriesService'
+import CourseService from '../services/CourseService'
 
 const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
-const seriesService = new SeriesService()
-const dataList = ref<Tables<'series'>[]>([])
+const courseService = new CourseService()
+const dataList = ref<Tables<'course'>[]>([])
 const schoolCount = ref(154)
 const classCount = ref(25)
 const approvalRate = ref(48)
@@ -24,27 +24,27 @@ const filteredDataList = computed(() => {
     return dataList.value
   }
 
-  return dataList.value.filter((series: Tables<'series'>) =>
-    series.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  return dataList.value.filter((course: Tables<'course'>) =>
+    course.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 
-async function loadSeries() {
+async function loadCourse() {
   try {
-    const series = await seriesService.getAll() // getAll() pode retornar null
-    dataList.value = series ?? [] // Se retornar null, atribuímos um array vazio
+    const courses = await courseService.getAll() // getAll() pode retornar null
+    dataList.value = courses ?? [] // Se retornar null, atribuímos um array vazio
   }
   catch (error) {
-    console.error('Erro ao carregar as séries:', error)
+    console.error('Erro ao carregar os cursos:', error)
   }
 }
 
 function navigateToRegister() {
-  router.push({ name: 'RegisterSeries' })
+  router.push({ name: 'RegisterCourse' })
 }
 
 onMounted(() => {
-  loadSeries()
+  loadCourse()
 })
 </script>
 
@@ -55,7 +55,7 @@ onMounted(() => {
       :teacher-count="teacherCount"
     />
     <ion-toolbar>
-      <ion-title>Séries ativas ({{ filteredDataList.length }})</ion-title>
+      <ion-title>Cursos ativos ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
     <ion-row class="ion-align-items-center ion-justify-content-between">
       <ion-col size="10">
@@ -69,7 +69,7 @@ onMounted(() => {
         </ion-button>
       </ion-col>
     </ion-row>
-    <SeriesList :data-list="filteredDataList" />
+    <CourseList :data-list="filteredDataList" />
   </ContentLayout>
 </template>
 

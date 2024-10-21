@@ -97,7 +97,7 @@ const formSchema = yup.object({
     .required('Aluno não selecionado ou não cadastrado'),
 })
 
-const { values, errors, validate, setFieldValue } = useForm<EnrollmentPartial>({
+const { values, errors, validate, setFieldValue } = useForm<any>({
   validationSchema: formSchema,
 })
 
@@ -202,9 +202,9 @@ async function loadStudents() {
       enrollmentService.getAll(),
     ])
 
-    const enrolledStudentIds = enrollments.map(enrollment => enrollment.student_id)
+    const enrolledStudentIds = enrollments ? enrollments.map(enrollment => enrollment.student_id) : []
 
-    studentList.value = students.map(student => ({
+    studentList.value = (students ?? []).map(student => ({
       ...student,
       enrolled: enrolledStudentIds.includes(student.id),
     }))
@@ -215,17 +215,21 @@ async function loadStudents() {
   }
 }
 
-const filteredStudents = computed(() => {
-  const query = searchQuery.value.toLowerCase()
+const filteredStudents = ref<{ id: string, name: string, enrolled: boolean }[]>([])
+
+watch(searchQuery, (newQuery) => {
+  const query = newQuery.toLowerCase()
   if (query.length >= 3) {
-    return studentList.value.filter(student =>
+    filteredStudents.value = studentList.value.filter((student: any) =>
       student.name.toLowerCase().includes(query),
     ).slice(0, 5) // Limita a 5 resultados
   }
-  return [] // Se a consulta estiver vazia, limpa a lista filtrada
+  else {
+    filteredStudents.value = [] // Se a consulta estiver vazia, limpa a lista filtrada
+  }
 })
 
-function selectStudent(student) {
+function selectStudent(student: any) {
   studentId.value = student.id
 
   if (!enrollmentId.value) { // Somente limpa o código de matrícula se for uma nova matrícula
@@ -234,12 +238,12 @@ function selectStudent(student) {
   }
   searchQuery.value = ''
   setFieldValue('name', student.name)
-  filteredStudents.value = []
+  searchQuery.value = ''
 }
 
 async function loadEnrollment() {
   try {
-    const [schools, classrooms, students, series, courses, enrollments] = await Promise.all([
+    const [schools, classrooms, students, series, courses] = await Promise.all([
       schoolService.getAll(),
       classroomService.getAll(),
       studentService.getAll(),
@@ -250,9 +254,9 @@ async function loadEnrollment() {
     console.log('Chegou', students)
 
     // Função auxiliar para mapear os dados
-    const mapData = (data, targetList) => {
+    const mapData = (data: any, targetList: any) => {
       if (data) {
-        targetList.value = data.map(item => ({
+        targetList.value = data.map((item: any) => ({
           id: item.id,
           name: item.name,
         }))
@@ -271,34 +275,28 @@ async function loadEnrollment() {
   }
 }
 
-//* * Mask Inputs
-const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/])
-const postalCodeMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/])
-const numberAddressMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
-const cpfMask = ref([/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/])
-
 async function getEnrollmentData() {
   if (enrollmentId.value) {
     const enrollmentDbData = await enrollmentService.getById(enrollmentId.value)
     if (enrollmentDbData) {
-      schoolId.value = enrollmentDbData.school_id,
-      classroomId.value = enrollmentDbData.classroom_id,
-      seriesId.value = enrollmentDbData.series_id,
-      studentId.value = enrollmentDbData.student_id,
-      courseId.value = enrollmentDbData.course_id,
-      enrollmentCode.value = enrollmentDbData.enrollmentCode,
-      setFieldValue('date_enrollment', enrollmentDbData.date_enrollment),
-      setFieldValue('observations', enrollmentDbData.observations),
-      setFieldValue('school_id', enrollmentDbData.school_id),
-      setFieldValue('schoolId', enrollmentDbData.schoolId),
-      setFieldValue('seriesId', enrollmentDbData.seriesId),
-      setFieldValue('classroom_id', enrollmentDbData.classroom_id),
-      setFieldValue('classroomId', enrollmentDbData.classroomId),
-      setFieldValue('studentId', enrollmentDbData.studentId),
-      setFieldValue('courseId', enrollmentDbData.courseId),
-      setFieldValue('name', enrollmentDbData.name),
-      setFieldValue('status', enrollmentDbData.status),
-      setFieldValue('situation', enrollmentDbData.situation),
+      schoolId.value = enrollmentDbData.school_id
+      classroomId.value = enrollmentDbData.classroom_id
+      seriesId.value = enrollmentDbData.series_id
+      studentId.value = enrollmentDbData.student_id
+      courseId.value = enrollmentDbData.course_id
+      enrollmentCode.value = enrollmentDbData.enrollmentCode ?? ''
+      setFieldValue('date_enrollment', enrollmentDbData.date_enrollment)
+      setFieldValue('observations', enrollmentDbData.observations)
+      setFieldValue('school_id', enrollmentDbData.school_id)
+      setFieldValue('schoolId', enrollmentDbData.school_id)
+      setFieldValue('seriesId', enrollmentDbData.series_id)
+      setFieldValue('classroom_id', enrollmentDbData.classroom_id)
+      setFieldValue('classroomId', enrollmentDbData.classroom_id)
+      setFieldValue('studentId', enrollmentDbData.student_id)
+      setFieldValue('courseId', enrollmentDbData.course_id)
+      setFieldValue('name', enrollmentDbData.name)
+      setFieldValue('status', enrollmentDbData.status)
+      setFieldValue('situation', enrollmentDbData.situation)
       setFieldValue('enrollmentCode', enrollmentDbData.enrollmentCode)
 
       const student = await studentService.getById(enrollmentDbData.student_id)
@@ -332,11 +330,25 @@ watch(studentId, (newValue) => {
   }
 })
 
-function applyPhoneMask(phone: string | null): string {
-  if (!phone)
-    return ''
-  return phone.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3')
-}
+// Carregamento diferido para séries, turmas e cursos
+watch(schoolId, async (newSchoolId) => {
+  if (newSchoolId) {
+    try {
+      classroomList.value = await classroomService.getBySchoolId(newSchoolId)
+      seriesList.value = await seriesService.getBySchoolId(newSchoolId)
+      courseList.value = await courseService.getBySchoolId(newSchoolId)
+    }
+    catch (error) {
+      console.error('Erro ao carregar turmas e séries para o escritório:', error)
+      showToast('Erro ao carregar dados. Tente novamente.', 'top', 'danger')
+    }
+  }
+  else {
+    classroomList.value = []
+    seriesList.value = []
+    courseList.value = []
+  }
+})
 
 onMounted(async () => {
   const defaultDate = `${currentYear}-01-01`
@@ -370,8 +382,8 @@ onMounted(async () => {
       <IonSearchbar
         v-model="searchQuery"
         placeholder="Pesquise o aluno..."
-        animated="true"
-        debounce="400"
+        :animated="true"
+        :debounce="400"
       />
     </ion-list>
 
@@ -424,7 +436,7 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
 
-    <ion-list id="courseList">
+    <ion-list v-if="schoolId" id="courseList">
       <ion-item>
         <IonSelect
           v-model="courseId"
@@ -442,7 +454,7 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
 
-    <ion-list id="seriesList">
+    <ion-list v-if="schoolId" id="seriesList">
       <ion-item>
         <IonSelect
           v-model="seriesId"
@@ -460,7 +472,7 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
 
-    <ion-list id="classroomList">
+    <ion-list v-if="schoolId" id="classroomList">
       <ion-item>
         <IonSelect
           v-model="classroomId"
@@ -540,7 +552,7 @@ onMounted(async () => {
       />
     </ion-item>
 
-    <EpInput v-model="values.observations" name="observations" label="Observações" type="textarea" placeholder="Digite observações sobre a matrícula" />
+    <EpInput v-model="values.observations" name="observations" label="Observações" placeholder="Digite observações sobre a matrícula" />
   </div>
 </template>
 

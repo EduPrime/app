@@ -18,27 +18,27 @@ defineEmits<{
 }>()
 
 defineExpose({
-  registerSeries,
+  registerCourse,
 })
 
 const selectedSegment = ref('general-info')
 const router = useRouter()
 const route = useRouter()
-const seriesData = ref< Tables<'series'> | []>([])
-const seriesId = computed(() => route.currentRoute.value.params.id) as { value: string }
+const courseData = ref< Tables<'course'> | []>([])
+const courseId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const schoolService = new SchoolService()
 const seriesService = new SeriesService()
 const courseService = new CourseService()
 const institutionService = new InstitutionService()
-const course_stage = ['Etapa 1', 'Etapa 2', 'Etapa 3', 'Etapa 4', 'Etapa 5', 'Etapa 6']
-const graduate = ['Sim', 'Não']
+const teaching_type = ['Complementar', 'Padrão']
+const regime_type = ['Presencial', 'EAD', 'Semi-Presencial']
+const course_modality = ['Ensino Regular', 'EJA', 'Educação Profissional', 'Educação Especial']
 const institutionId = ref('')
 const schoolId = ref('')
 const institutionList = ref()
 const seriesList = ref()
 const serieId = ref('')
 const courseList = ref()
-const courseId = ref('')
 const timetable_Id = ref('')
 const formSchema = yup.object ({
   name: yup
@@ -46,14 +46,30 @@ const formSchema = yup.object ({
     .required('Nome é obrigatório'),
   institutionId: yup.string()
     .required('Instituição é obrigatória'),
-  courseId: yup.string()
-    .required('Curso é obrigatório'),
   course_stage: yup
+    .number()
+    .transform((value, originalValue) => {
+    // Verifica se o originalValue é uma string e tenta convertê-la em número
+      if (typeof originalValue === 'string') {
+        const trimmedValue = originalValue.trim()
+        // Se a string não é vazia e pode ser convertida em um número, retorna o número
+        const parsedValue = Number(trimmedValue)
+        return isNaN(parsedValue) ? null : parsedValue // Se não for um número, retorna null
+      }
+      // Se não for uma string (como undefined, null, number), apenas retorna o valor original
+      return originalValue
+    })
+    .required('Etapa Curso é obrigatória')
+    .positive('A etapa curso deve ser um número positivo')
+    .integer('A etapa curso deve ser um número inteiro'),
+  teaching_type: yup
     .string()
-    .required('Etapa Curso é obrigatório'),
-  graduate: yup
+    .required('Tipo de Ensino é obrigatório'),
+  regime_type: yup
+    .string(),
+  course_modality: yup
     .string()
-    .required('Concluinte é obrigatório'),
+    .required('Modalidade de Curso é obrigatório'),
   workload: yup
     .number()
     .transform((value, originalValue) => {
@@ -71,30 +87,13 @@ const formSchema = yup.object ({
     .positive('A carga horária deve ser um número positivo')
     .integer('A carga horária deve ser um número inteiro')
     .min(1, 'A carga horária deve ser pelo menos 1 hora'),
-  school_days: yup
-    .number()
-    .transform((value, originalValue) => {
-    // Verifica se o originalValue é uma string e tenta convertê-la em número
-      if (typeof originalValue === 'string') {
-        const trimmedValue = originalValue.trim()
-        // Se a string não é vazia e pode ser convertida em um número, retorna o número
-        const parsedValue = Number(trimmedValue)
-        return isNaN(parsedValue) ? null : parsedValue // Se não for um número, retorna null
-      }
-      // Se não for uma string (como undefined, null, number), apenas retorna o valor original
-      return originalValue
-    })
-    .required('Dias Letivos é obrigatório')
-    .positive('Os dias letivos devem ser um número positivo')
-    .integer('Os dias letivos devem ser um número inteiro')
-    .min(1, 'Os dias letivos devem ser pelo menos 1 dia'),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<any>({
   validationSchema: formSchema,
 })
 
-async function registerSeries() {
+async function registerCourse() {
   const validationResult = await validate()
 
   if (!validationResult.valid) {
@@ -103,35 +102,36 @@ async function registerSeries() {
   }
   else {
     const formData = {
-      /* school_id: schoolId.value, */
       course_id: courseId.value,
       institution_id: institutionId.value,
       course_stage: values.course_stage,
       graduate: values.graduate,
       name: values.name,
       workload: values.workload,
-      school_days: values.school_days,
+      teaching_type: values.teaching_type,
+      regime_type: values.regime_type,
+      course_modality: values.course_modality,
     }
     console.log('FormData:', formData)
     try {
       let result
-      if (seriesId.value) {
-        result = await seriesService.update(seriesId.value, formData)
+      if (courseId.value) {
+        result = await courseService.update(courseId.value, formData)
         if (result) {
-          showToast('Série atualizada com sucesso')
+          showToast('Curso atualizado com sucesso')
           setTimeout(() => {
-            router.push('/Series/list').then(() => {
+            router.push('/Course/list').then(() => {
               location.reload()
             })
           }, 2000)
         }
       }
       else {
-        result = await seriesService.create(formData)
+        result = await courseService.create(formData)
         if (result) {
-          showToast('Série cadastrada com sucesso!', 'top', 'success')
+          showToast('Curso cadastrado com sucesso!', 'top', 'success')
           setTimeout(() => {
-            router.push('/Series/list').then(() => {
+            router.push('/Course/list').then(() => {
               location.reload()
             })
           }, 2000)
@@ -145,7 +145,7 @@ async function registerSeries() {
   }
 }
 
-async function loadSeries() {
+async function loadCourse() {
   try {
     const [institutions, series, courses] = await Promise.all([
       institutionService.getAll(),
@@ -156,56 +156,62 @@ async function loadSeries() {
     console.log('Chegou', institutions, series, courses)
 
     // Função auxiliar para mapear os dados
-    const mapData = (data: any, targetList: any) => {
+    const mapData = (data: any[], targetList: any) => {
       if (data) {
-        targetList.value = data.map((item: any) => ({
+        targetList.value = data.map(item => ({
           id: item.id,
           name: item.name,
           course_stage: item.course_stage,
           graduate: item.graduate,
           workload: item.workload,
-          school_days: item.school_days,
         }))
       }
     }
 
-    mapData(institutions, institutionList)
-    mapData(series, seriesList)
-    mapData(courses, courseList)
+    if (institutions) {
+      mapData(institutions, institutionList)
+    }
+    if (series) {
+      mapData(series, seriesList)
+    }
+    if (courses) {
+      mapData(courses, courseList)
+    }
   }
   catch (error) {
     console.error('Erro ao carregar dados:', error)
   }
 }
-async function getSeriesData() {
-  if (seriesId.value) {
-    const seriesDbData = await seriesService.getById(seriesId.value)
-    if (seriesDbData) {
-      institutionId.value = seriesDbData.institution_id || ''
-      courseId.value = seriesDbData.course_id
-      /* schoolId.value = seriesDbData.school_id */
-      setFieldValue('institutionId', seriesDbData.institution_id)
-      /* setFieldValue('schoolId', seriesDbData.school_id) */
-      setFieldValue('courseId', seriesDbData.course_id)
-      setFieldValue('institution', seriesDbData.institution_id)
-      setFieldValue('course', seriesDbData.course_id)
-      setFieldValue('name', seriesDbData.name)
-      setFieldValue('course_stage', seriesDbData.course_stage)
-      setFieldValue('graduate', seriesDbData.graduate)
-      setFieldValue('workload', seriesDbData.workload)
-      setFieldValue('school_days', seriesDbData.school_days)
+async function getCourseData() {
+  if (courseId.value) {
+    const courseDbData = await courseService.getById(courseId.value)
+    if (courseDbData) {
+      institutionId.value = courseDbData.institution_id ?? ''
+      /*  courseId.value = courseDbData.course_id */
+      setFieldValue('institutionId', courseDbData.institution_id)
+      /* setFieldValue('schoolId', courseDbData.school_id) */
+      /* setFieldValue('courseId', courseDbData.courseId) */
+      setFieldValue('institution', courseDbData.institution_id)
+      /*       setFieldValue('course', courseDbData.course_id) */
+      setFieldValue('name', courseDbData.name)
+      setFieldValue('course_stage', courseDbData.course_stage)
+      /* setFieldValue('graduate', courseDbData.graduate) */
+      setFieldValue('workload', courseDbData.workload)
+      setFieldValue('teaching_type', courseDbData.teaching_type)
+      setFieldValue('regime_type', courseDbData.regime_type)
+      setFieldValue('course_modality', courseDbData.course_modality)
     }
     else {
-      console.error(`Dados da série não encontrados para o ID: ${seriesId.value}`)
+      console.error(`Dados da série não encontrados para o ID: ${courseId.value}`)
     }
   }
 }
 
 onMounted(async () => {
-  /* schoolId.value = (await schoolService.getAll())?.at(0)?.id */
-  await loadSeries()
-  if (seriesId.value) {
-    await getSeriesData()
+/*   schoolId.value = (await schoolService.getAll())?.at(0)?.id */
+  await loadCourse()
+  if (courseId.value) {
+    await getCourseData()
     if (institutionId.value)
       setFieldValue('institutionId', institutionId.value)
     if (courseId.value)
@@ -242,59 +248,58 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
 
-    <ion-list id="courseList">
+    <EpInput v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome do curso" />
+
+    <ion-list id="teaching_type">
       <ion-item>
         <IonSelect
-          v-model="courseId"
+          v-model="values.teaching_type"
           justify="space-between"
-          label="Curso*"
-          placeholder="Selecione o curso"
-          @ion-change="(e) => {
-            setFieldValue('courseId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
-            {{ course.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
-    </ion-list>
-
-    <EpInput v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome da série" />
-
-    <ion-list id="course_stage">
-      <ion-item>
-        <IonSelect
-          v-model="values.course_stage"
-          justify="space-between"
-          label="Etapa Curso*"
+          label="Tipo de Ensino*"
           placeholder="Selecione"
-          @ion-change="(e) => setFieldValue('course_stage', e.target.value)"
+          @ion-change="(e) => setFieldValue('teaching_type', e.target.value)"
         >
-          <IonSelectOption v-for="course_stage in course_stage" :key="course_stage" :value="course_stage">
-            {{ course_stage }}
+          <IonSelectOption v-for="teaching_type in teaching_type" :key="teaching_type" :value="teaching_type">
+            {{ teaching_type }}
           </IonSelectOption>
         </IonSelect>
       </ion-item>
     </ion-list>
 
-    <ion-list id="graduate">
+    <ion-list id="regime_type">
       <ion-item>
         <IonSelect
-          v-model="values.graduate"
+          v-model="values.regime_type"
           justify="space-between"
-          label="Concluinte*"
+          label="Tipo de Regime"
           placeholder="Selecione"
-          @ion-change="(e) => setFieldValue('graduate', e.target.value)"
+          @ion-change="(e) => setFieldValue('regime_type', e.target.value)"
         >
-          <IonSelectOption v-for="graduate in graduate" :key="graduate" :value="graduate">
-            {{ graduate }}
+          <IonSelectOption v-for="regime_type in regime_type" :key="regime_type" :value="regime_type">
+            {{ regime_type }}
           </IonSelectOption>
         </IonSelect>
       </ion-item>
     </ion-list>
+
+    <EpInput v-model="values.course_stage" name="course_stage" label="Etapa Curso*" placeholder="Digite a etapa do curso" />
 
     <EpInput v-model="values.workload" name="workload" label="Carga Horária*" placeholder="Digite a carga horária" />
-    <EpInput v-model="values.school_days" name="school_days" label="Dias Letivos*" placeholder="Digite os dias letivos" />
+
+    <ion-list id="course_modality">
+      <ion-item>
+        <IonSelect
+          v-model="values.course_modality"
+          justify="space-between"
+          label="Modalidade do Curso*"
+          placeholder="Selecione"
+          @ion-change="(e) => setFieldValue('course_modality', e.target.value)"
+        >
+          <IonSelectOption v-for="course_modality in course_modality" :key="course_modality" :value="course_modality">
+            {{ course_modality }}
+          </IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
   </div>
 </template>

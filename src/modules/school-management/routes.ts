@@ -1,11 +1,13 @@
-import { create, list, people, school } from 'ionicons/icons'
+import { book, create, list, people, school } from 'ionicons/icons'
 import DashboardClass from './views/DashboardClass.vue'
+import DashboardCourse from './views/DashboardCourse.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
 import DashboardSeries from './views/DashboardSeries.vue'
 import EditClass from './views/EditClass.vue'
 import EditSchools from './views/EditSchools.vue'
 import EditSeries from './views/EditSeries.vue'
 import RegisterClass from './views/RegisterClass.vue'
+import RegisterCourse from './views/RegisterCourse.vue'
 import RegisterSchool from './views/RegisterSchool.vue'
 import RegisterSeries from './views/RegisterSeries.vue'
 
@@ -120,6 +122,31 @@ const routes = [
       icon: create,
       name: 'Registrar série',
       order: 9,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Course/list',
+    name: 'CourseListCourse',
+    component: DashboardCourse,
+    meta: {
+      moduleName: 'Schools',
+      moduleIcon: school,
+      icon: book,
+      name: 'Cursos',
+      order: 10,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/Course/register',
+    name: 'RegisterCourse',
+    component: RegisterCourse,
+    meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Registrar curso',
+      order: 11,
       requiredRole: ['public'],
     },
   },

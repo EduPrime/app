@@ -53,10 +53,10 @@ const formSchema = yup.object ({
     .required('Endereço é obrigatório'),
   city: yup
     .string()
-    .required('Cidade é obrigatório'),
+    .required('Cidade é obrigatória'),
   school_zone: yup
     .string()
-    .required('Zona da Escola é obrigatório'),
+    .required('Zona da Escola é obrigatória'),
   state: yup
     .string()
     .max(2)
@@ -73,11 +73,9 @@ const formSchema = yup.object ({
     .string()
     .required('Abreviação é obrigatório')
     .max(10, 'Abreviação deve ter no máximo 10 caracteres'),
-  school_zone: yup.string()
-    .required('Zona Escolar é obrigatória'),
 })
 
-const { values, errors, validate, setFieldValue } = useForm<SchoolPartial>({
+const { values, errors, validate, setFieldValue } = useForm<any>({
   validationSchema: formSchema,
 })
 
@@ -140,19 +138,19 @@ async function getSchoolData() {
   if (schoolId.value) {
     const schoolDbData = await schoolService.getById(schoolId.value)
     if (schoolDbData) {
-      setFieldValue('institutionId', schoolDbData.institutionId),
-      setFieldValue('name', schoolDbData.name),
-      setFieldValue('phone', schoolDbData.phone),
-      setFieldValue('email', schoolDbData.email),
-      setFieldValue('website', schoolDbData.website),
-      setFieldValue('social_network', schoolDbData.social_network),
-      setFieldValue('address', schoolDbData.address),
-      setFieldValue('city', schoolDbData.city),
-      setFieldValue('state', schoolDbData.state),
-      setFieldValue('postalcode', schoolDbData.postalcode),
-      setFieldValue('school_zone', schoolDbData.school_zone),
-      setFieldValue('logourl', schoolDbData.logourl),
-      setFieldValue('school_zone', schoolDbData.school_zone),
+      setFieldValue('institutionId', schoolDbData.institution_id)
+      setFieldValue('name', schoolDbData.name)
+      setFieldValue('phone', schoolDbData.phone)
+      setFieldValue('email', schoolDbData.email)
+      setFieldValue('website', schoolDbData.website)
+      setFieldValue('social_network', schoolDbData.social_network)
+      setFieldValue('address', schoolDbData.address)
+      setFieldValue('city', schoolDbData.city)
+      setFieldValue('state', schoolDbData.state)
+      setFieldValue('postalcode', schoolDbData.postalcode)
+      setFieldValue('school_zone', schoolDbData.school_zone)
+      setFieldValue('logourl', schoolDbData.logourl)
+      setFieldValue('school_zone', schoolDbData.school_zone)
       setFieldValue('abbreviation', schoolDbData.abbreviation)
     }
     else {
@@ -170,7 +168,7 @@ const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, 
 const areaMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
 
 onMounted(async () => {
-  institutionId.value = (await institutionService.getAll())?.at(0)?.id
+  /* institutionId.value = (await institutionService.getAll())?.at(0)?.id */
   if (schoolId.value) {
     await getSchoolData()
   }
@@ -198,7 +196,7 @@ onMounted(async () => {
     <EpInput v-model="values.email" name="email" label="Email" placeholder="educacao@email.com" />
     <EpInput v-model="values.website" name="website" label="Site" placeholder="escolaeducacao.com.br" />
     <EpInput v-model="values.social_network" name="social_network" label="Rede Social" placeholder="Digite o link da rede social" />
-    <EpInput v-model="values.logourl" name="logourl" label="URL do Logo*" placeholder="Digite a URL do logo" />
+    <EpInput v-model="values.logourl" name="logourl" label="URL do Logo" placeholder="Digite a URL do logo" />
   </div>
 
   <div v-show="selectedSegment === 'location'">

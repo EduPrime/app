@@ -5,16 +5,16 @@ import { IonAlert } from '@ionic/vue'
 import { pencil, trash } from 'ionicons/icons'
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import SeriesService from '../services/SeriesService'
+import CourseService from '../services/CourseService'
 
 const props = defineProps<{
-  dataList: Tables<'series'>[]
+  dataList: Tables<'course'>[]
 }>()
 
 // Instanciando o serviço da tabela
-const service = new SeriesService()
+const service = new CourseService()
 
-const series = ref< Tables<'series'> | []>([])
+const course = ref< Tables<'course'> | []>([])
 const dataList = ref()
 watch(
   () => props.dataList,
@@ -26,7 +26,7 @@ watch(
 )
 
 // Nome da tabela e campos
-const tableName = 'series'
+const tableName = 'course'
 const fields = ['course_id', 'created_at', 'deleted_at', 'id', 'metadata', 'name', 'timetable_id', 'updated_at', 'user_created']
 const router = useRouter()
 
@@ -51,7 +51,7 @@ function toggleDetails(index: number) {
 function editItem(item: any) {
   // Exemplo de navegação para a página de edição
   // Dependendo da sua implementação, ajuste a rota
-  router.push({ name: `EditSeries`, params: { id: item.id.toString() } })
+  router.push({ name: `EditCourse`, params: { id: item.id.toString() } })
 }
 
 const isAlertOpen = ref(false)
@@ -72,13 +72,13 @@ function handleAlertDismiss(ev: CustomEvent) {
   }
 }
 
-async function deleteItem(item: Tables<'series'>) {
+async function deleteItem(item: Tables<'course'>) {
   try {
     const result = await service.softDelete(item.id)
     if (result) {
-      showToast(`${item.name} excluído com sucesso`)
-      // Tipagem explícita para o item no filter
-      dataList.value = dataList.value.filter((i: Tables<'series'>) => i.id !== item.id)
+      showToast(`${item.name} exclu�do com sucesso`)
+      // Tipagem expl�cita para o item no filter
+      dataList.value = dataList.value.filter((i: Tables<'course'>) => i.id !== item.id)
       isAlertOpen.value = false
       itemToDelete.value = null
     }

@@ -39,7 +39,7 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
   },
   {
     path: '/login',
-    component: () => import('@/views/LoginPage.vue'),
+    component: () => import('../views/LoginPage.vue'),
     name: 'Login',
     meta: {
       requiredRole: ['public'],
@@ -47,7 +47,7 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
   },
   {
     path: '/signup',
-    component: () => import('@/views/SignUpPage.vue'),
+    component: () => import('../views/SignUpPage.vue'),
     name: 'SignUp',
     meta: {
       requiredRole: ['public'],
@@ -154,7 +154,7 @@ router.beforeEach(async (to, from, next) => {
     else {
       const role = user?.user_metadata?.role
 
-      if (to.meta.requiredRoles && !to.meta.requiredRoles.includes(role)) {
+      if (Array.isArray(to.meta.requiredRoles) && !to.meta.requiredRoles.includes(role)) {
         return next('/login')
       }
     }
