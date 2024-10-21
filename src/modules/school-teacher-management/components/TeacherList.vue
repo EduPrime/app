@@ -4,26 +4,11 @@ import { IonAlert } from '@ionic/vue'
 import { pencil, trash } from 'ionicons/icons'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import type { Tables } from '@/types/database.types'
 import TeacherService from '../services/TeacherService'
 
-interface Teacher {
-  id: string
-  name: string
-  address: string
-  showDetails: boolean
-  series: Array<{
-    name: string
-    classes: Array<{
-      name: string
-      teacher: string
-      schedule: string
-      subjects: string[]
-    }>
-  }>
-}
-
 const props = defineProps<{
-  teachers: Teacher[]
+  teachers: Tables<'teacher'>[]
 }>()
 
 const emit = defineEmits(['update:teachers'])
@@ -75,7 +60,6 @@ async function deleteTeacher(teacher: Teacher) {
 }
 
 function handleCancel() {
-  console.info('Exclusão cancelada')
   isAlertOpen.value = false
   teacherToDelete.value = null
 }
