@@ -406,6 +406,15 @@ export interface Database {
           {
             foreignKeyName: 'course_institution_id_fkey'
             columns: ['institution_id']
+            foreignKeyName: 'course_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'course_schoolid_fkey'
+            columns: ['school_id']
             isOneToOne: false
             referencedRelation: 'institution'
             referencedColumns: ['id']
@@ -1048,6 +1057,7 @@ export interface Database {
           metadata: Json | null
           name: string
           school_days: string
+          school_id: string
           timetable_id: string | null
           updated_at: string | null
           user_created: string | null
@@ -1064,6 +1074,7 @@ export interface Database {
           metadata?: Json | null
           name: string
           school_days: string
+          school_id: string
           timetable_id?: string | null
           updated_at?: string | null
           user_created?: string | null
@@ -1177,6 +1188,7 @@ export interface Database {
           rg_issuer: string | null
           rg_number: string | null
           rg_state: string | null
+          school_id: string
           status: Database['public']['Enums']['status'] | null
           updated_at: string | null
           user_created: string | null
@@ -1228,6 +1240,7 @@ export interface Database {
           rg_issuer?: string | null
           rg_number?: string | null
           rg_state?: string | null
+          school_id: string
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
@@ -1279,11 +1292,35 @@ export interface Database {
           rg_issuer?: string | null
           rg_number?: string | null
           rg_state?: string | null
+          school_id?: string
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
         }
         Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: 'student_classroom_id_fkey'
+            columns: ['classroom_id']
+            isOneToOne: false
+            referencedRelation: 'classroom'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'student_classroomid_fkey'
+            columns: ['classroom_id']
+            isOneToOne: false
+            referencedRelation: 'classroom'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'student_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+        ]
       }
       teacher: {
         Row: {

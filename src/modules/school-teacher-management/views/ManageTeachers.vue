@@ -53,6 +53,7 @@ async function loadTeachers() {
   try {
     const teachers: any = await teacherService.getAll('created_at', true)
     teacherData.value = teachers || []
+    console.log('Professores carregados:', teachers)
   }
   catch (error) {
     console.error('Erro ao carregar os professores:', error)

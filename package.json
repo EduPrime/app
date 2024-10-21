@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --config ./eslint.config.js . --fix",
     "type-check": "vue-tsc --noEmit",
-    "generateNewTypes": "node supabase/upgrade-database.js generateNewTypes",
+    "generateNewTypes": "npx supabase gen types --lang=typescript --local > src/types/database.types.ts",
     "dbReset": "node supabase/upgrade-database.js dbReset"
   },
   "dependencies": {
