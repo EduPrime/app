@@ -32,6 +32,7 @@ const fieldLabels: Record<keyof Tables<'enrollment'>, string> = {
   student_id: 'ID do Aluno',
   course_id: 'ID do Curso',
   series_id: 'ID da Série',
+  institution_id: 'ID da Instituição',
   date_enrollment: 'Data da Matrícula',
   observations: 'Observações',
   created_at: 'Criado Em',

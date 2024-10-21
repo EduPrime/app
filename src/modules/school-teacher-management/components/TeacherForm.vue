@@ -123,7 +123,7 @@ async function registerTeacher() {
         }
       }
       else {
-        result = await teacherService.create(formData)
+        result = await teacherService.create({ ...formData, showDetails: true })
         if (result) {
           showToast('Professor cadastrado com sucesso!')
           setTimeout(() => {
