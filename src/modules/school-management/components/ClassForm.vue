@@ -11,6 +11,7 @@ import * as yup from 'yup'
 import ClassroomService from '../services/ClassroomService'
 import CourseService from '../services/CourseService'
 import InstitutionService from '../services/InstitutionService'
+import School_courseService from '../services/School_courseService'
 import SchoolService from '../services/SchoolService'
 import SeriesService from '../services/SeriesService'
 
@@ -43,6 +44,7 @@ const seriesService = new SeriesService()
 const institutionService = new InstitutionService()
 const teacherService = new TeacherService()
 const courseService = new CourseService()
+const school_courseService = new School_courseService()
 const seriesList = ref()
 const classroomList = ref()
 const institutionList = ref()
@@ -244,29 +246,30 @@ async function getClassData() {
   }
 }
 
-// Carregamento diferido para professores, turmas, séries e cursos
+async function loadSchools() {
+  const schools = await schoolService.getAll()
+  schoolList.value = schools.map((school: any) => ({
+    id: school.id,
+    name: school.name,
+  }))
+}
+
+async function loadCoursesBySchool(schoolId: string) {
+  const courses = await school_courseService.getCoursesBySchool(schoolId)
+  courseList.value = courses.map((course: any) => ({
+    id: course.id,
+    name: course.name,
+  }))
+}
+
 watch(schoolId, async (newSchoolId) => {
   if (newSchoolId) {
-    try {
-      courseList.value = await courseService.getBySchoolId(newSchoolId)
-      seriesList.value = await seriesService.getBySchoolId(newSchoolId)
-      teacherList.value = await teacherService.getBySchoolId(newSchoolId)
-      classroomList.value = await classroomService.getBySchoolId(newSchoolId)
-    }
-    catch (error) {
-      console.error('Erro ao carregar turmas e séries para o escritório:', error)
-      showToast('Erro ao carregar dados. Tente novamente.', 'top', 'danger')
-    }
-  }
-  else {
-    courseList.value = []
-    seriesList.value = []
-    classroomList.value = []
-    teacherList.value = []
+    await loadCoursesBySchool(newSchoolId)
   }
 })
 
 onMounted(async () => {
+  await loadSchools()
   await loadClassroom()
   if (classId.value) {
     await getClassData()
