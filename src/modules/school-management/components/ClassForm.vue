@@ -9,6 +9,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
 import ClassroomService from '../services/ClassroomService'
+import Course_series_disciplineService from '../services/Course_series_disciplineService'
 import CourseService from '../services/CourseService'
 import InstitutionService from '../services/InstitutionService'
 import School_courseService from '../services/School_courseService'
@@ -45,6 +46,7 @@ const institutionService = new InstitutionService()
 const teacherService = new TeacherService()
 const courseService = new CourseService()
 const school_courseService = new School_courseService()
+const series_course_disciplineService = new Course_series_disciplineService()
 const seriesList = ref()
 const classroomList = ref()
 const institutionList = ref()
@@ -55,8 +57,6 @@ const classId = computed(() => route.currentRoute.value.params.id) as { value: s
 const formSchema = yup.object({
   name: yup.string()
     .required('Nome da turma é obrigatório'),
-  institutionId: yup.string()
-    .required('Instituição é obrigatória'),
   schoolId: yup.string()
     .required('Escola é obrigatória'),
   courseId: yup.string()
@@ -254,6 +254,26 @@ async function loadSchools() {
   }))
 }
 
+async function loadInstitution() {
+  try {
+    const institutions = await institutionService.getAll()
+
+    if (institutions && institutions.length === 1) {
+      institutionId.value = institutions[0].id
+    }
+
+    if (institutions) {
+      institutionList.value = institutions.map((institution: any) => ({
+        id: institution.id,
+        name: institution.name,
+      }))
+    }
+  }
+  catch (error) {
+    console.error('Erro ao carregar dados:', error)
+  }
+}
+
 async function loadCoursesBySchool(schoolId: string) {
   const courses = await school_courseService.getCoursesBySchool(schoolId)
   courseList.value = courses.map((course: any) => ({
@@ -268,7 +288,22 @@ watch(schoolId, async (newSchoolId) => {
   }
 })
 
+async function loadSeriesByCourse(courseId: string) {
+  const series = await series_course_disciplineService.getSeriesByCourse(courseId)
+  seriesList.value = series.map((serie: any) => ({
+    id: serie.id,
+    name: serie.name,
+  }))
+}
+
+watch(courseId, async (newCourseId) => {
+  if (newCourseId) {
+    await loadSeriesByCourse(newCourseId)
+  }
+})
+
 onMounted(async () => {
+  await loadInstitution()
   await loadSchools()
   await loadClassroom()
   if (classId.value) {
@@ -305,106 +340,115 @@ onMounted(async () => {
     <EpInput v-model="values.abbreviation" name="abbreviation" label="Abreviação" placeholder="Digite a abreviação" />
     <EpInput v-model="values.year" name="year" label="Ano*" type="number" placeholder="Digite o ano" />
     <ion-list id="periodList">
-      <ion-item>
-        <IonSelect
-          v-model="values.status"
-          justify="space-between"
-          label="Tipo de Turma*"
-          placeholder="Selecione o tipo de turma"
-          @ion-change="(e) => setFieldValue('status', e.target.value)"
-        >
-          <IonSelectOption v-for="status in status" :key="status" :value="status">
-            {{ status }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+      <IonSelect
+        v-model="values.status"
+        cancel-text="Cancelar"
+        fill="outline"
+        label-placement="floating"
+        justify="space-between"
+        label="Tipo de Turma*"
+        placeholder="Selecione o tipo de turma"
+        @ion-change="(e) => setFieldValue('status', e.target.value)"
+      >
+        <IonSelectOption v-for="status in status" :key="status" :value="status">
+          {{ status }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
     <EpInput v-model="values.maxStudents" name="maxStudents" label="Máximo de Alunos*" type="number" placeholder="Digite o número máximo de alunos" />
 
     <ion-list id="institutionList">
-      <ion-item>
-        <IonSelect
-          v-model="institutionId"
-          justify="space-between"
-          label="Instituição*"
-          placeholder="Selecione a instituição"
-          @ion-change="(e) => {
-            setFieldValue('institutionId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="institution in institutionList" :key="institution.id" :value="institution.id">
-            {{ institution.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+      <IonSelect
+        v-model="institutionId"
+        :disabled="true"
+        cancel-text="Cancelar"
+        fill="outline"
+        label-placement="floating"
+        justify="space-between"
+        label="Instituição*"
+        placeholder="Selecione a instituição"
+        @ion-change="(e) => {
+          setFieldValue('institutionId', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="institution in institutionList" :key="institution.id" :value="institution.id">
+          {{ institution.name }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
     <ion-list id="schoolList">
-      <ion-item>
-        <IonSelect
-          v-model="schoolId"
-          justify="space-between"
-          label="Escola*"
-          placeholder="Selecione a escola"
-          @ion-change="(e) => {
-            setFieldValue('schoolId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
-            {{ school.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+      <IonSelect
+        v-model="schoolId"
+        cancel-text="Cancelar"
+        fill="outline"
+        label-placement="floating"
+        justify="space-between"
+        label="Escola*"
+        placeholder="Selecione a escola"
+        @ion-change="(e) => {
+          setFieldValue('schoolId', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
+          {{ school.name }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
-    <ion-list v-if="schoolId" id="courseList">
-      <ion-item>
-        <IonSelect
-          v-model="courseId"
-          justify="space-between"
-          label="Curso*"
-          placeholder="Selecione o curso"
-          @ion-change="(e) => {
-            setFieldValue('courseId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
-            {{ course.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+    <ion-list id="courseList">
+      <IonSelect
+        v-model="courseId"
+        :disabled="!schoolId"
+        cancel-text="Cancelar"
+        fill="outline"
+        label-placement="floating"
+        justify="space-between"
+        label="Curso*"
+        placeholder="Selecione o curso"
+        @ion-change="(e) => {
+          setFieldValue('courseId', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
+          {{ course.name }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
-    <ion-list v-if="schoolId" id="seriesList">
-      <ion-item>
-        <IonSelect
-          v-model="seriesId"
-          justify="space-between"
-          label="Série*"
-          placeholder="Selecione a série"
-          @ion-change="(e) => {
-            setFieldValue('seriesId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
-            {{ series.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+    <ion-list id="seriesList">
+      <IonSelect
+        v-model="seriesId"
+        :disabled="!courseId"
+        cancel-text="Cancelar"
+        fill="outline"
+        label-placement="floating"
+        justify="space-between"
+        label="Série*"
+        placeholder="Selecione a série"
+        @ion-change="(e) => {
+          setFieldValue('seriesId', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
+          {{ series.name }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
-    <ion-list v-if="schoolId" id="teacherList">
-      <ion-item>
-        <IonSelect
-          v-model="teacherId"
-          justify="space-between"
-          label="Professor*"
-          placeholder="Selecione o professor"
-          @ion-change="(e) => {
-            setFieldValue('teacherId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="teacher in teacherList" :key="teacher.id" :value="teacher.id">
-            {{ teacher.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+    <ion-list id="teacherList">
+      <IonSelect
+        v-model="teacherId"
+        cancel-text="Cancelar"
+        fill="outline"
+        label-placement="floating"
+        justify="space-between"
+        label="Professor*"
+        placeholder="Selecione o professor"
+        @ion-change="(e) => {
+          setFieldValue('teacherId', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="teacher in teacherList" :key="teacher.id" :value="teacher.id">
+          {{ teacher.name }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
   </div>
   <div v-show="selectedSegment === 'class-info'">
@@ -413,35 +457,37 @@ onMounted(async () => {
     <EpInput v-model="values.endTimeInterval" name="endTimeInterval" label="Intervalo Final" type="time" placeholder="Digite o intervalo final" />
     <EpInput v-model="values.endTime" name="endTime" label="Hora Final" type="time" placeholder="Digite a hora final" />
     <ion-list id="daysOfWeek">
-      <ion-item>
-        <IonSelect
-          v-model="values.day_of_week"
-          multiple
-          justify="space-between"
-          label="Dias da Semana"
-          placeholder="Selecione os dias da semana"
-          @ion-change="(e) => setFieldValue('day_of_week', e.target.value)"
-        >
-          <IonSelectOption v-for="day_of_week in day_of_week" :key="day_of_week" :value="day_of_week">
-            {{ day_of_week }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+      <IonSelect
+        v-model="values.day_of_week"
+        fill="outline"
+        label-placement="floating"
+        cancel-text="Cancelar"
+        multiple
+        justify="space-between"
+        label="Dias da Semana"
+        placeholder="Selecione os dias da semana"
+        @ion-change="(e) => setFieldValue('day_of_week', e.target.value)"
+      >
+        <IonSelectOption v-for="day_of_week in day_of_week" :key="day_of_week" :value="day_of_week">
+          {{ day_of_week }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
     <ion-list id="periodList">
-      <ion-item>
-        <IonSelect
-          v-model="values.period"
-          justify="space-between"
-          label="Turno"
-          placeholder="Selecione o turno"
-          @ion-change="(e) => setFieldValue('period', e.target.value)"
-        >
-          <IonSelectOption v-for="period in period" :key="period" :value="period">
-            {{ period }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+      <IonSelect
+        v-model="values.period"
+        fill="outline"
+        label-placement="floating"
+        cancel-text="Cancelar"
+        justify="space-between"
+        label="Turno"
+        placeholder="Selecione o turno"
+        @ion-change="(e) => setFieldValue('period', e.target.value)"
+      >
+        <IonSelectOption v-for="period in period" :key="period" :value="period">
+          {{ period }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
   </div>
 </template>

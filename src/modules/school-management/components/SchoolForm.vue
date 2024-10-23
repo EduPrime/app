@@ -139,7 +139,7 @@ async function registerSchool() {
   }
 }
 
-async function loadSchool() {
+async function loadInstitution() {
   try {
     const institutions = await institutionService.getAll()
 
@@ -195,7 +195,7 @@ const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, 
 const areaMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
 
 onMounted(async () => {
-  await loadSchool()
+  await loadInstitution()
   /*   institutionId.value = (await institutionService.getAll())?.at(0)?.id */
   if (schoolId.value) {
     await getSchoolData()
