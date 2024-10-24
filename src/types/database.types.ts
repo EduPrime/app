@@ -240,20 +240,20 @@ export interface Database {
           abbreviation: string | null
           course_id: string
           created_at: string
-          day_of_week: Database['public']['Enums']['day_of_week']
+          day_of_week: Database['public']['Enums']['day_of_week'] | null
           deleted_at: string | null
-          endTime: string
-          endTimeInterval: string
+          endTime: string | null
+          endTimeInterval: string | null
           id: string
           institution_id: string
           maxStudents: number
           metadata: Json | null
           name: string
-          period: Database['public']['Enums']['period']
+          period: Database['public']['Enums']['period'] | null
           school_id: string
           series_id: string
-          startTime: string
-          startTimeInterval: string
+          startTime: string | null
+          startTimeInterval: string | null
           status: Database['public']['Enums']['status']
           teacher_id: string
           updated_at: string | null
@@ -264,20 +264,20 @@ export interface Database {
           abbreviation?: string | null
           course_id: string
           created_at?: string
-          day_of_week: Database['public']['Enums']['day_of_week']
+          day_of_week?: Database['public']['Enums']['day_of_week'] | null
           deleted_at?: string | null
-          endTime: string
-          endTimeInterval: string
+          endTime?: string | null
+          endTimeInterval?: string | null
           id?: string
           institution_id: string
           maxStudents: number
           metadata?: Json | null
           name: string
-          period?: Database['public']['Enums']['period']
+          period?: Database['public']['Enums']['period'] | null
           school_id: string
           series_id: string
-          startTime: string
-          startTimeInterval: string
+          startTime?: string | null
+          startTimeInterval?: string | null
           status?: Database['public']['Enums']['status']
           teacher_id: string
           updated_at?: string | null
@@ -288,20 +288,20 @@ export interface Database {
           abbreviation?: string | null
           course_id?: string
           created_at?: string
-          day_of_week?: Database['public']['Enums']['day_of_week']
+          day_of_week?: Database['public']['Enums']['day_of_week'] | null
           deleted_at?: string | null
-          endTime?: string
-          endTimeInterval?: string
+          endTime?: string | null
+          endTimeInterval?: string | null
           id?: string
           institution_id?: string
           maxStudents?: number
           metadata?: Json | null
           name?: string
-          period?: Database['public']['Enums']['period']
+          period?: Database['public']['Enums']['period'] | null
           school_id?: string
           series_id?: string
-          startTime?: string
-          startTimeInterval?: string
+          startTime?: string | null
+          startTimeInterval?: string | null
           status?: Database['public']['Enums']['status']
           teacher_id?: string
           updated_at?: string | null
@@ -426,6 +426,7 @@ export interface Database {
         Row: {
           course_id: string | null
           created_at: string
+          deleted_at: string | null
           discipline_id: string | null
           id: string
           series_id: string | null
@@ -434,6 +435,7 @@ export interface Database {
         Insert: {
           course_id?: string | null
           created_at?: string
+          deleted_at?: string | null
           discipline_id?: string | null
           id?: string
           series_id?: string | null
@@ -442,6 +444,7 @@ export interface Database {
         Update: {
           course_id?: string | null
           created_at?: string
+          deleted_at?: string | null
           discipline_id?: string | null
           id?: string
           series_id?: string | null
@@ -1257,16 +1260,18 @@ export interface Database {
       student: {
         Row: {
           address: string | null
+          birth_certificate: string | null
           birthdate: string
           city: string | null
           complement: string | null
-          cpf: string
+          cpf: string | null
           created_at: string
           deficiency: Database['public']['Enums']['deficiency_type'] | null
           deficiency_description: string | null
           deleted_at: string | null
           docsType: string | null
           email: string | null
+          ethnicity: Database['public']['Enums']['ethnicity_type'] | null
           father_cpf: string | null
           father_email: string | null
           father_name: string | null
@@ -1280,18 +1285,11 @@ export interface Database {
           mother_phone: string | null
           name: string
           neighborhood: string | null
-          new_birth_cert_number: string | null
           number_address: string | null
-          old_birth_cert_book: string | null
-          old_birth_cert_date_issue: string | null
-          old_birth_cert_sheet: string | null
-          old_birth_cert_state: string | null
-          old_birth_cert_term: string | null
           phone: string
           photo: string | null
           place_of_birth: string | null
           postalcode: string | null
-          race: Database['public']['Enums']['race_type'] | null
           residence_zone:
             | Database['public']['Enums']['residence_zone_type']
             | null
@@ -1306,16 +1304,18 @@ export interface Database {
         }
         Insert: {
           address?: string | null
+          birth_certificate?: string | null
           birthdate: string
           city?: string | null
           complement?: string | null
-          cpf: string
+          cpf?: string | null
           created_at?: string
           deficiency?: Database['public']['Enums']['deficiency_type'] | null
           deficiency_description?: string | null
           deleted_at?: string | null
           docsType?: string | null
           email?: string | null
+          ethnicity?: Database['public']['Enums']['ethnicity_type'] | null
           father_cpf?: string | null
           father_email?: string | null
           father_name?: string | null
@@ -1329,18 +1329,11 @@ export interface Database {
           mother_phone?: string | null
           name: string
           neighborhood?: string | null
-          new_birth_cert_number?: string | null
           number_address?: string | null
-          old_birth_cert_book?: string | null
-          old_birth_cert_date_issue?: string | null
-          old_birth_cert_sheet?: string | null
-          old_birth_cert_state?: string | null
-          old_birth_cert_term?: string | null
           phone: string
           photo?: string | null
           place_of_birth?: string | null
           postalcode?: string | null
-          race?: Database['public']['Enums']['race_type'] | null
           residence_zone?:
             | Database['public']['Enums']['residence_zone_type']
             | null
@@ -1357,16 +1350,18 @@ export interface Database {
         }
         Update: {
           address?: string | null
+          birth_certificate?: string | null
           birthdate?: string
           city?: string | null
           complement?: string | null
-          cpf?: string
+          cpf?: string | null
           created_at?: string
           deficiency?: Database['public']['Enums']['deficiency_type'] | null
           deficiency_description?: string | null
           deleted_at?: string | null
           docsType?: string | null
           email?: string | null
+          ethnicity?: Database['public']['Enums']['ethnicity_type'] | null
           father_cpf?: string | null
           father_email?: string | null
           father_name?: string | null
@@ -1380,18 +1375,11 @@ export interface Database {
           mother_phone?: string | null
           name?: string
           neighborhood?: string | null
-          new_birth_cert_number?: string | null
           number_address?: string | null
-          old_birth_cert_book?: string | null
-          old_birth_cert_date_issue?: string | null
-          old_birth_cert_sheet?: string | null
-          old_birth_cert_state?: string | null
-          old_birth_cert_term?: string | null
           phone?: string
           photo?: string | null
           place_of_birth?: string | null
           postalcode?: string | null
-          race?: Database['public']['Enums']['race_type'] | null
           residence_zone?:
             | Database['public']['Enums']['residence_zone_type']
             | null
@@ -1778,6 +1766,13 @@ export interface Database {
         | 'Múltipla'
         | 'Outros'
         | 'Não possui'
+      ethnicity_type:
+        | 'Branca'
+        | 'Preta'
+        | 'Parda'
+        | 'Amarela'
+        | 'Indígena'
+        | 'Não declarada'
       gender_type: 'Masculino' | 'Feminino'
       graduate_status: 'Sim' | 'Não'
       marital_status_type:
@@ -1789,13 +1784,6 @@ export interface Database {
         | 'União Estável'
         | 'Não Informado'
       period: 'Manhã' | 'Tarde' | 'Noite'
-      race_type:
-        | 'Branca'
-        | 'Preta'
-        | 'Parda'
-        | 'Amarela'
-        | 'Indígena'
-        | 'Não declarada'
       regime_type: 'Presencial' | 'EAD' | 'Semi-Presencial'
       residence_zone_type: 'Urbana' | 'Rural'
       responsibletype: 'Pai' | 'Mãe' | 'Ambos'

@@ -248,10 +248,15 @@ async function getClassData() {
 
 async function loadSchools() {
   const schools = await schoolService.getAll()
-  schoolList.value = schools.map((school: any) => ({
-    id: school.id,
-    name: school.name,
-  }))
+  if (schools) {
+    schoolList.value = schools.map((school: any) => ({
+      id: school.id,
+      name: school.name,
+    }))
+  }
+  else {
+    schoolList.value = []
+  }
 }
 
 async function loadInstitution() {
@@ -276,6 +281,11 @@ async function loadInstitution() {
 
 async function loadCoursesBySchool(schoolId: string) {
   const courses = await school_courseService.getCoursesBySchool(schoolId)
+
+  if (courses.length === 0) {
+    showToast('Nenhum curso cadastrado para essa escola. É necessário realizar o cadastro.', 'top', 'warning')
+  }
+
   courseList.value = courses.map((course: any) => ({
     id: course.id,
     name: course.name,
@@ -290,6 +300,11 @@ watch(schoolId, async (newSchoolId) => {
 
 async function loadSeriesByCourse(courseId: string) {
   const series = await series_course_disciplineService.getSeriesByCourse(courseId)
+
+  if (series.length === 0) {
+    showToast('Nenhuma série cadastrada para esse curso. É necessário realizar o cadastro.', 'top', 'warning')
+  }
+
   seriesList.value = series.map((serie: any) => ({
     id: serie.id,
     name: serie.name,

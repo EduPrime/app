@@ -51,12 +51,7 @@ const valuesDocs = ref({
   rg_state: '',
   rg_issue_date: '',
   rg_issuer: '',
-  new_birth_cert_number: '',
-  old_birth_cert_term: '',
-  old_birth_cert_book: '',
-  old_birth_cert_sheet: '',
-  old_birth_cert_date_issue: '',
-  old_birth_cert_state: '',
+  birth_certificate: '',
 
 })
 const studentData = ref< Tables<'student'> | []>([])
@@ -94,7 +89,7 @@ const rg_state = [...states]
 const gender = ['Masculino', 'Feminino']
 const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED']
 const residence_zone = ['Urbana', 'Rural']
-const race = ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena', 'Não declarada']
+const ethnicity = ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena', 'Não declarada']
 const deficiency = ['Visual', 'Auditiva', 'Física', 'Intelectual', 'Mental', 'Múltipla', 'Outros', 'Não possui']
 const selectedSegment = ref('general-info')
 const studentService = new StudentService()
@@ -215,26 +210,13 @@ const formSchema = yup.object({
     .required('Tipo de responsável é obrigatório'),
   docsType: yup.string()
     .required('Tipo de documento é obrigatório'),
-  new_birth_cert_number: yup.string()
+  birth_certificate: yup.string()
     .nullable()
     .min(32, 'O número da matrícula deve ter no mínimo 32 caracteres')
     .max(32, 'O número da matrícula deve ter no máximo 32 caracteres'),
-  old_birth_cert_term: yup.string()
+  ethnicity: yup.string()
     .nullable()
-    .max(30, 'O termo deve ter no máximo 30 caracteres'),
-  old_birth_cert_sheet: yup.string()
-    .nullable()
-    .max(30, 'A folha deve ter no máximo 30 caracteres'),
-  old_birth_cert_date_issue: yup.string()
-    .nullable(),
-  old_birth_cert_book: yup.string()
-    .nullable()
-    .max(30, 'O livro deve ter no máximo 30 caracteres'),
-  old_birth_cert_state: yup.string()
-    .nullable(),
-  race: yup.string()
-    .nullable()
-    .required('Raça é obrigatória'),
+    .required('Etnia é obrigatória'),
   deficiency: yup.string()
     .nullable()
     .required('Necessário informar se possui necessidades'),
@@ -274,12 +256,7 @@ async function registerStudent() {
       rg_state: values.rg_state,
       rg_issue_date: values.rg_issue_date,
       rg_issuer: values.rg_issuer,
-      new_birth_cert_number: values.new_birth_cert_number,
-      old_birth_cert_book: values.old_birth_cert_book,
-      old_birth_cert_date_issue: values.old_birth_cert_date_issue,
-      old_birth_cert_sheet: values.old_birth_cert_sheet,
-      old_birth_cert_state: values.old_birth_cert_state,
-      old_birth_cert_term: values.old_birth_cert_term,
+      birth_certificate: values.birth_certificate,
       father_name: values.father_name,
       father_cpf: values.father_cpf,
       father_email: values.father_email,
@@ -290,7 +267,7 @@ async function registerStudent() {
       mother_phone: values.mother_phone,
       responsibleType: values.responsibleType,
       docsType: values.docsType,
-      race: values.race,
+      ethnicity: values.ethnicity,
       deficiency: values.deficiency,
       deficiency_description: values.deficiency_description,
 
@@ -388,17 +365,12 @@ async function getStudentData() {
       setFieldValue('mother_phone', studentDbData.mother_phone)
       setFieldValue('responsibleType', studentDbData.responsibleType)
       setFieldValue('docsType', studentDbData.docsType)
-      setFieldValue('old_birth_cert_book', studentDbData.old_birth_cert_book)
-      setFieldValue('old_birth_cert_sheet', studentDbData.old_birth_cert_sheet)
-      setFieldValue('old_birth_cert_term', studentDbData.old_birth_cert_term)
-      setFieldValue('old_birth_cert_date_issue', studentDbData.old_birth_cert_date_issue)
-      setFieldValue('old_birth_cert_state', studentDbData.old_birth_cert_state)
-      setFieldValue('new_birth_cert_number', studentDbData.new_birth_cert_number)
+      setFieldValue('birth_certificate', studentDbData.birth_certificate)
       setFieldValue('rg_number', studentDbData.rg_number)
       setFieldValue('rg_state', studentDbData.rg_state)
       setFieldValue('rg_issue_date', studentDbData.rg_issue_date)
       setFieldValue('rg_issuer', studentDbData.rg_issuer)
-      setFieldValue('race', studentDbData.race)
+      setFieldValue('ethnicity', studentDbData.ethnicity)
       setFieldValue('deficiency', studentDbData.deficiency)
       setFieldValue('deficiency_description', studentDbData.deficiency_description)
     }
@@ -450,14 +422,7 @@ watch(docsType, (newValue, oldValue) => {
     valuesDocs.value.rg_issuer = ''
   }
   else if (newValue === 'Certidão de Nascimento (Novo Formato)') {
-    valuesDocs.value.new_birth_cert_number = ''
-  }
-  else if (newValue === 'Certidão de Nascimento (Antigo Formato)') {
-    valuesDocs.value.old_birth_cert_book = ''
-    valuesDocs.value.old_birth_cert_sheet = ''
-    valuesDocs.value.old_birth_cert_term = ''
-    valuesDocs.value.old_birth_cert_date_issue = ''
-    valuesDocs.value.old_birth_cert_state = ''
+    valuesDocs.value.birth_certificate = ''
   }
 })
 
@@ -518,19 +483,19 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
 
-    <ion-list id="race">
+    <ion-list id="ethnicity">
       <ion-item>
         <IonSelect
-          v-model="values.race"
+          v-model="values.ethnicity"
           justify="space-between"
           label="Raça*"
           placeholder="Selecione a raça"
           @ion-change="(e) => {
-            setFieldValue('race', e.detail.value)
+            setFieldValue('ethnicity', e.detail.value)
           }"
         >
-          <IonSelectOption v-for="race in race" :key="race" :value="race">
-            {{ race }}
+          <IonSelectOption v-for="ethnicity in ethnicity" :key="ethnicity" :value="ethnicity">
+            {{ ethnicity }}
           </IonSelectOption>
         </IonSelect>
       </ion-item>
@@ -777,9 +742,6 @@ onMounted(async () => {
           <IonSelectOption value="Certidão de Nascimento (Novo Formato)">
             Certidão de Nascimento (Novo Formato)
           </IonSelectOption>
-          <IonSelectOption value="Certidão de Nascimento (Antigo Formato)">
-            Certidão de Nascimento (Antigo Formato)
-          </IonSelectOption>
         </IonSelect>
       </ion-item>
     </ion-list>
@@ -826,51 +788,11 @@ onMounted(async () => {
     <!-- Campos da Certidão de Nascimento (Novo Formato) -->
     <div v-show="values.docsType === 'Certidão de Nascimento (Novo Formato)'">
       <EpInput
-        v-model="values.new_birth_cert_number"
-        name="new_birth_cert_number"
+        v-model="values.birth_certificate"
+        name="birth_certificate"
         label="Matrícula"
         placeholder="Digite a Matrícula da Certidão"
       />
-    </div>
-
-    <!-- Campos da Certidão de Nascimento (Antigo Formato) -->
-    <div v-show="values.docsType === 'Certidão de Nascimento (Antigo Formato)'">
-      <EpInput
-        v-model="values.old_birth_cert_term"
-        name="old_birth_cert_term"
-        label="Termo"
-        placeholder="Digite o número do termo da certidão"
-      />
-      <EpInput
-        v-model="values.old_birth_cert_book"
-        name="old_birth_cert_book"
-        label="Livro"
-        placeholder="Informe o número do livro do registro"
-      />
-      <EpInput
-        v-model="values.old_birth_cert_sheet"
-        name="old_birth_cert_sheet"
-        label="Folha"
-        placeholder="Indique a folha do livro onde está o registro"
-      />
-      <ion-list id="old_birth_cert_state">
-        <ion-item>
-          <IonSelect
-            v-model="values.old_birth_cert_state"
-            justify="space-between"
-            label="Estado de Emissão"
-            placeholder="Selecione o estado onde a certidão foi emitida"
-            @ion-change="(e) => {
-              setFieldValue('old_birth_cert_state', e.detail.value)
-            }"
-          >
-            <IonSelectOption v-for="old_birth_cert_state in old_birth_cert_state" :key="old_birth_cert_state" :value="old_birth_cert_state">
-              {{ old_birth_cert_state }}
-            </IonSelectOption>
-          </IonSelect>
-        </ion-item>
-      </ion-list>
-      <EpInput v-model="values.old_birth_cert_date_issue" name="old_birth_cert_date_issue" label="Data de Emissão" type="date" placeholder="Selecione a data de emissão da certidão" />
     </div>
     <ion-item>
       <div v-if="values.docsType">
