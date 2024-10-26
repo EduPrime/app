@@ -29,6 +29,7 @@ const schoolId = computed(() => route.currentRoute.value.params.id) as { value: 
 const schoolService = new SchoolService()
 const institutionService = new InstitutionService()
 const institutionId = ref('')
+const institutionList = ref()
 const formSchema = yup.object ({
   name: yup
     .string()
@@ -41,12 +42,15 @@ const formSchema = yup.object ({
     .test('valid-ddd', 'DDD inválido', value => isValidDDD(value || '')),
   email: yup
     .string()
+    .nullable()
     .email('Email inválido'),
   website: yup
     .string()
+    .nullable()
     .url('Deve ser uma URL válida'),
   social_network: yup
     .string()
+    .nullable()
     .url('Deve ser uma URL válida'),
   address: yup
     .string()
@@ -68,6 +72,7 @@ const formSchema = yup.object ({
     .matches(/^\d{5}-\d{3}$/, 'Código postal deve estar no formato 00000-000'),
   logourl: yup
     .string()
+    .nullable()
     .url('Deve ser uma URL válida'),
   abbreviation: yup
     .string()
@@ -134,11 +139,33 @@ async function registerSchool() {
   }
 }
 
+async function loadInstitution() {
+  try {
+    const institutions = await institutionService.getAll()
+
+    if (institutions && institutions.length === 1) {
+      institutionId.value = institutions[0].id
+    }
+
+    if (institutions) {
+      institutionList.value = institutions.map((institution: any) => ({
+        id: institution.id,
+        name: institution.name,
+      }))
+    }
+  }
+  catch (error) {
+    console.error('Erro ao carregar dados:', error)
+  }
+}
+
 async function getSchoolData() {
   if (schoolId.value) {
     const schoolDbData = await schoolService.getById(schoolId.value)
     if (schoolDbData) {
+      institutionId.value = schoolDbData.institution_id
       setFieldValue('institutionId', schoolDbData.institution_id)
+      setFieldValue('institution', schoolDbData.institution_id)
       setFieldValue('name', schoolDbData.name)
       setFieldValue('phone', schoolDbData.phone)
       setFieldValue('email', schoolDbData.email)
@@ -168,9 +195,12 @@ const phoneMask = ref(['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, 
 const areaMask = ref([/\d/, /\d/, /\d/, /\d/, /\d/])
 
 onMounted(async () => {
-  /* institutionId.value = (await institutionService.getAll())?.at(0)?.id */
+  await loadInstitution()
+  /*   institutionId.value = (await institutionService.getAll())?.at(0)?.id */
   if (schoolId.value) {
     await getSchoolData()
+    if (institutionId.value)
+      setFieldValue('institutionId', institutionId.value)
   }
 })
 </script>
@@ -190,6 +220,24 @@ onMounted(async () => {
   </IonSegment>
 
   <div v-show="selectedSegment === 'general-info'">
+    <ion-list id="institutionList">
+      <ion-item>
+        <IonSelect
+          v-model="institutionId"
+          justify="space-between"
+          label="Instituição*"
+          placeholder="Selecione a instituição"
+          :disabled="true"
+          @ion-change="(e) => {
+            setFieldValue('institutionId', e.detail.value)
+          }"
+        >
+          <IonSelectOption v-for="institution in institutionList" :key="institution.id" :value="institution.id">
+            {{ institution.name }}
+          </IonSelectOption>
+        </IonSelect>
+      </ion-item>
+    </ion-list>
     <EpInput v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome da escola" />
     <EpInput v-model="values.abbreviation" name="abbreviation" :mask="abbreviationMask" label="Abreviação*" placeholder="Digite a abreviação" />
     <EpInput v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone*" placeholder="(99) 99999-9999" />

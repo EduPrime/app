@@ -59,7 +59,7 @@ onMounted(() => {
     </ion-toolbar>
     <ion-row class="ion-align-items-center ion-justify-content-between">
       <ion-col size="10">
-        <ion-searchbar v-model="searchQuery" placeholder="Buscar escola" />
+        <ion-searchbar v-model="searchQuery" placeholder="Buscar séries" />
       </ion-col>
       <ion-col size="2" class="ion-text-end">
         <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">

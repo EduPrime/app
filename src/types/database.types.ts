@@ -7,31 +7,6 @@ export type Json =
   | Json[]
 
 export interface Database {
-  graphql_public: {
-    Tables: {
-      [_ in never]: never
-    }
-    Views: {
-      [_ in never]: never
-    }
-    Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
-    }
-    Enums: {
-      [_ in never]: never
-    }
-    CompositeTypes: {
-      [_ in never]: never
-    }
-  }
   public: {
     Tables: {
       _teachertotimetable: {
@@ -265,20 +240,20 @@ export interface Database {
           abbreviation: string | null
           course_id: string
           created_at: string
-          day_of_week: Database['public']['Enums']['day_of_week']
+          day_of_week: Database['public']['Enums']['day_of_week'] | null
           deleted_at: string | null
-          endTime: string
-          endTimeInterval: string
+          endTime: string | null
+          endTimeInterval: string | null
           id: string
           institution_id: string
           maxStudents: number
           metadata: Json | null
           name: string
-          period: Database['public']['Enums']['period']
+          period: Database['public']['Enums']['period'] | null
           school_id: string
           series_id: string
-          startTime: string
-          startTimeInterval: string
+          startTime: string | null
+          startTimeInterval: string | null
           status: Database['public']['Enums']['status']
           teacher_id: string
           updated_at: string | null
@@ -289,20 +264,20 @@ export interface Database {
           abbreviation?: string | null
           course_id: string
           created_at?: string
-          day_of_week: Database['public']['Enums']['day_of_week']
+          day_of_week?: Database['public']['Enums']['day_of_week'] | null
           deleted_at?: string | null
-          endTime: string
-          endTimeInterval: string
+          endTime?: string | null
+          endTimeInterval?: string | null
           id?: string
           institution_id: string
           maxStudents: number
           metadata?: Json | null
           name: string
-          period?: Database['public']['Enums']['period']
+          period?: Database['public']['Enums']['period'] | null
           school_id: string
           series_id: string
-          startTime: string
-          startTimeInterval: string
+          startTime?: string | null
+          startTimeInterval?: string | null
           status?: Database['public']['Enums']['status']
           teacher_id: string
           updated_at?: string | null
@@ -313,20 +288,20 @@ export interface Database {
           abbreviation?: string | null
           course_id?: string
           created_at?: string
-          day_of_week?: Database['public']['Enums']['day_of_week']
+          day_of_week?: Database['public']['Enums']['day_of_week'] | null
           deleted_at?: string | null
-          endTime?: string
-          endTimeInterval?: string
+          endTime?: string | null
+          endTimeInterval?: string | null
           id?: string
           institution_id?: string
           maxStudents?: number
           metadata?: Json | null
           name?: string
-          period?: Database['public']['Enums']['period']
+          period?: Database['public']['Enums']['period'] | null
           school_id?: string
           series_id?: string
-          startTime?: string
-          startTimeInterval?: string
+          startTime?: string | null
+          startTimeInterval?: string | null
           status?: Database['public']['Enums']['status']
           teacher_id?: string
           updated_at?: string | null
@@ -373,52 +348,62 @@ export interface Database {
       }
       course: {
         Row: {
+          course_modality: Database['public']['Enums']['course_modality'] | null
+          course_stage: string | null
           created_at: string
           deleted_at: string | null
+          description: string | null
           id: string
-          institution_id: string
+          institution_id: string | null
           metadata: Json | null
           name: string
-          course_stage: string
-          workload: string
-          teaching_type: string
-          regime_type: string
-          course_modality: string
+          regime_type: Database['public']['Enums']['regime_type'] | null
+          school_id: string | null
           status: Database['public']['Enums']['status'] | null
+          teaching_type: Database['public']['Enums']['teaching_type'] | null
           updated_at: string | null
           user_created: string | null
+          workload: string | null
         }
         Insert: {
+          course_modality?:
+            | Database['public']['Enums']['course_modality']
+            | null
+          course_stage?: string | null
           created_at?: string
           deleted_at?: string | null
+          description?: string | null
           id?: string
-          institution_id: string
+          institution_id?: string | null
           metadata?: Json | null
           name: string
-          course_stage: string
-          workload: string
-          teaching_type: string
-          regime_type: string
-          course_modality: string
+          regime_type?: Database['public']['Enums']['regime_type'] | null
+          school_id?: string | null
           status?: Database['public']['Enums']['status'] | null
+          teaching_type?: Database['public']['Enums']['teaching_type'] | null
           updated_at?: string | null
           user_created?: string | null
+          workload?: string | null
         }
         Update: {
+          course_modality?:
+            | Database['public']['Enums']['course_modality']
+            | null
+          course_stage?: string | null
           created_at?: string
           deleted_at?: string | null
+          description?: string | null
           id?: string
-          institution_id?: string
+          institution_id?: string | null
           metadata?: Json | null
           name?: string
-          course_stage?: string
-          workload?: string
-          teaching_type?: string
-          regime_type?: string
-          course_modality?: string
+          regime_type?: Database['public']['Enums']['regime_type'] | null
+          school_id?: string | null
           status?: Database['public']['Enums']['status'] | null
+          teaching_type?: Database['public']['Enums']['teaching_type'] | null
           updated_at?: string | null
           user_created?: string | null
+          workload?: string | null
         }
         Relationships: [
           {
@@ -426,6 +411,65 @@ export interface Database {
             columns: ['institution_id']
             isOneToOne: false
             referencedRelation: 'institution'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'course_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      course_series_discipline: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          deleted_at: string | null
+          discipline_id: string | null
+          id: string
+          series_id: string | null
+          workload: number | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          discipline_id?: string | null
+          id?: string
+          series_id?: string | null
+          workload?: number | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          discipline_id?: string | null
+          id?: string
+          series_id?: string | null
+          workload?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'course_series_discipline_course_id_fkey'
+            columns: ['course_id']
+            isOneToOne: false
+            referencedRelation: 'course'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'course_series_discipline_discipline_id_fkey'
+            columns: ['discipline_id']
+            isOneToOne: false
+            referencedRelation: 'discipline'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'course_series_discipline_series_id_fkey'
+            columns: ['series_id']
+            isOneToOne: false
+            referencedRelation: 'series'
             referencedColumns: ['id']
           },
         ]
@@ -437,11 +481,10 @@ export interface Database {
           id: string
           metadata: Json | null
           name: string
-          school_id: string
           status: Database['public']['Enums']['status'] | null
-          teacher_id: string
           updated_at: string | null
           user_created: string | null
+          workload: number | null
         }
         Insert: {
           created_at?: string
@@ -449,11 +492,10 @@ export interface Database {
           id?: string
           metadata?: Json | null
           name: string
-          school_id: string
           status?: Database['public']['Enums']['status'] | null
-          teacher_id: string
           updated_at?: string | null
           user_created?: string | null
+          workload?: number | null
         }
         Update: {
           created_at?: string
@@ -461,35 +503,12 @@ export interface Database {
           id?: string
           metadata?: Json | null
           name?: string
-          school_id?: string
           status?: Database['public']['Enums']['status'] | null
-          teacher_id?: string
           updated_at?: string | null
           user_created?: string | null
+          workload?: number | null
         }
-        Relationships: [
-          {
-            foreignKeyName: 'discipline_school_id_fkey'
-            columns: ['school_id']
-            isOneToOne: false
-            referencedRelation: 'school'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'discipline_teacher_id_fkey'
-            columns: ['teacher_id']
-            isOneToOne: false
-            referencedRelation: 'teacher'
-            referencedColumns: ['id']
-          },
-          {
-            foreignKeyName: 'discipline_teacherid_fkey'
-            columns: ['teacher_id']
-            isOneToOne: false
-            referencedRelation: 'teacher'
-            referencedColumns: ['id']
-          },
-        ]
+        Relationships: []
       }
       document: {
         Row: {
@@ -557,8 +576,8 @@ export interface Database {
           deleted_at: string | null
           enrollmentCode: string | null
           id: string
-          institution_id: string
-          name: string | null
+          institution_id: string | null
+          name: string
           observations: string | null
           school_id: string
           series_id: string
@@ -575,8 +594,8 @@ export interface Database {
           deleted_at?: string | null
           enrollmentCode?: string | null
           id?: string
-          institution_id: string
-          name?: string | null
+          institution_id?: string | null
+          name: string
           observations?: string | null
           school_id: string
           series_id: string
@@ -593,8 +612,8 @@ export interface Database {
           deleted_at?: string | null
           enrollmentCode?: string | null
           id?: string
-          institution_id?: string
-          name?: string | null
+          institution_id?: string | null
+          name?: string
           observations?: string | null
           school_id?: string
           series_id?: string
@@ -801,6 +820,124 @@ export interface Database {
         }
         Relationships: []
       }
+      institution_settings: {
+        Row: {
+          created_at: string
+          date_closing: string | null
+          date_end: string | null
+          date_opening: string | null
+          date_start: string | null
+          id: number
+          institution_id: string | null
+          school_days: number | null
+        }
+        Insert: {
+          created_at?: string
+          date_closing?: string | null
+          date_end?: string | null
+          date_opening?: string | null
+          date_start?: string | null
+          id?: number
+          institution_id?: string | null
+          school_days?: number | null
+        }
+        Update: {
+          created_at?: string
+          date_closing?: string | null
+          date_end?: string | null
+          date_opening?: string | null
+          date_start?: string | null
+          id?: number
+          institution_id?: string | null
+          school_days?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'institution_settings_institution_id_fkey'
+            columns: ['institution_id']
+            isOneToOne: false
+            referencedRelation: 'institution'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      pre_enrollment: {
+        Row: {
+          course_id: string
+          created_at: string
+          date_enrollment: string
+          deleted_at: string | null
+          id: string
+          observations: string | null
+          pre_enrollment_code: string | null
+          school_id: string
+          series_id: string
+          situation: Database['public']['Enums']['situation_type'] | null
+          status: Database['public']['Enums']['status'] | null
+          student_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          date_enrollment: string
+          deleted_at?: string | null
+          id?: string
+          observations?: string | null
+          pre_enrollment_code?: string | null
+          school_id: string
+          series_id: string
+          situation?: Database['public']['Enums']['situation_type'] | null
+          status?: Database['public']['Enums']['status'] | null
+          student_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          date_enrollment?: string
+          deleted_at?: string | null
+          id?: string
+          observations?: string | null
+          pre_enrollment_code?: string | null
+          school_id?: string
+          series_id?: string
+          situation?: Database['public']['Enums']['situation_type'] | null
+          status?: Database['public']['Enums']['status'] | null
+          student_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'pre_enrollment_course_id_fkey'
+            columns: ['course_id']
+            isOneToOne: false
+            referencedRelation: 'course'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'pre_enrollment_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'pre_enrollment_series_id_fkey'
+            columns: ['series_id']
+            isOneToOne: false
+            referencedRelation: 'series'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'pre_enrollment_student_id_fkey'
+            columns: ['student_id']
+            isOneToOne: false
+            referencedRelation: 'student'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       role: {
         Row: {
           id: string
@@ -946,6 +1083,83 @@ export interface Database {
           },
         ]
       }
+      school_course: {
+        Row: {
+          course_id: string | null
+          created_at: string
+          id: string
+          school_id: string | null
+        }
+        Insert: {
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          school_id?: string | null
+        }
+        Update: {
+          course_id?: string | null
+          created_at?: string
+          id?: string
+          school_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'school_course_course_id_fkey'
+            columns: ['course_id']
+            isOneToOne: false
+            referencedRelation: 'course'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'school_course_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      school_settings: {
+        Row: {
+          created_at: string
+          date_closing: string | null
+          date_end: string | null
+          date_opening: string | null
+          date_start: string | null
+          id: string
+          institution_id: string | null
+          school_days: number | null
+        }
+        Insert: {
+          created_at?: string
+          date_closing?: string | null
+          date_end?: string | null
+          date_opening?: string | null
+          date_start?: string | null
+          id?: string
+          institution_id?: string | null
+          school_days?: number | null
+        }
+        Update: {
+          created_at?: string
+          date_closing?: string | null
+          date_end?: string | null
+          date_opening?: string | null
+          date_start?: string | null
+          id?: string
+          institution_id?: string | null
+          school_days?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'school_settings_institution_id_fkey'
+            columns: ['institution_id']
+            isOneToOne: false
+            referencedRelation: 'institution'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       series: {
         Row: {
           course_id: string
@@ -958,6 +1172,7 @@ export interface Database {
           metadata: Json | null
           name: string
           school_days: string
+          school_id: string | null
           timetable_id: string | null
           updated_at: string | null
           user_created: string | null
@@ -974,6 +1189,7 @@ export interface Database {
           metadata?: Json | null
           name: string
           school_days: string
+          school_id?: string | null
           timetable_id?: string | null
           updated_at?: string | null
           user_created?: string | null
@@ -990,6 +1206,7 @@ export interface Database {
           metadata?: Json | null
           name?: string
           school_days?: string
+          school_id?: string | null
           timetable_id?: string | null
           updated_at?: string | null
           user_created?: string | null
@@ -1018,6 +1235,13 @@ export interface Database {
             referencedColumns: ['id']
           },
           {
+            foreignKeyName: 'series_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
+            referencedColumns: ['id']
+          },
+          {
             foreignKeyName: 'series_timetable_id_fkey'
             columns: ['timetable_id']
             isOneToOne: false
@@ -1036,14 +1260,18 @@ export interface Database {
       student: {
         Row: {
           address: string | null
+          birth_certificate: string | null
           birthdate: string
           city: string | null
           complement: string | null
-          cpf: string
+          cpf: string | null
           created_at: string
+          deficiency: Database['public']['Enums']['deficiency_type'] | null
+          deficiency_description: string | null
           deleted_at: string | null
           docsType: string | null
           email: string | null
+          ethnicity: Database['public']['Enums']['ethnicity_type'] | null
           father_cpf: string | null
           father_email: string | null
           father_name: string | null
@@ -1057,13 +1285,7 @@ export interface Database {
           mother_phone: string | null
           name: string
           neighborhood: string | null
-          new_birth_cert_number: string | null
           number_address: string | null
-          old_birth_cert_book: string | null
-          old_birth_cert_date_issue: string | null
-          old_birth_cert_sheet: string | null
-          old_birth_cert_state: string | null
-          old_birth_cert_term: string | null
           phone: string
           photo: string | null
           place_of_birth: string | null
@@ -1077,22 +1299,23 @@ export interface Database {
           rg_number: string | null
           rg_state: string | null
           status: Database['public']['Enums']['status'] | null
-          race: Database['public']['Enums']['race_type'] | null
-          deficiency: Database['public']['Enums']['deficiency_type'] | null
-          deficiency_description: string | null
           updated_at: string | null
           user_created: string | null
         }
         Insert: {
           address?: string | null
+          birth_certificate?: string | null
           birthdate: string
           city?: string | null
           complement?: string | null
-          cpf: string
+          cpf?: string | null
           created_at?: string
+          deficiency?: Database['public']['Enums']['deficiency_type'] | null
+          deficiency_description?: string | null
           deleted_at?: string | null
           docsType?: string | null
           email?: string | null
+          ethnicity?: Database['public']['Enums']['ethnicity_type'] | null
           father_cpf?: string | null
           father_email?: string | null
           father_name?: string | null
@@ -1106,13 +1329,7 @@ export interface Database {
           mother_phone?: string | null
           name: string
           neighborhood?: string | null
-          new_birth_cert_number?: string | null
           number_address?: string | null
-          old_birth_cert_book?: string | null
-          old_birth_cert_date_issue?: string | null
-          old_birth_cert_sheet?: string | null
-          old_birth_cert_state?: string | null
-          old_birth_cert_term?: string | null
           phone: string
           photo?: string | null
           place_of_birth?: string | null
@@ -1128,22 +1345,23 @@ export interface Database {
           rg_number?: string | null
           rg_state?: string | null
           status?: Database['public']['Enums']['status'] | null
-          race: Database['public']['Enums']['race_type'] | null
-          deficiency: Database['public']['Enums']['deficiency_type'] | null
-          deficiency_description: string | null
           updated_at?: string | null
           user_created?: string | null
         }
         Update: {
           address?: string | null
+          birth_certificate?: string | null
           birthdate?: string
           city?: string | null
           complement?: string | null
-          cpf?: string
+          cpf?: string | null
           created_at?: string
+          deficiency?: Database['public']['Enums']['deficiency_type'] | null
+          deficiency_description?: string | null
           deleted_at?: string | null
           docsType?: string | null
           email?: string | null
+          ethnicity?: Database['public']['Enums']['ethnicity_type'] | null
           father_cpf?: string | null
           father_email?: string | null
           father_name?: string | null
@@ -1157,13 +1375,7 @@ export interface Database {
           mother_phone?: string | null
           name?: string
           neighborhood?: string | null
-          new_birth_cert_number?: string | null
           number_address?: string | null
-          old_birth_cert_book?: string | null
-          old_birth_cert_date_issue?: string | null
-          old_birth_cert_sheet?: string | null
-          old_birth_cert_state?: string | null
-          old_birth_cert_term?: string | null
           phone?: string
           photo?: string | null
           place_of_birth?: string | null
@@ -1179,14 +1391,10 @@ export interface Database {
           rg_number?: string | null
           rg_state?: string | null
           status?: Database['public']['Enums']['status'] | null
-          race: Database['public']['Enums']['race_type'] | null
-          deficiency: Database['public']['Enums']['deficiency_type'] | null
-          deficiency_description: string | null
           updated_at?: string | null
           user_created?: string | null
         }
-        Relationships: [
-        ]
+        Relationships: []
       }
       teacher: {
         Row: {
@@ -1201,7 +1409,7 @@ export interface Database {
           phone: string | null
           qualifications: Json | null
           school_id: string
-          showDetails: boolean
+          showDetails: boolean | null
           status: Database['public']['Enums']['status'] | null
           updated_at: string | null
           user_created: string | null
@@ -1218,7 +1426,7 @@ export interface Database {
           phone?: string | null
           qualifications?: Json | null
           school_id: string
-          showDetails: boolean
+          showDetails?: boolean | null
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
@@ -1235,7 +1443,7 @@ export interface Database {
           phone?: string | null
           qualifications?: Json | null
           school_id?: string
-          showDetails?: boolean
+          showDetails?: boolean | null
           status?: Database['public']['Enums']['status'] | null
           updated_at?: string | null
           user_created?: string | null
@@ -1529,6 +1737,11 @@ export interface Database {
     }
     Enums: {
       attendance_status: 'PRESENT' | 'ABSENT' | 'EXCUSED'
+      course_modality:
+        | 'Ensino Regular'
+        | 'EJA'
+        | 'Educação Profissional'
+        | 'Educação Especial'
       course_stage_type:
         | 'Etapa 1'
         | 'Etapa 2'
@@ -1544,6 +1757,22 @@ export interface Database {
         | 'Sexta'
         | 'Sábado'
         | 'Domingo'
+      deficiency_type:
+        | 'Visual'
+        | 'Auditiva'
+        | 'Física'
+        | 'Intelectual'
+        | 'Mental'
+        | 'Múltipla'
+        | 'Outros'
+        | 'Não possui'
+      ethnicity_type:
+        | 'Branca'
+        | 'Preta'
+        | 'Parda'
+        | 'Amarela'
+        | 'Indígena'
+        | 'Não declarada'
       gender_type: 'Masculino' | 'Feminino'
       graduate_status: 'Sim' | 'Não'
       marital_status_type:
@@ -1555,10 +1784,9 @@ export interface Database {
         | 'União Estável'
         | 'Não Informado'
       period: 'Manhã' | 'Tarde' | 'Noite'
+      regime_type: 'Presencial' | 'EAD' | 'Semi-Presencial'
       residence_zone_type: 'Urbana' | 'Rural'
       responsibletype: 'Pai' | 'Mãe' | 'Ambos'
-      race_type: 'Branca' | 'Preta' | 'Parda' | 'Amarela' | 'Indígena' | 'Não declarada'
-      deficiency_type: 'Visual' | 'Auditiva' | 'Física' | 'Intelectual' | 'Mental' | 'Múltiplia' | 'Outros' | 'Não possui'
       situation_type:
         | 'Pendente'
         | 'Cursando'
@@ -1570,6 +1798,7 @@ export interface Database {
         | 'Abandono'
         | 'Falecido'
       status: 'Ativo' | 'Inativo' | 'Graduado' | 'Suspenso' | 'Transferido'
+      teaching_type: 'Complementar' | 'Padrão'
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1657,4 +1886,19 @@ export type Enums<
   ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
     ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+  | keyof PublicSchema['CompositeTypes']
+  | { schema: keyof Database },
+  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+    schema: keyof Database
+  }
+    ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    : never = never,
+> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
+  ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes']
+    ? PublicSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never
