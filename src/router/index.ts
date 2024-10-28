@@ -22,6 +22,7 @@ const dynamicRoutes: CustomRouteRecordRaw[] = []
 
 for (const path in moduleRoutes) {
   const module: any = moduleRoutes[path]
+
   if (module.default) {
     dynamicRoutes.push(...module.default)
   }

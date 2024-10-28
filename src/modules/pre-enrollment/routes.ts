@@ -1,5 +1,5 @@
-import { flame, flameOutline } from 'ionicons/icons';
-import PreEnrollment from './views/PreEnrollment.vue';
+import { flame, flameOutline } from 'ionicons/icons'
+import PreEnrollment from './views/PreEnrollment.vue'
 
 const routes = [
   {
@@ -10,11 +10,12 @@ const routes = [
       moduleName: 'Pre Enrollment',
       moduleIcon: flameOutline,
       icon: flame,
-      name: 'Pre Enrollment',
+      name: 'Pré-Matrículas',
+      layout: 'blank',
       order: 4,
       requiredRole: ['public', 'admin'],
     },
   },
-];
+]
 
-export default routes;
+export default routes
