@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Tables } from '@/types/database.types'
 import EpInput from '@/components/EpInput.vue'
 import TeacherService from '@/modules/school-teacher-management/services/TeacherService'
 import showToast from '@/utils/toast-alert'
@@ -8,6 +7,7 @@ import { useForm } from 'vee-validate'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
+import type { Tables } from '@/types/database.types'
 import ClassroomService from '../services/ClassroomService'
 import CourseService from '../services/CourseService'
 import InstitutionService from '../services/InstitutionService'

@@ -136,6 +136,41 @@ VALUES
         NOW ()
     );
 
+
+-- Inserção de Relacionamentos entre Escola e Curso
+INSERT INTO school_course (id, school_id, course_id, created_at)
+VALUES
+    (
+        gen_random_uuid(),
+        (
+            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
+        ),
+        (
+            SELECT id FROM course WHERE name = 'Ensino Fundamental I'
+        ),
+        NOW()
+    ),
+    (
+        gen_random_uuid(),
+        (
+            SELECT id FROM school WHERE name = 'Escola Fundamental Alfa'
+        ),
+        (
+            SELECT id FROM course WHERE name = 'Ensino Fundamental II'
+        ),
+        NOW()
+    ),
+    (
+        gen_random_uuid(),
+        (
+            SELECT id FROM school WHERE name = 'Colégio Beta'
+        ),
+        (
+            SELECT id FROM course WHERE name = 'Ensino Médio'
+        ),
+        NOW()
+    );    
+
 -- Inserção de Séries
 INSERT INTO
     series (id, school_id, course_id, institution_id, timetable_id, name, course_stage, graduate, workload, school_days, metadata, user_created, created_at)
