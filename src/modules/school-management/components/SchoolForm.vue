@@ -10,6 +10,7 @@ import { useRouter } from 'vue-router'
 import * as yup from 'yup'
 import InstitutionService from '../../institution/services/InstitutionService'
 import SchoolService from '../../institution/services/SchoolService'
+import School_settingsService from '../services/School_settingsService'
 
 defineEmits<{
   (e: 'cancel'): void
@@ -28,6 +29,7 @@ const school_zone = ['Urbana', 'Rural']
 const schoolId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const schoolService = new SchoolService()
 const institutionService = new InstitutionService()
+const school_settingsService = new School_settingsService()
 const institutionId = ref('')
 const institutionList = ref()
 const formSchema = yup.object ({
@@ -78,6 +80,36 @@ const formSchema = yup.object ({
     .string()
     .required('Abreviação é obrigatório')
     .max(10, 'Abreviação deve ter no máximo 10 caracteres'),
+  school_days: yup
+    .number()
+    .transform((value, originalValue) => {
+    // Verifica se o originalValue é uma string e tenta convertê-la em número
+      if (typeof originalValue === 'string') {
+        const trimmedValue = originalValue.trim()
+        // Se a string não é vazia e pode ser convertida em um número, retorna o número
+        const parsedValue = Number(trimmedValue)
+        return isNaN(parsedValue) ? null : parsedValue // Se não for um número, retorna null
+      }
+      // Se não for uma string (como undefined, null, number), apenas retorna o valor original
+      return originalValue
+    })
+    .required('Dias Letivos é obrigatório')
+    .positive('Os dias letivos devem ser um número positivo')
+    .integer('Os dias letivos devem ser um número inteiro')
+    .min(1, 'Os dias letivos devem ser pelo menos 1 dia'),
+  date_opening: yup.date()
+    .required('Data de abertura do ano letivo é obrigatória')
+    .typeError('Data de ano letivo inválida'),
+  date_closing: yup.date()
+    .required('Data de encerramento do ano letivo é obrigatória')
+    .typeError('Data de ano letivo inválida'),
+  date_start: yup.date()
+    .required('Data de início do ano letivo é obrigatória')
+    .typeError('Data de ano letivo inválida'),
+  date_end: yup.date()
+    .required('Data de término do ano letivo é obrigatória')
+    .typeError('Data de ano letivo inválida'),
+
 })
 
 const { values, errors, validate, setFieldValue } = useForm<any>({
@@ -107,11 +139,21 @@ async function registerSchool() {
       logourl: values.logourl,
       abbreviation: values.abbreviation,
     }
+
+    const schoolSettingsData = {
+      school_days: values.school_days,
+      date_opening: values.date_opening,
+      date_closing: values.date_closing,
+      date_start: values.date_start,
+      date_end: values.date_end,
+    }
     try {
       let result
       if (schoolId.value) {
         result = await schoolService.update(schoolId.value, formData)
         if (result) {
+          await school_settingsService.update(schoolId.value, schoolSettingsData)
+
           showToast('Escola atualizada com sucesso')
           setTimeout(() => {
             router.push('/Schools/list').then(() => {
@@ -123,6 +165,7 @@ async function registerSchool() {
       else {
         result = await schoolService.create(formData)
         if (result) {
+          await school_settingsService.create({ ...schoolSettingsData, school_id: result.id, institution_id: institutionId.value })
           showToast('Escola cadastrada com sucesso!', 'top', 'success')
           setTimeout(() => {
             router.push('/Schools/list').then(() => {
@@ -183,6 +226,24 @@ async function getSchoolData() {
     else {
       console.error(`Dados da escola não encontrados para o ID: ${schoolId.value}`)
     }
+
+    const schoolSettingsDataArray = await school_settingsService.getBySchoolId(schoolId.value)
+
+    const schoolSettingsData = schoolSettingsDataArray && schoolSettingsDataArray[0]
+    if (schoolSettingsData) {
+      institutionId.value = schoolSettingsData.institution_id
+      schoolId.value = schoolSettingsData.school_id
+      setFieldValue('institutionId', schoolSettingsData.institution_id)
+      setFieldValue('institution', schoolSettingsData.institution_id)
+      setFieldValue('school_days', schoolSettingsData.school_days)
+      setFieldValue('date_opening', schoolSettingsData.date_opening)
+      setFieldValue('date_closing', schoolSettingsData.date_closing)
+      setFieldValue('date_start', schoolSettingsData.date_start)
+      setFieldValue('date_end', schoolSettingsData.date_end)
+    }
+    else {
+      console.error(`Dados de configurações da escola não encontrados para o ID: ${schoolId.value}`)
+    }
   }
 }
 
@@ -215,6 +276,11 @@ onMounted(async () => {
     <IonSegmentButton value="location">
       <IonLabel style="font-size: calc(1rem - 2px);">
         Localização
+      </IonLabel>
+    </IonSegmentButton>
+    <IonSegmentButton value="school-settings">
+      <IonLabel style="font-size: calc(1rem - 2px);">
+        Ano Letivo
       </IonLabel>
     </IonSegmentButton>
   </IonSegment>
@@ -269,5 +335,13 @@ onMounted(async () => {
     </ion-list>
     <EpInput v-model="values.state" :maxlength="2" name="state" :mask="stateMask" label="Estado*" placeholder="Digite o estado" />
     <EpInput v-model="values.postalcode" name="postalcode" :mask="postalCodeMask" inputmode="number" label="CEP*" placeholder="00000-000" />
+  </div>
+
+  <div v-show="selectedSegment === 'school-settings'">
+    <EpInput v-model="values.school_days" name="school_days" label="Dias Letivos" placeholder="Digite os dias letivos" />
+    <EpInput v-model="values.date_opening" name="date_opening" label="Data de Abertura" type="date" placeholder="Digite a data de abertura" />
+    <EpInput v-model="values.date_closing" name="date_closing" label="Data de Encerramento" type="date" placeholder="Digite a data de encerramento" />
+    <EpInput v-model="values.date_start" name="date_start" label="Data de Início" type="date" placeholder="Digite a data de início" />
+    <EpInput v-model="values.date_end" name="date_end" label="Data de Término" type="date" placeholder="Digite a data de término" />
   </div>
 </template>
