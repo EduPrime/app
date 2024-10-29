@@ -2,8 +2,7 @@
 import { catchPageWidth } from '@/utils/useUtils'
 import { IonCard, IonCardHeader, IonText } from '@ionic/vue'
 import { defineEmits, defineProps, onMounted, ref } from 'vue'
-import useSupabase from '../composables/useSupabase'
-
+import SeriesService from '../services/SeriesService'
 // import Swiper core and required modules
 import { A11y, Navigation, Pagination, Scrollbar } from 'swiper/modules'
 
@@ -36,7 +35,7 @@ interface Props {
   course: string
 }
 
-const supabase = new useSupabase()
+const supabase = new SeriesService()
 
 const pageWidth = catchPageWidth()
 const gSeries = ref()
@@ -60,13 +59,17 @@ onMounted(async () => {
   <!-- @swiper="onSwiper"
         @slideChange="onSlideChange" -->
   <div :style="pageWidth?.pageWidth > 992 ? 'max-width: 992px' : 'width: 100vw;'">
-    <Swiper :modules="modules" :slides-per-view="pageWidth?.pageWidth > 992 ? 2 : 1.4" :space-between="5"
-      :scrollbar="{ draggable: true }">
+    <Swiper
+      :modules="modules" :slides-per-view="pageWidth?.pageWidth > 992 ? 2 : 1.4" :space-between="5"
+      :scrollbar="{ draggable: true }"
+    >
       <SwiperSlide v-for="series in boundledSeries" :key="series">
         <div>
-          <IonCard v-for="serie in series.items" :key="serie"
+          <IonCard
+            v-for="serie in series.items" :key="serie"
             style=" margin-bottom: 25px; background-image: linear-gradient(to  right, var(--ion-color-tertiary) -50%, #fff 60%  );"
-            @click="emits('update:modelValue', serie)">
+            @click="emits('update:modelValue', serie)"
+          >
             <IonCardHeader>
               <div class="flex" style="height: 90px;">
                 <span class="my-auto mx-auto" style="font-size: 22pt;">

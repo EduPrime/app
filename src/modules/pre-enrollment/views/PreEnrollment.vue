@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { catchPageWidth } from '@/utils/useUtils'
 import { IonButton, IonCol, IonContent, IonGrid, IonHeader, IonPage, IonRow, IonSearchbar, IonText, IonToolbar } from '@ionic/vue'
-
 import { onMounted, ref } from 'vue'
 import appFooter from '../components/AppFooter.vue'
 import remainingTime from '../components/RemainingTime.vue'
@@ -40,8 +39,7 @@ function handleInput(event: { target: any }) {
 //         console.log(error);
 
 // })
-
-onMounted(() => {
+onMounted(async () => {
   pageWidth.value = catchPageWidth()
 })
 </script>
@@ -53,10 +51,11 @@ onMounted(() => {
         <!-- <ion-title>Página Inicial</ion-title> -->
       </IonToolbar>
     </IonHeader>
-
     <IonContent>
-      <div id="block1" class="ion-padding"
-        style="padding-bottom: 4rem; background-image: linear-gradient(to bottom right, var(--ion-color-tertiary) -20%, var(--ion-color-lightaccent),var(--ion-color-secondary) 120%  );">
+      <div
+        id="block1" class="ion-padding"
+        style="padding-bottom: 4rem; background-image: linear-gradient(to bottom right, var(--ion-color-tertiary) -20%, var(--ion-color-lightaccent),var(--ion-color-secondary) 120%  );"
+      >
         <div style="max-width: 992px;" class="mx-auto">
           <IonGrid>
             <IonRow>
@@ -81,7 +80,7 @@ onMounted(() => {
                     </IonText>
                   </IonCol>
                   <IonCol size="12">
-                    <remainingTime />
+                    <remainingTime t-date="2024-12-31T23:59:59" />
                   </IonCol>
                   <IonCol size="12">
                     <IonText color="primary">
@@ -114,27 +113,34 @@ onMounted(() => {
           </IonGrid>
         </div>
       </div>
-      <div id="block2" class="ion-padding-top"
-        style="background-color: var(--ion-color-secondary); padding-bottom: 4rem;">
+      <div
+        id="block2" class="ion-padding-top"
+        style="background-color: var(--ion-color-secondary); padding-bottom: 4rem;"
+      >
         <div style="max-width: 992px;" class="mx-auto">
-          <div class="ion-padding-vertical"
-            :class="pageWidth?.pageWidth < 992 ? 'ion-padding-start ion-padding-end' : ''">
+          <div
+            class="ion-padding-vertical"
+            :class="pageWidth?.pageWidth < 992 ? 'ion-padding-start ion-padding-end' : ''"
+          >
             <h2 v-if="etapa < 4" class="dark-background-title" style="padding-left: 6px;">
-              Selecione {{ etapa > 1 && etapa < 3 ? 'o curso' : etapa > 2 && etapa < 4 ? 'a série' : 'a escola' }} </h2>
-                  <h2 v-else class="dark-background-title" style="padding-left: 6px;">
-                    Preencha o formulário
-                  </h2>
+              Selecione {{ etapa > 1 && etapa < 3 ? 'o curso' : etapa > 2 && etapa < 4 ? 'a série' : 'a escola' }}
+            </h2>
+            <h2 v-else class="dark-background-title" style="padding-left: 6px;">
+              Preencha o formulário
+            </h2>
 
-                  <div v-if="etapa == 1" class="ion-padding-top ">
-                    <IonSearchbar placeholder="Buscar Escola..." @ion-input="handleInput($event)" />
-                  </div>
+            <div v-if="etapa === 1" class="ion-padding-top ">
+              <IonSearchbar placeholder="Buscar Escola..." @ion-input="handleInput($event)" />
+            </div>
           </div>
           <startEnrollment v-model="etapa" :searchbox="queryBlock2" />
         </div>
       </div>
 
-      <div id="block3" class="ion-padding-top"
-        style="background-color: var(--ion-color-lightaccent); padding-bottom: 4rem; ">
+      <div
+        id="block3" class="ion-padding-top"
+        style="background-color: var(--ion-color-lightaccent); padding-bottom: 4rem; "
+      >
         <div style="max-width: 992px;" class="mx-auto" :class="pageWidth?.pageWidth < 992 ? 'ion-padding' : ''">
           <h2 class="dark-background-title" style="padding-left: 6px;">
             <IonText color="primary">

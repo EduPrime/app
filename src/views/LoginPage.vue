@@ -22,6 +22,8 @@ async function signIn() {
     password: password.value,
   })
 
+  router.push(`/`) // Enquanto o login não é feito, redireciona para a home para simular um login efetivo
+
   if (error) {
     console.error('Erro ao fazer login:', error.message)
   }

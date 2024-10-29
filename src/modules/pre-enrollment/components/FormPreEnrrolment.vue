@@ -7,7 +7,7 @@ import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 
 import { IonAlert, IonButton, IonCol, IonGrid, IonIcon, IonInput, IonItem, IonRow, IonSelect, IonSelectOption } from '@ionic/vue'
 import { checkmarkCircleOutline } from 'ionicons/icons'
-import useSupabase from '../composables/useSupabase'
+import StudentService from '../services/StudentService'
 
 // const gedService = new GedService()
 // const documentFiles = ref<Tables<'document'>[]>([])
@@ -90,7 +90,7 @@ const student = ref(
   },
 )
 
-const supabase = new useSupabase()
+const supabase = new StudentService()
 const studentList = ref()
 
 watch(result, async (value) => {
@@ -110,7 +110,7 @@ watch(result, async (value) => {
     studentId.value = await supabase.getStudentId(student.value)
   }
   else {
-    someProblems.value
+    someProblems.value = true // eu adicionei um valor ( true ) estava sem modificação de valor
     finished.value = false
   }
 })
@@ -289,19 +289,27 @@ onMounted(async () => {
 
       <IonCol v-if="docModel" size="12" size-md="6">
         <IonItem>
-          <IonInput v-if="docModel === 'cpf'" v-model="student.cpf" type="text" label="Numero do CPF"
-            label-placement="floating" />
-          <IonInput v-else-if="docModel === 'rg'" v-model="student.rg_number" type="text" label="Numero do RG"
-            label-placement="floating" />
-          <IonInput v-else-if="docModel === 'certidao'" v-model="student.birth_certificate" type="text"
-            label="Certidão de Nascimento" label-placement="floating" />
+          <IonInput
+            v-if="docModel === 'cpf'" v-model="student.cpf" type="text" label="Numero do CPF"
+            label-placement="floating"
+          />
+          <IonInput
+            v-else-if="docModel === 'rg'" v-model="student.rg_number" type="text" label="Numero do RG"
+            label-placement="floating"
+          />
+          <IonInput
+            v-else-if="docModel === 'certidao'" v-model="student.birth_certificate" type="text"
+            label="Certidão de Nascimento" label-placement="floating"
+          />
         </IonItem>
       </IonCol>
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonInput v-model="student.phone" v-mask="'(##) #####-####'" type="text" label="Telefone"
-            label-placement="floating" />
+          <IonInput
+            v-model="student.phone" v-mask="'(##) #####-####'" type="text" label="Telefone"
+            label-placement="floating"
+          />
         </IonItem>
       </IonCol>
 
@@ -313,8 +321,10 @@ onMounted(async () => {
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonInput v-model="student.postalcode" v-mask="'#####-###'" type="text" label="CEP"
-            label-placement="floating" />
+          <IonInput
+            v-model="student.postalcode" v-mask="'#####-###'" type="text" label="CEP"
+            label-placement="floating"
+          />
         </IonItem>
       </IonCol>
 
@@ -372,8 +382,10 @@ onMounted(async () => {
             <p>Os dados do aluno foram salvos com sucesso.</p>
             <p>Código de pré-matrícula: {{ codPreEnrollment }}</p>
             <div class="flex" style="min-height: 150px;">
-              <IonIcon :icon="checkmarkCircleOutline" class="my-auto mx-auto"
-                style="font-size: 130px; color:lawngreen;" />
+              <IonIcon
+                :icon="checkmarkCircleOutline" class="my-auto mx-auto"
+                style="font-size: 130px; color:lawngreen;"
+              />
             </div>
           </ion-card-content>
         </ion-card>
@@ -384,7 +396,8 @@ onMounted(async () => {
   incompleteStep: {{ incompleteStep }}
 </pre> -->
 
-  <IonAlert :is-open="duplicated" trigger="present-alert" header="Aluno já cadastrado"
+  <IonAlert
+    :is-open="duplicated" trigger="present-alert" header="Aluno já cadastrado"
     sub-header="Desculpe mas este aluno já foi cadastrado anteriormente."
     message="Caso deseje você pode clicar em 'atualizar' para atualizar os dados que já foram cadastrados anteriormente."
     :buttons="[{
@@ -392,17 +405,22 @@ onMounted(async () => {
       handler: () => {
         console.info('Função (Atualizar cadastro) ainda não implementada')
       },
-    }, 'Fechar']" @did-dismiss="duplicated = false" />
+    }, 'Fechar']" @did-dismiss="duplicated = false"
+  />
 
-  <IonAlert :is-open="someProblems" trigger="present-alert" header="Desculpe, ocorreu um erro ao salvar os dados"
+  <IonAlert
+    :is-open="someProblems" trigger="present-alert" header="Desculpe, ocorreu um erro ao salvar os dados"
     sub-header="Erro ao salvar os dados do aluno"
     message="Por favor, recarregue a página ou tente novamente mais tarde." :buttons="['Fechar']"
-    @did-dismiss="someProblems = false" />
+    @did-dismiss="someProblems = false"
+  />
 
-  <IonAlert :is-open="incompleteStep" trigger="present-alert" header="Preencha os campos obrigatórios para continuar"
+  <IonAlert
+    :is-open="incompleteStep" trigger="present-alert" header="Preencha os campos obrigatórios para continuar"
     sub-header="Campos obrigatórios tem um asterisco (*)"
     :message="adicionalRequired ? `Preencha também Telefone e RG, CPF ou Certidão de Nascimento para efetuar a pré-matrícula` : `Os campos Nome e Data de Nascimento são obrigatórios`"
-    :buttons="['Fechar']" @did-dismiss="incompleteStep = false" />
+    :buttons="['Fechar']" @did-dismiss="incompleteStep = false"
+  />
 </template>
 
 <style scoped>

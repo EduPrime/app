@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { catchPageWidth } from '@/utils/useUtils'
-
 import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonItem, IonText } from '@ionic/vue'
+
 import { defineEmits, onMounted, ref, watch } from 'vue'
-import useSupabase from '../composables/useSupabase'
+import SchoolService from '../services/SchoolService'
 // import Swiper core and required modules
 import { A11y, Navigation, Pagination, Scrollbar } from 'swiper/modules'
 
@@ -34,7 +34,7 @@ const modules = [Navigation, Pagination, Scrollbar, A11y]
 //
 
 const pageWidth = ref()
-const supabase = new useSupabase()
+const supabase = new SchoolService()
 const schoolList = ref()
 
 watch(() => props.query, async (qValue: string) => {
@@ -53,10 +53,14 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div :style="pageWidth?.pageWidth > 992 ? 'max-width: 992px' : 'width: 100vw;'">
+  <div
+    :style="pageWidth?.pageWidth > 992 ? 'max-width: 992px' : 'width: 100vw;'"
+  >
     <!-- @swiper="onSwiper" @slideChange="onSlideChange" -->
-    <Swiper :modules="modules" :slides-per-view="pageWidth?.pageWidth > 800 ? 3 : schoolList?.length === 1 ? 1 : 1.2"
-      :space-between="20" :scrollbar="{ draggable: true }">
+    <Swiper
+      :modules="modules" :slides-per-view="pageWidth?.pageWidth > 800 ? 3 : schoolList?.length === 1 ? 1 : 1.2"
+      :space-between="20" :scrollbar="{ draggable: true }"
+    >
       <SwiperSlide v-for="school in schoolList" :key="school.id" @click="emits('update:modelValue', school)">
         <IonCard style="min-height: 100%;" :style="schoolList?.length === 1 ? '' : 'width: 100%;'">
           <IonCardHeader class="ion-padding-top">
@@ -85,8 +89,10 @@ onMounted(async () => {
                   Matriculas encerradas
                 </p>
               </div>
-              <div style="height: 16px; width: 16px; border-radius: 100%; margin-left: auto"
-                :style="school.open ? ' background-color:chartreuse;' : ' background-color: orange;'" />
+              <div
+                style="height: 16px; width: 16px; border-radius: 100%; margin-left: auto"
+                :style="school.open ? ' background-color:chartreuse;' : ' background-color: orange;'"
+              />
             </IonItem>
           </IonCardContent>
         </IonCard>

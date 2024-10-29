@@ -7,12 +7,12 @@ const route = useRoute()
 </script>
 
 <template>
-  <LayoutDefault v-if="route.meta.layout != 'blank'">
-    <ion-router-outlet id="main-content" />
-  </LayoutDefault>
-  <LayoutBlank v-else>
+  <LayoutBlank v-if="route.meta.layout === 'blank'">
     <ion-router-outlet id="main-content" />
   </LayoutBlank>
+  <LayoutDefault v-else>
+    <ion-router-outlet id="main-content" />
+  </LayoutDefault>
 </template>
 <!-- <pre>
   route: {{ route.meta.layout }}

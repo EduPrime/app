@@ -1,7 +1,13 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { defineProps, onMounted, onUnmounted, ref, watch } from 'vue'
 
-const targetDate = new Date('2024-12-31T23:59:59') // Defina a data alvo aqui
+interface Props {
+  tDate: string
+}
+
+const props = defineProps<Props>()
+
+const targetDate = new Date(props.tDate) // Defina a data alvo aqui
 
 const months = ref(0)
 const days = ref(0)
