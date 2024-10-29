@@ -5,6 +5,10 @@ import { IonButton, IonCol, IonGrid, IonIcon, IonRow, IonSpinner } from '@ionic/
 
 import { arrowBackOutline, checkmarkCircleOutline } from 'ionicons/icons'
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
+
+import PreEnrollmentService from '../services/PreEnrollmentService'
+
+// componentes
 import formPreEnrrolment from '../components/FormPreEnrrolment.vue'
 import selectCourseSlider from '../components/SelectCourseSlider.vue'
 
@@ -16,6 +20,8 @@ interface Props {
 }
 const props = defineProps<Props>()
 const emits = defineEmits(['update:modelValue'])
+
+const supabase = new PreEnrollmentService()
 const studentId = ref()
 const pageWidth = ref()
 const loading = ref(false)
@@ -25,9 +31,19 @@ const etapa = ref(1)
 const selectedSchool = ref()
 const selectedCourse = ref()
 const selectedSeries = ref()
+const shiftPreference = ref()
 
+const preEnrollment = ref({
+  school_id: undefined as string | undefined,
+  course_id: undefined as string | undefined,
+  series_id: undefined as string | undefined,
+  student_id: undefined as string | undefined,
+  observations: undefined as string | undefined,
+  date_enrolment: new Date().toISOString().slice(0, 10),
+})
 watch(selectedSchool, (value) => {
   if (value) {
+    preEnrollment.value.school_id = value.id
     loading.value = true
     finished.value = false
 
@@ -48,6 +64,7 @@ watch(selectedSchool, (value) => {
 
 watch(selectedCourse, (value) => {
   if (value) {
+    preEnrollment.value.course_id = value.id
     loading.value = true
     finished.value = false
 
@@ -66,6 +83,7 @@ watch(selectedCourse, (value) => {
 
 watch(selectedSeries, (value) => {
   if (value) {
+    preEnrollment.value.series_id = value.id
     loading.value = true
     finished.value = false
 
@@ -88,12 +106,32 @@ watch(etapa, (value) => {
   }
 })
 
-onMounted(() => {
+watch(studentId, (value) => {
+  if (value) {
+    preEnrollment.value.student_id = value
+  }
+})
+
+watch(shiftPreference, (value) => {
+  if (value) {
+    preEnrollment.value.observations = `A preferência de turno é: ${value}`
+  }
+})
+const teste = ref()
+onMounted(async () => {
   pageWidth.value = catchPageWidth()
+  teste.value = await supabase.getPreEnrollments()
 })
 </script>
 
 <template>
+  <pre>
+    {{ new Date().toISOString().slice(0, 10) }}
+
+    preEnrollment: {{ preEnrollment }}
+
+    teste: {{ teste?.data }}
+  </pre>
   <div class="ion-padding-bottom">
     <div style="min-height: 250px; " class="flex wrap">
       <container
@@ -145,7 +183,7 @@ onMounted(() => {
           <IonGrid style="padding: 0;">
             <IonRow>
               <IonCol style="padding: 0;" size="12">
-                <formPreEnrrolment v-model="studentId" :page-width="pageWidth?.pageWidth" />
+                <formPreEnrrolment v-model="studentId" :page-width="pageWidth?.pageWidth" @preference="($event) => shiftPreference = $event" />
               </IonCol>
             </IonRow>
           </IonGrid>

@@ -17,7 +17,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const emits = defineEmits(['update:modelValue'])
+const emits = defineEmits(['update:modelValue', 'preference'])
 
 const next = ref(false)
 const incompleteStep = ref(false)
@@ -26,6 +26,7 @@ const duplicated = ref(false)
 const finished = ref(false)
 
 const codPreEnrollment = ref()
+const shiftPreference = ref()
 
 const result = ref()
 const studentId = ref()
@@ -118,6 +119,12 @@ watch(result, async (value) => {
 watch(studentId, (value) => {
   if (value) {
     emits('update:modelValue', value)
+  }
+}, { immediate: true })
+
+watch(shiftPreference, (value) => {
+  if (value) {
+    emits('preference', value)
   }
 }, { immediate: true })
 
@@ -230,7 +237,7 @@ onMounted(async () => {
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonSelect label="Preferência de turno" label-placement="floating">
+          <IonSelect v-model="shiftPreference" label="Preferência de turno" label-placement="floating">
             <IonSelectOption value="manha">
               Manhã
             </IonSelectOption>
