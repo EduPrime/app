@@ -152,7 +152,18 @@ async function registerSchool() {
       if (schoolId.value) {
         result = await schoolService.update(schoolId.value, formData)
         if (result) {
-          await school_settingsService.update(schoolId.value, schoolSettingsData)
+          const existingSettings = await school_settingsService.getBySchoolId(schoolId.value)
+
+          if (existingSettings && existingSettings.length > 0) {
+            await school_settingsService.updateSettings(schoolId.value, schoolSettingsData)
+          }
+          else {
+            await school_settingsService.create({
+              ...schoolSettingsData,
+              school_id: schoolId.value,
+              institution_id: institutionId.value,
+            })
+          }
 
           showToast('Escola atualizada com sucesso')
           setTimeout(() => {
