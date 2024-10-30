@@ -14,10 +14,10 @@ const router = useRouter()
 const schoolService = new SchoolService()
 const dataList = ref<Tables<'school'>[]>([])
 const schoolData = ref<Array<{ school: Tables<'school'>, courses: Tables<'course'>[], series: Tables<'series'>[] }> | []>([])
-const schoolCount = ref(154)
-const classCount = ref(25)
-const approvalRate = ref(48)
-const teacherCount = ref(30)
+const schoolCount = ref(0)
+const classCount = ref(0)
+const approvalRate = ref(0)
+const teacherCount = ref(0)
 const searchQuery = ref('')
 
 const filteredDataList = computed(() => {
@@ -52,8 +52,10 @@ onMounted(() => {
 <template>
   <ContentLayout>
     <SchoolCards
-      :student-count="schoolCount" :class-count="classCount" :approval-rate="approvalRate"
+      :student-count="schoolCount"
       :teacher-count="teacherCount"
+      :class-count="classCount"
+      :approval-rate="approvalRate"
     />
     <ion-toolbar>
       <ion-title>Escolas ativas ({{ filteredDataList.length }})</ion-title>

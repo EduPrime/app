@@ -1,10 +1,29 @@
 <script setup lang="ts">
-const props = defineProps<{
-  studentCount: number
-  teacherCount: number
-  classCount: number
-  approvalRate: number
-}>()
+import { onMounted, ref } from 'vue'
+import SchoolService from '../services/SchoolService'
+
+const schoolService = new SchoolService()
+
+const studentCount = ref(0)
+const teacherCount = ref(0)
+const classCount = ref(0)
+const approvalRate = ref(0)
+
+async function loadCounters() {
+  try {
+    studentCount.value = await schoolService.getStudentCount()
+    classCount.value = await schoolService.getClassCount()
+    teacherCount.value = await schoolService.getTeacherCount()
+    approvalRate.value = await schoolService.getApprovalRate()
+  }
+  catch (error) {
+    console.error('Erro ao carregar os contadores:', error)
+  }
+}
+
+onMounted(() => {
+  loadCounters()
+})
 </script>
 
 <template>
@@ -18,7 +37,7 @@ const props = defineProps<{
         </ion-card-header>
         <ion-card-content>
           <h1 class="ion-text-xxl">
-            {{ props.studentCount }}
+            {{ studentCount }}
           </h1>
         </ion-card-content>
       </ion-card>
@@ -33,7 +52,7 @@ const props = defineProps<{
         </ion-card-header>
         <ion-card-content>
           <h1 class="ion-text-xxl">
-            {{ props.teacherCount }}
+            {{ teacherCount }}
           </h1>
         </ion-card-content>
       </ion-card>
@@ -48,7 +67,7 @@ const props = defineProps<{
         </ion-card-header>
         <ion-card-content>
           <h1 class="ion-text-xxl">
-            {{ props.classCount }}
+            {{ classCount }}
           </h1>
         </ion-card-content>
       </ion-card>
@@ -63,7 +82,7 @@ const props = defineProps<{
         </ion-card-header>
         <ion-card-content>
           <h1 class="ion-text-xxl">
-            {{ props.approvalRate }}%
+            {{ approvalRate }}%
           </h1>
         </ion-card-content>
       </ion-card>
