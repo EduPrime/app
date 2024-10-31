@@ -1,5 +1,6 @@
-import { create, folder, swapHorizontal } from 'ionicons/icons'
+import { create, documentText, folder, swapHorizontal } from 'ionicons/icons'
 import DashboardEnrollment from './views/DashboardEnrollment.vue'
+import DashboardPre_enrollment from './views/DashboardPre_enrollment.vue'
 import DashboardStudent from './views/DashboardStudent.vue'
 import EditEnrollment from './views/EditEnrollment.vue'
 import EditStudent from './views/EditStudent.vue'
@@ -82,7 +83,7 @@ const routes = [
       requiredRole: ['public', 'admin'],
     },
   },
-/*   {
+  /*   {
     path: '/student/enrollment/move/:id',
     name: 'StudentMove',
     component: MoveStudent,
@@ -94,6 +95,19 @@ const routes = [
       requiredRole: ['public', 'admin'],
     },
   }, */
+  {
+    path: '/student/pre-enrollment',
+    name: 'Pre_enrollmentList',
+    component: DashboardPre_enrollment,
+    meta: {
+      moduleName: 'Student',
+      moduleIcon: documentText,
+      icon: documentText,
+      name: 'Pré-matrícula',
+      order: 5,
+      requiredRole: ['public', 'admin'],
+    },
+  },
 ]
 
 export default routes
