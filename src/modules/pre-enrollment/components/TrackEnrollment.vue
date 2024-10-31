@@ -1,8 +1,29 @@
 <script setup lang="ts">
 import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonItem, IonText } from '@ionic/vue'
+import { computed, defineProps, onMounted, ref, watch } from 'vue'
+
+import PreEnrollmentService from '../services/PreEnrollmentService'
+
+interface Props {
+  query: string
+}
+
+const props = defineProps<Props>()
+const query = computed(() => props.query)
+const result = ref()
+const supabase = new PreEnrollmentService()
+
+watch(query, async (value) => {
+  if (value) {
+    result.value = await supabase.getPreEnrollmentByCode(value)
+  }
+})
 </script>
 
 <template>
+  <pre>
+    {{ result }}
+  </pre>
   <IonCard>
     <div style="display: flex;">
       <img

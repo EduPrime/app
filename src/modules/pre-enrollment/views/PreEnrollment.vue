@@ -13,6 +13,7 @@ const pageWidth = ref()
 // const router = useRouter()
 
 const queryBlock2 = ref()
+const queryBlock3 = ref()
 
 // const navigateToDetails = () => {
 //     router.push('/details');
@@ -21,6 +22,11 @@ const queryBlock2 = ref()
 function handleInput(event: { target: any }) {
   const query = event.target.value.toLowerCase()
   queryBlock2.value = query
+}
+
+function handleTrackInput(event: { target: any }) {
+  const query = event.target.value.toLowerCase()
+  queryBlock3.value = query
 }
 // import { createClient } from '@supabase/supabase-js'
 
@@ -148,10 +154,10 @@ onMounted(async () => {
             </IonText>
           </h2>
           <div class="ion-padding-top ">
-            <IonSearchbar placeholder="Buscar Aluno..." />
+            <IonSearchbar placeholder="Buscar Aluno..." @ion-input="handleTrackInput($event)" />
           </div>
           <div class="ion-padding-bottom ion-padding-top">
-            <trackEnrollment />
+            <trackEnrollment :query="queryBlock3" />
             <div class="ion-padding-bottom ion-padding-top">
               <IonButton expand="full" href="/inicio#block2">
                 Começar Agora

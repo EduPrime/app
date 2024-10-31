@@ -37,13 +37,13 @@ const insertedPreEnrollment = ref()
 const postStatus = ref()
 
 const preEnrollment = ref({
-  school_id: undefined as string | undefined,
-  course_id: undefined as string | undefined,
-  series_id: undefined as string | undefined,
-  student_id: undefined as string | undefined,
-  observations: undefined as string | undefined,
+  school_id: '',
+  course_id: '',
+  series_id: '',
+  student_id: '',
+  observations: undefined as string | null | undefined,
+  pre_enrollment_code: undefined as string | null | undefined,
   date_enrollment: new Date().toISOString().slice(0, 10),
-  pre_enrollment_code: undefined as string | undefined,
 })
 watch(selectedSchool, (value) => {
   if (value) {
@@ -247,7 +247,8 @@ onMounted(async () => {
                 </IonCardHeader>
                 <IonCardContent>
                   <p>Os dados do aluno foram salvos com sucesso! Salve o código de pré-matrícula caso deseje acompanhar a situação.</p>
-                  <p style="font-size: 14pt;">
+
+                  <p style="font-size: 14pt;" class="ion-padding-top">
                     Código da pré-matrícula: <span style="font-weight: 800;">
 
                       {{ insertedPreEnrollment.data.at(0).pre_enrollment_code }}

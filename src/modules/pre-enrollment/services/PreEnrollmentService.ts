@@ -5,19 +5,13 @@ const table = 'pre_enrollment' as const
 
 interface PreEnrollmentType {
   course_id: string
-  created_at?: string | undefined
   date_enrollment: string
-  deleted_at?: string | null | undefined
   id?: string | undefined
   observations?: string | null | undefined
   pre_enrollment_code?: string | null | undefined
   school_id: string
   series_id: string
-  situation?: 'Transferido' | 'Pendente' | 'Cursando' | 'Aprovado' | 'Aprovado pelo Conselho' | 'Aprovado com Dependência' | 'Reprovado' | 'Abandono' | 'Falecido' | null | undefined
-  status?: 'Ativo' | 'Inativo' | 'Graduado' | 'Suspenso' | 'Transferido' | null | undefined
   student_id: string
-  updated_at?: string | null | undefined
-
 }
 
 type TabelaType = typeof table
@@ -34,6 +28,27 @@ export default class PreEnrollmentService extends BaseService<TabelaType> {
     }
     catch (error) {
       console.error('Erro ao listar as pré-matrículas:', error)
+      throw error
+    }
+  }
+
+  async getPreEnrollmentByCode(uniqueCode: string) {
+    try {
+      const student = ref()
+      const data: { data: { student_id: string }[] } | any = await this.client.from(table)
+        .select('pre_enrollment_code')
+        .eq('pre_enrollment_code', uniqueCode)
+
+      if (data.data.length > 0) {
+        student.value = await this.client.from('student')
+          .select('*')
+          .eq('id', data.data[0].student_id)
+      }
+
+      return { data, student }
+    }
+    catch (error) {
+      console.error('Erro ao listar a pré-matrícula:', error)
       throw error
     }
   }
