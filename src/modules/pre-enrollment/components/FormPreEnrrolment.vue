@@ -17,7 +17,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const emits = defineEmits(['update:modelValue', 'preference'])
+const emits = defineEmits(['update:modelValue', 'preference', 'postStatus'])
 
 const next = ref(false)
 const incompleteStep = ref(false)
@@ -105,6 +105,9 @@ watch(result, async (value) => {
     finished.value = false
     codPreEnrollment.value = `pre-${generateRandomCode()}`
     if (value.error.code === '23505') {
+      emits('postStatus', {
+        loading: false,
+      })
       duplicated.value = true
     }
 
@@ -131,9 +134,13 @@ watch(shiftPreference, (value) => {
 async function submitForm() {
   if (student.value.name && student.value.birthdate && student.value.phone && (student.value.cpf || student.value.rg_number || student.value.birth_certificate)) {
     result.value = await postStudent(student.value)
+    if (result.value && result.value.status === 201) {
+      emits('postStatus', { loading: true })
+    }
     adicionalRequired.value = false
   }
   else {
+    emits('postStatus', { loading: false })
     incompleteStep.value = true
     adicionalRequired.value = true
   }
@@ -173,6 +180,15 @@ async function postStudent(studentObject: any) {
     console.error(error)
   }
 }
+
+function closeDialog() {
+  duplicated.value = false
+
+  return emits('postStatus', {
+    loading: true,
+  })
+}
+
 onMounted(async () => {
   studentList.value = await supabase.getStudents()
   // await loadDocumentFiles()
@@ -412,7 +428,7 @@ onMounted(async () => {
       handler: () => {
         console.info('Função (Atualizar cadastro) ainda não implementada')
       },
-    }, 'Fechar']" @did-dismiss="duplicated = false"
+    }, 'Continuar']" @did-dismiss="closeDialog()"
   />
 
   <IonAlert

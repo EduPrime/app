@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { catchPageWidth } from '@/utils/useUtils'
 
-import { IonButton, IonCol, IonGrid, IonIcon, IonRow, IonSpinner } from '@ionic/vue'
+import { IonButton, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonGrid, IonHeader, IonIcon, IonRow, IonSpinner } from '@ionic/vue'
 
 import { arrowBackOutline, checkmarkCircleOutline } from 'ionicons/icons'
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
@@ -32,6 +32,9 @@ const selectedSchool = ref()
 const selectedCourse = ref()
 const selectedSeries = ref()
 const shiftPreference = ref()
+const insertedPreEnrollment = ref()
+
+const postStatus = ref()
 
 const preEnrollment = ref({
   school_id: undefined as string | undefined,
@@ -39,7 +42,8 @@ const preEnrollment = ref({
   series_id: undefined as string | undefined,
   student_id: undefined as string | undefined,
   observations: undefined as string | undefined,
-  date_enrolment: new Date().toISOString().slice(0, 10),
+  date_enrollment: new Date().toISOString().slice(0, 10),
+  pre_enrollment_code: undefined as string | undefined,
 })
 watch(selectedSchool, (value) => {
   if (value) {
@@ -108,7 +112,11 @@ watch(etapa, (value) => {
 
 watch(studentId, (value) => {
   if (value) {
+    // loading.value = true
     preEnrollment.value.student_id = value
+  }
+  else {
+    // loading.value = false
   }
 })
 
@@ -117,6 +125,46 @@ watch(shiftPreference, (value) => {
     preEnrollment.value.observations = `A preferência de turno é: ${value}`
   }
 })
+
+// return emits('postStatus', {
+//     duplicated: duplicated.value,
+//     loading: true,
+//   })
+
+watch(postStatus, async (value) => {
+  if (value && value.loading === true) {
+    loading.value = true
+    finished.value = false
+
+    setTimeout(() => {
+      finished.value = true
+    }, 500) // 1 segundo antes de loading se tornar false
+
+    preEnrollment.value.pre_enrollment_code = await supabase.generateUnicPreEnrollmentCode()
+
+    if (
+      preEnrollment.value.pre_enrollment_code
+      && preEnrollment.value.school_id
+      && preEnrollment.value.course_id
+      && preEnrollment.value.series_id
+      && preEnrollment.value.student_id
+    ) {
+      insertedPreEnrollment.value = await supabase.insertPreEnrollment(preEnrollment.value)
+    }
+
+    setTimeout(() => {
+      loading.value = false
+      finished.value = true
+    }, 1500) // 1 segundo depois de finished se tornar true
+
+    etapa.value = 5
+  }
+  else {
+    loading.value = false
+    etapa.value = 4
+  }
+})
+
 const teste = ref()
 onMounted(async () => {
   pageWidth.value = catchPageWidth()
@@ -125,13 +173,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <pre>
-    {{ new Date().toISOString().slice(0, 10) }}
+  <IonButton v-if="postStatus?.loading" :class="pageWidth?.pageWidth < 992 ? 'ion-margin-start' : ''" color="light" @click="postStatus = undefined">
+    <IonIcon :icon="arrowBackOutline" />
+  </IonButton>
 
-    preEnrollment: {{ preEnrollment }}
-
-    teste: {{ teste?.data }}
-  </pre>
   <div class="ion-padding-bottom">
     <div style="min-height: 250px; " class="flex wrap">
       <container
@@ -179,15 +224,46 @@ onMounted(async () => {
         >
           <IonIcon :icon="arrowBackOutline" />
         </IonButton>
+
         <div class="ion-padding-top ">
           <IonGrid style="padding: 0;">
             <IonRow>
               <IonCol style="padding: 0;" size="12">
-                <formPreEnrrolment v-model="studentId" :page-width="pageWidth?.pageWidth" @preference="($event) => shiftPreference = $event" />
+                <formPreEnrrolment v-model="studentId" :page-width="pageWidth?.pageWidth" @preference="($event) => shiftPreference = $event" @post-status="($event) => postStatus = $event" />
               </IonCol>
             </IonRow>
           </IonGrid>
         </div>
+      </div>
+      <div v-else-if="etapa === 5" style="width: 100%;">
+        <IonGrid>
+          <IonRow>
+            <IonCol size="12">
+              <ion-card>
+                <IonCardHeader>
+                  <IonCardTitle style="font-size: 16pt; font-weight: 800;">
+                    Pré-Matrícula realizada com sucesso
+                  </IonCardTitle>
+                </IonCardHeader>
+                <IonCardContent>
+                  <p>Os dados do aluno foram salvos com sucesso! Salve o código de pré-matrícula caso deseje acompanhar a situação.</p>
+                  <p style="font-size: 14pt;">
+                    Código da pré-matrícula: <span style="font-weight: 800;">
+
+                      {{ insertedPreEnrollment.data.at(0).pre_enrollment_code }}
+                    </span>
+                  </p>
+                  <div class="flex" style="min-height: 150px;">
+                    <IonIcon
+                      :icon="checkmarkCircleOutline" class="my-auto mx-auto"
+                      style="font-size: 130px; color:lawngreen;"
+                    />
+                  </div>
+                </IonCardContent>
+              </ion-card>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
       </div>
     </div>
   </div>
