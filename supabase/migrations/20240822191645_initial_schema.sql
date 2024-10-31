@@ -152,6 +152,7 @@ CREATE TABLE teacher
     email        VARCHAR(255),
     phone        VARCHAR(15),
     address VARCHAR(255),
+    showDetails BOOLEAN DEFAULT FALSE,
     qualifications  jsonb,
     status       status           DEFAULT 'Ativo',
     metadata     JSONB,
@@ -268,6 +269,7 @@ CREATE TABLE series
 CREATE TABLE student
 (
     id             UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    classroom_id   UUID                                       NOT NULL REFERENCES classroom (id) ON UPDATE CASCADE ON DELETE RESTRICT,
     name           VARCHAR(100)                               NOT NULL,
     birthdate      DATE                                       NOT NULL,
     gender         gender_type DEFAULT 'Masculino',

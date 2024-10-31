@@ -943,7 +943,8 @@ CREATE TABLE IF NOT EXISTS "public"."student" (
     "updated_at" timestamp with time zone,
     "ethnicity" "public"."ethnicity_type",
     "deficiency" "public"."deficiency_type",
-    "deficiency_description" character varying
+    "deficiency_description" character varying,
+    "city_state" character varying
 );
 
 
@@ -1154,7 +1155,22 @@ ALTER TABLE ONLY "public"."series"
 
 
 ALTER TABLE ONLY "public"."student"
+    ADD CONSTRAINT "student_birth_certificate_key" UNIQUE ("birth_certificate");
+
+
+
+ALTER TABLE ONLY "public"."student"
+    ADD CONSTRAINT "student_cpf_key" UNIQUE ("cpf");
+
+
+
+ALTER TABLE ONLY "public"."student"
     ADD CONSTRAINT "student_pkey" PRIMARY KEY ("id");
+
+
+
+ALTER TABLE ONLY "public"."student"
+    ADD CONSTRAINT "student_rg_number_key" UNIQUE ("rg_number");
 
 
 
