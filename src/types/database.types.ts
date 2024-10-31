@@ -579,6 +579,7 @@ export interface Database {
           institution_id: string | null
           name: string
           observations: string | null
+          pre_enrollment_id: string | null
           school_id: string
           series_id: string
           situation: Database['public']['Enums']['situation_type'] | null
@@ -597,6 +598,7 @@ export interface Database {
           institution_id?: string | null
           name: string
           observations?: string | null
+          pre_enrollment_id?: string | null
           school_id: string
           series_id: string
           situation?: Database['public']['Enums']['situation_type'] | null
@@ -615,6 +617,7 @@ export interface Database {
           institution_id?: string | null
           name?: string
           observations?: string | null
+          pre_enrollment_id?: string | null
           school_id?: string
           series_id?: string
           situation?: Database['public']['Enums']['situation_type'] | null
@@ -642,6 +645,13 @@ export interface Database {
             columns: ['institution_id']
             isOneToOne: false
             referencedRelation: 'institution'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'enrollment_pre_enrollment_id_fkey'
+            columns: ['pre_enrollment_id']
+            isOneToOne: false
+            referencedRelation: 'pre_enrollment'
             referencedColumns: ['id']
           },
           {
@@ -1126,9 +1136,11 @@ export interface Database {
           date_end: string | null
           date_opening: string | null
           date_start: string | null
+          deleted_at: string | null
           id: string
-          institution_id: string | null
+          institution_id: string
           school_days: number | null
+          school_id: string
         }
         Insert: {
           created_at?: string
@@ -1136,9 +1148,11 @@ export interface Database {
           date_end?: string | null
           date_opening?: string | null
           date_start?: string | null
+          deleted_at?: string | null
           id?: string
-          institution_id?: string | null
+          institution_id: string
           school_days?: number | null
+          school_id: string
         }
         Update: {
           created_at?: string
@@ -1146,9 +1160,11 @@ export interface Database {
           date_end?: string | null
           date_opening?: string | null
           date_start?: string | null
+          deleted_at?: string | null
           id?: string
-          institution_id?: string | null
+          institution_id?: string
           school_days?: number | null
+          school_id?: string
         }
         Relationships: [
           {
@@ -1156,6 +1172,13 @@ export interface Database {
             columns: ['institution_id']
             isOneToOne: false
             referencedRelation: 'institution'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'school_settings_school_id_fkey'
+            columns: ['school_id']
+            isOneToOne: false
+            referencedRelation: 'school'
             referencedColumns: ['id']
           },
         ]
@@ -1263,6 +1286,7 @@ export interface Database {
           birth_certificate: string | null
           birthdate: string
           city: string | null
+          city_state: string | null
           complement: string | null
           cpf: string | null
           created_at: string
@@ -1307,6 +1331,7 @@ export interface Database {
           birth_certificate?: string | null
           birthdate: string
           city?: string | null
+          city_state?: string | null
           complement?: string | null
           cpf?: string | null
           created_at?: string
@@ -1353,6 +1378,7 @@ export interface Database {
           birth_certificate?: string | null
           birthdate?: string
           city?: string | null
+          city_state?: string | null
           complement?: string | null
           cpf?: string | null
           created_at?: string

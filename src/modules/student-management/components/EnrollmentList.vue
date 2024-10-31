@@ -42,6 +42,7 @@ const fieldLabels: Record<keyof Tables<'enrollment'>, string> = {
   name: 'Nome', // Chave ausente adicionada
   enrollmentCode: 'Código de Matrícula', // Chave ausente adicionada
   situation: 'Situação', // Chave ausente adicionada
+  pre_enrollment_id: 'ID da Pré-Matrícula', // Chave ausente adicionada
 }
 const fields = Object.keys(fieldLabels) as Array<keyof Tables<'enrollment'>>
 const router = useRouter()
