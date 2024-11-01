@@ -51,7 +51,7 @@ async function loadPre_enrollment() {
 }
 
 function navigateToRegister() {
-  router.push({ name: 'EnrollmentRegister' })
+  router.push({ name: 'Pre_enrollmentRegister' })
 }
 
 onMounted(() => {

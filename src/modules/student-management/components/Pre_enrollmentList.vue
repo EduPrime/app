@@ -52,7 +52,7 @@ function toggleDetails(index: number) {
 }
 
 function editItem(item: any) {
-  router.push({ name: `Edit${tableName}`, params: { id: item.id.toString() } })
+  router.push({ name: `Pre_enrollmentEdit`, params: { id: item.id.toString() } })
 }
 
 const isAlertOpen = ref(false)
@@ -77,7 +77,7 @@ async function deleteItem(item: any) {
   try {
     const result = await service.softDelete(item.id)
     if (result) {
-      showToast(`${tableName} excluído com sucesso`)
+      showToast(`${item.student?.name} excluído com sucesso`)
       dataList.value = dataList.value.filter((i: Tables<'pre_enrollment'>) => i.id !== item.id)
       isAlertOpen.value = false
       itemToDelete.value = null
