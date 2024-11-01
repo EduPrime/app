@@ -27,6 +27,9 @@ defineExpose({
 const router = useRouter()
 const route = useRouter()
 const responsibleType = ref(null)
+const valuesDeficiency = ref({
+  deficiency_description: '',
+})
 const valuesType = ref({
   father_name: '',
   father_cpf: '',
@@ -48,6 +51,9 @@ const status = ['Ativo', 'Inativo']
 const situation = ['Pendente', 'Cursando', 'Aprovado', 'Aprovado pelo Conselho', 'Aprovado com Dependência', 'Reprovado', 'Transferido', 'Abandono', 'Falecido']
 const residence_zone = ['Urbana', 'Rural']
 const marital_status = ['Solteiro', 'Casado', 'Divorciado', 'Viúvo', 'Separado', 'União Estável', 'Não Informado']
+const ethnicity = ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena', 'Não declarada']
+const deficiency = ['Visual', 'Auditiva', 'Física', 'Intelectual', 'Mental', 'Múltipla', 'Outros', 'Não possui']
+const period = ['Manhã', 'Tarde', 'Noite']
 const selectedSegment = ref('general-info')
 const classroomService = new ClassroomService()
 const enrollmentService = new EnrollmentService()
@@ -69,17 +75,17 @@ function enforceYear() {
 const searchQuery = ref('')
 const schoolList = ref()
 const studentList = ref()
-const enrollmentCode = ref('')
+const pre_enrollment_code = ref('')
 const seriesList = ref()
 const courseList = ref()
 const pre_enrollmentId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = yup.object({
   date_enrollment: yup.date()
-    .required('Data de matrícula é obrigatória')
-    .typeError('Data de matrícula inválida'),
+    .required('Data de pré-matrícula é obrigatória')
+    .typeError('Data de pré-matrícula inválida'),
   observations: yup.string()
     .nullable(),
-  enrollmentCode: yup.string()
+  pre_enrollment_code: yup.string()
     .nullable(),
   schoolId: yup.string()
     .required('Escola é obrigatória'),
@@ -97,6 +103,22 @@ const formSchema = yup.object({
     .required('Curso é obrigatório'),
   name: yup.string()
     .required('Aluno não selecionado ou não cadastrado'),
+  gender: yup.string()
+    .required('Gênero é obrigatório'),
+  birthdate: yup.date()
+    .required('Data de nascimento é obrigatória')
+    .typeError('Data de nascimento inválida'),
+  ethnicity: yup.string()
+    .nullable()
+    .required('Etnia é obrigatória'),
+  deficiency: yup.string()
+    .nullable()
+    .required('Necessário informar se possui necessidades'),
+  deficiency_description: yup.string()
+    .nullable(),
+  period: yup.string()
+    .nullable()
+    .required('Período é obrigatório'),
 })
 
 const { values, errors, validate, setFieldValue } = useForm<any>({
@@ -128,14 +150,20 @@ async function registerPre_enrollment() {
         name: values.name,
         status: values.status,
         situation: values.situation,
-        enrollmentCode: enrollmentCode.value,
+        pre_enrollment_code: pre_enrollment_code.value,
+        gender: values.gender,
+        birthdate: values.birthdate,
+        ethnicity: values.ethnicity,
+        deficiency: values.deficiency,
+        deficiency_description: values.deficiency_description,
+        period: values.period,
       }
 
       let result
       if (pre_enrollmentId.value) {
         result = await pre_enrollmentService.update(pre_enrollmentId.value, formData)
         if (result) {
-          showToast('Matrícula atualizada com sucesso')
+          showToast('Pré-Matrícula atualizada com sucesso')
           setTimeout(() => {
             router.push('/Student/pre-enrollment').then(() => {
               location.reload()
@@ -146,7 +174,7 @@ async function registerPre_enrollment() {
       else {
         result = await tryCreateEnrollment(formData)
         if (result) {
-          showToast('Matrícula realizada com sucesso!', 'top', 'success')
+          showToast('Pré-Matrícula realizada com sucesso!', 'top', 'success')
           setTimeout(() => {
             router.push('/Student/pre-enrollment').then(() => {
               location.reload()
@@ -156,8 +184,8 @@ async function registerPre_enrollment() {
       }
     }
     catch (error) {
-      console.error('Erro ao salvar matrícula:', error)
-      showToast('Erro ao realizar matrícula. Tente novamente.', 'top', 'danger')
+      console.error('Erro ao salvar pré-matrícula:', error)
+      showToast('Erro ao realizar pré-matrícula. Tente novamente.', 'top', 'danger')
     }
   }
 }
@@ -169,10 +197,10 @@ async function tryCreateEnrollment(formData: any) {
   }
   catch (error: any) {
     // Se o erro for de duplicidade de código, tenta gerar um novo código
-    if (error.code === '23505' && error.details?.includes('enrollmentCode')) {
-      console.warn('Código de matrícula duplicado detectado. Tentando gerar um novo código...')
+    if (error.code === '23505' && error.details?.includes('pre_enrollment_code')) {
+      console.warn('Código de pré-matrícula duplicado detectado. Tentando gerar um novo código...')
       await ensureUniqueEnrollmentCode() // Gera um novo código
-      formData.enrollmentCode = enrollmentCode.value // Atualiza o código no formData
+      formData.pre_enrollment_code = pre_enrollment_code.value // Atualiza o código no formData
       return tryCreateEnrollment(formData) // Tenta novamente
     }
     throw error // Se for outro erro, lança o erro original
@@ -188,12 +216,12 @@ async function ensureUniqueEnrollmentCode() {
     // Gera um novo código aleatório
     await generateCodeEnrollment()
     // Verifica se o código já existe
-    isUnique = await enrollmentService.isUniqueEnrollmentCode(enrollmentCode.value)
+    isUnique = await enrollmentService.isUniqueEnrollmentCode(pre_enrollment_code.value)
     attempts++
   }
 
   if (!isUnique) {
-    throw new Error('Não foi possível gerar um código de matrícula único após várias tentativas.')
+    throw new Error('Não foi possível gerar um código de pré-matrícula único após várias tentativas.')
   }
 }
 
@@ -236,7 +264,7 @@ function selectStudent(student: any) {
   studentId.value = student.id
 
   if (!pre_enrollmentId.value) { // Somente limpa o código de matrícula se for uma nova matrícula
-    enrollmentCode.value = '' // Limpa o código de matrícula
+    pre_enrollment_code.value = '' // Limpa o código de matrícula
     // generateCodeEnrollment()  // Gera um novo código de matrícula
   }
   searchQuery.value = ''
@@ -288,7 +316,7 @@ async function getPre_enrollmentData() {
       seriesId.value = enrollmentDbData.series_id
       studentId.value = enrollmentDbData.student_id
       courseId.value = enrollmentDbData.course_id
-      enrollmentCode.value = enrollmentDbData.enrollmentCode ?? ''
+      pre_enrollment_code.value = enrollmentDbData.pre_enrollment_code ?? ''
       setFieldValue('date_enrollment', enrollmentDbData.date_enrollment)
       setFieldValue('observations', enrollmentDbData.observations)
       setFieldValue('school_id', enrollmentDbData.school_id)
@@ -301,7 +329,13 @@ async function getPre_enrollmentData() {
       setFieldValue('name', enrollmentDbData.name)
       setFieldValue('status', enrollmentDbData.status)
       setFieldValue('situation', enrollmentDbData.situation)
-      setFieldValue('enrollmentCode', enrollmentDbData.enrollmentCode)
+      setFieldValue('pre_enrollment_code', enrollmentDbData.pre_enrollment_code)
+      setFieldValue('gender', enrollmentDbData.gender)
+      setFieldValue('birthdate', enrollmentDbData.birthdate)
+      setFieldValue('ethnicity', enrollmentDbData.ethnicity)
+      setFieldValue('deficiency', enrollmentDbData.deficiency)
+      setFieldValue('deficiency_description', enrollmentDbData.deficiency_description)
+      setFieldValue('period', enrollmentDbData.period)
 
       const student = await studentService.getById(enrollmentDbData.student_id)
       if (student) {
@@ -325,11 +359,11 @@ async function generateCodeEnrollment() {
   const lettersRandom = Array.from({ length: 3 }, () => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
   const numbersRandom = Array.from({ length: 3 }, () => Math.floor(Math.random() * 10)).join('')
   const currentYear = new Date().getFullYear()
-  enrollmentCode.value = `MAT-${lettersRandom}${numbersRandom}-${currentYear}`
+  pre_enrollment_code.value = `MAT-${lettersRandom}${numbersRandom}-${currentYear}`
 }
 
 watch(studentId, (newValue) => {
-  if (!enrollmentCode.value && !pre_enrollmentId.value) { // Gera código apenas para novas matrículas
+  if (!pre_enrollment_code.value && !pre_enrollmentId.value) { // Gera código apenas para novas matrículas
     // generateCodeEnrollment()
   }
 })
@@ -351,6 +385,12 @@ watch(schoolId, async (newSchoolId) => {
     classroomList.value = []
     seriesList.value = []
     courseList.value = []
+  }
+})
+
+watch(() => values.deficiency, (newValue) => {
+  if (newValue === 'Outros') {
+    valuesDeficiency.value.deficiency_description = ''
   }
 })
 
@@ -377,7 +417,12 @@ onMounted(async () => {
   <IonSegment v-model="selectedSegment">
     <IonSegmentButton value="general-info">
       <IonLabel style="font-size: calc(1rem - 2px);">
-        Informações Gerais
+        Informações da Pré-Matrícula
+      </IonLabel>
+    </IonSegmentButton>
+    <IonSegmentButton value="pre-enrollment-info">
+      <IonLabel style="font-size: calc(1rem - 2px);">
+        Informações Pessoais
       </IonLabel>
     </IonSegmentButton>
   </IonSegment>
@@ -408,100 +453,105 @@ onMounted(async () => {
       </ul>
     </div>
 
-    <ion-item>
-      <IonLabel position="stacked" color="medium">
-        Nome do Aluno (Somente Leitura):
-      </IonLabel>
-      <ion-input
-        v-model="values.name"
-        type="text"
-        placeholder="Aluno Matriculado"
-        readonly
-        :disabled="true"
-        class="readonly-input"
-      />
-    </ion-item>
+    <ion-list>
+      <ion-item>
+        <ion-input
+          v-model="values.name"
+          label="Nome do Aluno (Somente Leitura)"
+          label-placement="floating"
+          type="text"
+          placeholder="Aluno Matriculado"
+          readonly
+          :disabled="true"
+          class="readonly-input"
+        />
+      </ion-item>
+    </ion-list>
 
     <ion-list id="schoolList">
-      <ion-item>
-        <IonSelect
-          v-model="schoolId"
-          justify="space-between"
-          label="Escola*"
-          placeholder="Selecione a escola"
-          @ion-change="(e) => {
-            setFieldValue('schoolId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
-            {{ school.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+      <IonSelect
+        v-model="schoolId"
+        fill="outline"
+        label-placement="floating"
+        cancel-text="Cancelar"
+        justify="space-between"
+        label="Escola*"
+        placeholder="Selecione a escola"
+        @ion-change="(e) => {
+          setFieldValue('schoolId', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
+          {{ school.name }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
 
     <ion-list v-if="schoolId" id="courseList">
-      <ion-item>
-        <IonSelect
-          v-model="courseId"
-          justify="space-between"
-          label="Curso*"
-          placeholder="Selecione o curso"
-          @ion-change="(e) => {
-            setFieldValue('courseId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
-            {{ course.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+      <IonSelect
+        v-model="courseId"
+        fill="outline"
+        label-placement="floating"
+        cancel-text="Cancelar"
+        justify="space-between"
+        label="Curso*"
+        placeholder="Selecione o curso"
+        @ion-change="(e) => {
+          setFieldValue('courseId', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
+          {{ course.name }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
 
     <ion-list v-if="schoolId" id="seriesList">
-      <ion-item>
-        <IonSelect
-          v-model="seriesId"
-          justify="space-between"
-          label="Série*"
-          placeholder="Selecione a série"
-          @ion-change="(e) => {
-            setFieldValue('seriesId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
-            {{ series.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+      <IonSelect
+        v-model="seriesId"
+        fill="outline"
+        label-placement="floating"
+        cancel-text="Cancelar"
+        justify="space-between"
+        label="Série*"
+        placeholder="Selecione a série"
+        @ion-change="(e) => {
+          setFieldValue('seriesId', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
+          {{ series.name }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
 
     <ion-list v-if="schoolId" id="classroomList">
-      <ion-item>
-        <IonSelect
-          v-model="classroomId"
-          justify="space-between"
-          label="Turma*"
-          placeholder="Selecione a turma"
-          @ion-change="(e) => {
-            setFieldValue('classroomId', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="classroom in classroomList" :key="classroom.id" :value="classroom.id">
-            {{ classroom.name }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+      <IonSelect
+        v-model="classroomId"
+        fill="outline"
+        label-placement="floating"
+        cancel-text="Cancelar"
+        justify="space-between"
+        label="Turma*"
+        placeholder="Selecione a turma"
+        @ion-change="(e) => {
+          setFieldValue('classroomId', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="classroom in classroomList" :key="classroom.id" :value="classroom.id">
+          {{ classroom.name }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
 
     <EpInput
       v-model="values.date_enrollment"
       name="date_enrollment"
-      label="Data da Matrícula*"
+      label="Data da Pré-Matrícula*"
       type="date"
       :max="maxDate"
       :min="minDate"
-      placeholder="Digite a data de matrícula"
+      placeholder="Digite a data de pré-matrícula"
       @change="enforceYear"
     />
 
@@ -524,39 +574,127 @@ onMounted(async () => {
         </ion-item>
       </ion-list> -->
 
+    <ion-list id="periodList">
+      <IonSelect
+        v-model="values.period"
+        fill="outline"
+        label-placement="floating"
+        cancel-text="Cancelar"
+        justify="space-between"
+        label="Turno*"
+        placeholder="Selecione o turno"
+        @ion-change="(e) => setFieldValue('period', e.target.value)"
+      >
+        <IonSelectOption v-for="period in period" :key="period" :value="period">
+          {{ period }}
+        </IonSelectOption>
+      </IonSelect>
+    </ion-list>
+
     <ion-list id="situation">
-      <ion-item>
-        <IonSelect
-          v-model="values.situation"
-          justify="space-between"
-          label="Situação da Matrícula*"
-          placeholder="Selecione a situação"
-          @ion-change="(e) => {
-            setFieldValue('situation', e.detail.value)
-          }"
-        >
-          <IonSelectOption v-for="situation in situation" :key="situation" :value="situation">
-            {{ situation }}
-          </IonSelectOption>
-        </IonSelect>
-      </ion-item>
+      <IonSelect
+        v-model="values.situation"
+        fill="outline"
+        label-placement="floating"
+        cancel-text="Cancelar"
+        justify="space-between"
+        label="Situação da Pré-Matrícula*"
+        placeholder="Selecione a situação"
+        @ion-change="(e) => {
+          setFieldValue('situation', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="situation in situation" :key="situation" :value="situation">
+          {{ situation }}
+        </IonSelectOption>
+      </IonSelect>
     </ion-list>
 
     <ion-item>
       <IonLabel position="stacked" color="medium">
-        Código de Matrícula (Somente Leitura):
+        Código de Pré-Matrícula (Somente Leitura):
       </IonLabel>
       <ion-input
-        v-model="enrollmentCode"
+        v-model="pre_enrollment_code"
         type="text"
-        placeholder="Código gerado após finalizar a matrícula"
+        placeholder="Código gerado após finalizar a pré-matrícula"
         :disabled="true"
         readonly
         class="readonly-input"
       />
     </ion-item>
 
-    <EpInput v-model="values.observations" name="observations" label="Observações" placeholder="Digite observações sobre a matrícula" />
+    <EpInput v-model="values.observations" name="observations" label="Observações" placeholder="Digite observações sobre a pré-matrícula" />
+  </div>
+
+  <div v-show="selectedSegment === 'pre-enrollment-info'">
+    <EpInput v-model="values.birthdate" name="birthdate" label="Data de Nascimento*" type="date" placeholder="Digite a data de nascimento" />
+
+    <ion-list id="gender">
+      <IonSelect
+        v-model="values.gender"
+        fill="outline"
+        label-placement="floating"
+        cancel-text="Cancelar"
+        justify="space-between"
+        label="Gênero*"
+        placeholder="Selecione o gênero"
+        @ion-change="(e) => {
+          setFieldValue('gender', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="gender in gender" :key="gender" :value="gender">
+          {{ gender }}
+        </IonSelectOption>
+      </IonSelect>
+    </ion-list>
+
+    <ion-list id="ethnicity">
+      <IonSelect
+        v-model="values.ethnicity"
+        fill="outline"
+        label-placement="floating"
+        cancel-text="Cancelar"
+        justify="space-between"
+        label="Etnia*"
+        placeholder="Selecione a etnia"
+        @ion-change="(e) => {
+          setFieldValue('ethnicity', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="ethnicity in ethnicity" :key="ethnicity" :value="ethnicity">
+          {{ ethnicity }}
+        </IonSelectOption>
+      </IonSelect>
+    </ion-list>
+
+    <ion-list id="deficiency">
+      <IonSelect
+        v-model="values.deficiency"
+        fill="outline"
+        label-placement="floating"
+        cancel-text="Cancelar"
+        justify="space-between"
+        label="Necessidade Especial*"
+        placeholder="Selecione a necessidade"
+        @ion-change="(e) => {
+          setFieldValue('deficiency', e.detail.value)
+        }"
+      >
+        <IonSelectOption v-for="deficiency in deficiency" :key="deficiency" :value="deficiency">
+          {{ deficiency }}
+        </IonSelectOption>
+      </IonSelect>
+    </ion-list>
+    <!-- Outras deficiências -->
+    <div v-show="values.deficiency === 'Outros'">
+      <EpInput
+        v-model="values.deficiency_description"
+        name="deficiency_description"
+        label="Descrição da Necessidade"
+        placeholder="Digite a descrição da necessidade"
+      />
+    </div>
   </div>
 </template>
 

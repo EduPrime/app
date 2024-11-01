@@ -7,7 +7,7 @@ import EditPre_enrollment from './views/EditPre_enrollment.vue'
 import EditStudent from './views/EditStudent.vue'
 /* import MoveStudent from './views/MoveStudent.vue' */
 import RegisterEnrollment from './views/RegisterEnrollment.vue'
-import RegisterPre_enrollment from './views/RegisterPre_enrollment.vue'
+/* import RegisterPre_enrollment from './views/RegisterPre_enrollment.vue' */
 import RegisterStudent from './views/RegisterStudent.vue'
 
 const routes = [
@@ -110,7 +110,7 @@ const routes = [
       requiredRole: ['public', 'admin'],
     },
   },
-  {
+  /*   {
     path: '/student/pre-enrollment/register',
     name: 'Pre_enrollmentRegister',
     component: RegisterPre_enrollment,
@@ -121,7 +121,7 @@ const routes = [
       order: 6,
       requiredRole: ['public', 'admin'],
     },
-  },
+  }, */
   {
     path: '/student/pre-enrollment/edit/:id',
     name: 'Pre_enrollmentEdit',
@@ -130,7 +130,7 @@ const routes = [
       moduleName: 'Student',
       icon: documentText,
       name: 'Editar Pré-matrícula',
-      order: 7,
+      order: 6,
       requiredRole: ['public', 'admin'],
     },
   },

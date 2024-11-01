@@ -50,9 +50,9 @@ async function loadPre_enrollment() {
   }
 }
 
-function navigateToRegister() {
+/* function navigateToRegister() {
   router.push({ name: 'Pre_enrollmentRegister' })
-}
+} */
 
 onMounted(() => {
   loadPre_enrollment()
@@ -69,16 +69,16 @@ onMounted(() => {
       <ion-title>Pré-Matrículas ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
     <ion-row class="ion-align-items-center ion-justify-content-between">
-      <ion-col size="10">
+      <ion-col>
         <ion-searchbar v-model="searchQuery" placeholder="Buscar pré-matrículas" />
       </ion-col>
-      <ion-col size="2" class="ion-text-end">
+      <!--    <ion-col size="2" class="ion-text-end">
         <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
           <ion-icon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
           <ion-icon slot="start" :icon="add" class="ion-hide-sm-down" />
           <span class="ion-hide-sm-down">Novo</span>
         </ion-button>
-      </ion-col>
+      </ion-col> -->
     </ion-row>
     <Pre_enrollmentList :data-list="filteredDataList" />
   </ContentLayout>
