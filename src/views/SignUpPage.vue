@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { useUserStore } from '@/store/user'
+import showToast from '@/utils/toast-alert'
+import { IonSelect, IonSelectOption } from '@ionic/vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../supabaseClient'
 
 const email = ref('')
 const password = ref('')
+const confirmPassword = ref('')
 const role = ref('')
-const validRoles = ['adm', 'teacher', 'aluno']
+const validRoles = ['admin', 'professor', 'aluno']
 const router = useRouter()
 const userStore = useUserStore()
 
@@ -18,6 +21,13 @@ function onRoleChange(event: CustomEvent) {
 async function signUp() {
   if (!role.value || !validRoles.includes(role.value)) {
     console.error(`Role is required and must be one of: ${validRoles.join(', ')}`)
+    return
+  }
+
+  // Verifica se as senhas correspondem
+  if (password.value !== confirmPassword.value) {
+    console.error('Senhas não correspondem')
+    showToast('As senhas não correspondem. Tente novamente.', 'top', 'warning')
     return
   }
 
@@ -33,6 +43,7 @@ async function signUp() {
 
   if (error) {
     console.error('Error creating user:', error.message)
+    showToast('Email já cadastrado. Tente novamente.', 'top', 'warning')
   }
   else {
     const { user, session } = data
@@ -59,29 +70,33 @@ function goToLogin() {
           <ion-img src="/assets/logo.png" alt="Logo" class="signup-logo" />
 
           <!-- Formul�rio de cadastro -->
+
           <ion-item>
-            <ion-input v-model="email" placeholder="Email" />
+            <ion-input v-model="email" label="Email" label-placement="stacked" placeholder="seuemail@dominio.com" />
           </ion-item>
           <ion-item>
-            <ion-input v-model="password" type="password" placeholder="Password" />
+            <ion-input v-model="password" label="Senha" label-placement="stacked" type="password" placeholder="Escolha uma senha segura" />
           </ion-item>
           <ion-item>
-            <ion-select v-model="role" placeholder="Select a role" @ion-change="onRoleChange">
-              <ion-select-option value="adm">
+            <ion-input v-model="confirmPassword" label="Confirmar senha" label-placement="stacked" type="password" placeholder="Insira a senha novamente para confirmação" />
+          </ion-item>
+          <ion-item>
+            <IonSelect v-model="role" fill="solid" cancel-text="Cancelar" label="Selecione um tipo de usuário" label-placement="floating" placeholder="Selecione um tipo de usuário" @ion-change="onRoleChange">
+              <IonSelectOption value="admin">
                 Admin
-              </ion-select-option>
-              <ion-select-option value="teacher">
-                Teacher
-              </ion-select-option>
-              <ion-select-option value="aluno">
+              </IonSelectOption>
+              <IonSelectOption value="professor">
+                Professor
+              </IonSelectOption>
+              <IonSelectOption value="aluno">
                 Aluno
-              </ion-select-option>
-            </ion-select>
+              </IonSelectOption>
+            </IonSelect>
           </ion-item>
 
           <!-- Bot�o de Sign Up -->
           <ion-button expand="block" @click="signUp">
-            Sign Up
+            Registrar
           </ion-button>
 
           <!-- Bot�o de Voltar para Login -->
