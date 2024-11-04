@@ -1,0 +1,4 @@
+[submodule "src/modules/app-module-chatbot"]
+	path = src/modules/app-module-chatbot
+	url = https://github.com/EduPrime/app-module-chatbot.git
+
