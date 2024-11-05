@@ -2,7 +2,7 @@
 import { useUserStore } from '@/store/user'
 import showToast from '@/utils/toast-alert'
 import { IonSelect, IonSelectOption } from '@ionic/vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../supabaseClient'
 
@@ -14,8 +14,41 @@ const validRoles = ['admin', 'professor', 'aluno']
 const router = useRouter()
 const userStore = useUserStore()
 
+const passwordMismatch = ref(false) // Variável para controlar se as senhas não coincidem
+
 function onRoleChange(event: CustomEvent) {
   role.value = event.detail.value
+}
+
+// Requisitos para a senha
+const minLength = 8
+const hasNumber = /\d/
+const hasUpperCase = /[A-Z]/
+
+// Observa os requisitos da senha
+const passwordRequiriments = ref({
+  minLength: false,
+  hasNumber: false,
+  hasUpperCase: false,
+})
+
+watch(password, (newPassword) => {
+  passwordRequiriments.value.minLength = newPassword.length >= minLength
+  passwordRequiriments.value.hasNumber = hasNumber.test(newPassword)
+  passwordRequiriments.value.hasUpperCase = hasUpperCase.test(newPassword)
+})
+
+watch([password, confirmPassword], () => {
+  passwordMismatch.value = password.value !== confirmPassword.value
+})
+
+// Função para verificar todos os requisitos da senha
+function isPasswordValid() {
+  return (
+    passwordRequiriments.value.minLength
+    && passwordRequiriments.value.hasNumber
+    && passwordRequiriments.value.hasUpperCase
+  )
 }
 
 async function signUp() {
@@ -24,10 +57,14 @@ async function signUp() {
     return
   }
 
-  // Verifica se as senhas correspondem
-  if (password.value !== confirmPassword.value) {
+  if (passwordMismatch.value) {
     console.error('Senhas não correspondem')
     showToast('As senhas não correspondem. Tente novamente.', 'top', 'warning')
+    return
+  }
+
+  if (!isPasswordValid()) {
+    showToast('A senha não atende aos requisitos. Verifique e tente novamente.', 'top', 'warning')
     return
   }
 
@@ -78,8 +115,24 @@ function goToLogin() {
             <ion-input v-model="password" label="Senha" label-placement="stacked" type="password" placeholder="Escolha uma senha segura" />
           </ion-item>
           <ion-item>
+            <div class="password-requiriments">
+              <p :class="{ valid: passwordRequiriments.minLength }">
+                - Pelo menos 8 caracteres
+              </p>
+              <p :class="{ valid: passwordRequiriments.hasNumber }">
+                - Contém número
+              </p>
+              <p :class="{ valid: passwordRequiriments.hasUpperCase }">
+                - Contém letra maiúscula
+              </p>
+            </div>
+          </ion-item>
+          <ion-item>
             <ion-input v-model="confirmPassword" label="Confirmar senha" label-placement="stacked" type="password" placeholder="Insira a senha novamente para confirmação" />
           </ion-item>
+          <p v-if="passwordMismatch" class="error-message">
+            As senhas não correspondem.
+          </p>
           <ion-item>
             <IonSelect v-model="role" fill="solid" cancel-text="Cancelar" label="Selecione um tipo de usuário" label-placement="floating" placeholder="Selecione um tipo de usuário" @ion-change="onRoleChange">
               <IonSelectOption value="admin">
@@ -137,5 +190,21 @@ function goToLogin() {
   margin: 0 auto 20px;
   width: 150px;
   height: auto;
+}
+
+.password-requiriments p {
+  font-size: 0.85em;
+  margin: 2px 0;
+  color: #666;
+}
+
+.password-requiriments p.valid {
+  color: green;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.85em;
+  margin: 5px 0 0 15px;
 }
 </style>
