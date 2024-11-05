@@ -27,6 +27,7 @@ function handleInput(event: { target: any }) {
 
 function handleTrackInput(event: { target: any }) {
   const query = event.target.value.toLowerCase()
+
   queryBlock3.value = query
 }
 // import { createClient } from '@supabase/supabase-js'
@@ -155,13 +156,17 @@ onMounted(async () => {
             </IonText>
           </h2>
           <div class="ion-padding-top">
-            <IonText color="primary">
-              <p>
-                Digite o nome do aluno para acompanhar a pré-matrícula
-              </p>
-            </IonText>
+            <IonRow>
+              <IonCol v-if="trackNotFound !== true && trackNotFound !== false">
+                <IonText color="primary">
+                  <p>
+                    Digite o nome do aluno para acompanhar a pré-matrícula ou clique no botão "Começar Agora" para iniciar uma nova pré-matrícula.
+                  </p>
+                </IonText>
+              </IonCol>
+            </IonRow>
           </div>
-          <div class="ion-padding-top ">
+          <div :class="trackNotFound === true && trackNotFound === false ? 'ion-padding-top' : '' ">
             <IonSearchbar v-model="queryBlock3" placeholder="Buscar Aluno..." @ion-input="handleTrackInput($event)" />
           </div>
           <div class="ion-padding-bottom ion-padding-top">
