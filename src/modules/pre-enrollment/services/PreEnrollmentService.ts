@@ -32,20 +32,41 @@ export default class PreEnrollmentService extends BaseService<TabelaType> {
     }
   }
 
+  async genericGet(collection: string, id: string) {
+    try {
+      const data = await this.client.from(collection)
+        .select('name')
+        .eq('id', id)
+
+      return data.data?.at(0)
+    }
+    catch (error) {
+      console.error(`Erro ao listar dados da collection: ${collection} filtrando pelo id: ${id}`, error)
+    }
+  }
+
   async getPreEnrollmentByCode(uniqueCode: string) {
     try {
-      const student = ref()
+      const information = ref({
+        pre_enrollment: undefined as any,
+        student: undefined as any,
+        course: undefined as any,
+        school: undefined as any,
+        series: undefined as any,
+      })
       const data: { data: { student_id: string }[] } | any = await this.client.from(table)
-        .select('pre_enrollment_code')
+        .select('pre_enrollment_code, student_id, school_id, course_id, series_id, date_enrollment, observations, status')
         .eq('pre_enrollment_code', uniqueCode)
 
       if (data.data.length > 0) {
-        student.value = await this.client.from('student')
-          .select('*')
-          .eq('id', data.data[0].student_id)
+        information.value.pre_enrollment = data.data[0]
+        information.value.student = await this.genericGet('student', data.data[0].student_id)
+        information.value.course = await this.genericGet('course', data.data[0].course_id)
+        information.value.school = await this.genericGet('school', data.data[0].school_id)
+        information.value.series = await this.genericGet('series', data.data[0].series_id)
       }
 
-      return { data, student }
+      return information.value
     }
     catch (error) {
       console.error('Erro ao listar a pré-matrícula:', error)

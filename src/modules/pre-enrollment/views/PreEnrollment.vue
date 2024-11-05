@@ -9,6 +9,7 @@ import startEnrollment from '../components/StartEnrollment.vue'
 import trackEnrollment from '../components/TrackEnrollment.vue'
 
 const etapa = ref(1)
+const trackNotFound = ref()
 const pageWidth = ref()
 // const router = useRouter()
 
@@ -101,10 +102,10 @@ onMounted(async () => {
                   </IonCol>
                   <IonCol size="12">
                     <div class="ion-padding-bottom ">
-                      <IonButton href="/inicio#block2" expand="full">
+                      <IonButton href="/pre-enrollment#block2" expand="full">
                         Começar Agora
                       </IonButton>
-                      <IonButton href="/inicio#block3" expand="full" color="tertiary">
+                      <IonButton href="/pre-enrollment#block3" expand="full" color="tertiary">
                         Acompanhar
                         Pré-Matrícula
                       </IonButton>
@@ -150,21 +151,40 @@ onMounted(async () => {
         <div style="max-width: 992px;" class="mx-auto" :class="pageWidth?.pageWidth < 992 ? 'ion-padding' : ''">
           <h2 class="dark-background-title" style="padding-left: 6px;">
             <IonText color="primary">
-              Acompanhe sua matrícula
+              Acompanhe sua Pré-Matrícula
             </IonText>
           </h2>
+          <div class="ion-padding-top">
+            <IonText color="primary">
+              <p>
+                Digite o nome do aluno para acompanhar a pré-matrícula
+              </p>
+            </IonText>
+          </div>
           <div class="ion-padding-top ">
-            <IonSearchbar placeholder="Buscar Aluno..." @ion-input="handleTrackInput($event)" />
+            <IonSearchbar v-model="queryBlock3" placeholder="Buscar Aluno..." @ion-input="handleTrackInput($event)" />
           </div>
           <div class="ion-padding-bottom ion-padding-top">
-            <trackEnrollment :query="queryBlock3" />
+            <trackEnrollment v-model="trackNotFound" :query="queryBlock3" />
             <div class="ion-padding-bottom ion-padding-top">
-              <IonButton expand="full" href="/inicio#block2">
+              <IonButton expand="full" href="/pre-enrollment#block2">
                 Começar Agora
               </IonButton>
-              <IonButton expand="full" color="tertiary">
-                Acompanhar
-                Pré-Matrícula
+              <IonButton
+                v-if="trackNotFound === false" expand="full" color="tertiary" @click="() => {
+                  queryBlock3 = undefined
+                  trackNotFound = undefined
+                }"
+              >
+                Limpar Busca
+              </IonButton>
+              <IonButton
+                v-else-if="trackNotFound === true" expand="full" color="tertiary" @click="() => {
+                  queryBlock3 = undefined
+                  trackNotFound = undefined
+                }"
+              >
+                Buscar Outro
               </IonButton>
             </div>
           </div>

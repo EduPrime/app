@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonItem, IonText } from '@ionic/vue'
-import { computed, defineProps, onMounted, ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 
 import PreEnrollmentService from '../services/PreEnrollmentService'
 
@@ -9,6 +9,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const emits = defineEmits(['update:modelValue'])
 const query = computed(() => props.query)
 const result = ref()
 const supabase = new PreEnrollmentService()
@@ -17,14 +18,23 @@ watch(query, async (value) => {
   if (value) {
     result.value = await supabase.getPreEnrollmentByCode(value)
   }
+  else {
+    result.value = null
+  }
+})
+
+watch(result, (value) => {
+  if (value && value.pre_enrollment) {
+    emits('update:modelValue', true)
+  }
+  else {
+    emits('update:modelValue', false)
+  }
 })
 </script>
 
 <template>
-  <pre>
-    {{ result }}
-  </pre>
-  <IonCard>
+  <IonCard v-if="result && result?.pre_enrollment">
     <div style="display: flex;">
       <img
         src="../assets/images/default_user.png" width="70px" alt="" class="ion-padding-start ion-padding-top"
@@ -33,12 +43,15 @@ watch(query, async (value) => {
       <IonCardHeader class="ion-padding-top">
         <IonCardTitle>
           <IonText color="primary">
-            Aluno Fulano de Tal
+            {{ result.student.name }}
           </IonText>
         </IonCardTitle>
         <IonCardSubtitle>
           <IonText color="primary">
-            Pré-Matrícula: 84653
+            Pré-Matrícula:
+            <b class="ion-text-uppercase">
+              {{ result.pre_enrollment.pre_enrollment_code }}
+            </b>
           </IonText>
         </IonCardSubtitle>
       </IonCardHeader>
@@ -48,7 +61,7 @@ watch(query, async (value) => {
         <div>
           <IonText color="primary">
             <p>
-              Escola Municipal ABCD
+              {{ result.school.name }}
             </p>
           </IonText>
         </div>
@@ -56,7 +69,9 @@ watch(query, async (value) => {
       <IonItem>
         <div>
           <IonText color="primary">
-            <p>Ensino Fundamental I - 5° Ano</p>
+            <p>
+              {{ result.course.name }}
+            </p>
           </IonText>
         </div>
       </IonItem>
@@ -69,15 +84,24 @@ watch(query, async (value) => {
         <span style="display: flex; margin-left: auto">
           <IonCardSubtitle class="ion-padding-end">
             <IonText color="primary">
-              Em Analise
+              {{ result.pre_enrollment.status === 'Ativo' ? 'Em Analise' : 'Finalizado' }}
             </IonText>
-
           </IonCardSubtitle>
           <div
-            style="height: 16px; width: 16px; background-color:orange ; border-radius: 100%; margin-top: auto; margin-bottom: auto;"
+            :style="result.pre_enrollment.status === 'Ativo' ? 'background-color: orange' : 'background-color: gray'"
+            style="height: 16px; width: 16px; border-radius: 100%; margin-top: auto; margin-bottom: auto;"
           />
         </span>
       </IonItem>
     </IonCardContent>
+  </IonCard>
+
+  <IonCard v-else-if="result">
+    <IonCardHeader>
+      <IonCardTitle>Nenhum cadastro encontrado</IonCardTitle>
+      <IonCardSubtitle>Não foi possível encontrar cadastro {{ props.query ? `${props.query}` : '' }}</IonCardSubtitle>
+    </IonCardHeader>
+
+    <IonCardContent> Verifique se o código foi digitado corretamente ou selecione uma das opções abaixo </IonCardContent>
   </IonCard>
 </template>
