@@ -14,7 +14,7 @@ const validRoles = ['admin', 'professor', 'aluno']
 const router = useRouter()
 const userStore = useUserStore()
 
-const passwordMismatch = ref(false) // Variável para controlar se as senhas não coincidem
+const passwordsMatch = ref(true) // Variável para controlar se as senhas não coincidem
 
 function onRoleChange(event: CustomEvent) {
   role.value = event.detail.value
@@ -38,8 +38,8 @@ watch(password, (newPassword) => {
   passwordRequiriments.value.hasUpperCase = hasUpperCase.test(newPassword)
 })
 
-watch([password, confirmPassword], () => {
-  passwordMismatch.value = password.value !== confirmPassword.value
+watch(confirmPassword, (newConfirmPassword) => {
+  passwordsMatch.value = !newConfirmPassword || password.value === newConfirmPassword
 })
 
 // Função para verificar todos os requisitos da senha
@@ -57,9 +57,9 @@ async function signUp() {
     return
   }
 
-  if (passwordMismatch.value) {
+  if (passwordsMatch.value) {
+    showToast('As senhas não correspondem. Verifique e tente novamente.', 'top', 'warning')
     console.error('Senhas não correspondem')
-    showToast('As senhas não correspondem. Tente novamente.', 'top', 'warning')
     return
   }
 
@@ -130,9 +130,9 @@ function goToLogin() {
           <ion-item>
             <ion-input v-model="confirmPassword" label="Confirmar senha" label-placement="stacked" type="password" placeholder="Insira a senha novamente para confirmação" />
           </ion-item>
-          <p v-if="passwordMismatch" class="error-message">
+          <!--        <p v-if="!passwordsMatch" class="error-message">
             As senhas não correspondem.
-          </p>
+          </p> -->
           <ion-item>
             <IonSelect v-model="role" fill="solid" cancel-text="Cancelar" label="Selecione um tipo de usuário" label-placement="floating" placeholder="Selecione um tipo de usuário" @ion-change="onRoleChange">
               <IonSelectOption value="admin">
@@ -146,16 +146,17 @@ function goToLogin() {
               </IonSelectOption>
             </IonSelect>
           </ion-item>
+          <div class="button-container ion-margin-top">
+            <!-- Bot�o de Sign Up -->
+            <ion-button expand="block" @click="signUp">
+              Registrar
+            </ion-button>
 
-          <!-- Bot�o de Sign Up -->
-          <ion-button expand="block" @click="signUp">
-            Registrar
-          </ion-button>
-
-          <!-- Bot�o de Voltar para Login -->
-          <ion-button expand="block" fill="outline" @click="goToLogin">
-            Voltar para Login
-          </ion-button>
+            <!-- Bot�o de Voltar para Login -->
+            <ion-button expand="block" fill="outline" @click="goToLogin">
+              Voltar para Login
+            </ion-button>
+          </div>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -206,5 +207,9 @@ function goToLogin() {
   color: red;
   font-size: 0.85em;
   margin: 5px 0 0 15px;
+}
+
+.button-container {
+  margin-top: 20px;
 }
 </style>
