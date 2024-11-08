@@ -48,7 +48,7 @@ async function changePassword() {
   }
 
   loading.value = true
-  const { error } = await supabase.auth.update({ password: newPassword.value })
+  const { error } = await supabase.auth.updateUser({ password: newPassword.value })
   loading.value = false
 
   if (error) {
