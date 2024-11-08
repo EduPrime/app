@@ -11,7 +11,7 @@ const router = useRouter()
 
 async function resetPassword() {
   loading.value = true
-  const { error } = await supabase.auth.api.resetPasswordForEmail(email.value)
+  const { error } = await supabase.auth.resetPasswordForEmail(email.value)
   loading.value = false
 
   if (error) {
