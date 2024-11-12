@@ -28,6 +28,7 @@
     "@ionic/vue-router": "^8.4.0",
     "@maskito/core": "^3.2.0",
     "@maskito/vue": "^3.2.0",
+    "@prisma/client": "^5.20.0",
     "@uppy/core": "^4.2.3",
     "@uppy/dashboard": "^4.1.2",
     "@uppy/drag-drop": "^4.0.4",
