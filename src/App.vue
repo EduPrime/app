@@ -24,11 +24,6 @@ import { useRoute, useRouter } from 'vue-router'
 // import type CustomUser from '@/router/CustomUser'
 import type { RouteRecordNormalized } from 'vue-router'
 import NavItem from './components/NavItem.vue'
-import { useUserStore } from './store/user'
-import { supabase } from './supabaseClient'
-
-const userStore = useUserStore()
-// const user: CustomUser = userStore.user as CustomUser
 
 const tabs = ref([
   {
@@ -257,13 +252,11 @@ watch(route, (newRoute) => {
 })
 
 async function logout() {
-  const { error } = await supabase.auth.signOut()
+  const error: any = 0
   if (error) {
     console.error('Erro ao deslogar:', error.message)
   }
   else {
-    userStore.logout()
-
     router.push('/login')
   }
 }

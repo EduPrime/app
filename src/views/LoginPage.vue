@@ -1,43 +1,63 @@
 <script setup lang="ts">
+import BaseService from '@/services/BaseService'
+import { useAuthStore } from '@/store/autSthore'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '../store/user'
-import { supabase } from '../supabaseClient'
+import * as yup from 'yup'
 
-const email = ref<string>('')
-const password = ref<string>('')
-const user = ref<any>(null)
-const router = useRouter()
-const userStore = useUserStore()
+const email = ref<string>('admin@example.com')
+const password = ref<string>('complexAdminFakePass123')
 
-onMounted(async () => {
-  const { data: { session } } = await supabase.auth.getSession()
-  user.value = session?.user || null
-  user.value = session?.user
+const schema = yup.object().shape({
+  email: yup.string().email('Email inválido').required('Email é obrigatório'),
+  password: yup.string().min(8, 'A senha deve ter pelo menos 8 caracteres').required('Senha é obrigatória'),
 })
-
-async function signIn() {
-  const { error, data } = await supabase.auth.signInWithPassword({
-    email: email.value,
-    password: password.value,
-  })
-
-  if (error) {
-    console.error('Erro ao fazer login:', error.message)
+const authStore = useAuthStore()
+async function validateForm() {
+  try {
+    await schema.validate({ email: email.value, password: password.value }, { abortEarly: false })
+    return true
   }
-  else {
-    userStore.setUser(data.session?.user)
-    router.push(`/dashboard/${data.session?.user?.id}`)
+  catch (errors) {
+    console.error('Validation errors:', errors)
+    return false
   }
 }
+
+async function signIn() {
+  if (await validateForm()) {
+    await authStore.login(email.value, password.value)
+  }
+}
+const router = useRouter()
 
 function goToSignUp() {
   router.replace('/signup')
 }
+function generateRandomString(length: number): string {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = ''
+  const charactersLength = characters.length
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength))
+  }
+  return result
+}
+const user = ref(null)
+const institution = ref(null)
+onMounted(async () => {
+  user.value = authStore.user
+  const apiService = new BaseService('institution')
+  const data = {
+    name: `HERMES ${generateRandomString(12)}`,
+  }
+  institution.value = await apiService.countEntries()
+})
 </script>
 
 <template>
   <ion-content class="login-content">
+    {{ institution }}
     <ion-grid class="login-grid">
       <ion-row class="ion-justify-content-center ion-align-items-center full-height">
         <ion-col size="12" size-md="6" size-lg="4" class="login-form">
