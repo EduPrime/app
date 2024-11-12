@@ -9,7 +9,7 @@ import ReadInstitution from './crud/ReadInstitution.vue'
 import UpdateInstitution from './crud/UpdateInstitution.vue'
 
 // Estados para os dados da instituição e carregamento
-const institution = ref< Tables<'institution'> | null>()
+const institution = ref()
 const loading = ref(true)
 const isEditing = ref(false)
 

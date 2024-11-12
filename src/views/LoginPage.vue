@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import BaseService from '@/services/BaseService'
 import { useAuthStore } from '@/store/autSthore'
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
 
 const email = ref<string>('admin@example.com')
 const password = ref<string>('complexAdminFakePass123')
+const user = ref(null)
+const institution = ref<any[]>([])
+const showLoginForm = ref(true)
 
 const schema = yup.object().shape({
   email: yup.string().email('Email inválido').required('Email é obrigatório'),
@@ -27,6 +30,8 @@ async function validateForm() {
 async function signIn() {
   if (await validateForm()) {
     await authStore.login(email.value, password.value)
+    await validationBackend()
+    showLoginForm.value = false
   }
 }
 const router = useRouter()
@@ -34,31 +39,17 @@ const router = useRouter()
 function goToSignUp() {
   router.replace('/signup')
 }
-function generateRandomString(length: number): string {
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let result = ''
-  const charactersLength = characters.length
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength))
-  }
-  return result
-}
-const user = ref(null)
-const institution = ref(null)
-onMounted(async () => {
+
+async function validationBackend() {
   user.value = authStore.user
   const apiService = new BaseService('institution')
-  const data = {
-    name: `HERMES ${generateRandomString(12)}`,
-  }
-  institution.value = await apiService.countEntries()
-})
+  institution.value = await apiService.getAll()
+}
 </script>
 
 <template>
   <ion-content class="login-content">
-    {{ institution }}
-    <ion-grid class="login-grid">
+    <ion-grid v-if="showLoginForm" class="login-grid">
       <ion-row class="ion-justify-content-center ion-align-items-center full-height">
         <ion-col size="12" size-md="6" size-lg="4" class="login-form">
           <ion-img src="/assets/logo.png" alt="Logo" class="login-logo" />
@@ -77,6 +68,14 @@ onMounted(async () => {
           <ion-button expand="block" fill="outline" @click="goToSignUp">
             Registrar
           </ion-button>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    <ion-grid v-else class="user-info-grid">
+      <ion-row class="ion-justify-content-center ion-align-items-center full-height">
+        <ion-col size="12" size-md="6" size-lg="4" class="user-info">
+          <h2>Bem-vindo, {{ user }}</h2>
+          <p>Instituição: {{ institution }}</p>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -111,5 +110,17 @@ onMounted(async () => {
   margin: 0 auto 20px;
   width: 150px;
   height: auto;
+}
+
+.user-info-grid {
+  height: 100%;
+}
+
+.user-info {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
 }
 </style>

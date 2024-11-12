@@ -32,13 +32,7 @@ const schoolId = ref('')
 const institutionId = ref('')
 const courseId = ref('')
 const teacherId = ref('')
-const school = ref('')
-const classData = ref< Tables<'classroom'> | []>([])
 const selectedSegment = ref('general-info')
-const classList = ref<{ id: string, name: string }[]>([])
-const period = ['Manhã', 'Tarde', 'Noite']
-const status = ['Ativo', 'Inativo', 'Graduado', 'Suspenso', 'Transferido']
-const day_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
 const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
 const seriesService = new SeriesService()
@@ -182,9 +176,6 @@ async function loadClassroom() {
       classroomService.getAll(),
     ])
 
-    console.log('Chegou', institutions)
-
-    // Função auxiliar para mapear os dados
     const mapData = (data: any, targetList: { value: any[] }) => {
       if (data) {
         targetList.value = data.map((item: any) => ({
@@ -264,7 +255,7 @@ async function loadInstitution() {
     const institutions = await institutionService.getAll()
 
     if (institutions && institutions.length === 1) {
-      institutionId.value = institutions[0].id
+      institutionId.value = (institutions[0] as { id: string }).id
     }
 
     if (institutions) {

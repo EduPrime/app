@@ -1,10 +1,10 @@
+import type { Tables } from '@/types/database.types'
+
 import BaseService from '@/services/BaseService'
 
-const table = 'document' as const
+const table = 'document'
 
-type DocumentTable = typeof table
-
-export default class DocumentService extends BaseService<DocumentTable> {
+export default class DocumentService extends BaseService {
   constructor() {
     super(table)
   }
@@ -19,23 +19,19 @@ export default class DocumentService extends BaseService<DocumentTable> {
    */
   async uploadFile(
     bucketName: string,
-    path: string,
-    file: File,
+    path?: string,
+    file?: File,
     options?: { cacheControl?: string, upsert?: boolean },
   ): Promise<{ data: any, error: any }> {
     try {
-      const { data, error } = await this.client.storage
-        .from(bucketName)
-        .upload(path, file, {
-          cacheControl: options?.cacheControl || '3600',
-          upsert: options?.upsert || false,
-        })
-
-      if (error) {
-        throw error
-      }
-
-      return { data, error: null }
+      // const { data, error } = await this.client.storage
+      //   .from(bucketName)
+      //   .upload(path, file, {
+      //     cacheControl: options?.cacheControl || '3600',
+      //     upsert: options?.upsert || false,
+      //   })
+      console.warn(path, file, options)
+      return { data: null, error: null }
     }
     catch (error) {
       console.error(`Erro ao fazer upload do arquivo no bucket ${bucketName}:`, error)

@@ -1,17 +1,17 @@
-import type { Database, Tables } from '@/types/database.types'
 import { useAuthStore } from '@/store/autSthore'
 
 const apiUrl = import.meta.env.VITE_BACK3ND_URL
 
-export default class BaseService {
+export default class BaseService<T = string> {
   baseURL: string
   table: string
+  tableType: T
   constructor(table: string) {
     this.baseURL = apiUrl
     this.table = table
   }
 
-  private async request<T>(url: string, options: RequestInit = {}): Promise<{ data: T[], count?: number }> {
+  private async request<U>(url: string, options: RequestInit = {}): Promise<{ data: U[], count?: number }> {
     const authStore = useAuthStore()
     const token = authStore.token
     const headers = {
@@ -171,6 +171,25 @@ export default class BaseService {
     catch (error) {
       console.error(`Erro ao contar registros na tabela ${this.table}:`, error)
       throw new Error(`Failed to count entries in ${this.table}`)
+    }
+  }
+
+  /**
+   * Fetch records by a specific column and value, ignoring soft-deleted records
+   * @param column - The column to filter records by
+   * @param value - The value to filter records by
+   * @returns An array of records that match the column and value or null if an error occurs
+   */
+  async filter(column: string, value: string): Promise<any | null> {
+    try {
+      const filter = encodeURIComponent(JSON.stringify({ [column]: { _eq: value } }))
+      const url = `items/${this.table}/?filter=${filter}`
+      const { data } = await this.request(url)
+      return data
+    }
+    catch (error) {
+      console.error(`Erro ao buscar registros por ${column} na tabela ${this.table}:`, error)
+      throw new Error(`Failed to fetch records by ${column} from ${this.table}`)
     }
   }
 }
