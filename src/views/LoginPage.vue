@@ -43,7 +43,7 @@ const navigation = {
     router.replace('/signup')
   },
   resetPassword() {
-    router.push('/reset-password')
+    router.push('/forgot-password')
   },
 }
 </script>
