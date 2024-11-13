@@ -312,7 +312,6 @@ async function getPre_enrollmentData() {
     const enrollmentDbData = await pre_enrollmentService.getById(pre_enrollmentId.value)
     if (enrollmentDbData) {
       schoolId.value = enrollmentDbData.school_id
-      classroomId.value = enrollmentDbData.classroom_id
       seriesId.value = enrollmentDbData.series_id
       studentId.value = enrollmentDbData.student_id
       courseId.value = enrollmentDbData.course_id
@@ -322,20 +321,11 @@ async function getPre_enrollmentData() {
       setFieldValue('school_id', enrollmentDbData.school_id)
       setFieldValue('schoolId', enrollmentDbData.school_id)
       setFieldValue('seriesId', enrollmentDbData.series_id)
-      setFieldValue('classroom_id', enrollmentDbData.classroom_id)
-      setFieldValue('classroomId', enrollmentDbData.classroom_id)
       setFieldValue('studentId', enrollmentDbData.student_id)
       setFieldValue('courseId', enrollmentDbData.course_id)
-      setFieldValue('name', enrollmentDbData.name)
       setFieldValue('status', enrollmentDbData.status)
       setFieldValue('situation', enrollmentDbData.situation)
       setFieldValue('pre_enrollment_code', enrollmentDbData.pre_enrollment_code)
-      setFieldValue('gender', enrollmentDbData.gender)
-      setFieldValue('birthdate', enrollmentDbData.birthdate)
-      setFieldValue('ethnicity', enrollmentDbData.ethnicity)
-      setFieldValue('deficiency', enrollmentDbData.deficiency)
-      setFieldValue('deficiency_description', enrollmentDbData.deficiency_description)
-      setFieldValue('period', enrollmentDbData.period)
 
       const student = await studentService.getById(enrollmentDbData.student_id)
       if (student) {
