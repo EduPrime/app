@@ -54,6 +54,23 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     },
   },
   {
+    path: '/forgot-password',
+    component: () => import('../views/ForgotPasswordPage.vue'),
+    name: 'ForgotPassword',
+    meta: {
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/change-password',
+    component: () => import('../views/ChangePasswordPage.vue'),
+    name: 'ChangePassword',
+    meta: {
+      requiredRole: ['public'],
+
+    },
+  },
+  {
     path: '/dashboard/:id',
     component: () => import('../views/HomePage.vue'),
     meta: {
