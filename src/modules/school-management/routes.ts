@@ -4,6 +4,7 @@ import DashboardCourse from './views/DashboardCourse.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
 import DashboardSeries from './views/DashboardSeries.vue'
 import EditClass from './views/EditClass.vue'
+import EditCourse from './views/EditCourse.vue'
 import EditSchools from './views/EditSchools.vue'
 import EditSeries from './views/EditSeries.vue'
 import RegisterClass from './views/RegisterClass.vue'
@@ -139,6 +140,18 @@ const routes = [
     },
   },
   {
+    path: '/Course/edit/:id',
+    name: 'EditCourse',
+    component: EditCourse,
+    meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Editar curso',
+      order: 11,
+      requiredRole: ['public'],
+    },
+  },
+  {
     path: '/Course/register',
     name: 'RegisterCourse',
     component: RegisterCourse,
@@ -146,7 +159,7 @@ const routes = [
       moduleName: 'Schools',
       icon: create,
       name: 'Registrar curso',
-      order: 11,
+      order: 12,
       requiredRole: ['public'],
     },
   },

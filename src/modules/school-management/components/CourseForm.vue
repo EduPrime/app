@@ -102,7 +102,7 @@ async function registerCourse() {
   }
   else {
     const formData = {
-      course_id: courseId.value,
+      /* course_id: courseId.value, */
       institution_id: institutionId.value,
       course_stage: values.course_stage,
       graduate: values.graduate,
