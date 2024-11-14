@@ -82,7 +82,7 @@ const navigation = {
             Entrar
           </IonButton>
 
-          <IonButton expand="block" class="register-button" color="tertiary" @click="goToSignUp">
+          <IonButton expand="block" class="register-button" color="tertiary" @click="navigation.goToSignUp">
             Registrar
           </IonButton>
         </ion-col>
