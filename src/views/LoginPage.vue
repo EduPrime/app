@@ -27,6 +27,8 @@ async function signIn() {
   })
   loading.value = false
 
+  router.push(`/`) // Enquanto o login não é feito, redireciona para a home para simular um login efetivo
+
   if (error) {
     showToast('Falha ao fazer login', 'top', 'warning')
     console.error('Erro ao fazer login:', error.message)

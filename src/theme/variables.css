@@ -1,3 +1,42 @@
+html {
+	scroll-behavior: smooth;
+  }
+  
+  
+  .flex {
+	display: flex;
+  }
+  
+  .wrap {
+	flex-wrap: wrap;
+  }   
+  
+  .mx-auto {
+	margin-left: auto;
+	margin-right: auto;
+  }
+  
+  .my-auto {
+	margin-top: auto;
+	margin-bottom: auto;
+  }
+  
+  .ml-auto {
+	margin-left: auto;
+  }
+  
+  .mr-auto {
+	margin-right: auto;
+  }
+  
+  .mt-auto {
+	margin-top: auto;
+  }
+  
+  .mb-auto {
+	margin-bottom: auto;
+  }
+  
 @import url(/assets/fonts/Satoshi/satoshi.css);
 
 /* For information on how to create your own theme, please see:
