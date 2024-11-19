@@ -242,10 +242,10 @@ dynamicTabs.forEach((tab) => {
 tabs.value.push(...dynamicTabs)
 tabs.value.sort((a, b) => a.order - b.order)
 
-const isPublicPage = ref(route.path === '/login' || route.path === '/signup')
+const isPublicPage = ref(route.path === '/login' || route.path === '/signup' || route.path === '/forgot-password' || route.path === '/change-password')
 
 watch(route, (newRoute) => {
-  isPublicPage.value = newRoute.path === '/login' || newRoute.path === '/signup'
+  isPublicPage.value = newRoute.path === '/login' || newRoute.path === '/signup' || newRoute.path === '/forgot-password' || newRoute.path === '/change-password'
 })
 
 onMounted(() => {
