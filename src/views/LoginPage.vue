@@ -13,8 +13,6 @@ const user = ref<any>(null)
 const router = useRouter()
 const userStore = useUserStore()
 
-const showPassword = ref<boolean>(false)
-
 onMounted(async () => {
   const { data: { session } } = await supabase.auth.getSession()
   user.value = session?.user || null
@@ -42,10 +40,6 @@ async function signIn() {
   }
 }
 
-function togglePasswordVisibility() {
-  showPassword.value = !showPassword.value
-}
-
 const navigation = {
   goToSignUp() {
     router.replace('/signup')
@@ -69,11 +63,9 @@ const navigation = {
             </IonInput>
           </IonItem>
           <IonItem>
-            <IonInput :type="showPassword ? 'text' : 'password'" label-placement="stacked" label="Senha" placeholder="Digite sua senha">
+            <IonInput type="password" label-placement="stacked" label="Senha" placeholder="Digite sua senha">
               <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
-              <IonButton slot="end" fill="clear" aria-label="Show/hide" @click="togglePasswordVisibility">
-                <IonIcon slot="icon-only" :icon="eye" aria-hidden="true" />
-              </IonButton>
+              <ion-input-password-toggle slot="end" />
             </IonInput>
           </IonItem>
 
