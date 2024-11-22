@@ -34,7 +34,7 @@ export default class PreEnrollmentService extends BaseService<TabelaType> {
 
   async genericGet(collection: string, id: string) {
     try {
-      const data = await this.client.from(table)
+      const data = await this.client.from(collection)
         .select('name')
         .eq('id', id)
 
