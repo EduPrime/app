@@ -24,11 +24,6 @@ import { useRoute, useRouter } from 'vue-router'
 // import type CustomUser from '@/router/CustomUser'
 import type { RouteRecordNormalized } from 'vue-router'
 import NavItem from '@/components/NavItem.vue'
-import { useUserStore } from '@/store/user'
-import { supabase } from '../supabaseClient'
-
-const userStore = useUserStore()
-// const user: CustomUser = userStore.user as CustomUser
 
 const tabs = ref([
   {

@@ -80,7 +80,7 @@ async function validationBackend() {
             Entrar
           </IonButton>
 
-          <IonButton expand="block" class="register-button" color="tertiary" @click="navigation.goToSignUp">
+          <IonButton expand="block" class="register-button" color="tertiary" @click="goToSignUp">
             Registrar
           </IonButton>
         </ion-col>
