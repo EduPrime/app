@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import { useUserStore } from '@/store/user'
 import showToast from '@/utils/toast-alert'
-import { IonSelect, IonSelectOption } from '@ionic/vue'
+import { IonButton, IonIcon, IonInput, IonItem, IonList, IonSelect, IonSelectOption } from '@ionic/vue'
+import { eye, lockClosed, mail } from 'ionicons/icons'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../supabaseClient'
 
+const username = ref('')
+const phone = ref('')
+const cpf = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
@@ -103,18 +107,47 @@ function goToLogin() {
     <ion-grid class="signup-grid">
       <ion-row class="ion-justify-content-center ion-align-items-center full-height">
         <ion-col size="12" size-md="6" size-lg="4" class="signup-form">
-          <!-- Imagem acima do formul�rio -->
-          <ion-img src="/assets/logo.png" alt="Logo" class="signup-logo" />
+          <ion-toolbar class="tollbar">
+            <div class="logo-and-back">
+              <ion-buttons slots="start">
+                <ion-back-button class="custom-back-button" color="tertiary" default-href="/login" />
+              </ion-buttons>
+              <!-- Logo -->
+              <ion-img src="/assets/EduPrimeChatTitle.png" alt="Logo" class="signup-logo" />
+            </div>
+          </ion-toolbar>
 
           <!-- Formul�rio de cadastro -->
 
-          <ion-item>
-            <ion-input v-model="email" label="Email" label-placement="stacked" placeholder="seuemail@dominio.com" />
-          </ion-item>
-          <ion-item>
-            <ion-input v-model="password" label="Senha" label-placement="stacked" type="password" placeholder="Escolha uma senha segura" />
-          </ion-item>
-          <ion-item>
+          <div class="form-header">
+            <ion-text>
+              <h1 class="form-title">
+                Novo Cadastro
+              </h1>
+              <p class="form-subtitle">
+                Preencha com suas informações
+              </p>
+            </ion-text>
+          </div>
+          <IonItem>
+            <IonInput v-model="username" placeholder="Nome Completo" />
+          </IonItem>
+          <IonItem>
+            <IonInput v-model="email" placeholder="Email" />
+          </IonItem>
+          <IonItem>
+            <IonInput v-model="phone" placeholder="Telefone" />
+          </IonItem>
+          <IonItem>
+            <IonInput v-model="cpf" placeholder="CPF" />
+          </IonItem>
+          <IonItem>
+            <IonInput type="password" placeholder="Senha">
+              <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
+              <ion-input-password-toggle slot="end" />
+            </IonInput>
+          </IonItem>
+          <!--    <IonItem>
             <div class="password-requiriments">
               <p :class="{ valid: passwordRequiriments.minLength }">
                 - Pelo menos 8 caracteres
@@ -126,14 +159,18 @@ function goToLogin() {
                 - Contém letra maiúscula
               </p>
             </div>
-          </ion-item>
-          <ion-item>
-            <ion-input v-model="confirmPassword" label="Confirmar senha" label-placement="stacked" type="password" placeholder="Insira a senha novamente para confirmação" />
-          </ion-item>
+          </IonItem> -->
+          <IonItem>
+            <IonInput type="password" placeholder="Repita a Senha">
+              <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
+              <ion-input-password-toggle slot="end" />
+            </IonInput>
+          </IonItem>
+
           <!--        <p v-if="!passwordsMatch" class="error-message">
             As senhas não correspondem.
           </p> -->
-          <ion-item>
+          <!--       <IonItem>
             <IonSelect v-model="role" fill="solid" cancel-text="Cancelar" label="Selecione um tipo de usuário" label-placement="floating" placeholder="Selecione um tipo de usuário" @ion-change="onRoleChange">
               <IonSelectOption value="admin">
                 Admin
@@ -145,18 +182,28 @@ function goToLogin() {
                 Aluno
               </IonSelectOption>
             </IonSelect>
-          </ion-item>
+          </IonItem> -->
           <div class="button-container ion-margin-top">
             <!-- Bot�o de Sign Up -->
-            <ion-button expand="block" @click="signUp">
-              Registrar
-            </ion-button>
+            <IonButton expand="block" class="signup-button" @click="signUp">
+              Salvar
+            </IonButton>
 
             <!-- Bot�o de Voltar para Login -->
-            <ion-button expand="block" fill="outline" @click="goToLogin">
-              Voltar para Login
-            </ion-button>
+            <IonButton expand="block" color="tertiary" class="cancel-button" @click="goToLogin">
+              Cancelar
+            </IonButton>
           </div>
+          <ion-row class="ion-justify-content-center">
+            <ion-text>
+              <p class="login-text">
+                Já possui uma conta?
+                <IonButton fill="clear" class="login-button" @click="goToLogin">
+                  Entrar
+                </IonButton>
+              </p>
+            </ion-text>
+          </ion-row>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -164,11 +211,70 @@ function goToLogin() {
 </template>
 
 <style scoped>
+.form-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Alinha os títulos à esquerda */
+  padding: 0 16px; /* Igual ao padding padrão dos IonItem */
+  width: 100%; /* Garante alinhamento com IonItem */
+  box-sizing: border-box; /* Inclui o padding na largura total */
+  margin-top: 20px;
+}
+
+.form-title {
+  font-size: 1.8em;
+  margin: 0;
+  text-align: left;
+}
+
+.form-subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin: 5px 0 20px;
+  text-align: left;
+}
+
 .signup-content {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
+}
+
+.login-button {
+  padding: 0;
+  height: auto;
+  font-size: 0.9rem;
+  text-transform: none;
+  color: var(--ion-color-primary); /* Cor do botão */
+  font-weight: bold;
+  position: relative; /* Necessário para posicionar a linha */
+}
+
+.login-button::after {
+  content: '';
+  position: absolute;
+  bottom: 0; /* Posiciona a linha logo abaixo do texto */
+  left: 50%; /* Inicia a linha no centro horizontal do botão */
+  width: 0;
+  height: 2px; /* Espessura da linha */
+  background-color: #4f2974; /* Cor da linha */
+  transition: width 0.3s ease; /* Animação suave */
+  transform: translateX(-50%); /* Centraliza horizontalmente */
+  transform-origin: center; /* Faz a linha crescer para os dois lados */
+}
+
+.login-button:hover::after {
+  width: 100%; /* Aumenta a largura da linha para completar o botão */
+}
+
+.login-text {
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: var(--ion-color-primary); /* Cor do texto */
+  padding: 20px;
 }
 
 .full-height {
@@ -183,14 +289,49 @@ function goToLogin() {
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.signup-button {
+  margin-top: 20px;
+}
+
+.cancel-button {
+  margin-top: 10px;
 }
 
 .signup-logo {
   display: block;
-  margin: 0 auto 20px;
-  width: 150px;
+  margin: 0 0 20px auto;
+  width: 250px;
   height: auto;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 16px;
+}
+
+.custom-back-button {
+  background-color: pink;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  left: 16px;
+}
+
+.logo-and-back {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .password-requiriments p {
