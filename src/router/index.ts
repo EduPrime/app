@@ -1,5 +1,4 @@
 import type { CustomRouteRecordRaw } from '@/router/RouterType'
-import { useUserStore } from '@/store/user'
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { home } from 'ionicons/icons'
 
@@ -154,31 +153,6 @@ const router = createRouter({
   // eslint-disable-next-line ts/ban-ts-comment
   // @ts-expect-error
   routes,
-})
-
-router.beforeEach(async (to, from, next) => {
-  const userStore = useUserStore()
-
-  if (to.matched.some(record => record.meta.requiresAuth ?? true)) {
-    if (!userStore.user) {
-      await userStore.fetchUser()
-    }
-
-    const user = userStore.user
-
-    if (!user) {
-      return next('/login')
-    }
-    else {
-      const role = user?.user_metadata?.role
-
-      if (Array.isArray(to.meta.requiredRoles) && !to.meta.requiredRoles.includes(role)) {
-        return next('/login')
-      }
-    }
-  }
-
-  next()
 })
 
 export default router

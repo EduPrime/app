@@ -11,7 +11,6 @@ const gedService = new GedService()
 const bucketName = 'ged'
 const documentFiles: Ref<Tables<'document'>[] | []> = ref([])
 function handleUploadSuccess(file: any) {
-  console.log('Handle Upload file: ', file)
   if (file && file.storage_path) {
     gedService.create(file)
   }

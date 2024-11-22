@@ -53,12 +53,12 @@ async function loadTemplateDetails() {
 
 // Função para carregar lista de escolas
 async function loadSchools() {
-  schools.value = await schoolService.getAll()
+  schools.value = await schoolService.getAll() as Tables<'school'>[]
 }
 
 // Função para carregar lista de templates
 async function loadTemplates() {
-  templates.value = await academicTemplateService.getAll()
+  templates.value = await academicTemplateService.getAll() as Tables<'academic_year_template'>[]
 }
 
 // Função para confirmar a aplicação do template
