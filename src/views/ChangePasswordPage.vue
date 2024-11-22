@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import showToast from '@/utils/toast-alert'
-import { IonSpinner } from '@ionic/vue'
+import { IonButton, IonIcon, IonInput, IonItem, IonList, IonSpinner } from '@ionic/vue'
+import { eye, key, lockClosed, mail } from 'ionicons/icons'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { supabase } from '../supabaseClient'
@@ -74,16 +75,46 @@ const navigation = {
     <ion-grid class="reset-password-grid">
       <ion-row class="ion-justify-content-center ion-align-items-center full-height">
         <ion-col size="12" size-md="6" size-lg="4" class="reset-password-form">
-          <ion-img src="/assets/logo.png" alt="Logo" class="reset-password-logo" />
+          <ion-toolbar class="tollbar">
+            <div class="logo-and-back">
+              <ion-buttons slots="start">
+                <ion-back-button class="custom-back-button" color="tertiary" default-href="/login" />
+              </ion-buttons>
+              <!-- Logo -->
+              <ion-img src="/assets/EduPrimeChatTitle.png" alt="Logo" class="change-password-logo" />
+            </div>
+          </ion-toolbar>
 
-          <ion-item>
-            <ion-input v-model="newPassword" type="password" label-placement="stacked" label="Nova Senha" placeholder="Digite a nova senha" />
-          </ion-item>
+          <div class="form-header">
+            <ion-text>
+              <h1 class="form-title">
+                Recuperação de Senha
+              </h1>
+              <p class="form-subtitle">
+                Preencha com o código de autenticação e em seguida digite a sua nova senha
+              </p>
+            </ion-text>
+          </div>
+          <IonItem>
+            <IonInput placeholder="Digite o código de autenticação">
+              <IonIcon slot="start" :icon="key" aria-hidden="true" />
+            </IonInput>
+          </IonItem>
 
-          <ion-item>
-            <ion-input v-model="confirmPassword" type="password" label-placement="stacked" label="Confirme a Nova Senha" placeholder="Confirme a nova senha" />
-          </ion-item>
-          <ion-item>
+          <IonItem>
+            <IonInput type="password" placeholder="Digite a nova senha">
+              <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
+              <ion-input-password-toggle slot="end" />
+            </IonInput>
+          </IonItem>
+
+          <IonItem>
+            <IonInput type="password" placeholder="Confirme a nova senha">
+              <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
+              <ion-input-password-toggle slot="end" />
+            </IonInput>
+          </IonItem>
+          <!--       <ion-item>
             <div class="password-requiriments">
               <p :class="{ valid: passwordRequiriments.minLength }">
                 - Pelo menos 8 caracteres
@@ -95,16 +126,29 @@ const navigation = {
                 - Contém letra maiúscula
               </p>
             </div>
-          </ion-item>
+          </ion-item> -->
 
-          <ion-button expand="block" @click="changePassword">
-            <IonSpinner v-if="loading" slot="end" name="crescent" />
-            Redefinir Senha
-          </ion-button>
+          <div class="button-container ion-margin-top">
+            <!-- Bot�o de Sign Up -->
+            <IonButton expand="block" class="change-password-button">
+              Salvar
+            </IonButton>
 
-          <ion-button expand="block" fill="outline" @click="navigation.goToLogin">
-            Voltar ao Login
-          </ion-button>
+            <!-- Bot�o de Voltar para Login -->
+            <IonButton expand="block" color="tertiary" class="cancel-button" @click="navigation.goToLogin">
+              Cancelar
+            </IonButton>
+          </div>
+          <ion-row class="ion-justify-content-center">
+            <ion-text>
+              <p class="login-text">
+                Já possui uma conta?
+                <IonButton fill="clear" class="login-button" @click="navigation.goToLogin">
+                  Entrar
+                </IonButton>
+              </p>
+            </ion-text>
+          </ion-row>
         </ion-col>
       </ion-row>
     </ion-grid>
@@ -112,33 +156,59 @@ const navigation = {
 </template>
 
 <style scoped>
+.form-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Alinha os títulos à esquerda */
+  padding: 0 16px; /* Igual ao padding padrão dos IonItem */
+  width: 100%; /* Garante alinhamento com IonItem */
+  box-sizing: border-box; /* Inclui o padding na largura total */
+  margin-top: 20px;
+}
+
+.form-title {
+  font-size: 1.8em;
+  margin: 0;
+  text-align: left;
+}
+
+.form-subtitle {
+  font-size: 1rem;
+  color: #666;
+  margin: 5px 0 20px;
+  text-align: left;
+}
 .reset-password-content {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 .full-height {
-        height: 100%;
+  height: 100%;
 }
 
 .reset-password-grid {
-        height: 100%;
+  height: 100%;
 }
 
 .reset-password-form {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 10px;
+
+}
+
+ion-item {
+  margin-bottom: 16px;
 }
 
 .reset-password-logo {
-        display: block;
-        margin: 0 auto 20px;
-        width: 150px;
-        height: auto;
+  display: block;
+  margin: 0 auto 20px;
+  width: 150px;
+  height: auto;
 }
 
 .password-requiriments p {
@@ -149,5 +219,88 @@ const navigation = {
 
 .password-requiriments p.valid {
   color: green;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 16px;
+}
+
+.logo-and-back {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-back-button {
+  background-color: pink;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s ease-in-out;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
+  left: 16px;
+}
+
+.change-password-logo {
+  display: block;
+  margin: 0 0 20px auto;
+  width: 250px;
+  height: auto;
+}
+
+.login-text {
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  margin: 0;
+  color: var(--ion-color-primary); /* Cor do texto */
+  padding: 20px;
+}
+
+.login-button {
+  padding: 0;
+  height: auto;
+  font-size: 0.9rem;
+  text-transform: none;
+  color: var(--ion-color-primary); /* Cor do botão */
+  font-weight: bold;
+  position: relative; /* Necessário para posicionar a linha */
+}
+
+.login-button::after {
+  content: '';
+  position: absolute;
+  bottom: 0; /* Posiciona a linha logo abaixo do texto */
+  left: 50%; /* Inicia a linha no centro horizontal do botão */
+  width: 0;
+  height: 2px; /* Espessura da linha */
+  background-color: #4f2974; /* Cor da linha */
+  transition: width 0.3s ease; /* Animação suave */
+  transform: translateX(-50%); /* Centraliza horizontalmente */
+  transform-origin: center; /* Faz a linha crescer para os dois lados */
+}
+
+.login-button:hover::after {
+  width: 100%; /* Aumenta a largura da linha para completar o botão */
+}
+
+.button-container {
+  margin-top: 20px;
+}
+
+.change-password-button {
+  margin-top: 20px;
+}
+
+.cancel-button {
+  margin-top: 10px;
 }
 </style>
