@@ -18,12 +18,6 @@ const validRoles = ['admin', 'professor', 'aluno']
 const router = useRouter()
 const userStore = useUserStore()
 
-const showPassword = ref<boolean>(false)
-
-function togglePasswordVisibility() {
-  showPassword.value = !showPassword.value
-}
-
 const passwordsMatch = ref(true) // Variável para controlar se as senhas não coincidem
 
 function onRoleChange(event: CustomEvent) {
@@ -148,11 +142,9 @@ function goToLogin() {
             <IonInput v-model="cpf" placeholder="CPF" />
           </IonItem>
           <IonItem>
-            <IonInput :type="showPassword ? 'text' : 'password'" placeholder="Senha">
+            <IonInput type="password" placeholder="Senha">
               <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
-              <IonButton slot="end" fill="clear" aria-label="Show/hide" @click="togglePasswordVisibility">
-                <IonIcon slot="icon-only" :icon="eye" aria-hidden="true" />
-              </IonButton>
+              <ion-input-password-toggle slot="end" />
             </IonInput>
           </IonItem>
           <!--    <IonItem>
@@ -169,11 +161,9 @@ function goToLogin() {
             </div>
           </IonItem> -->
           <IonItem>
-            <IonInput :type="showPassword ? 'text' : 'password'" placeholder="Repita a Senha">
+            <IonInput type="password" placeholder="Repita a Senha">
               <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
-              <IonButton slot="end" fill="clear" aria-label="Show/hide" @click="togglePasswordVisibility">
-                <IonIcon slot="icon-only" :icon="eye" aria-hidden="true" />
-              </IonButton>
+              <ion-input-password-toggle slot="end" />
             </IonInput>
           </IonItem>
 
