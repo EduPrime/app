@@ -39,6 +39,15 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     },
   },
   {
+    path: '/dev',
+    component: () => import('../views/Dev.vue'),
+    name: 'Development',
+    meta: {
+      requiredRole: ['public'],
+
+    },
+  },
+  {
     path: '/login',
     component: () => import('../views/LoginPage.vue'),
     name: 'Login',

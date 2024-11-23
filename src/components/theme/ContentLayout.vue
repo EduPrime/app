@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IonButtons, IonFooter, IonHeader, IonIcon, IonMenuButton, IonNote, IonTitle, IonToolbar } from '@ionic/vue'
+import { IonButtons, IonFooter, IonHeader, IonMenuButton, IonNote, IonTitle, IonToolbar } from '@ionic/vue'
 import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -45,7 +45,7 @@ watch(
           <IonMenuButton color="primary" />
         </IonButtons>
         <slot name="header-buttons" />
-        <IonIcon v-if="metaIcon" slot="start" :icon="metaIcon" size="large" class="ion-margin-start" />
+        <!-- Removi o icone pois causava poluição visual <IonIcon v-if="metaIcon" slot="start" :icon="metaIcon" size="large" class="ion-margin-start" /> -->
         <IonTitle>{{ metaName }}</IonTitle>
         <slot name="header-right" />
       </IonToolbar>
