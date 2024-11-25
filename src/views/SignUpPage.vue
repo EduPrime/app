@@ -1,98 +1,51 @@
 <script setup lang="ts">
-import { useUserStore } from '@/store/user'
+import { useAuthStore } from '@/store/autSthore'
 import showToast from '@/utils/toast-alert'
 import { IonButton, IonIcon, IonInput, IonItem, IonList, IonSelect, IonSelectOption } from '@ionic/vue'
 import { eye, lockClosed, mail } from 'ionicons/icons'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '../supabaseClient'
+import * as yup from 'yup'
 
-const username = ref('')
-const phone = ref('')
-const cpf = ref('')
-const email = ref('')
-const password = ref('')
-const confirmPassword = ref('')
-const role = ref('')
-const validRoles = ['admin', 'professor', 'aluno']
+const name = ref<string>('teste')
+const phone = ref<string>('000')
+const cpf = ref<string>('000')
+const email = ref<string>('teste@teste.com')
+const password = ref<string>('12345678')
+
 const router = useRouter()
-const userStore = useUserStore()
+const authStore = useAuthStore()
 
-const passwordsMatch = ref(true) // Variável para controlar se as senhas não coincidem
+const schema = yup.object().shape({
+  name: yup.string().required('Nome é obrigatório'),
+  email: yup.string().email('Email inválido').required('Email é obrigatório'),
+  phone: yup.string().required('Telefone é obrigatório'),
+  cpf: yup.string().required('CPF é obrigatório'),
+  password: yup.string().min(8, 'A senha deve ter pelo menos 8 caracteres').required('Senha é obrigatória'),
+})
 
-function onRoleChange(event: CustomEvent) {
-  role.value = event.detail.value
+async function validateForm() {
+  try {
+    await schema.validate({ email: email.value, password: password.value, phone: phone.value, cpf: cpf.value, name: name.value }, { abortEarly: false })
+    return true
+  }
+  catch (errors) {
+    console.error('Validation errors:', errors)
+    showToast('Erro na validação do formulário')
+    return false
+  }
 }
 
-// Requisitos para a senha
-const minLength = 8
-const hasNumber = /\d/
-const hasUpperCase = /[A-Z]/
-
-// Observa os requisitos da senha
-const passwordRequiriments = ref({
-  minLength: false,
-  hasNumber: false,
-  hasUpperCase: false,
-})
-
-watch(password, (newPassword) => {
-  passwordRequiriments.value.minLength = newPassword.length >= minLength
-  passwordRequiriments.value.hasNumber = hasNumber.test(newPassword)
-  passwordRequiriments.value.hasUpperCase = hasUpperCase.test(newPassword)
-})
-
-watch(confirmPassword, (newConfirmPassword) => {
-  passwordsMatch.value = !newConfirmPassword || password.value === newConfirmPassword
-})
-
-// Função para verificar todos os requisitos da senha
-function isPasswordValid() {
-  return (
-    passwordRequiriments.value.minLength
-    && passwordRequiriments.value.hasNumber
-    && passwordRequiriments.value.hasUpperCase
-  )
-}
-
-async function signUp() {
-  if (!role.value || !validRoles.includes(role.value)) {
-    console.error(`Role is required and must be one of: ${validRoles.join(', ')}`)
-    return
-  }
-
-  if (passwordsMatch.value) {
-    showToast('As senhas não correspondem. Verifique e tente novamente.', 'top', 'warning')
-    console.error('Senhas não correspondem')
-    return
-  }
-
-  if (!isPasswordValid()) {
-    showToast('A senha não atende aos requisitos. Verifique e tente novamente.', 'top', 'warning')
-    return
-  }
-
-  const { data, error } = await supabase.auth.signUp({
-    email: email.value,
-    password: password.value,
-    options: {
-      data: {
-        role: role.value,
-      },
-    },
-  })
-
-  if (error) {
-    console.error('Error creating user:', error.message)
-    showToast('Email já cadastrado. Tente novamente.', 'top', 'warning')
-  }
-  else {
-    const { user, session } = data
-    if (user && session) {
-      userStore.setUser(user)
-      localStorage.setItem('user', JSON.stringify(user))
-
-      router.replace(`/dashboard/${user.id}`)
+async function registerUser() {
+  if (await validateForm()) {
+    try {
+      await authStore.register(email.value, password.value, name.value, phone.value, cpf.value)
+      showToast('Usuário cadastrado com sucesso')
+      router.replace('/login')
+    }
+    catch (error) {
+      console.error('Error registering user:', error)
+      showToast('Erro ao cadastrar usuário')
     }
   }
 }
@@ -130,7 +83,7 @@ function goToLogin() {
             </ion-text>
           </div>
           <IonItem>
-            <IonInput v-model="username" placeholder="Nome Completo" />
+            <IonInput v-model="name" placeholder="Nome Completo" />
           </IonItem>
           <IonItem>
             <IonInput v-model="email" placeholder="Email" />
@@ -142,50 +95,22 @@ function goToLogin() {
             <IonInput v-model="cpf" placeholder="CPF" />
           </IonItem>
           <IonItem>
-            <IonInput type="password" placeholder="Senha">
-              <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
-              <ion-input-password-toggle slot="end" />
-            </IonInput>
-          </IonItem>
-          <!--    <IonItem>
-            <div class="password-requiriments">
-              <p :class="{ valid: passwordRequiriments.minLength }">
-                - Pelo menos 8 caracteres
-              </p>
-              <p :class="{ valid: passwordRequiriments.hasNumber }">
-                - Contém número
-              </p>
-              <p :class="{ valid: passwordRequiriments.hasUpperCase }">
-                - Contém letra maiúscula
-              </p>
-            </div>
-          </IonItem> -->
-          <IonItem>
-            <IonInput type="password" placeholder="Repita a Senha">
+            <IonInput v-model="password" type="password" placeholder="Senha">
               <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
               <ion-input-password-toggle slot="end" />
             </IonInput>
           </IonItem>
 
-          <!--        <p v-if="!passwordsMatch" class="error-message">
-            As senhas não correspondem.
-          </p> -->
-          <!--       <IonItem>
-            <IonSelect v-model="role" fill="solid" cancel-text="Cancelar" label="Selecione um tipo de usuário" label-placement="floating" placeholder="Selecione um tipo de usuário" @ion-change="onRoleChange">
-              <IonSelectOption value="admin">
-                Admin
-              </IonSelectOption>
-              <IonSelectOption value="professor">
-                Professor
-              </IonSelectOption>
-              <IonSelectOption value="aluno">
-                Aluno
-              </IonSelectOption>
-            </IonSelect>
+          <!--      <IonItem>
+            <IonInput v-model="password" type="password" placeholder="Repita a Senha">
+              <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
+              <ion-input-password-toggle slot="end" />
+            </IonInput>
           </IonItem> -->
+
           <div class="button-container ion-margin-top">
             <!-- Bot�o de Sign Up -->
-            <IonButton expand="block" class="signup-button" @click="signUp">
+            <IonButton expand="block" class="signup-button" @click="registerUser">
               Salvar
             </IonButton>
 

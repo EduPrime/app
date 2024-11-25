@@ -31,9 +31,9 @@ async function validateForm() {
 }
 
 async function signIn() {
-  if (await validateForm()) {
+  if (validateForm()) {
     await authStore.login(email.value, password.value)
-    await validationBackend()
+
     showLoginForm.value = false
   }
 }
@@ -41,12 +41,6 @@ const router = useRouter()
 
 function goToSignUp() {
   router.replace('/signup')
-}
-
-async function validationBackend() {
-  user.value = authStore.user
-  const apiService = new BaseService('institution')
-  institution.value = await apiService.getAll()
 }
 </script>
 

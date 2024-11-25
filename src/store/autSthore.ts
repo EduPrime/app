@@ -74,6 +74,34 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
+    async register(email: string, password: string) {
+      try {
+        const response = await fetch(`${apiUrl}auth/register`, {
+          method: 'POST',
+          body: JSON.stringify({ email, password }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        if (!response.ok) {
+          throw new Error(`Registration failed! status: ${response.status}`)
+        }
+
+        const data = await response.json()
+        if (!data.token) {
+          throw new Error('Token is missing in the response')
+        }
+
+        this.setToken(data.token)
+        await this.fetchUserData()
+        return this.user
+      }
+      catch (error) {
+        console.error('Registration failed:', error)
+        throw error
+      }
+    },
+
     async fetchUserData() {
       try {
         const response = await fetch(`${apiUrl}me`, {
