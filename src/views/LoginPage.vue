@@ -8,8 +8,8 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
 
-const email = ref<string>('admin@example.com')
-const password = ref<string>('complexAdminFakePass123')
+const email = ref<string>('')
+const password = ref<string>('')
 const user = ref(null)
 const institution = ref<any[]>([])
 const showLoginForm = ref(true)
@@ -19,6 +19,7 @@ const schema = yup.object().shape({
   password: yup.string().min(8, 'A senha deve ter pelo menos 8 caracteres').required('Senha é obrigatória'),
 })
 const authStore = useAuthStore()
+const router = useRouter()
 async function validateForm() {
   try {
     await schema.validate({ email: email.value, password: password.value }, { abortEarly: false })
@@ -26,68 +27,60 @@ async function validateForm() {
   }
   catch (errors) {
     console.error('Validation errors:', errors)
+    showToast('Erro na validação dos dados. Verifique os campos e tente novamente.', 'top', 'danger')
     return false
   }
 }
 
 async function signIn() {
-  if (validateForm()) {
-    await authStore.login(email.value, password.value)
-
-    showLoginForm.value = false
+  if (await validateForm()) {
+    try {
+      await authStore.login(email.value, password.value)
+      showToast('Login realizado com sucesso', 'top', 'success')
+      router.push('/dashboard/Home')
+    }
+    catch (error) {
+      console.error('Error registering user:', error)
+      showToast('Erro ao realizar login. Verifique suas credenciais e tente novamente.', 'top', 'danger')
+    }
   }
-}
-const router = useRouter()
-
-function goToSignUp() {
-  router.replace('/signup')
 }
 </script>
 
 <template>
   <ion-content class="login-content">
-    <ion-grid v-if="showLoginForm" class="login-grid">
-      <ion-row class="ion-justify-content-center ion-align-items-center full-height">
-        <ion-col size="12" size-md="6" size-lg="4" class="login-form">
-          <ion-img src="/assets/EduPrimeChat.png" alt="Logo" class="login-logo" />
+    <ion-row class="ion-justify-content-center ion-align-items-center full-height">
+      <ion-col size="12" size-md="6" size-lg="4" class="login-form">
+        <ion-img src="/assets/EduPrimeChat.png" alt="Logo" class="login-logo" />
 
-          <IonItem>
-            <IonInput label-placement="stacked" label="Email" placeholder="seuemail@dominio.com">
-              <IonIcon slot="start" :icon="mail" aria-hidden="true" />
-            </IonInput>
-          </IonItem>
-          <IonItem>
-            <IonInput type="password" label-placement="stacked" label="Senha" placeholder="Digite sua senha">
-              <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
-              <ion-input-password-toggle slot="end" />
-            </IonInput>
-          </IonItem>
+        <IonItem>
+          <IonInput v-model="email" label-placement="stacked" label="Email" placeholder="seuemail@dominio.com">
+            <IonIcon slot="start" :icon="mail" aria-hidden="true" />
+          </IonInput>
+        </IonItem>
+        <IonItem>
+          <IonInput v-model="password" type="password" label-placement="stacked" label="Senha" placeholder="Digite sua senha">
+            <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
+            <ion-input-password-toggle slot="end" />
+          </IonInput>
+        </IonItem>
 
-          <ion-row class="ion-justify-content-start">
-            <ion-col size="auto">
-              <IonButton fill="clear" class="forgot-password-button">
-                Esqueceu a senha?
-              </IonButton>
-            </ion-col>
-          </ion-row>
-          <IonButton expand="block" class="login-button" @click="signIn">
-            Entrar
-          </IonButton>
+        <ion-row class="ion-justify-content-start">
+          <ion-col size="auto">
+            <IonButton fill="clear" class="forgot-password-button">
+              Esqueceu a senha?
+            </IonButton>
+          </ion-col>
+        </ion-row>
+        <IonButton expand="block" class="login-button" @click="signIn">
+          Entrar
+        </IonButton>
 
-          <IonButton expand="block" class="register-button" color="tertiary" @click="goToSignUp">
-            Registrar
-          </IonButton>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-    <ion-grid v-else class="user-info-grid">
-      <ion-row class="ion-justify-content-center ion-align-items-center full-height">
-        <ion-col size="12" size-md="6" size-lg="4" class="user-info">
-          <h2>Bem-vindo, {{ user }}</h2>
-          <p>Instituição: {{ institution }}</p>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
+        <IonButton expand="block" class="register-button" color="tertiary" @click="goToSignUp">
+          Registrar
+        </IonButton>
+      </ion-col>
+    </ion-row>
   </ion-content>
 </template>
 

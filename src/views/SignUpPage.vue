@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useAuthStore } from '@/store/autSthore'
 import showToast from '@/utils/toast-alert'
-import { IonButton, IonIcon, IonInput, IonItem, IonList, IonSelect, IonSelectOption } from '@ionic/vue'
-import { eye, lockClosed, mail } from 'ionicons/icons'
-import { ref, watch } from 'vue'
+import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/vue'
+import { lockClosed } from 'ionicons/icons'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
 
@@ -39,7 +39,7 @@ async function validateForm() {
 async function registerUser() {
   if (await validateForm()) {
     try {
-      await authStore.register(email.value, password.value, name.value, phone.value, cpf.value)
+      await authStore.register(email.value, password.value, phone.value, cpf.value, name.value)
       showToast('Usuário cadastrado com sucesso')
       router.replace('/login')
     }
