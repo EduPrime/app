@@ -1,3 +1,4 @@
+import showToast from '@/utils/toast-alert'
 import { defineStore } from 'pinia'
 
 const apiUrl = import.meta.env.VITE_BACK3ND_URL
@@ -63,8 +64,7 @@ export const useAuthStore = defineStore('auth', {
         if (!data.token) {
           throw new Error('Token is missing in the response')
         }
-
-        this.setToken(data.token)
+        await this.setToken(data.token)
         await this.fetchUserData()
         return this.user
       }
@@ -103,6 +103,10 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async fetchUserData() {
+      if (!this.token) {
+        throw new Error('Token não encontrado')
+      }
+
       try {
         const response = await fetch(`${apiUrl}me`, {
           headers: {
@@ -122,6 +126,7 @@ export const useAuthStore = defineStore('auth', {
 
     logout() {
       this.clearAuthData()
+      showToast('Sessão encerrada com sucesso!', 'top', 'success')
     },
 
     async setToken(token: string) {

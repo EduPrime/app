@@ -4,30 +4,29 @@ import { useAuthStore } from '@/store/autSthore'
 import showToast from '@/utils/toast-alert'
 import { IonButton, IonIcon, IonInput, IonItem, IonList } from '@ionic/vue'
 import { eye, lockClosed, mail } from 'ionicons/icons'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
 
 const email = ref<string>('')
 const password = ref<string>('')
 const user = ref(null)
-const institution = ref<any[]>([])
-const showLoginForm = ref(true)
 
 const schema = yup.object().shape({
   email: yup.string().email('Email inválido').required('Email é obrigatório'),
-  password: yup.string().min(8, 'A senha deve ter pelo menos 8 caracteres').required('Senha é obrigatória'),
+  password: yup.string().required('Senha é obrigatória').min(8, 'A senha deve ter pelo menos 8 caracteres'),
 })
 const authStore = useAuthStore()
 const router = useRouter()
+
 async function validateForm() {
   try {
     await schema.validate({ email: email.value, password: password.value }, { abortEarly: false })
     return true
   }
   catch (errors) {
-    console.error('Validation errors:', errors)
-    showToast('Erro na validação dos dados. Verifique os campos e tente novamente.', 'top', 'danger')
+    const validationErrors = errors.inner.map((err: any) => err.message).join(', ')
+    showToast(`Erro na validação dos dados: ${validationErrors}`, 'top', 'warning')
     return false
   }
 }
@@ -36,6 +35,7 @@ async function signIn() {
   if (await validateForm()) {
     try {
       await authStore.login(email.value, password.value)
+      await validationBackend()
       showToast('Login realizado com sucesso', 'top', 'success')
       router.push('/dashboard/Home')
     }
@@ -45,6 +45,20 @@ async function signIn() {
     }
   }
 }
+
+async function validationBackend() {
+  user.value = authStore.user
+}
+
+const navigation = {
+  goToSignUp() {
+    router.push('/signup')
+  },
+}
+
+onMounted(() => {
+  authStore.initializeAuthState()
+})
 </script>
 
 <template>
@@ -76,7 +90,7 @@ async function signIn() {
           Entrar
         </IonButton>
 
-        <IonButton expand="block" class="register-button" color="tertiary" @click="goToSignUp">
+        <IonButton expand="block" class="register-button" color="tertiary" @click="navigation.goToSignUp">
           Registrar
         </IonButton>
       </ion-col>
