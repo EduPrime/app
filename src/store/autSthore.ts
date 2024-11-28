@@ -126,6 +126,10 @@ export const useAuthStore = defineStore('auth', {
 
     logout() {
       this.clearAuthData()
+    },
+
+    logoutWithToast() {
+      this.logout()
       showToast('Sessão encerrada com sucesso!', 'top', 'success')
     },
 

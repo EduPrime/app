@@ -24,6 +24,8 @@ import { useRoute, useRouter } from 'vue-router'
 // import type CustomUser from '@/router/CustomUser'
 import type { RouteRecordNormalized } from 'vue-router'
 import NavItem from '@/components/NavItem.vue'
+import { useAuthStore } from '@/store/autSthore'
+import showToast from '@/utils/toast-alert'
 
 const tabs = ref([
   {
@@ -251,15 +253,16 @@ watch(route, (newRoute) => {
   updateSelectedTab(newRoute.path)
 })
 
-async function logout() {
-  const { error } = await supabase.auth.signOut()
-  if (error) {
-    console.error('Erro ao deslogar:', error.message)
-  }
-  else {
-    userStore.logout()
+const authStore = useAuthStore()
 
+async function logout() {
+  try {
+    await authStore.logoutWithToast()
+    await authStore.logout()
     router.push('/login')
+  }
+  catch (error) {
+    console.error('Erro ao deslogar:', error)
   }
 }
 </script>

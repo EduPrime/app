@@ -1,4 +1,5 @@
 import type { CustomRouteRecordRaw } from '@/router/RouterType'
+import { useAuthStore } from '@/store/autSthore'
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { home } from 'ionicons/icons'
 
@@ -153,6 +154,31 @@ const router = createRouter({
   // eslint-disable-next-line ts/ban-ts-comment
   // @ts-expect-error
   routes,
+})
+
+// Middleware para proteção de rotas
+router.beforeEach((to, _from, next) => {
+  const authStore = useAuthStore()
+
+  // Verifica se a rota exige autenticação
+  if (to.meta.requiredRole && !authStore.token) {
+    if (Array.isArray(to.meta.requiredRole) && to.meta.requiredRole.includes('public')) {
+      // Permite acesso para rotas públicas
+      next()
+    }
+    else {
+      // Redireciona para login se não autenticado
+      next('/login')
+    }
+  }
+  else if (Array.isArray(to.meta.requiredRole) && to.meta.requiredRole.includes('public') && authStore.token) {
+    // Se o usuário está logado e tenta acessar rotas públicas (ex: login), redireciona para o dashboard
+    next('/dashboard/Home')
+  }
+  else {
+    // Caso contrário, permite a navegação
+    next()
+  }
 })
 
 export default router

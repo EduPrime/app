@@ -1,3 +1,4 @@
+import { useAuthStore } from '@/store/autSthore'
 import {
   IonApp,
   IonBackButton,
@@ -116,3 +117,6 @@ for (const path in modules) {
 router.isReady().then(() => {
   app.mount('#app')
 })
+
+const authStore = useAuthStore()
+authStore.initializeAuthState()
