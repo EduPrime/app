@@ -35,7 +35,6 @@ export const useAuthStore = defineStore('auth', {
       if (this.token && !isTokenExpired(this.token)) {
         try {
           await this.fetchUserData()
-          this.user = await this.fetchUserData()
         }
         catch (error) {
           console.error('Error fetching user data:', error)
