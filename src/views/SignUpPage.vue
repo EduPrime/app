@@ -7,11 +7,11 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
 
-const name = ref<string>('teste')
-const phone = ref<string>('000')
-const cpf = ref<string>('000')
-const email = ref<string>('teste@teste.com')
-const password = ref<string>('12345678')
+const name = ref<string>('')
+const phone = ref<string>('')
+const cpf = ref<string>('')
+const email = ref<string>('')
+const password = ref<string>('')
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -26,7 +26,7 @@ const schema = yup.object().shape({
 
 async function validateForm() {
   try {
-    await schema.validate({ email: email.value, password: password.value, phone: phone.value, cpf: cpf.value, name: name.value }, { abortEarly: false })
+    await schema.validate({ name: name.value, email: email.value, phone: phone.value, cpf: cpf.value, password: password.value }, { abortEarly: false })
     return true
   }
   catch (errors) {
@@ -39,7 +39,7 @@ async function validateForm() {
 async function registerUser() {
   if (await validateForm()) {
     try {
-      await authStore.register(email.value, password.value, phone.value, cpf.value, name.value)
+      await authStore.register(name.value, email.value, phone.value, cpf.value, password.value)
       showToast('Usuário cadastrado com sucesso')
       router.replace('/login')
     }

@@ -73,11 +73,11 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async register(email: string, password: string, cpf: string, name: string, phone: string) {
+    async register(name: string, email: string, phone: string, cpf: string, password: string) {
       try {
         const response = await fetch(`${apiUrl}auth/register`, {
           method: 'POST',
-          body: JSON.stringify({ email, password, cpf, name, phone }),
+          body: JSON.stringify({ name, email, phone, cpf, password }),
           headers: {
             'Content-Type': 'application/json',
           },

@@ -77,7 +77,7 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     meta: {
       icon: home,
       name: 'Main Dashboard',
-      requiredRole: ['adm', 'teacher'],
+      requiredRole: ['admin', 'teacher'],
     },
   },
   {
@@ -93,56 +93,56 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     path: '/files/:id',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['adm', 'teacher', 'student'],
+      requiredRole: ['admin', 'teacher', 'student'],
     },
   },
   {
     path: '/files/:id/:page',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['adm', 'teacher'],
+      requiredRole: ['admin', 'teacher'],
     },
   },
   {
     path: '/files/:id/:page/:reportType',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['adm', 'teacher', 'student'],
+      requiredRole: ['admin', 'teacher', 'student'],
     },
   },
   {
     path: '/users/:id',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['adm', 'teacher', 'student'],
+      requiredRole: ['admin', 'teacher', 'student'],
     },
   },
   {
     path: '/insights/:id',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['adm', 'teacher', 'student'],
+      requiredRole: ['admin', 'teacher', 'student'],
     },
   },
   {
     path: '/settings/:id',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['adm', 'teacher', 'student'],
+      requiredRole: ['admin', 'teacher', 'student'],
     },
   },
   {
     path: '/profile',
     component: () => import('../views/ProfilePage.vue'),
     meta: {
-      requiredRole: ['adm', 'teacher', 'student'],
+      requiredRole: ['admin', 'teacher', 'student'],
     },
   },
   {
     path: '/notifications',
     component: () => import('../views/NotificationsPage.vue'),
     meta: {
-      requiredRole: ['adm', 'teacher', 'student'],
+      requiredRole: ['admin', 'teacher', 'student'],
     },
   },
 ]
