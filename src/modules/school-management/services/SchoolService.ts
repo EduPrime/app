@@ -1,7 +1,9 @@
 import type { Tables } from '@/types/database.types'
 import BaseService from '@/services/BaseService'
+import { PrismaClient } from '@prisma/client'
 
-const table = 'school' as const
+const prisma = new PrismaClient()
+const table = 'School' as const
 
 type SchoolTable = typeof table
 
@@ -10,16 +12,14 @@ export default class SchoolService extends BaseService<SchoolTable> {
     super(table) // Passando o nome da tabela para a classe base
   }
 
-  async getSchoolCount(): Promise<number> {
+/*   async getSchoolCount(): Promise<number> {
     try {
-      const { count, error } = await this.client
-        .from('school') // Tabela de escolas
-        .select('*', { count: 'exact', head: true }) // Conta o número de escolas ignorando os soft-deleted
-        .is('deleted_at', null) // Ignora as escolas delet
-
-      if (error)
-        throw error
-      return count ?? 0
+      const count = await prisma.school.count({
+        where: {
+          deleted_at: null,
+        },
+      })
+      return count
     }
     catch (error) {
       console.error('Error ao contar escolas:', error)
@@ -29,14 +29,12 @@ export default class SchoolService extends BaseService<SchoolTable> {
 
   async getClassCount(): Promise<number> {
     try {
-      const { count, error } = await this.client
-        .from('classroom') // Tabela de turmas
-        .select('*', { count: 'exact', head: true }) // Conta o número de turmas ignorando as soft-deleted
-        .is('deleted_at', null) // Ignora as turmas deletadas
-
-      if (error)
-        throw error
-      return count ?? 0
+      const count = await prisma.classroom.count({
+        where: {
+          deleted_at: null,
+        },
+      })
+      return count
     }
     catch (error) {
       console.error('Error ao contar turmas:', error)
@@ -46,14 +44,12 @@ export default class SchoolService extends BaseService<SchoolTable> {
 
   async getTeacherCount(): Promise<number> {
     try {
-      const { count, error } = await this.client
-        .from('teacher') // Tabela de professores
-        .select('*', { count: 'exact', head: true }) // Conta o número de professores ignorando os soft-deleted
-        .is('deleted_at', null) // Ignora os professores deletados
-
-      if (error)
-        throw error
-      return count ?? 0
+      const count = await prisma.teacher.count({
+        where: {
+          deleted_at: null,
+        },
+      })
+      return count
     }
     catch (error) {
       console.error('Error ao contar professores:', error)
@@ -63,46 +59,39 @@ export default class SchoolService extends BaseService<SchoolTable> {
 
   async getApprovalRate(): Promise<number> {
     try {
-      const { count: totalStudents, error: totalError } = await this.client
-        .from('student') // Tabela de estudantes
-        .select('*', { count: 'exact', head: true }) // Conta o número de estudantes ignorando os soft-deleted
+      const totalStudents = await prisma.student.count({
+        where: {
+          deleted_at: null,
+        },
+      })
 
-      if (totalError)
-        throw totalError
+      const approvedStudents = await prisma.student.count({
+        where: {
+          deleted_at: null,
+          approved: true,
+        },
+      })
 
-      const { count: approvedStudents, error: approvedError } = await this.client
-        .from('student') // Tabela de estudantes
-        .select('*', { count: 'exact', head: true }) // Conta o número de estudantes ignorando os soft-deleted
-        .is('deleted_at', null) // Ignora os estudantes deletados
-      /*   .filter({ approved: true }) // Filtra os estudantes aprovados ou .eq({ approved: true }) */
-
-      if (approvedError)
-        throw approvedError
-
-      const total = totalStudents ?? 0
-      const approved = approvedStudents ?? 0
-      return total > 0 ? Math.round((approved / total) * 100) : 0
+      return totalStudents > 0 ? Math.round((approvedStudents / totalStudents) * 100) : 0
     }
     catch (error) {
-      console.error('Error ao calcular taxa de aprovação:', error)
+      console.error('Erro ao calcular taxa de aprovação:', error)
       return 0
     }
   }
 
   async getStudentCount(): Promise<number> {
     try {
-      const { count, error } = await this.client
-        .from('student') // Tabela de estudantes
-        .select('*', { count: 'exact', head: true }) // Conta o número de estudantes ignorando os soft-deleted
-        .is('deleted_at', null) // Ignora os estudantes deletados
-
-      if (error)
-        throw error
-      return count ?? 0
+      const count = await prisma.student.count({
+        where: {
+          deleted_at: null,
+        },
+      })
+      return count
     }
     catch (error) {
       console.error('Error ao contar estudantes:', error)
       return 0
     }
-  }
+  } */
 }
