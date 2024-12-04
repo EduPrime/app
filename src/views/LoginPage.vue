@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import EscolaService from '@/services/EscolaService'
 import showToast from '@/utils/toast-alert'
 import { IonButton, IonIcon, IonInput, IonItem, IonList } from '@ionic/vue'
 import { eye, lockClosed, mail } from 'ionicons/icons'
@@ -48,6 +49,24 @@ const navigation = {
     router.push('/forgot-password')
   },
 }
+
+async function fetchEscolas1960() {
+  try {
+    const data = await escolaService.getByAnoFundacao(1960)
+    escolas.value = data || []
+  }
+  catch (err) {
+    error.value = (err as Error).message
+  }
+  finally {
+    loading.value = false
+  }
+}
+
+// Buscar escolas ao montar o componente
+onMounted(() => {
+  fetchEscolas1960()
+})
 </script>
 
 <template>
