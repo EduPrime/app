@@ -1,4 +1,8 @@
 <script setup lang="ts">
+// import type CustomUser from '@/router/CustomUser'
+import type { RouteRecordNormalized } from 'vue-router'
+import NavItem from '@/components/NavItem.vue'
+import { useUserStore } from '@/store/user'
 import {
   barChart,
   barChartOutline,
@@ -21,10 +25,6 @@ import {
 } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-// import type CustomUser from '@/router/CustomUser'
-import type { RouteRecordNormalized } from 'vue-router'
-import NavItem from '@/components/NavItem.vue'
-import { useUserStore } from '@/store/user'
 import { supabase } from '../supabaseClient'
 
 const userStore = useUserStore()

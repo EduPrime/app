@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { catchPageWidth } from '@/utils/useUtils'
 import { IonCard, IonCardHeader, IonText } from '@ionic/vue'
-import { defineEmits, defineProps, onMounted, ref } from 'vue'
-import SeriesService from '../services/SeriesService'
 // import Swiper core and required modules
 import { A11y, Navigation, Pagination, Scrollbar } from 'swiper/modules'
-
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from 'swiper/vue'
+import { defineEmits, defineProps, onMounted, ref } from 'vue'
+
+import SeriesService from '../services/SeriesService'
 
 // Import Swiper styles
 import 'swiper/css'
@@ -35,7 +35,7 @@ interface Props {
   course: string
 }
 
-const supabase = new SeriesService()
+const postgrest = new SeriesService()
 
 const pageWidth = catchPageWidth()
 const gSeries = ref()
@@ -50,7 +50,7 @@ function groupCourses(courses: any[]): any[] {
 }
 
 onMounted(async () => {
-  gSeries.value = await supabase.getSeries(props.course)
+  gSeries.value = await postgrest.getSeries(props.course)
   boundledSeries.value = groupCourses(gSeries.value)
 })
 </script>

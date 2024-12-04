@@ -6,14 +6,14 @@ import { IonButton, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonGrid
 import { arrowBackOutline, checkmarkCircleOutline } from 'ionicons/icons'
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 
-import PreEnrollmentService from '../services/PreEnrollmentService'
-
 // componentes
 import formPreEnrrolment from '../components/FormPreEnrrolment.vue'
-import selectCourseSlider from '../components/SelectCourseSlider.vue'
 
+import selectCourseSlider from '../components/SelectCourseSlider.vue'
 import selectSchoolSlider from '../components/SelectSchoolSlider.vue'
+
 import selectSeriesSlider from '../components/SelectSeriesSlider.vue'
+import PreEnrollmentService from '../services/PreEnrollmentService'
 
 interface Props {
   searchbox: string
@@ -21,7 +21,7 @@ interface Props {
 const props = defineProps<Props>()
 const emits = defineEmits(['update:modelValue'])
 
-const supabase = new PreEnrollmentService()
+const postgrest = new PreEnrollmentService()
 const studentId = ref()
 const pageWidth = ref()
 const loading = ref(false)
@@ -140,7 +140,7 @@ watch(postStatus, async (value) => {
       finished.value = true
     }, 500) // 1 segundo antes de loading se tornar false
 
-    preEnrollment.value.pre_enrollment_code = await supabase.generateUnicPreEnrollmentCode()
+    preEnrollment.value.pre_enrollment_code = await postgrest.generateUnicPreEnrollmentCode()
 
     if (
       preEnrollment.value.pre_enrollment_code
@@ -149,7 +149,7 @@ watch(postStatus, async (value) => {
       && preEnrollment.value.series_id
       && preEnrollment.value.student_id
     ) {
-      insertedPreEnrollment.value = await supabase.insertPreEnrollment(preEnrollment.value)
+      insertedPreEnrollment.value = await postgrest.insertPreEnrollment(preEnrollment.value)
     }
 
     setTimeout(() => {
@@ -168,7 +168,7 @@ watch(postStatus, async (value) => {
 const teste = ref()
 onMounted(async () => {
   pageWidth.value = catchPageWidth()
-  teste.value = await supabase.getPreEnrollments()
+  teste.value = await postgrest.getPreEnrollments()
 })
 </script>
 

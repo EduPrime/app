@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
+import { IonAlert, IonButton, IonCol, IonGrid, IonIcon, IonInput, IonItem, IonRow, IonSelect, IonSelectOption } from '@ionic/vue'
 // import GedService from '@/modules/ged/services/GedService'
 // import FileUpload from '@/modules/ged/components/FileUpload.vue'
 
 // import type { Tables } from '@/types/database.types'
 
-import { IonAlert, IonButton, IonCol, IonGrid, IonIcon, IonInput, IonItem, IonRow, IonSelect, IonSelectOption } from '@ionic/vue'
 import { checkmarkCircleOutline } from 'ionicons/icons'
+import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 import StudentService from '../services/StudentService'
 
 // const gedService = new GedService()
@@ -91,7 +91,7 @@ const student = ref(
   },
 )
 
-const supabase = new StudentService()
+const postgrest = new StudentService()
 const studentList = ref()
 
 watch(result, async (value) => {
@@ -111,7 +111,7 @@ watch(result, async (value) => {
       duplicated.value = true
     }
 
-    studentId.value = await supabase.getStudentId(student.value)
+    studentId.value = await postgrest.getStudentId(student.value)
   }
   else {
     someProblems.value = true // eu adicionei um valor ( true ) estava sem modificação de valor
@@ -172,7 +172,7 @@ function nextStep() {
 
 async function postStudent(studentObject: any) {
   try {
-    const data = await supabase.insertStudent(studentObject)
+    const data = await postgrest.insertStudent(studentObject)
 
     return data
   }
@@ -190,7 +190,7 @@ function closeDialog() {
 }
 
 onMounted(async () => {
-  studentList.value = await supabase.getStudents()
+  studentList.value = await postgrest.getStudents()
   // await loadDocumentFiles()
 })
 </script>

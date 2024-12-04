@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { catchPageWidth } from '@/utils/useUtils'
 import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonText } from '@ionic/vue'
-import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
-import SchoolCourseService from '../services/School_courseService'
 // import Swiper core and required modules
 import { A11y, Navigation, Pagination, Scrollbar } from 'swiper/modules'
-
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from 'swiper/vue'
+import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
+
+import SchoolCourseService from '../services/School_courseService'
 
 // Import Swiper styles
 import 'swiper/css'
@@ -35,7 +35,7 @@ interface Props {
   school: any
 }
 
-const supabase = new SchoolCourseService()
+const postgrest = new SchoolCourseService()
 
 const courseList = ref()
 const boundledCourses = ref()
@@ -53,7 +53,7 @@ watch(() => props.school, async (value) => {
   if (value) {
     // console.log('props.school:', value)
 
-    courseList.value = await supabase.getCoursesBySchoolId(props.school)
+    courseList.value = await postgrest.getCoursesBySchoolId(props.school)
     // console.log('courseList atualizado:', courseList.value)
   }
 }, { immediate: true })

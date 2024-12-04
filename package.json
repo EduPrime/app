@@ -10,10 +10,7 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "lint:fix": "eslint --config ./eslint.config.js . --fix",
-    "type-check": "vue-tsc --noEmit",
-    "generateNewTypes": "npx supabase gen types --lang=typescript --local > src/types/database.types.ts",
-    "generateNewTypesOnline": "JARDEL: npx supabase gen types --lang=typescript --project-id '$PROJECT_REF' --schema public > database.types.ts",
-    "dbReset": "node supabase/upgrade-database.js dbReset"
+    "type-check": "vue-tsc --noEmit"
   },
   "dependencies": {
     "@antfu/eslint-config": "^3.11.2",
@@ -60,7 +57,6 @@
     "eslint-plugin-vue": "^9.32.0",
     "jsdom": "^25.0.1",
     "sass": "^1.82.0",
-    "supabase": "^1.226.4",
     "terser": "^5.36.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.2",
