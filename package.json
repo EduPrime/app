@@ -5,6 +5,7 @@
   "private": true,
   "description": "Gestão Pedagógica",
   "scripts": {
+    "vite": "vite",
     "dev": "ionic serve --browser firefox",
     "build": "vue-tsc && vite build",
     "preview": "vite preview",

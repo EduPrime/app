@@ -19,7 +19,7 @@ export default class BaseService {
         .from(this.table)
         .select('*')
         .eq('id', id)
-        .is('deleted_at', null)
+        .is('deletedAt', null)
         .single()
 
       if (error)
@@ -38,7 +38,7 @@ export default class BaseService {
     limit?: number,
   ): Promise<[] | null> {
     try {
-      let query = this.client.from(this.table).select('*').is('deleted_at', null)
+      let query = this.client.from(this.table).select('*').is('deletedAt', null)
 
       if (orderBy) {
         query = query.order(orderBy as string, { ascending })
@@ -66,7 +66,7 @@ export default class BaseService {
         .from(this.table)
         .select('*')
         .eq('school_id', schoolId)
-        .is('deleted_at', null)
+        .is('deletedAt', null)
 
       if (error)
         throw error
@@ -107,7 +107,7 @@ export default class BaseService {
         .from(this.table)
         .update(updates)
         .eq('id', id)
-        .is('deleted_at', null)
+        .is('deletedAt', null)
         .select()
         .single()
 
@@ -125,7 +125,7 @@ export default class BaseService {
     try {
       const { data, error } = await this.client
         .from(this.table)
-        .update({ deleted_at: new Date().toISOString() })
+        .update({ deletedAt: new Date().toISOString() })
         .eq('id', id)
         .select()
         .single()
@@ -145,7 +145,7 @@ export default class BaseService {
       const { count, error } = await this.client
         .from(this.table)
         .select('*', { count: 'exact', head: true })
-        .is('deleted_at', null)
+        .is('deletedAt', null)
 
       if (error)
         throw error

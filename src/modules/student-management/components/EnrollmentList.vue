@@ -35,10 +35,10 @@ const fieldLabels: Record<keyof Tables<'enrollment'>, string> = {
   institution_id: 'ID da Instituição',
   date_enrollment: 'Data da Matrícula',
   observations: 'Observações',
-  created_at: 'Criado Em',
-  deleted_at: 'Deletado Em',
+  createdAt: 'Criado Em',
+  deletedAt: 'Deletado Em',
   status: 'Status',
-  updated_at: 'Atualizado Em',
+  updatedAt: 'Atualizado Em',
   name: 'Nome', // Chave ausente adicionada
   enrollmentCode: 'Código de Matrícula', // Chave ausente adicionada
   situation: 'Situação', // Chave ausente adicionada

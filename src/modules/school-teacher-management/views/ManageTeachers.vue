@@ -51,7 +51,7 @@ const filteredTeacher = computed(() => {
 
 async function loadTeachers() {
   try {
-    const teachers: any = await teacherService.getAll('created_at', true)
+    const teachers: any = await teacherService.getAll('createdAt', true)
     teacherData.value = teachers || []
     console.log('Professores carregados:', teachers)
   }

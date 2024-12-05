@@ -21,7 +21,7 @@ export default class SchoolService extends BaseService<SchoolTable> {
   } | null> {
     try {
       // Fetch courses related to the school
-      const { data: courses, error: coursesError } = await this.client.from('course').select('*').eq('school_id', schoolId).is('deleted_at', null)
+      const { data: courses, error: coursesError } = await this.client.from('course').select('*').eq('school_id', schoolId).is('deletedAt', null)
 
       if (coursesError) {
         throw coursesError
@@ -35,7 +35,7 @@ export default class SchoolService extends BaseService<SchoolTable> {
       const courseIds = courses.map(course => course.id)
 
       // Fetch series related to the courses
-      const { data: series, error: seriesError } = await this.client.from('series').select('*').in('course_id', courseIds).is('deleted_at', null)
+      const { data: series, error: seriesError } = await this.client.from('series').select('*').in('course_id', courseIds).is('deletedAt', null)
 
       if (seriesError) {
         throw seriesError

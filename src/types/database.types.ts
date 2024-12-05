@@ -41,114 +41,114 @@ export interface Database {
       }
       academic_year: {
         Row: {
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           id: string
           metadata: Json | null
           ref_year: number
           school_id: string
           template_id: string
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
         }
         Insert: {
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           id?: string
           metadata?: Json | null
           ref_year: number
           school_id: string
           template_id: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Update: {
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           id?: string
           metadata?: Json | null
           ref_year?: number
           school_id?: string
           template_id?: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Relationships: []
       }
       academic_year_template: {
         Row: {
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           id: string
           metadata: Json | null
           name: string
           ref_year: number
           stage_count: number | null
           stages: Json
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
         }
         Insert: {
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           id?: string
           metadata?: Json | null
           name: string
           ref_year: number
           stage_count?: number | null
           stages: Json
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Update: {
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           id?: string
           metadata?: Json | null
           name?: string
           ref_year?: number
           stage_count?: number | null
           stages?: Json
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Relationships: []
       }
       attendance: {
         Row: {
-          created_at: string
+          createdAt: string
           date: string
-          deleted_at: string | null
+          deletedAt: string | null
           id: string
           metadata: Json | null
           school_id: string
           status: Database['public']['Enums']['attendance_status']
           student_id: string
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
         }
         Insert: {
-          created_at?: string
+          createdAt?: string
           date: string
-          deleted_at?: string | null
+          deletedAt?: string | null
           id?: string
           metadata?: Json | null
           school_id: string
           status: Database['public']['Enums']['attendance_status']
           student_id: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Update: {
-          created_at?: string
+          createdAt?: string
           date?: string
-          deleted_at?: string | null
+          deletedAt?: string | null
           id?: string
           metadata?: Json | null
           school_id?: string
           status?: Database['public']['Enums']['attendance_status']
           student_id?: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Relationships: [
@@ -170,9 +170,9 @@ export interface Database {
       }
       class_session: {
         Row: {
-          created_at: string
+          createdAt: string
           day_of_week: Database['public']['Enums']['day_of_week']
-          deleted_at: string | null
+          deletedAt: string | null
           discipline_id: string
           end_time: string
           id: string
@@ -180,13 +180,13 @@ export interface Database {
           school_id: string
           start_time: string
           timetable_id: string
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
         }
         Insert: {
-          created_at?: string
+          createdAt?: string
           day_of_week: Database['public']['Enums']['day_of_week']
-          deleted_at?: string | null
+          deletedAt?: string | null
           discipline_id: string
           end_time: string
           id?: string
@@ -194,13 +194,13 @@ export interface Database {
           school_id: string
           start_time: string
           timetable_id: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Update: {
-          created_at?: string
+          createdAt?: string
           day_of_week?: Database['public']['Enums']['day_of_week']
-          deleted_at?: string | null
+          deletedAt?: string | null
           discipline_id?: string
           end_time?: string
           id?: string
@@ -208,7 +208,7 @@ export interface Database {
           school_id?: string
           start_time?: string
           timetable_id?: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Relationships: [
@@ -239,9 +239,9 @@ export interface Database {
         Row: {
           abbreviation: string | null
           course_id: string
-          created_at: string
+          createdAt: string
           day_of_week: Database['public']['Enums']['day_of_week'] | null
-          deleted_at: string | null
+          deletedAt: string | null
           endTime: string | null
           endTimeInterval: string | null
           id: string
@@ -256,16 +256,16 @@ export interface Database {
           startTimeInterval: string | null
           status: Database['public']['Enums']['status']
           teacher_id: string
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
           year: number
         }
         Insert: {
           abbreviation?: string | null
           course_id: string
-          created_at?: string
+          createdAt?: string
           day_of_week?: Database['public']['Enums']['day_of_week'] | null
-          deleted_at?: string | null
+          deletedAt?: string | null
           endTime?: string | null
           endTimeInterval?: string | null
           id?: string
@@ -280,16 +280,16 @@ export interface Database {
           startTimeInterval?: string | null
           status?: Database['public']['Enums']['status']
           teacher_id: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           year: number
         }
         Update: {
           abbreviation?: string | null
           course_id?: string
-          created_at?: string
+          createdAt?: string
           day_of_week?: Database['public']['Enums']['day_of_week'] | null
-          deleted_at?: string | null
+          deletedAt?: string | null
           endTime?: string | null
           endTimeInterval?: string | null
           id?: string
@@ -304,7 +304,7 @@ export interface Database {
           startTimeInterval?: string | null
           status?: Database['public']['Enums']['status']
           teacher_id?: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           year?: number
         }
@@ -350,8 +350,8 @@ export interface Database {
         Row: {
           course_modality: Database['public']['Enums']['course_modality'] | null
           course_stage: string | null
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           description: string | null
           id: string
           institution_id: string | null
@@ -361,7 +361,7 @@ export interface Database {
           school_id: string | null
           status: Database['public']['Enums']['status'] | null
           teaching_type: Database['public']['Enums']['teaching_type'] | null
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
           workload: string | null
         }
@@ -370,8 +370,8 @@ export interface Database {
             | Database['public']['Enums']['course_modality']
             | null
           course_stage?: string | null
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           description?: string | null
           id?: string
           institution_id?: string | null
@@ -381,7 +381,7 @@ export interface Database {
           school_id?: string | null
           status?: Database['public']['Enums']['status'] | null
           teaching_type?: Database['public']['Enums']['teaching_type'] | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           workload?: string | null
         }
@@ -390,8 +390,8 @@ export interface Database {
             | Database['public']['Enums']['course_modality']
             | null
           course_stage?: string | null
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           description?: string | null
           id?: string
           institution_id?: string | null
@@ -401,7 +401,7 @@ export interface Database {
           school_id?: string | null
           status?: Database['public']['Enums']['status'] | null
           teaching_type?: Database['public']['Enums']['teaching_type'] | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           workload?: string | null
         }
@@ -425,8 +425,8 @@ export interface Database {
       course_series_discipline: {
         Row: {
           course_id: string | null
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           discipline_id: string | null
           id: string
           series_id: string | null
@@ -434,8 +434,8 @@ export interface Database {
         }
         Insert: {
           course_id?: string | null
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           discipline_id?: string | null
           id?: string
           series_id?: string | null
@@ -443,8 +443,8 @@ export interface Database {
         }
         Update: {
           course_id?: string | null
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           discipline_id?: string | null
           id?: string
           series_id?: string | null
@@ -476,35 +476,35 @@ export interface Database {
       }
       discipline: {
         Row: {
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           id: string
           metadata: Json | null
           name: string
           status: Database['public']['Enums']['status'] | null
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
           workload: number | null
         }
         Insert: {
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           id?: string
           metadata?: Json | null
           name: string
           status?: Database['public']['Enums']['status'] | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           workload?: number | null
         }
         Update: {
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           id?: string
           metadata?: Json | null
           name?: string
           status?: Database['public']['Enums']['status'] | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           workload?: number | null
         }
@@ -513,8 +513,8 @@ export interface Database {
       document: {
         Row: {
           compression_applied: boolean | null
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           file_hash: string | null
           file_name: string
           id: string
@@ -524,15 +524,15 @@ export interface Database {
           mime_type: string
           size: number
           storage_path: string
-          updated_at: string | null
+          updatedAt: string | null
           upload_date: string | null
           user_created: string | null
           version: number | null
         }
         Insert: {
           compression_applied?: boolean | null
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           file_hash?: string | null
           file_name: string
           id?: string
@@ -542,15 +542,15 @@ export interface Database {
           mime_type: string
           size: number
           storage_path: string
-          updated_at?: string | null
+          updatedAt?: string | null
           upload_date?: string | null
           user_created?: string | null
           version?: number | null
         }
         Update: {
           compression_applied?: boolean | null
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           file_hash?: string | null
           file_name?: string
           id?: string
@@ -560,7 +560,7 @@ export interface Database {
           mime_type?: string
           size?: number
           storage_path?: string
-          updated_at?: string | null
+          updatedAt?: string | null
           upload_date?: string | null
           user_created?: string | null
           version?: number | null
@@ -571,9 +571,9 @@ export interface Database {
         Row: {
           classroom_id: string
           course_id: string
-          created_at: string
+          createdAt: string
           date_enrollment: string
-          deleted_at: string | null
+          deletedAt: string | null
           enrollmentCode: string | null
           id: string
           institution_id: string | null
@@ -585,14 +585,14 @@ export interface Database {
           situation: Database['public']['Enums']['situation_type'] | null
           status: Database['public']['Enums']['status'] | null
           student_id: string
-          updated_at: string | null
+          updatedAt: string | null
         }
         Insert: {
           classroom_id: string
           course_id: string
-          created_at?: string
+          createdAt?: string
           date_enrollment: string
-          deleted_at?: string | null
+          deletedAt?: string | null
           enrollmentCode?: string | null
           id?: string
           institution_id?: string | null
@@ -604,14 +604,14 @@ export interface Database {
           situation?: Database['public']['Enums']['situation_type'] | null
           status?: Database['public']['Enums']['status'] | null
           student_id: string
-          updated_at?: string | null
+          updatedAt?: string | null
         }
         Update: {
           classroom_id?: string
           course_id?: string
-          created_at?: string
+          createdAt?: string
           date_enrollment?: string
-          deleted_at?: string | null
+          deletedAt?: string | null
           enrollmentCode?: string | null
           id?: string
           institution_id?: string | null
@@ -623,7 +623,7 @@ export interface Database {
           situation?: Database['public']['Enums']['situation_type'] | null
           status?: Database['public']['Enums']['status'] | null
           student_id?: string
-          updated_at?: string | null
+          updatedAt?: string | null
         }
         Relationships: [
           {
@@ -679,41 +679,41 @@ export interface Database {
       }
       grade: {
         Row: {
-          created_at: string
+          createdAt: string
           date: string
-          deleted_at: string | null
+          deletedAt: string | null
           discipline_id: string
           id: string
           metadata: Json | null
           school_id: string
           student_id: string
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
           value: number
         }
         Insert: {
-          created_at?: string
+          createdAt?: string
           date: string
-          deleted_at?: string | null
+          deletedAt?: string | null
           discipline_id: string
           id?: string
           metadata?: Json | null
           school_id: string
           student_id: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           value: number
         }
         Update: {
-          created_at?: string
+          createdAt?: string
           date?: string
-          deleted_at?: string | null
+          deletedAt?: string | null
           discipline_id?: string
           id?: string
           metadata?: Json | null
           school_id?: string
           student_id?: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           value?: number
         }
@@ -783,8 +783,8 @@ export interface Database {
         Row: {
           address: string | null
           city: string | null
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           email: string | null
           id: string
           metadata: Json | null
@@ -793,14 +793,14 @@ export interface Database {
           postalcode: string | null
           singleton: number
           state: string | null
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
         }
         Insert: {
           address?: string | null
           city?: string | null
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           email?: string | null
           id?: string
           metadata?: Json | null
@@ -809,14 +809,14 @@ export interface Database {
           postalcode?: string | null
           singleton?: number
           state?: string | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Update: {
           address?: string | null
           city?: string | null
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           email?: string | null
           id?: string
           metadata?: Json | null
@@ -825,14 +825,14 @@ export interface Database {
           postalcode?: string | null
           singleton?: number
           state?: string | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Relationships: []
       }
       institution_settings: {
         Row: {
-          created_at: string
+          createdAt: string
           date_closing: string | null
           date_end: string | null
           date_opening: string | null
@@ -842,7 +842,7 @@ export interface Database {
           school_days: number | null
         }
         Insert: {
-          created_at?: string
+          createdAt?: string
           date_closing?: string | null
           date_end?: string | null
           date_opening?: string | null
@@ -852,7 +852,7 @@ export interface Database {
           school_days?: number | null
         }
         Update: {
-          created_at?: string
+          createdAt?: string
           date_closing?: string | null
           date_end?: string | null
           date_opening?: string | null
@@ -874,9 +874,9 @@ export interface Database {
       pre_enrollment: {
         Row: {
           course_id: string
-          created_at: string
+          createdAt: string
           date_enrollment: string
-          deleted_at: string | null
+          deletedAt: string | null
           id: string
           observations: string | null
           pre_enrollment_code: string | null
@@ -885,13 +885,13 @@ export interface Database {
           situation: Database['public']['Enums']['situation_type'] | null
           status: Database['public']['Enums']['status'] | null
           student_id: string
-          updated_at: string | null
+          updatedAt: string | null
         }
         Insert: {
           course_id: string
-          created_at?: string
+          createdAt?: string
           date_enrollment: string
-          deleted_at?: string | null
+          deletedAt?: string | null
           id?: string
           observations?: string | null
           pre_enrollment_code?: string | null
@@ -900,13 +900,13 @@ export interface Database {
           situation?: Database['public']['Enums']['situation_type'] | null
           status?: Database['public']['Enums']['status'] | null
           student_id: string
-          updated_at?: string | null
+          updatedAt?: string | null
         }
         Update: {
           course_id?: string
-          created_at?: string
+          createdAt?: string
           date_enrollment?: string
-          deleted_at?: string | null
+          deletedAt?: string | null
           id?: string
           observations?: string | null
           pre_enrollment_code?: string | null
@@ -915,7 +915,7 @@ export interface Database {
           situation?: Database['public']['Enums']['situation_type'] | null
           status?: Database['public']['Enums']['status'] | null
           student_id?: string
-          updated_at?: string | null
+          updatedAt?: string | null
         }
         Relationships: [
           {
@@ -1025,8 +1025,8 @@ export interface Database {
           active: boolean
           address: string | null
           city: string | null
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           email: string | null
           id: string
           institution_id: string
@@ -1037,7 +1037,7 @@ export interface Database {
           school_zone: string | null
           social_network: string | null
           state: string | null
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
           website: string | null
         }
@@ -1046,8 +1046,8 @@ export interface Database {
           active?: boolean
           address?: string | null
           city?: string | null
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           email?: string | null
           id?: string
           institution_id: string
@@ -1058,7 +1058,7 @@ export interface Database {
           school_zone?: string | null
           social_network?: string | null
           state?: string | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           website?: string | null
         }
@@ -1067,8 +1067,8 @@ export interface Database {
           active?: boolean
           address?: string | null
           city?: string | null
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           email?: string | null
           id?: string
           institution_id?: string
@@ -1079,7 +1079,7 @@ export interface Database {
           school_zone?: string | null
           social_network?: string | null
           state?: string | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           website?: string | null
         }
@@ -1096,19 +1096,19 @@ export interface Database {
       school_course: {
         Row: {
           course_id: string | null
-          created_at: string
+          createdAt: string
           id: string
           school_id: string | null
         }
         Insert: {
           course_id?: string | null
-          created_at?: string
+          createdAt?: string
           id?: string
           school_id?: string | null
         }
         Update: {
           course_id?: string | null
-          created_at?: string
+          createdAt?: string
           id?: string
           school_id?: string | null
         }
@@ -1131,36 +1131,36 @@ export interface Database {
       }
       school_settings: {
         Row: {
-          created_at: string
+          createdAt: string
           date_closing: string | null
           date_end: string | null
           date_opening: string | null
           date_start: string | null
-          deleted_at: string | null
+          deletedAt: string | null
           id: string
           institution_id: string
           school_days: number | null
           school_id: string
         }
         Insert: {
-          created_at?: string
+          createdAt?: string
           date_closing?: string | null
           date_end?: string | null
           date_opening?: string | null
           date_start?: string | null
-          deleted_at?: string | null
+          deletedAt?: string | null
           id?: string
           institution_id: string
           school_days?: number | null
           school_id: string
         }
         Update: {
-          created_at?: string
+          createdAt?: string
           date_closing?: string | null
           date_end?: string | null
           date_opening?: string | null
           date_start?: string | null
-          deleted_at?: string | null
+          deletedAt?: string | null
           id?: string
           institution_id?: string
           school_days?: number | null
@@ -1187,8 +1187,8 @@ export interface Database {
         Row: {
           course_id: string
           course_stage: Database['public']['Enums']['course_stage_type']
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           graduate: Database['public']['Enums']['graduate_status']
           id: string
           institution_id: string | null
@@ -1197,15 +1197,15 @@ export interface Database {
           school_days: string
           school_id: string | null
           timetable_id: string | null
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
           workload: string
         }
         Insert: {
           course_id: string
           course_stage?: Database['public']['Enums']['course_stage_type']
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           graduate?: Database['public']['Enums']['graduate_status']
           id?: string
           institution_id?: string | null
@@ -1214,15 +1214,15 @@ export interface Database {
           school_days: string
           school_id?: string | null
           timetable_id?: string | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           workload: string
         }
         Update: {
           course_id?: string
           course_stage?: Database['public']['Enums']['course_stage_type']
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           graduate?: Database['public']['Enums']['graduate_status']
           id?: string
           institution_id?: string | null
@@ -1231,7 +1231,7 @@ export interface Database {
           school_days?: string
           school_id?: string | null
           timetable_id?: string | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
           workload?: string
         }
@@ -1289,10 +1289,10 @@ export interface Database {
           city_state: string | null
           complement: string | null
           cpf: string | null
-          created_at: string
+          createdAt: string
           deficiency: Database['public']['Enums']['deficiency_type'] | null
           deficiency_description: string | null
-          deleted_at: string | null
+          deletedAt: string | null
           docsType: string | null
           email: string | null
           ethnicity: Database['public']['Enums']['ethnicity_type'] | null
@@ -1323,7 +1323,7 @@ export interface Database {
           rg_number: string | null
           rg_state: string | null
           status: Database['public']['Enums']['status'] | null
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
         }
         Insert: {
@@ -1334,10 +1334,10 @@ export interface Database {
           city_state?: string | null
           complement?: string | null
           cpf?: string | null
-          created_at?: string
+          createdAt?: string
           deficiency?: Database['public']['Enums']['deficiency_type'] | null
           deficiency_description?: string | null
-          deleted_at?: string | null
+          deletedAt?: string | null
           docsType?: string | null
           email?: string | null
           ethnicity?: Database['public']['Enums']['ethnicity_type'] | null
@@ -1370,7 +1370,7 @@ export interface Database {
           rg_number?: string | null
           rg_state?: string | null
           status?: Database['public']['Enums']['status'] | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Update: {
@@ -1381,10 +1381,10 @@ export interface Database {
           city_state?: string | null
           complement?: string | null
           cpf?: string | null
-          created_at?: string
+          createdAt?: string
           deficiency?: Database['public']['Enums']['deficiency_type'] | null
           deficiency_description?: string | null
-          deleted_at?: string | null
+          deletedAt?: string | null
           docsType?: string | null
           email?: string | null
           ethnicity?: Database['public']['Enums']['ethnicity_type'] | null
@@ -1417,7 +1417,7 @@ export interface Database {
           rg_number?: string | null
           rg_state?: string | null
           status?: Database['public']['Enums']['status'] | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Relationships: []
@@ -1426,8 +1426,8 @@ export interface Database {
         Row: {
           address: string | null
           birthdate: string
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           email: string | null
           id: string
           metadata: Json | null
@@ -1437,14 +1437,14 @@ export interface Database {
           school_id: string
           showDetails: boolean | null
           status: Database['public']['Enums']['status'] | null
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
         }
         Insert: {
           address?: string | null
           birthdate: string
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           email?: string | null
           id?: string
           metadata?: Json | null
@@ -1454,14 +1454,14 @@ export interface Database {
           school_id: string
           showDetails?: boolean | null
           status?: Database['public']['Enums']['status'] | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Update: {
           address?: string | null
           birthdate?: string
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           email?: string | null
           id?: string
           metadata?: Json | null
@@ -1471,7 +1471,7 @@ export interface Database {
           school_id?: string
           showDetails?: boolean | null
           status?: Database['public']['Enums']['status'] | null
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Relationships: [
@@ -1534,38 +1534,38 @@ export interface Database {
       timetable: {
         Row: {
           classroom_id: string
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           discipline_id: string | null
           id: string
           metadata: Json | null
           name: string
           school_id: string
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
         }
         Insert: {
           classroom_id: string
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           discipline_id?: string | null
           id?: string
           metadata?: Json | null
           name: string
           school_id: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Update: {
           classroom_id?: string
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           discipline_id?: string | null
           id?: string
           metadata?: Json | null
           name?: string
           school_id?: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Relationships: [
@@ -1608,30 +1608,30 @@ export interface Database {
       }
       timetable_school: {
         Row: {
-          created_at: string
-          deleted_at: string | null
+          createdAt: string
+          deletedAt: string | null
           metadata: Json | null
           school_id: string
           timetable_id: string
-          updated_at: string | null
+          updatedAt: string | null
           user_created: string | null
         }
         Insert: {
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           metadata?: Json | null
           school_id: string
           timetable_id: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Update: {
-          created_at?: string
-          deleted_at?: string | null
+          createdAt?: string
+          deletedAt?: string | null
           metadata?: Json | null
           school_id?: string
           timetable_id?: string
-          updated_at?: string | null
+          updatedAt?: string | null
           user_created?: string | null
         }
         Relationships: [

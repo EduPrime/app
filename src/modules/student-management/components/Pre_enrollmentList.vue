@@ -20,7 +20,7 @@ const dataList = ref()
 // Nome da tabela e campos
 const pre_enrollment = ref< Tables<'pre_enrollment'> | []>([])
 const tableName = 'pre_enrollment'
-const fields = ['course_id', 'created_at', 'date_enrollment', 'deleted_at', 'id', 'observations', 'pre_enrollment_code', 'school_id', 'series_id', 'situation', 'status', 'student_id', 'updated_at']
+const fields = ['course_id', 'createdAt', 'date_enrollment', 'deletedAt', 'id', 'observations', 'pre_enrollment_code', 'school_id', 'series_id', 'situation', 'status', 'student_id', 'updatedAt']
 const router = useRouter()
 
 watch(
