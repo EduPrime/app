@@ -25,7 +25,7 @@ const selectedSegment = ref('general-info')
 const router = useRouter()
 const route = useRouter()
 const schoolData = ref< Tables<'school'> | []>([])
-const school_zone = ['Urbana', 'Rural']
+// const school_zone = ['Urbana', 'Rural']
 const schoolId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const schoolService = new SchoolService()
 const institutionService = new InstitutionService()
@@ -42,27 +42,27 @@ const formSchema = yup.object ({
     .required('Telefone é obrigatório')
     .matches(/^\(\d{2}\) \d{5}-\d{4}$/, 'Telefone inválido')
     .test('valid-ddd', 'DDD inválido', value => isValidDDD(value || '')),
-  email: yup
-    .string()
-    .nullable()
-    .email('Email inválido'),
-  website: yup
-    .string()
-    .nullable()
-    .url('Deve ser uma URL válida'),
-  social_network: yup
-    .string()
-    .nullable()
-    .url('Deve ser uma URL válida'),
+  // email: yup
+  //   .string()
+  //   .nullable()
+  //   .email('Email inválido'),
+  // website: yup
+  //   .string()
+  //   .nullable()
+  //   .url('Deve ser uma URL válida'),
+  // social_network: yup
+  //   .string()
+  //   .nullable()
+  //   .url('Deve ser uma URL válida'),
   address: yup
     .string()
     .required('Endereço é obrigatório'),
   city: yup
     .string()
     .required('Cidade é obrigatória'),
-  school_zone: yup
-    .string()
-    .required('Zona da Escola é obrigatória'),
+  // school_zone: yup
+  //   .string()
+  //   .required('Zona da Escola é obrigatória'),
   state: yup
     .string()
     .max(2)
@@ -125,11 +125,11 @@ async function registerSchool() {
   }
   else {
     const formData = {
-      institution_id: institutionId.value,
-      school_zone: values.school_zone,
-      email: values.email,
-      website: values.website,
-      social_network: values.social_network,
+      institutionid: institutionId.value,
+      // school_zone: values.school_zone,
+      // email: values.email,
+      // website: values.website,
+      // social_network: values.social_network,
       name: values.name,
       phone: values.phone,
       address: values.address,
@@ -222,16 +222,16 @@ async function getSchoolData() {
       setFieldValue('institution', schoolDbData.institution_id)
       setFieldValue('name', schoolDbData.name)
       setFieldValue('phone', schoolDbData.phone)
-      setFieldValue('email', schoolDbData.email)
-      setFieldValue('website', schoolDbData.website)
-      setFieldValue('social_network', schoolDbData.social_network)
+      // setFieldValue('email', schoolDbData.email)
+      // setFieldValue('website', schoolDbData.website)
+      // setFieldValue('social_network', schoolDbData.social_network)
       setFieldValue('address', schoolDbData.address)
       setFieldValue('city', schoolDbData.city)
       setFieldValue('state', schoolDbData.state)
       setFieldValue('postalcode', schoolDbData.postalcode)
-      setFieldValue('school_zone', schoolDbData.school_zone)
+      // setFieldValue('school_zone', schoolDbData.school_zone)
       setFieldValue('logourl', schoolDbData.logourl)
-      setFieldValue('school_zone', schoolDbData.school_zone)
+      // setFieldValue('school_zone', schoolDbData.school_zone)
       setFieldValue('abbreviation', schoolDbData.abbreviation)
     }
     else {
@@ -242,15 +242,15 @@ async function getSchoolData() {
 
     const schoolSettingsData = schoolSettingsDataArray && schoolSettingsDataArray[0]
     if (schoolSettingsData) {
-      institutionId.value = schoolSettingsData.institution_id
-      schoolId.value = schoolSettingsData.school_id
-      setFieldValue('institutionId', schoolSettingsData.institution_id)
-      setFieldValue('institution', schoolSettingsData.institution_id)
-      setFieldValue('school_days', schoolSettingsData.school_days)
-      setFieldValue('date_opening', schoolSettingsData.date_opening)
-      setFieldValue('date_closing', schoolSettingsData.date_closing)
-      setFieldValue('date_start', schoolSettingsData.date_start)
-      setFieldValue('date_end', schoolSettingsData.date_end)
+      institutionId.value = schoolSettingsData.institutionid
+      schoolId.value = schoolSettingsData.schoolid
+      setFieldValue('institutionId', schoolSettingsData.institutionid)
+      setFieldValue('institution', schoolSettingsData.institutionid)
+      setFieldValue('school_days', schoolSettingsData.schooldays)
+      setFieldValue('date_opening', schoolSettingsData.dateopening)
+      setFieldValue('date_closing', schoolSettingsData.dateclosing)
+      setFieldValue('date_start', schoolSettingsData.datestart)
+      setFieldValue('date_end', schoolSettingsData.dateend)
     }
     else {
       console.error(`Dados de configurações da escola não encontrados para o ID: ${schoolId.value}`)
@@ -318,16 +318,16 @@ onMounted(async () => {
     <EpInput v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome da escola" />
     <EpInput v-model="values.abbreviation" name="abbreviation" :mask="abbreviationMask" label="Abreviação*" placeholder="Digite a abreviação" />
     <EpInput v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone*" placeholder="(99) 99999-9999" />
-    <EpInput v-model="values.email" name="email" label="Email" placeholder="educacao@email.com" />
-    <EpInput v-model="values.website" name="website" label="Site" placeholder="escolaeducacao.com.br" />
-    <EpInput v-model="values.social_network" name="social_network" label="Rede Social" placeholder="Digite o link da rede social" />
+    <!-- <EpInput v-model="values.email" name="email" label="Email" placeholder="educacao@email.com" /> -->
+    <!-- <EpInput v-model="values.website" name="website" label="Site" placeholder="escolaeducacao.com.br" /> -->
+    <!-- <EpInput v-model="values.social_network" name="social_network" label="Rede Social" placeholder="Digite o link da rede social" /> -->
     <EpInput v-model="values.logourl" name="logourl" label="URL do Logo" placeholder="Digite a URL do logo" />
   </div>
 
   <div v-show="selectedSegment === 'location'">
     <EpInput v-model="values.address" name="address" label="Endereço*" placeholder="Digite o endereço" />
     <EpInput v-model="values.city" name="city" label="Cidade*" placeholder="Digite a cidade" />
-    <ion-list id="school_zone">
+    <!-- <ion-list id="school_zone">
       <ion-item>
         <IonSelect
           v-model="values.school_zone"
@@ -343,7 +343,7 @@ onMounted(async () => {
           </IonSelectOption>
         </IonSelect>
       </ion-item>
-    </ion-list>
+    </ion-list> -->
     <EpInput v-model="values.state" :maxlength="2" name="state" :mask="stateMask" label="Estado*" placeholder="Digite o estado" />
     <EpInput v-model="values.postalcode" name="postalcode" :mask="postalCodeMask" inputmode="number" label="CEP*" placeholder="00000-000" />
   </div>
