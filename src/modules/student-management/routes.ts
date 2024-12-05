@@ -1,12 +1,15 @@
 import { create, documentText, folder, swapHorizontal } from 'ionicons/icons'
 import DashboardEnrollment from './views/DashboardEnrollment.vue'
+import DashboardModal from './views/DashboardModal.vue'
 import DashboardPre_enrollment from './views/DashboardPre_enrollment.vue'
 import DashboardStudent from './views/DashboardStudent.vue'
 import EditEnrollment from './views/EditEnrollment.vue'
+import EditModal from './views/EditModal.vue'
 import EditPre_enrollment from './views/EditPre_enrollment.vue'
 import EditStudent from './views/EditStudent.vue'
 /* import MoveStudent from './views/MoveStudent.vue' */
 import RegisterEnrollment from './views/RegisterEnrollment.vue'
+import RegisterModal from './views/RegisterModal.vue'
 /* import RegisterPre_enrollment from './views/RegisterPre_enrollment.vue' */
 import RegisterStudent from './views/RegisterStudent.vue'
 
@@ -131,6 +134,43 @@ const routes = [
       icon: documentText,
       name: 'Editar Pré-matrícula',
       order: 6,
+      requiredRole: ['public', 'admin'],
+    },
+  },
+  {
+    path: '/student/modal',
+    name: 'ModalList',
+    component: DashboardModal,
+    meta: {
+      moduleName: 'Student',
+      moduleIcon: create,
+      icon: create,
+      name: 'Modal',
+      order: 7,
+      requiredRole: ['public'],
+    },
+  },
+  {
+    path: '/student/modal/register',
+    name: 'ModalRegister',
+    component: RegisterModal,
+    meta: {
+      moduleName: 'Student',
+      icon: create,
+      name: 'Novo Modal',
+      order: 8,
+      requiredRole: ['public', 'admin'],
+    },
+  },
+  {
+    path: '/student/modal/edit/:id',
+    name: 'ModalEdit',
+    component: EditModal,
+    meta: {
+      moduleName: 'Student',
+      icon: create,
+      name: 'Editar Modal',
+      order: 9,
       requiredRole: ['public', 'admin'],
     },
   },
