@@ -6,7 +6,7 @@ import InfoCards from '@/modules/student-management/components/InfoCards.vue'
 import ModalForm from '@/modules/student-management/components/ModalForm.vue'
 import ModalList from '@/modules/student-management/components/ModalList.vue'
 import { IonButton, IonIcon, IonSearchbar, IonSegment, IonSegmentButton, IonSelect, IonSelectOption } from '@ionic/vue'
-import { add } from 'ionicons/icons'
+import { add, chevronDownOutline } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import EnrollmentService from '../services/EnrollmentService'
@@ -47,6 +47,26 @@ function navigateToRegister() {
   router.push({ name: 'ModalRegister' })
 }
 
+const selectedAgeRange = ref<string | null>(null)
+
+const ageRanges = [
+  { label: 'Educação Infantil (0-5 anos)', value: '0-5' },
+  { label: 'Ensino Fundamental (6-14 anos)', value: '6-14' },
+  { label: 'Ensino Médio (15-17 anos)', value: '15-17' },
+  { label: 'Outras idades (18+ anos)', value: '18+' },
+]
+
+const filteredDataByAge = computed(() => {
+  if (!selectedAgeRange.value)
+    return dataList.value
+
+  const [minAge, maxAge] = selectedAgeRange.value.split('-').map(Number)
+  return dataList.value.filter((enrollment: Tables<'enrollment'>) => {
+    const age = enrollment.age
+    return age >= minAge && (maxAge ? age <= maxAge : true)
+  })
+})
+
 onMounted(() => {
   loadEnrollment()
 })
@@ -59,11 +79,21 @@ onMounted(() => {
       :teacher-count="teacherCount"
     />
     <ion-toolbar>
-      <ion-title>Alunos Matriculados ({{ filteredDataList.length }})</ion-title>
+      <ion-title>Solicitações de Matrícula ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
     <ion-row class="ion-align-items-center ion-justify-content-between">
       <ion-col size="10">
         <IonSearchbar v-model="searchQuery" placeholder="Buscar alunos" />
+      </ion-col>
+      <ion-col size="2">
+        <IonSelect v-model="selectedAgeRange" placeholder="Idade">
+          <IonSelectOption
+            v-for="range in ageRanges" :key="range.value"
+            :value="range.value"
+          >
+            {{ range.label }}
+          </IonSelectOption>
+        </IonSelect>
       </ion-col>
       <ion-col size="2" class="ion-text-end">
         <IonButton id="add-btn" expand="block" class="ion-text-uppercase">
@@ -91,5 +121,25 @@ ion-label h2 {
 
 ion-searchbar {
   --background: var(--ion-color-light);
+
+}
+
+ion-select {
+  --background: var(--ion-color-light);
+  --color: white; /* Cor do texto selecionado */
+  --padding-start: 16px;
+  --border-radius: 8px;
+  --icon-size: 24px;
+  margin-left: 8px;
+}
+
+ion-select::part(icon) {
+  color: var(--ion-color-dark);
+  margin-right: 8px;
+}
+
+ion-select-option {
+  padding: 8px 16px;
+  font-size: 14px;
 }
 </style>
