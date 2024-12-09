@@ -45,7 +45,7 @@ const seriesId = ref('')
 const studentId = ref('')
 const classroomId = ref('')
 const courseId = ref('')
-const pre_enrollmentData = ref< Tables<'pre_enrollment'> | []>([])
+const pre_enrollmentData = ref< Tables<'preenrollment'> | []>([])
 const gender = ['Masculino', 'Feminino']
 const status = ['Ativo', 'Inativo']
 const situation = ['Pendente', 'Cursando', 'Aprovado', 'Aprovado pelo Conselho', 'Aprovado com Dependência', 'Reprovado', 'Transferido', 'Abandono', 'Falecido']
@@ -140,22 +140,22 @@ async function registerPre_enrollment() {
       }
 
       const formData = {
-        school_id: schoolId.value,
-        classroom_id: classroomId.value,
-        series_id: seriesId.value,
-        student_id: studentId.value,
-        course_id: courseId.value,
-        date_enrollment: values.date_enrollment,
+        schoolId: schoolId.value,
+        classroomId: classroomId.value,
+        seriesId: seriesId.value,
+        studentId: studentId.value,
+        courseId: courseId.value,
+        datePreenrollment: values.date_enrollment,
         observations: values.observations,
         name: values.name,
         status: values.status,
         situation: values.situation,
-        pre_enrollment_code: pre_enrollment_code.value,
+        preenrollmentcode: pre_enrollment_code.value,
         gender: values.gender,
         birthdate: values.birthdate,
         ethnicity: values.ethnicity,
         deficiency: values.deficiency,
-        deficiency_description: values.deficiency_description,
+        deficiencyDescription: values.deficiency_description,
         period: values.period,
       }
 

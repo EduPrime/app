@@ -12,10 +12,10 @@ export default class Pre_enrollmentService extends BaseService<TabelaType> {
   // Método para buscar pré-matrículas com dados do aluno
   async getAllWithStudents() {
     const { data, error } = await this.client
-      .from('pre_enrollment')
+      .from('preenrollment')
       .select(`
         *,
-        student:student_id (name, address)
+        student:studentId (name, address)
       `) // Fazendo a seleção e o join com a tabela 'student'
 
     if (error) {
