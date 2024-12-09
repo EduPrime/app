@@ -40,6 +40,7 @@ const schoolList = ref()
 watch(() => props.query, async (qValue: string) => {
   if (qValue && qValue.length > 2) {
     schoolList.value = schoolList.value = await postgrest.searchSchools(qValue)
+    console.log('schoolList:', schoolList.value)
   }
   else {
     schoolList.value = await postgrest.getSchools()
