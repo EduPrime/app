@@ -9,12 +9,12 @@ export default class SeriesService extends BaseService<TabelaType> {
     super(table)
   }
 
-  async getSeries(course_id: string) {
+  async getSeries(courseId: string) {
     try {
       const { data, error } = await this.client
         .from('series')
         .select('*')
-        .eq('course_id', course_id)
+        .eq('courseId', courseId)
 
       if (error) {
         console.error(error)

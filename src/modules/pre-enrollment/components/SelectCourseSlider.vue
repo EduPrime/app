@@ -7,7 +7,7 @@ import { A11y, Navigation, Pagination, Scrollbar } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 
-import SchoolCourseService from '../services/School_courseService'
+import CourseService from '../services/CourseService'
 
 // Import Swiper styles
 import 'swiper/css'
@@ -35,7 +35,7 @@ interface Props {
   school: any
 }
 
-const postgrest = new SchoolCourseService()
+const postgrest = new CourseService()
 
 const courseList = ref()
 const boundledCourses = ref()
@@ -54,6 +54,7 @@ watch(() => props.school, async (value) => {
     // console.log('props.school:', value)
 
     courseList.value = await postgrest.getCoursesBySchoolId(props.school)
+
     // console.log('courseList atualizado:', courseList.value)
   }
 }, { immediate: true })

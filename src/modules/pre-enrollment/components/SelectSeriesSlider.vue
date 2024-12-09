@@ -42,9 +42,12 @@ const gSeries = ref()
 const boundledSeries = ref()
 
 function groupCourses(courses: any[]): any[] {
+  // Ordenar os cursos em ordem alfabética com base no nome
+  const sortedCourses = courses.sort((a, b) => a.name.localeCompare(b.name))
+
   const boundled = []
-  for (let i = 0; i < courses.length; i += 2) {
-    boundled.push({ items: courses.slice(i, i + 2) })
+  for (let i = 0; i < sortedCourses.length; i += 2) {
+    boundled.push({ items: sortedCourses.slice(i, i + 2) })
   }
   return boundled
 }

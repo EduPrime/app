@@ -9,9 +9,6 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
 import ClassroomService from '../services/ClassroomService'
-import Course_series_disciplineService from '../services/Course_series_disciplineService'
-import CourseService from '../services/CourseService'
-import InstitutionService from '../services/InstitutionService'
 import School_courseService from '../services/School_courseService'
 import SchoolService from '../services/SchoolService'
 import SeriesService from '../services/SeriesService'
@@ -29,42 +26,37 @@ const router = useRouter()
 const route = useRouter()
 const seriesId = ref('')
 const schoolId = ref('')
-const institutionId = ref('')
 const courseId = ref('')
-const teacherId = ref('')
+// const teacherId = ref('')
 const school = ref('')
 const classData = ref< Tables<'classroom'> | []>([])
 const selectedSegment = ref('general-info')
 const classList = ref<{ id: string, name: string }[]>([])
 const period = ['Manhã', 'Tarde', 'Noite']
-const status = ['Ativo', 'Inativo', 'Graduado', 'Suspenso', 'Transferido']
-const day_of_week = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+const status = ['ACTIVE', 'Inativo', 'Graduado', 'Suspenso', 'Transferido']
+const dayofweek = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
 const classroomService = new ClassroomService()
 const schoolService = new SchoolService()
 const seriesService = new SeriesService()
-const institutionService = new InstitutionService()
 const teacherService = new TeacherService()
-const courseService = new CourseService()
-const school_courseService = new School_courseService()
-const series_course_disciplineService = new Course_series_disciplineService()
 const seriesList = ref()
 const classroomList = ref()
-const institutionList = ref()
+// const institutionList = ref()
 const schoolList = ref()
-const teacherList = ref()
-const courseList = ref()
+// const teacherList = ref()
+// const courseList = ref()
 const classId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = yup.object({
   name: yup.string()
     .required('Nome da turma é obrigatório'),
   schoolId: yup.string()
     .required('Escola é obrigatória'),
-  courseId: yup.string()
-    .required('Curso é obrigatório'),
+  // courseId: yup.string()
+  //   .required('Curso é obrigatório'),
   seriesId: yup.string()
     .required('Série é obrigatória'),
-  teacherId: yup.string()
-    .required('Professor é obrigatório'),
+  // teacherId: yup.string()
+  //   .required('Professor é obrigatório'),
   status: yup.string()
     .required('Tipo de Turma é obrigatório'),
   year: yup
@@ -122,11 +114,11 @@ async function registerClass() {
   else {
     const formData = {
       name: values.name,
-      institution_id: institutionId.value,
-      school_id: schoolId.value,
-      course_id: courseId.value,
-      series_id: seriesId.value,
-      teacher_id: teacherId.value,
+      // institution_id: institutionId.value,
+      schoolId: schoolId.value,
+      // course_id: courseId.value,
+      seriesId: seriesId.value,
+      // teacher_id: teacherId.value,
       abbreviation: values.abbreviation,
       year: values.year,
       status: values.status,
@@ -135,7 +127,7 @@ async function registerClass() {
       startTimeInterval: values.startTimeInterval,
       endTimeInterval: values.endTimeInterval,
       endTime: values.endTime,
-      day_of_week: values.day_of_week,
+      dayofweek: values.day_of_week,
       period: values.period,
 
     }
@@ -173,16 +165,14 @@ async function registerClass() {
 
 async function loadClassroom() {
   try {
-    const [institutions, schools, courses, teachers, series, classrooms] = await Promise.all([
-      institutionService.getAll(),
+    const [schools, series, classrooms] = await Promise.all([
       schoolService.getAll(),
-      courseService.getAll(),
-      teacherService.getAll(),
+      // teacherService.getAll(),
       seriesService.getAll(),
       classroomService.getAll(),
     ])
 
-    console.log('Chegou', institutions)
+    console.log('Chegou', schools)
 
     // Função auxiliar para mapear os dados
     const mapData = (data: any, targetList: { value: any[] }) => {
@@ -192,15 +182,13 @@ async function loadClassroom() {
           name: item.name,
           period: item.period,
           status: item.status,
-          day_of_week: item.day_of_week,
+          dayofweek: item.day_of_week,
         }))
       }
     }
 
-    mapData(institutions, institutionList)
     mapData(schools, schoolList)
-    mapData(courses, courseList)
-    mapData(teachers, teacherList)
+    // mapData(teachers, teacherList)
     mapData(series, seriesList)
     mapData(classrooms, classroomList)
   }
@@ -213,22 +201,22 @@ async function getClassData() {
   if (classId.value) {
     const classDbData = await classroomService.getById(classId.value)
     if (classDbData) {
-      institutionId.value = classDbData.institution_id
-      schoolId.value = classDbData.school_id
-      courseId.value = classDbData.course_id
-      seriesId.value = classDbData.series_id
-      teacherId.value = classDbData.teacher_id
+      // institutionId.value = classDbData.institution_id
+      schoolId.value = classDbData.schoolId
+      // courseId.value = classDbData.course_id
+      seriesId.value = classDbData.seriesId
+      // teacherId.value = classDbData.teacher_id
       setFieldValue('name', classDbData.name)
-      setFieldValue('institutionId', classDbData.institution_id)
-      setFieldValue('institution', classDbData.institution_id)
-      setFieldValue('course', classDbData.course_id)
-      setFieldValue('school_id', classDbData.school_id)
-      setFieldValue('series_id', classDbData.series_id)
-      setFieldValue('teacher', classDbData.teacher_id)
-      setFieldValue('schoolId', classDbData.school_id)
-      setFieldValue('courseId', classDbData.course_id)
-      setFieldValue('seriesId', classDbData.series_id)
-      setFieldValue('teacherId', classDbData.teacher_id)
+      // setFieldValue('institutionId', classDbData.institution_id)
+      // setFieldValue('institution', classDbData.institution_id)
+      // setFieldValue('course', classDbData.course_id)
+      setFieldValue('schoolId', classDbData.schoolId)
+      setFieldValue('seriesId', classDbData.seriesId)
+      // setFieldValue('teacher', classDbData.teacher_id)
+      // setFieldValue('schoolId', classDbData.school_id)
+      // setFieldValue('courseId', classDbData.course_id)
+      // setFieldValue('seriesId', classDbData.series_id)
+      // setFieldValue('teacherId', classDbData.teacher_id)
       setFieldValue('abbreviation', classDbData.abbreviation)
       setFieldValue('year', classDbData.year)
       setFieldValue('status', classDbData.status)
@@ -237,7 +225,7 @@ async function getClassData() {
       setFieldValue('startTimeInterval', classDbData.startTimeInterval)
       setFieldValue('endTimeInterval', classDbData.endTimeInterval)
       setFieldValue('endTime', classDbData.endTime)
-      setFieldValue('day_of_week', classDbData.day_of_week)
+      setFieldValue('dayofweek', classDbData.day_of_week)
       setFieldValue('period', classDbData.period)
     }
     else {
@@ -248,6 +236,7 @@ async function getClassData() {
 
 async function loadSchools() {
   const schools = await schoolService.getAll()
+
   if (schools) {
     schoolList.value = schools.map((school: any) => ({
       id: school.id,
@@ -259,47 +248,8 @@ async function loadSchools() {
   }
 }
 
-async function loadInstitution() {
-  try {
-    const institutions = await institutionService.getAll()
-
-    if (institutions && institutions.length === 1) {
-      institutionId.value = institutions[0].id
-    }
-
-    if (institutions) {
-      institutionList.value = institutions.map((institution: any) => ({
-        id: institution.id,
-        name: institution.name,
-      }))
-    }
-  }
-  catch (error) {
-    console.error('Erro ao carregar dados:', error)
-  }
-}
-
-async function loadCoursesBySchool(schoolId: string) {
-  const courses = await school_courseService.getCoursesBySchool(schoolId)
-
-  if (courses.length === 0) {
-    showToast('Nenhum curso cadastrado para essa escola. É necessário realizar o cadastro.', 'top', 'warning')
-  }
-
-  courseList.value = courses.map((course: any) => ({
-    id: course.id,
-    name: course.name,
-  }))
-}
-
-watch(schoolId, async (newSchoolId) => {
-  if (newSchoolId) {
-    await loadCoursesBySchool(newSchoolId)
-  }
-})
-
-async function loadSeriesByCourse(courseId: string) {
-  const series = await series_course_disciplineService.getSeriesByCourse(courseId)
+async function loadSeriesBySchool(schoolId: string) {
+  const series = await seriesService.getSeriesBySchool(schoolId)
 
   if (series.length === 0) {
     showToast('Nenhuma série cadastrada para esse curso. É necessário realizar o cadastro.', 'top', 'warning')
@@ -311,28 +261,28 @@ async function loadSeriesByCourse(courseId: string) {
   }))
 }
 
-watch(courseId, async (newCourseId) => {
-  if (newCourseId) {
-    await loadSeriesByCourse(newCourseId)
+watch(schoolId, async (newSchoolId) => {
+  if (newSchoolId) {
+    await loadSeriesBySchool(newSchoolId)
   }
 })
 
 onMounted(async () => {
-  await loadInstitution()
+  // await loadInstitution()
   await loadSchools()
   await loadClassroom()
   if (classId.value) {
     await getClassData()
-    if (institutionId.value)
-      setFieldValue('institutionId', institutionId.value)
+    // if (institutionId.value)
+    //   setFieldValue('institutionId', institutionId.value)
     if (schoolId.value)
       setFieldValue('schoolId', schoolId.value)
-    if (courseId.value)
-      setFieldValue('courseId', courseId.value)
+    // if (courseId.value)
+    //   setFieldValue('courseId', courseId.value)
     if (seriesId.value)
       setFieldValue('seriesId', seriesId.value)
-    if (teacherId.value)
-      setFieldValue('teacherId', teacherId.value)
+    // if (teacherId.value)
+    //   setFieldValue('teacherId', teacherId.value)
   }
 })
 </script>
@@ -372,25 +322,6 @@ onMounted(async () => {
     </ion-list>
     <EpInput v-model="values.maxStudents" name="maxStudents" label="Máximo de Alunos*" type="number" placeholder="Digite o número máximo de alunos" />
 
-    <ion-list id="institutionList">
-      <IonSelect
-        v-model="institutionId"
-        :disabled="true"
-        cancel-text="Cancelar"
-        fill="outline"
-        label-placement="floating"
-        justify="space-between"
-        label="Instituição*"
-        placeholder="Selecione a instituição"
-        @ion-change="(e) => {
-          setFieldValue('institutionId', e.detail.value)
-        }"
-      >
-        <IonSelectOption v-for="institution in institutionList" :key="institution.id" :value="institution.id">
-          {{ institution.name }}
-        </IonSelectOption>
-      </IonSelect>
-    </ion-list>
     <ion-list id="schoolList">
       <IonSelect
         v-model="schoolId"
@@ -409,29 +340,10 @@ onMounted(async () => {
         </IonSelectOption>
       </IonSelect>
     </ion-list>
-    <ion-list id="courseList">
-      <IonSelect
-        v-model="courseId"
-        :disabled="!schoolId"
-        cancel-text="Cancelar"
-        fill="outline"
-        label-placement="floating"
-        justify="space-between"
-        label="Curso*"
-        placeholder="Selecione o curso"
-        @ion-change="(e) => {
-          setFieldValue('courseId', e.detail.value)
-        }"
-      >
-        <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
-          {{ course.name }}
-        </IonSelectOption>
-      </IonSelect>
-    </ion-list>
     <ion-list id="seriesList">
       <IonSelect
         v-model="seriesId"
-        :disabled="!courseId"
+        :disabled="!schoolId"
         cancel-text="Cancelar"
         fill="outline"
         label-placement="floating"
@@ -447,7 +359,7 @@ onMounted(async () => {
         </IonSelectOption>
       </IonSelect>
     </ion-list>
-    <ion-list id="teacherList">
+    <!-- <ion-list id="teacherList">
       <IonSelect
         v-model="teacherId"
         cancel-text="Cancelar"
@@ -464,7 +376,7 @@ onMounted(async () => {
           {{ teacher.name }}
         </IonSelectOption>
       </IonSelect>
-    </ion-list>
+    </ion-list> -->
   </div>
   <div v-show="selectedSegment === 'class-info'">
     <EpInput v-model="values.startTime" name="startTime" label="Hora Inicial" type="time" placeholder="Digite a hora inicial" />
@@ -483,8 +395,8 @@ onMounted(async () => {
         placeholder="Selecione os dias da semana"
         @ion-change="(e) => setFieldValue('day_of_week', e.target.value)"
       >
-        <IonSelectOption v-for="day_of_week in day_of_week" :key="day_of_week" :value="day_of_week">
-          {{ day_of_week }}
+        <IonSelectOption v-for="dayofweek in dayofweek" :key="dayofweek" :value="dayofweek">
+          {{ dayofweek }}
         </IonSelectOption>
       </IonSelect>
     </ion-list>
