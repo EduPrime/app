@@ -1,27 +1,53 @@
 <script setup lang="ts">
+import ClassroomService from '@/modules/school-management/services/ClassroomService'
 import SchoolService from '@/modules/school-management/services/SchoolService'
+import SeriesService from '@/modules/school-management/services/SeriesService'
 import { IonIcon } from '@ionic/vue'
-import { businessOutline, list, peopleOutline, searchCircle } from 'ionicons/icons'
+import { businessOutline, list, peopleOutline } from 'ionicons/icons'
 import { computed, defineEmits, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 
 const emits = defineEmits(['update:modelValue'])
 
 const schoolInput = ref('')
 const seriesInput = ref('')
-const shiftInput = ref('')
-const showResults = ref(false)
+const classroomInput = ref('')
+const showSchoolResults = ref(false)
+const showSeriesResults = ref(false)
+const showClassroomResults = ref(false)
 
-// Adicionando a funcionalidade de pesquisa de escolas
+// Adicionando a funcionalidade de pesquisa de escolas, séries e turmas
 const schoolService = new SchoolService()
+const seriesService = new SeriesService()
+const classroomService = new ClassroomService()
+
 const schoolList = ref([])
+const seriesList = ref([])
+const classroomList = ref([])
 
 const filteredSchoolList = computed(() => {
   if (schoolInput.value.length < 3) {
     return []
   }
-
   return schoolList.value.filter((school: any) =>
     school.name.toLowerCase().includes(schoolInput.value.toLowerCase()),
+  )
+})
+
+const filteredSeriesList = computed(() => {
+  if (seriesInput.value.length < 3) {
+    return []
+  }
+  return seriesList.value.filter((series: any) =>
+    series.name.toLowerCase().includes(seriesInput.value.toLowerCase()),
+  )
+})
+
+const filteredClassroomList = computed(() => {
+  if (classroomInput.value.length < 3) {
+    return []
+  }
+  return classroomList.value.filter((classroom: any) =>
+    classroom.name.toLowerCase().includes(classroomInput.value.toLowerCase()),
   )
 })
 
@@ -35,8 +61,30 @@ async function loadSchools() {
   }
 }
 
+async function loadSeries() {
+  try {
+    const series = await seriesService.getAll()
+    seriesList.value = series ?? []
+  }
+  catch (error) {
+    console.error('Erro ao carregar as séries:', error)
+  }
+}
+
+async function loadClassrooms() {
+  try {
+    const classrooms = await classroomService.getAll()
+    classroomList.value = classrooms ?? []
+  }
+  catch (error) {
+    console.error('Erro ao carregar as turmas:', error)
+  }
+}
+
 onMounted(() => {
   loadSchools()
+  loadSeries()
+  loadClassrooms()
   document.addEventListener('click', handleClickOutside)
 })
 
@@ -45,20 +93,40 @@ onBeforeUnmount(() => {
 })
 
 function handleClickOutside(event: MouseEvent) {
-  const inputWrapper = document.querySelector('.input-wrapper')
-  if (inputWrapper && !inputWrapper.contains(event.target as Node)) {
-    showResults.value = false
+  const inputWrapper = document.querySelectorAll('.input-wrapper')
+  let clickedInside = false
+
+  inputWrapper.forEach((wrapper) => {
+    if (wrapper.contains(event.target as Node)) {
+      clickedInside = true
+    }
+  })
+
+  if (!clickedInside) {
+    showSchoolResults.value = false
+    showSeriesResults.value = false
+    showClassroomResults.value = false
   }
 }
 
 function selectSchool(schoolName: string) {
   schoolInput.value = schoolName
-  showResults.value = false
+  showSchoolResults.value = false
 }
 
-watch([schoolInput, seriesInput, shiftInput], ([newSchool, newSeries, newShift]) => {
-  if (newSchool || newSeries || newShift) {
-    emits('update:modelValue', { school: newSchool, series: newSeries, shift: newShift })
+function selectSeries(seriesName: string) {
+  seriesInput.value = seriesName
+  showSeriesResults.value = false
+}
+
+function selectClassroom(classroomName: string) {
+  classroomInput.value = classroomName
+  showClassroomResults.value = false
+}
+
+watch([schoolInput, seriesInput, classroomInput], ([newSchool, newSeries, newClassroom]) => {
+  if (newSchool || newSeries || newClassroom) {
+    emits('update:modelValue', { school: newSchool, series: newSeries, classroom: newClassroom })
   }
 }, { immediate: true })
 </script>
@@ -68,8 +136,8 @@ watch([schoolInput, seriesInput, shiftInput], ([newSchool, newSeries, newShift])
     <ion-row>
       <ion-col size="12" size-lg="6" class="input-col">
         <div class="input-wrapper">
-          <ion-searchbar v-model="schoolInput" color="secondary" :search-icon="businessOutline" class="filter-content-input text-input-start school-input" placeholder="Escola" @ion-focus="showResults = true" />
-          <ion-list v-if="showResults && filteredSchoolList.length" class="results-list">
+          <ion-searchbar v-model="schoolInput" color="secondary" :search-icon="businessOutline" class="filter-content-input text-input-start school-input" placeholder="Escola" @ion-focus="showSchoolResults = true" />
+          <ion-list v-if="showSchoolResults && filteredSchoolList.length > 0" class="results-list school-results">
             <ion-item v-for="school in filteredSchoolList" :key="school.id" @click="selectSchool(school.name)">
               {{ school.name }}
             </ion-item>
@@ -77,14 +145,24 @@ watch([schoolInput, seriesInput, shiftInput], ([newSchool, newSeries, newShift])
         </div>
       </ion-col>
       <ion-col size="6" size-lg="3" class="input-col">
-        <ion-input v-model="seriesInput" class="ion-padding-horizontal filter-content-input text-input-start series-input" placeholder="Série">
-          <IonIcon slot="start" color="lightaccent" class="input-icon" :ios="list" :md="list" />
-        </ion-input>
+        <div class="input-wrapper">
+          <ion-searchbar v-model="seriesInput" color="tertiary" :search-icon="list" class="filter-content-input text-input-start series-input" placeholder="Série" @ion-focus="showSeriesResults = true" />
+          <ion-list v-if="showSeriesResults && filteredSeriesList.length > 0" class="results-list series-results">
+            <ion-item v-for="series in filteredSeriesList" :key="series.id" @click="selectSeries(series.name)">
+              {{ series.name }}
+            </ion-item>
+          </ion-list>
+        </div>
       </ion-col>
       <ion-col size="6" size-lg="3" class="input-col">
-        <ion-input v-model="shiftInput" class="ion-padding-horizontal filter-content-input text-input-start shift-input" placeholder="Turma">
-          <IonIcon slot="start" color="lightaccent" class="input-icon" :ios="peopleOutline" :md="peopleOutline" />
-        </ion-input>
+        <div class="input-wrapper">
+          <ion-searchbar v-model="classroomInput" color="primary" :search-icon="peopleOutline" class="filter-content-input text-input-start classroom-input" placeholder="Turma" @ion-focus="showClassroomResults = true" />
+          <ion-list v-if="showClassroomResults && filteredClassroomList.length > 0" class="results-list classroom-results">
+            <ion-item v-for="classroom in filteredClassroomList" :key="classroom.id" @click="selectClassroom(classroom.name)">
+              {{ classroom.name }}
+            </ion-item>
+          </ion-list>
+        </div>
       </ion-col>
     </ion-row>
   </ion-grid>
@@ -110,14 +188,14 @@ watch([schoolInput, seriesInput, shiftInput], ([newSchool, newSeries, newShift])
   background-color: var(--ion-color-tertiary); width: 100%; height: 100%; border-bottom-left-radius: 5px;
 }
 
-.shift-input {
+.classroom-input {
   background-color: var(--ion-color-primary); width: 100%; height: 100%; border-bottom-right-radius: 5px;
 }
 
 /* Estilo para o texto dos placeholders */
 .school-input::placeholder,
 .series-input::placeholder,
-.shift-input::placeholder {
+.classroom-input::placeholder {
   color: white; /* Cor do texto do placeholder */
   opacity: 1;   /* Garante que o placeholder seja visível */
 }
@@ -125,14 +203,14 @@ watch([schoolInput, seriesInput, shiftInput], ([newSchool, newSeries, newShift])
 /* Estilo para o texto digitado */
 .school-input,
 .series-input,
-.shift-input {
+.classroom-input {
   color: white; /* Cor do texto digitado */
 }
 
 /* Wrapper para o input e a lista de resultados */
 .input-wrapper {
   position: relative;
-  width: 100%;
+  width: 100%;;
 }
 
 /* Estilo para a lista de resultados */
@@ -141,7 +219,6 @@ watch([schoolInput, seriesInput, shiftInput], ([newSchool, newSeries, newShift])
   top: 100%;
   left: 0;
   z-index: 1000;
-  background-color: var(--ion-color-secondary);
   width: 100%;
   max-height: 200px;
   overflow-y: auto;
@@ -149,8 +226,20 @@ watch([schoolInput, seriesInput, shiftInput], ([newSchool, newSeries, newShift])
   border-bottom-right-radius: 5px;
 }
 
+.school-results {
+  background-color: var(--ion-color-secondary);
+}
+
+.series-results {
+  background-color: var(--ion-color-tertiary);
+}
+
+.classroom-results {
+  background-color: var(--ion-color-primary);
+}
+
 ion-item {
-  --background: var(--ion-color-secondary);
+  --background: transparent;
   color: white;
 }
 

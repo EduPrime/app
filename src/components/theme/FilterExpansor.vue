@@ -34,9 +34,18 @@ function handleAccordionChange(event: CustomEvent) {
           </ion-button>
         </div>
       </div>
-      <div id="accordionContent" slot="content" style="background-color: #F9D3E350; box-shadow: inset 0 -5px 6px rgba(0, 0, 0, 0.2);" class="ion-padding-horizontal ion-padding-bottom">
+      <div id="accordionContent" slot="content" class="accordion-content">
         <slot />
       </div>
     </IonAccordion>
   </IonAccordionGroup>
 </template>
+
+<style scoped>
+.accordion-content {
+  background-color: #F9D3E350;
+  box-shadow: inset 0 -5px 6px rgba(0, 0, 0, 0.2);
+  padding: 16px; /* Ajuste o padding conforme necessário */
+  height: 200px; /* Ajuste a altura conforme necessário */
+}
+</style>
