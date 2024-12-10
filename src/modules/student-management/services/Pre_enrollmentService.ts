@@ -1,6 +1,6 @@
 import BaseService from '@/services/BaseService'
 
-const table = 'pre_enrollment' as const
+const table = 'preenrollment' as const
 
 type TabelaType = typeof table
 

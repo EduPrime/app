@@ -34,6 +34,9 @@ export default class StudentService extends BaseService<TabelaType> {
         .from('student')
         .insert([student])
         .select('id') // Seleciona o ID do novo registro
+
+      console.log(data, 'Insert Student')
+
       return data
     }
     catch (error: unknown | any) {
@@ -42,7 +45,7 @@ export default class StudentService extends BaseService<TabelaType> {
     }
   }
 
-  async getStudentId(student: { cpf?: any, birth_certificate?: any, rg_number?: any }) {
+  async getStudentId(student: { cpf?: any, birthCertificate?: any, rgNumber?: any }) {
     try {
       let query = this.client
         .from('student')
@@ -51,11 +54,11 @@ export default class StudentService extends BaseService<TabelaType> {
       if (student.cpf) {
         query = query.eq('cpf', student.cpf)
       }
-      else if (student.birth_certificate) {
-        query = query.eq('birth_certificate', student.birth_certificate)
+      else if (student.birthCertificate) {
+        query = query.eq('birthCertificate', student.birthCertificate)
       }
-      else if (student.rg_number) {
-        query = query.eq('rg_number', student.rg_number)
+      else if (student.rgNumber) {
+        query = query.eq('rgNumber', student.rgNumber)
       }
       else {
         throw new Error('Nenhum campo de identificação fornecido')

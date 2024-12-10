@@ -64,11 +64,11 @@ const states = [
   'SE', // Sergipe
   'TO', // Tocantins
 ]
-const genders = ['Masculino', 'Feminino']
+const genders = ['M', 'F']
 const responsibles = ['Pai', 'Mãe', 'Ambos', 'Outro']
-const residence_zone = ['Urbana', 'Rural']
-const races = ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena', 'Não declarada']
-const deficiencies = ['Visual', 'Auditiva', 'Física', 'Intelectual', 'Mental', 'Múltipla', 'Outros', 'Não possui']
+const residenceZone = ['Urbana', 'Rural']
+// const races = ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena', 'Não declarada']
+// const deficiencies = ['Visual', 'Auditiva', 'Física', 'Intelectual', 'Mental', 'Múltipla', 'Outros', 'Não possui']
 
 const student = ref(
   {
@@ -77,11 +77,11 @@ const student = ref(
     phone: undefined as string | number | undefined,
     email: undefined as string | undefined,
     city: undefined as string | undefined,
-    cityState: undefined as string | undefined,
+    citystate: undefined as string | undefined,
     address: undefined as string | undefined,
-    postalcode: undefined as string | number | undefined,
-    deficiency: undefined as string | undefined,
-    ethnicity: undefined as string | undefined,
+    postalCode: undefined as string | number | undefined,
+    // deficiency: undefined as string | undefined,
+    // ethnicity: undefined as string | undefined,
     gender: undefined as string | undefined,
     residenceZone: undefined as string | undefined,
     responsibleType: undefined as string | undefined,
@@ -103,7 +103,7 @@ watch(result, async (value) => {
   }
   else if (value && value.status === 409) {
     finished.value = false
-    codPreEnrollment.value = `pre-${generateRandomCode()}`
+    codPreEnrollment.value = `PRE-${generateRandomCode()}`
     if (value.error.code === '23505') {
       emits('postStatus', {
         loading: false,
@@ -132,7 +132,7 @@ watch(shiftPreference, (value) => {
 }, { immediate: true })
 
 async function submitForm() {
-  if (student.value.name && student.value.birthdate && student.value.phone && (student.value.cpf || student.value.rg_number || student.value.birth_certificate)) {
+  if (student.value.name && student.value.birthdate && student.value.phone && (student.value.cpf || student.value.rgNumber || student.value.birthCertificate)) {
     result.value = await postStudent(student.value)
     if (result.value && result.value.status === 201) {
       emits('postStatus', { loading: true })
@@ -214,7 +214,7 @@ onMounted(async () => {
         </IonItem>
       </IonCol>
 
-      <IonCol size="12" size-md="6">
+      <!-- <IonCol size="12" size-md="6">
         <IonItem>
           <IonSelect v-model="student.ethnicity" label="Etnia" label-placement="floating">
             <IonSelectOption v-for="race in races" :key="race" :value="race">
@@ -222,9 +222,9 @@ onMounted(async () => {
             </IonSelectOption>
           </IonSelect>
         </IonItem>
-      </IonCol>
+      </IonCol> -->
 
-      <IonCol size="12" size-md="6">
+      <!-- <IonCol size="12" size-md="6">
         <IonItem>
           <IonSelect v-model="student.deficiency" label="Necessidade especial" label-placement="floating">
             <IonSelectOption v-for="deficiency in deficiencies" :key="deficiency" :value="deficiency">
@@ -233,7 +233,7 @@ onMounted(async () => {
             </IonSelectOption>
           </IonSelect>
         </IonItem>
-      </IonCol>
+      </IonCol> -->
 
       <IonCol size="12" size-md="6">
         <IonItem>
@@ -317,11 +317,11 @@ onMounted(async () => {
             label-placement="floating"
           />
           <IonInput
-            v-else-if="docModel === 'rg'" v-model="student.rg_number" type="text" label="Numero do RG"
+            v-else-if="docModel === 'rg'" v-model="student.rgNumber" type="text" label="Numero do RG"
             label-placement="floating"
           />
           <IonInput
-            v-else-if="docModel === 'certidao'" v-model="student.birth_certificate" type="text"
+            v-else-if="docModel === 'certidao'" v-model="student.birthCertificate" type="text"
             label="Certidão de Nascimento" label-placement="floating"
           />
         </IonItem>
@@ -345,7 +345,7 @@ onMounted(async () => {
       <IonCol size="12" size-md="6">
         <IonItem>
           <IonInput
-            v-model="student.postalcode" v-mask="'#####-###'" type="text" label="CEP"
+            v-model="student.postalCode" v-mask="'#####-###'" type="text" label="CEP"
             label-placement="floating"
           />
         </IonItem>
@@ -353,8 +353,8 @@ onMounted(async () => {
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonSelect v-model="student.residence_zone" label="Zona Residencial" label-placement="floating">
-            <IonSelectOption v-for="zone in residence_zone" :key="zone" :value="zone">
+          <IonSelect v-model="student.residenceZone" label="Zona Residencial" label-placement="floating">
+            <IonSelectOption v-for="zone in residenceZone" :key="zone" :value="zone">
               {{ zone }}
             </IonSelectOption>
           </IonSelect>
@@ -369,7 +369,7 @@ onMounted(async () => {
 
       <IonCol size="4" size-md="2">
         <IonItem>
-          <IonSelect v-model="student.city_state" label="Estado" label-placement="floating">
+          <IonSelect v-model="student.citystate" label="Estado" label-placement="floating">
             <IonSelectOption v-for="state in states" :key="state" :value="state">
               {{ state }}
             </IonSelectOption>
