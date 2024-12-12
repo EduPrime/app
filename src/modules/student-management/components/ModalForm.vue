@@ -21,7 +21,7 @@ defineEmits<{
 }>()
 
 defineExpose({
-  registerPre_enrollment,
+  registerModal,
 })
 
 const router = useRouter()
@@ -125,7 +125,7 @@ const { values, errors, validate, setFieldValue } = useForm<any>({
   validationSchema: formSchema,
 })
 
-async function registerPre_enrollment() {
+async function registerModal() {
   const validationResult = await validate()
 
   if (!validationResult.valid) {

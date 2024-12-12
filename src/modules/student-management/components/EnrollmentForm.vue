@@ -59,9 +59,9 @@ const currentYear = 2025
 const minDate = `${currentYear}-01-01`
 const maxDate = `${currentYear}-12-31`
 function enforceYear() {
-  const selectedDate = new Date(values.date_enrollment)
+  const selectedDate = new Date(values.dateEnrollment)
   if (selectedDate.getFullYear() !== currentYear) {
-    setFieldValue('date_enrollment', `${currentYear}-01-01`)
+    setFieldValue('dateEnrollment', `${currentYear}-01-01`)
   }
 }
 const searchQuery = ref('')
@@ -72,7 +72,7 @@ const seriesList = ref()
 const courseList = ref()
 const enrollmentId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = yup.object({
-  date_enrollment: yup.date()
+  dateEnrollment: yup.date()
     .required('Data de matrícula é obrigatória')
     .typeError('Data de matrícula inválida'),
   observations: yup.string()
@@ -116,12 +116,12 @@ async function registerEnrollment() {
       }
 
       const formData = {
-        school_id: schoolId.value,
-        classroom_id: classroomId.value,
-        series_id: seriesId.value,
-        student_id: studentId.value,
-        course_id: courseId.value,
-        date_enrollment: values.date_enrollment,
+        schoolId: schoolId.value,
+        classroomId: classroomId.value,
+        seriesId: seriesId.value,
+        studentId: studentId.value,
+        courseId: courseId.value,
+        dateEnrollment: values.dateEnrollment,
         observations: values.observations,
         name: values.name,
         status: values.status,
@@ -202,7 +202,7 @@ async function loadStudents() {
       enrollmentService.getAll(),
     ])
 
-    const enrolledStudentIds = enrollments ? enrollments.map(enrollment => enrollment.student_id) : []
+    const enrolledStudentIds = enrollments ? enrollments.map(enrollment => enrollment.studentId) : []
 
     studentList.value = (students ?? []).map(student => ({
       ...student,
@@ -279,27 +279,27 @@ async function getEnrollmentData() {
   if (enrollmentId.value) {
     const enrollmentDbData = await enrollmentService.getById(enrollmentId.value)
     if (enrollmentDbData) {
-      schoolId.value = enrollmentDbData.school_id
-      classroomId.value = enrollmentDbData.classroom_id
-      seriesId.value = enrollmentDbData.series_id
-      studentId.value = enrollmentDbData.student_id
-      courseId.value = enrollmentDbData.course_id
+      schoolId.value = enrollmentDbData.schoolId
+      classroomId.value = enrollmentDbData.classroomId
+      seriesId.value = enrollmentDbData.seriesId
+      studentId.value = enrollmentDbData.studentId
+      courseId.value = enrollmentDbData.courseId
       enrollmentCode.value = enrollmentDbData.enrollmentCode ?? ''
-      setFieldValue('date_enrollment', enrollmentDbData.date_enrollment)
+      setFieldValue('dateEnrollment', enrollmentDbData.dateEnrollment)
       setFieldValue('observations', enrollmentDbData.observations)
       setFieldValue('school_id', enrollmentDbData.school_id)
-      setFieldValue('schoolId', enrollmentDbData.school_id)
-      setFieldValue('seriesId', enrollmentDbData.series_id)
+      setFieldValue('schoolId', enrollmentDbData.schoolId)
+      setFieldValue('seriesId', enrollmentDbData.seriesId)
       setFieldValue('classroom_id', enrollmentDbData.classroom_id)
-      setFieldValue('classroomId', enrollmentDbData.classroom_id)
-      setFieldValue('studentId', enrollmentDbData.student_id)
-      setFieldValue('courseId', enrollmentDbData.course_id)
+      setFieldValue('classroomId', enrollmentDbData.classroomId)
+      setFieldValue('studentId', enrollmentDbData.studentId)
+      setFieldValue('courseId', enrollmentDbData.courseId)
       setFieldValue('name', enrollmentDbData.name)
       setFieldValue('status', enrollmentDbData.status)
       setFieldValue('situation', enrollmentDbData.situation)
       setFieldValue('enrollmentCode', enrollmentDbData.enrollmentCode)
 
-      const student = await studentService.getById(enrollmentDbData.student_id)
+      const student = await studentService.getById(enrollmentDbData.studentId)
       if (student) {
         setFieldValue('name', student.name)
         searchQuery.value = ''
@@ -352,7 +352,7 @@ watch(schoolId, async (newSchoolId) => {
 
 onMounted(async () => {
   const defaultDate = `${currentYear}-01-01`
-  setFieldValue('date_enrollment', defaultDate)
+  setFieldValue('dateEnrollment', defaultDate)
   await loadEnrollment()
   await loadStudents()
   if (enrollmentId.value) {
@@ -491,8 +491,8 @@ onMounted(async () => {
     </ion-list>
 
     <EpInput
-      v-model="values.date_enrollment"
-      name="date_enrollment"
+      v-model="values.dateEnrollment"
+      name="dateEnrollment"
       label="Data da Matrícula*"
       type="date"
       :max="maxDate"

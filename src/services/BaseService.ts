@@ -4,11 +4,11 @@ const REST_URL = import.meta.env.VITE_POSTGREST_URL
 
 const postgrest = new PostgrestClient(REST_URL)
 
-export default class BaseService {
+export default class BaseService<T extends string> {
   protected client: PostgrestClient
-  protected table
+  protected table: T
 
-  constructor(table: string) {
+  constructor(table: T) {
     this.table = table
     this.client = postgrest
   }
@@ -65,7 +65,7 @@ export default class BaseService {
       const { data, error } = await this.client
         .from(this.table)
         .select('*')
-        .eq('school_id', schoolId)
+        .eq('schoolId', schoolId)
         .is('deletedAt', null)
 
       if (error)
@@ -73,8 +73,8 @@ export default class BaseService {
       return data as [] | null
     }
     catch (error) {
-      console.error(`Erro ao buscar registros por school_id na tabela ${this.table}:`, error)
-      throw new Error(`Failed to fetch records by school_id from ${this.table}`)
+      console.error(`Erro ao buscar registros por schoolId na tabela ${this.table}:`, error)
+      throw new Error(`Failed to fetch records by schoolId from ${this.table}`)
     }
   }
 
