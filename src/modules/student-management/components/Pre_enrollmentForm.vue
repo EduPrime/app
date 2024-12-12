@@ -27,32 +27,32 @@ defineExpose({
 const router = useRouter()
 const route = useRouter()
 const responsibleType = ref(null)
-const valuesDeficiency = ref({
-  deficiency_description: '',
-})
+// const valuesDeficiency = ref({
+//   deficiency_description: '',
+// })
 const valuesType = ref({
-  father_name: '',
-  father_cpf: '',
-  father_email: '',
-  father_phone: '',
-  mother_name: '',
-  mother_cpf: '',
-  mother_email: '',
-  mother_phone: '',
+  fatherName: '',
+  fatherCpf: '',
+  fatherEmail: '',
+  fatherPhone: '',
+  motherName: '',
+  motherCpf: '',
+  motherEmail: '',
+  motherPhone: '',
 })
 const schoolId = ref('')
 const seriesId = ref('')
 const studentId = ref('')
-const classroomId = ref('')
+// const classroomId = ref('')
 const courseId = ref('')
-const pre_enrollmentData = ref< Tables<'pre_enrollment'> | []>([])
+const pre_enrollmentData = ref< Tables<'preenrollment'> | []>([])
 const gender = ['Masculino', 'Feminino']
 const status = ['Ativo', 'Inativo']
 const situation = ['Pendente', 'Cursando', 'Aprovado', 'Aprovado pelo Conselho', 'Aprovado com Dependência', 'Reprovado', 'Transferido', 'Abandono', 'Falecido']
 const residence_zone = ['Urbana', 'Rural']
 const marital_status = ['Solteiro', 'Casado', 'Divorciado', 'Viúvo', 'Separado', 'União Estável', 'Não Informado']
-const ethnicity = ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena', 'Não declarada']
-const deficiency = ['Visual', 'Auditiva', 'Física', 'Intelectual', 'Mental', 'Múltipla', 'Outros', 'Não possui']
+// const ethnicity = ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena', 'Não declarada']
+// const deficiency = ['Visual', 'Auditiva', 'Física', 'Intelectual', 'Mental', 'Múltipla', 'Outros', 'Não possui']
 const period = ['Manhã', 'Tarde', 'Noite']
 const selectedSegment = ref('general-info')
 const classroomService = new ClassroomService()
@@ -75,7 +75,7 @@ function enforceYear() {
 const searchQuery = ref('')
 const schoolList = ref()
 const studentList = ref()
-const pre_enrollment_code = ref('')
+const preenrollmentcode = ref('')
 const seriesList = ref()
 const courseList = ref()
 const pre_enrollmentId = computed(() => route.currentRoute.value.params.id) as { value: string }
@@ -85,12 +85,12 @@ const formSchema = yup.object({
     .typeError('Data de pré-matrícula inválida'),
   observations: yup.string()
     .nullable(),
-  pre_enrollment_code: yup.string()
+  preenrollmentcode: yup.string()
     .nullable(),
   schoolId: yup.string()
     .required('Escola é obrigatória'),
-  classroomId: yup.string()
-    .required('Turma é obrigatória'),
+  // classroomId: yup.string()
+  //   .required('Turma é obrigatória'),
   seriesId: yup.string()
     .required('Série é obrigatória'),
   // status: yup.string()
@@ -108,14 +108,14 @@ const formSchema = yup.object({
   birthdate: yup.date()
     .required('Data de nascimento é obrigatória')
     .typeError('Data de nascimento inválida'),
-  ethnicity: yup.string()
-    .nullable()
-    .required('Etnia é obrigatória'),
-  deficiency: yup.string()
-    .nullable()
-    .required('Necessário informar se possui necessidades'),
-  deficiency_description: yup.string()
-    .nullable(),
+  // ethnicity: yup.string()
+  //   .nullable()
+  //   .required('Etnia é obrigatória'),
+  // deficiency: yup.string()
+  //   .nullable()
+  //   .required('Necessário informar se possui necessidades'),
+  // deficiency_description: yup.string()
+  //   .nullable(),
   period: yup.string()
     .nullable()
     .required('Período é obrigatório'),
@@ -140,23 +140,21 @@ async function registerPre_enrollment() {
       }
 
       const formData = {
-        school_id: schoolId.value,
-        classroom_id: classroomId.value,
-        series_id: seriesId.value,
-        student_id: studentId.value,
-        course_id: courseId.value,
-        date_enrollment: values.date_enrollment,
+        schoolId: schoolId.value,
+        seriesId: seriesId.value,
+        studentId: studentId.value,
+        courseId: courseId.value,
+        datePreenrollment: values.date_enrollment,
         observations: values.observations,
-        name: values.name,
         status: values.status,
         situation: values.situation,
-        pre_enrollment_code: pre_enrollment_code.value,
+        preenrollmentcode: preenrollmentcode.value,
         gender: values.gender,
         birthdate: values.birthdate,
-        ethnicity: values.ethnicity,
-        deficiency: values.deficiency,
-        deficiency_description: values.deficiency_description,
-        period: values.period,
+        // ethnicity: values.ethnicity,
+        // deficiency: values.deficiency,
+        // deficiencyDescription: values.deficiency_description,
+        // period: values.period,
       }
 
       let result
@@ -197,10 +195,10 @@ async function tryCreateEnrollment(formData: any) {
   }
   catch (error: any) {
     // Se o erro for de duplicidade de código, tenta gerar um novo código
-    if (error.code === '23505' && error.details?.includes('pre_enrollment_code')) {
+    if (error.code === '23505' && error.details?.includes('preenrollmentcode')) {
       console.warn('Código de pré-matrícula duplicado detectado. Tentando gerar um novo código...')
       await ensureUniqueEnrollmentCode() // Gera um novo código
-      formData.pre_enrollment_code = pre_enrollment_code.value // Atualiza o código no formData
+      formData.preenrollmentcode = preenrollmentcode.value // Atualiza o código no formData
       return tryCreateEnrollment(formData) // Tenta novamente
     }
     throw error // Se for outro erro, lança o erro original
@@ -216,7 +214,7 @@ async function ensureUniqueEnrollmentCode() {
     // Gera um novo código aleatório
     await generateCodeEnrollment()
     // Verifica se o código já existe
-    isUnique = await enrollmentService.isUniqueEnrollmentCode(pre_enrollment_code.value)
+    isUnique = await enrollmentService.isUniqueEnrollmentCode(preenrollmentcode.value)
     attempts++
   }
 
@@ -233,7 +231,7 @@ async function loadStudents() {
       pre_enrollmentService.getAll(),
     ])
 
-    const enrolledStudentIds = enrollments ? enrollments.map(enrollment => enrollment.student_id) : []
+    const enrolledStudentIds = enrollments ? enrollments.map(enrollment => enrollment.studentId) : []
 
     studentList.value = (students ?? []).map(student => ({
       ...student,
@@ -264,7 +262,7 @@ function selectStudent(student: any) {
   studentId.value = student.id
 
   if (!pre_enrollmentId.value) { // Somente limpa o código de matrícula se for uma nova matrícula
-    pre_enrollment_code.value = '' // Limpa o código de matrícula
+    preenrollmentcode.value = '' // Limpa o código de matrícula
     // generateCodeEnrollment()  // Gera um novo código de matrícula
   }
   searchQuery.value = ''
@@ -315,17 +313,16 @@ async function getPre_enrollmentData() {
       seriesId.value = enrollmentDbData.series_id
       studentId.value = enrollmentDbData.student_id
       courseId.value = enrollmentDbData.course_id
-      pre_enrollment_code.value = enrollmentDbData.pre_enrollment_code ?? ''
-      setFieldValue('date_enrollment', enrollmentDbData.date_enrollment)
+      preenrollmentcode.value = enrollmentDbData.preenrollmentcode ?? ''
+      setFieldValue('datePreenrollment', enrollmentDbData.datePreenrollment)
       setFieldValue('observations', enrollmentDbData.observations)
-      setFieldValue('school_id', enrollmentDbData.school_id)
-      setFieldValue('schoolId', enrollmentDbData.school_id)
-      setFieldValue('seriesId', enrollmentDbData.series_id)
-      setFieldValue('studentId', enrollmentDbData.student_id)
-      setFieldValue('courseId', enrollmentDbData.course_id)
+      setFieldValue('schoolId', enrollmentDbData.schoolId)
+      setFieldValue('seriesId', enrollmentDbData.seriesId)
+      setFieldValue('studentId', enrollmentDbData.studentId)
+      setFieldValue('courseId', enrollmentDbData.courseId)
       setFieldValue('status', enrollmentDbData.status)
       setFieldValue('situation', enrollmentDbData.situation)
-      setFieldValue('pre_enrollment_code', enrollmentDbData.pre_enrollment_code)
+      setFieldValue('preenrollmentcode', enrollmentDbData.preenrollmentcode)
 
       const student = await studentService.getById(enrollmentDbData.student_id)
       if (student) {
@@ -397,8 +394,8 @@ onMounted(async () => {
       setFieldValue('courseId', courseId.value)
     if (seriesId.value)
       setFieldValue('seriesId', seriesId.value)
-    if (classroomId.value)
-      setFieldValue('classroomId', classroomId.value)
+    // if (classroomId.value)
+    //   setFieldValue('classroomId', classroomId.value)
   }
 })
 </script>
@@ -515,7 +512,7 @@ onMounted(async () => {
       </IonSelect>
     </ion-list>
 
-    <ion-list v-if="schoolId" id="classroomList">
+    <!-- <ion-list v-if="schoolId" id="classroomList">
       <IonSelect
         v-model="classroomId"
         fill="outline"
@@ -532,7 +529,7 @@ onMounted(async () => {
           {{ classroom.name }}
         </IonSelectOption>
       </IonSelect>
-    </ion-list>
+    </ion-list> -->
 
     <EpInput
       v-model="values.date_enrollment"
@@ -639,7 +636,7 @@ onMounted(async () => {
       </IonSelect>
     </ion-list>
 
-    <ion-list id="ethnicity">
+    <!-- <ion-list id="ethnicity">
       <IonSelect
         v-model="values.ethnicity"
         fill="outline"
@@ -656,7 +653,7 @@ onMounted(async () => {
           {{ ethnicity }}
         </IonSelectOption>
       </IonSelect>
-    </ion-list>
+    </ion-list> -->
 
     <ion-list id="deficiency">
       <IonSelect
