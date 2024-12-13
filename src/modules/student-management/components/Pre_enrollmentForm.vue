@@ -78,7 +78,7 @@ const studentList = ref()
 const preenrollmentcode = ref('')
 const seriesList = ref()
 const courseList = ref()
-const pre_enrollmentId = computed(() => route.currentRoute.value.params.id) as { value: string }
+const preenrollmentId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = yup.object({
   date_enrollment: yup.date()
     .required('Data de pré-matrícula é obrigatória')
@@ -135,7 +135,7 @@ async function registerPre_enrollment() {
   else {
     try {
     // Garante que o código de matrícula seja único antes de salvar
-      if (!pre_enrollmentId.value) {
+      if (!preenrollmentId.value) {
         await ensureUniqueEnrollmentCode()
       }
 
@@ -158,8 +158,8 @@ async function registerPre_enrollment() {
       }
 
       let result
-      if (pre_enrollmentId.value) {
-        result = await pre_enrollmentService.update(pre_enrollmentId.value, formData)
+      if (preenrollmentId.value) {
+        result = await pre_enrollmentService.update(preenrollmentId.value, formData)
         if (result) {
           showToast('Pré-Matrícula atualizada com sucesso')
           setTimeout(() => {
@@ -261,7 +261,7 @@ watch(searchQuery, (newQuery) => {
 function selectStudent(student: any) {
   studentId.value = student.id
 
-  if (!pre_enrollmentId.value) { // Somente limpa o código de matrícula se for uma nova matrícula
+  if (!preenrollmentId.value) { // Somente limpa o código de matrícula se for uma nova matrícula
     preenrollmentcode.value = '' // Limpa o código de matrícula
     // generateCodeEnrollment()  // Gera um novo código de matrícula
   }
@@ -306,13 +306,13 @@ async function loadEnrollment() {
 }
 
 async function getPre_enrollmentData() {
-  if (pre_enrollmentId.value) {
-    const enrollmentDbData = await pre_enrollmentService.getById(pre_enrollmentId.value)
+  if (preenrollmentId.value) {
+    const enrollmentDbData = await pre_enrollmentService.getById(preenrollmentId.value)
     if (enrollmentDbData) {
-      schoolId.value = enrollmentDbData.school_id
-      seriesId.value = enrollmentDbData.series_id
-      studentId.value = enrollmentDbData.student_id
-      courseId.value = enrollmentDbData.course_id
+      schoolId.value = enrollmentDbData.schoolId
+      seriesId.value = enrollmentDbData.seriesId
+      studentId.value = enrollmentDbData.studentId
+      courseId.value = enrollmentDbData.courseId
       preenrollmentcode.value = enrollmentDbData.preenrollmentcode ?? ''
       setFieldValue('datePreenrollment', enrollmentDbData.datePreenrollment)
       setFieldValue('observations', enrollmentDbData.observations)
@@ -324,14 +324,14 @@ async function getPre_enrollmentData() {
       setFieldValue('situation', enrollmentDbData.situation)
       setFieldValue('preenrollmentcode', enrollmentDbData.preenrollmentcode)
 
-      const student = await studentService.getById(enrollmentDbData.student_id)
+      const student = await studentService.getById(enrollmentDbData.studentId)
       if (student) {
         setFieldValue('name', student.name)
         searchQuery.value = ''
       }
     }
     else {
-      console.error(`Dados da matricula não encontrados para o ID: ${pre_enrollmentId.value}`)
+      console.error(`Dados da matricula não encontrados para o ID: ${preenrollmentId.value}`)
     }
   }
 }
@@ -346,11 +346,11 @@ async function generateCodeEnrollment() {
   const lettersRandom = Array.from({ length: 3 }, () => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
   const numbersRandom = Array.from({ length: 3 }, () => Math.floor(Math.random() * 10)).join('')
   const currentYear = new Date().getFullYear()
-  pre_enrollment_code.value = `MAT-${lettersRandom}${numbersRandom}-${currentYear}`
+  preenrollmentcode.value = `MAT-${lettersRandom}${numbersRandom}-${currentYear}`
 }
 
 watch(studentId, (newValue) => {
-  if (!pre_enrollment_code.value && !pre_enrollmentId.value) { // Gera código apenas para novas matrículas
+  if (!preenrollmentcode.value && !preenrollmentId.value) { // Gera código apenas para novas matrículas
     // generateCodeEnrollment()
   }
 })
@@ -386,7 +386,7 @@ onMounted(async () => {
   setFieldValue('date_enrollment', defaultDate)
   await loadEnrollment()
   await loadStudents()
-  if (pre_enrollmentId.value) {
+  if (preenrollmentId.value) {
     await getPre_enrollmentData()
     if (schoolId.value)
       setFieldValue('schoolId', schoolId.value)
@@ -414,7 +414,7 @@ onMounted(async () => {
     </IonSegmentButton>
   </IonSegment>
   <div v-show="selectedSegment === 'general-info'">
-    <ion-list v-if="!pre_enrollmentId" id="studentList">
+    <ion-list v-if="!preenrollmentId" id="studentList">
       <IonSearchbar
         v-model="searchQuery"
         placeholder="Pesquise o aluno..."
@@ -602,7 +602,7 @@ onMounted(async () => {
         Código de Pré-Matrícula (Somente Leitura):
       </IonLabel>
       <ion-input
-        v-model="pre_enrollment_code"
+        v-model="preenrollmentcode"
         type="text"
         placeholder="Código gerado após finalizar a pré-matrícula"
         :disabled="true"

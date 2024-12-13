@@ -2,6 +2,7 @@
 import type { Tables } from '@/types/database.types'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
+import InfoCards from '@/modules/student-management/components/InfoCards.vue'
 import Pre_enrollmentList from '@/modules/student-management/components/Pre_enrollmentList.vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
@@ -61,7 +62,7 @@ onMounted(() => {
 
 <template>
   <ContentLayout>
-    <SchoolCards
+    <InfoCards
       :student-count="schoolCount" :class-count="classCount" :approval-rate="approvalRate"
       :teacher-count="teacherCount"
     />
