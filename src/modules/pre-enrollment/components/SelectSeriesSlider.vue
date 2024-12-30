@@ -5,7 +5,7 @@ import { IonCard, IonCardHeader, IonText } from '@ionic/vue'
 import { A11y, Navigation, Pagination, Scrollbar } from 'swiper/modules'
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { defineEmits, defineProps, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 
 import SeriesService from '../services/SeriesService'
 

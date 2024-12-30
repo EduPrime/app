@@ -4,7 +4,7 @@ import { catchPageWidth } from '@/utils/useUtils'
 import { IonButton, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonGrid, IonHeader, IonIcon, IonRow, IonSpinner } from '@ionic/vue'
 
 import { arrowBackOutline, checkmarkCircleOutline } from 'ionicons/icons'
-import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 // componentes
 import formPreEnrrolment from '../components/FormPreEnrrolment.vue'

@@ -6,7 +6,7 @@ import { IonAlert, IonButton, IonCol, IonGrid, IonIcon, IonInput, IonItem, IonRo
 // import type { Tables } from '@/types/database.types'
 
 import { checkmarkCircleOutline } from 'ionicons/icons'
-import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import StudentService from '../services/StudentService'
 
 // const gedService = new GedService()

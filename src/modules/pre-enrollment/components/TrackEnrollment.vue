@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonItem, IonText } from '@ionic/vue'
-import { computed, defineEmits, defineProps, onMounted, ref, watch } from 'vue'
+import { computed, defineProps, ref, watch } from 'vue'
 
 import PreEnrollmentService from '../services/PreEnrollmentService'
 

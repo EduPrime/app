@@ -6,7 +6,7 @@ import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, 
 import { A11y, Navigation, Pagination, Scrollbar } from 'swiper/modules'
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { defineEmits, onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
 import SchoolService from '../services/SchoolService'
 

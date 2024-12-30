@@ -2,7 +2,12 @@ import { PostgrestClient } from '@supabase/postgrest-js'
 
 const REST_URL = import.meta.env.VITE_POSTGREST_URL
 
-const postgrest = new PostgrestClient(REST_URL)
+const postgrest = new PostgrestClient(REST_URL, {
+  headers: {
+    'X-Client-Info': 'your-client-info',
+    'Prefer': 'return=representation',
+  },
+})
 
 export default class BaseService {
   protected client: PostgrestClient
