@@ -3,7 +3,28 @@ import showToast from '@/utils/toast-alert'
 import { IonButton, IonIcon, IonInput, IonItem, IonList, IonSelect, IonSelectOption, IonSpinner } from '@ionic/vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '../supabaseClient'
+import { auth } from 'better-auth'
+import { authClient } from '../services/AuthService'
+
+async function sendEmail({ to, subject, text }) {
+  console.log('Sending email to:', to)
+  console.log('Subject:', subject)
+  console.log('Text:', text)
+}
+
+const auth = betterAuth({
+  emailAndPassword: {
+    enabled: true,
+    sendResetPassword: async ({ user, url, token }, request) => {
+      await sendEmail({
+        to: user.email,
+        subject: "Reset your password",
+        text: `Click the link to reset your password: ${url}`,
+      });
+    },
+  },
+});
+
 
 const email = ref<string>('')
 const loading = ref<boolean>(false)
@@ -11,7 +32,7 @@ const router = useRouter()
 
 async function resetPassword() {
   loading.value = true
-  const { error } = await supabase.auth.resetPasswordForEmail(email.value)
+  const { error } = await authClient.forgetPassword(email.value)
   loading.value = false
 
   if (error) {
@@ -52,7 +73,8 @@ const navigation = {
                 Recuperar Senha
               </h1>
               <p class="form-subtitle">
-                Ao solicitar a recuperação de senha, você irá receber um e-mail com um código de autenticação temporário.
+                Ao solicitar a recuperação de senha, você irá receber um e-mail com um código de autenticação
+                temporário.
               </p>
             </ion-text>
           </div>
@@ -92,10 +114,14 @@ const navigation = {
 .form-header {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Alinha os títulos à esquerda */
-  padding: 0 16px; /* Igual ao padding padrão dos IonItem */
-  width: 100%; /* Garante alinhamento com IonItem */
-  box-sizing: border-box; /* Inclui o padding na largura total */
+  align-items: flex-start;
+  /* Alinha os títulos à esquerda */
+  padding: 0 16px;
+  /* Igual ao padding padrão dos IonItem */
+  width: 100%;
+  /* Garante alinhamento com IonItem */
+  box-sizing: border-box;
+  /* Inclui o padding na largura total */
   margin-top: 20px;
 }
 
@@ -113,30 +139,30 @@ const navigation = {
 }
 
 .reset-password-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
 .full-height {
-    height: 100%;
+  height: 100%;
 }
 
 .reset-password-grid {
-    height: 100%;
+  height: 100%;
 }
 
 .reset-password-form {
-    background-color: #fff;
-    border-radius: 10px;
+  background-color: #fff;
+  border-radius: 10px;
 }
 
 .reset-password-logo {
-    display: block;
-    margin: 0 auto 20px;
-    width: 150px;
-    height: auto;
+  display: block;
+  margin: 0 auto 20px;
+  width: 150px;
+  height: auto;
 }
 
 .toolbar {
@@ -191,26 +217,36 @@ const navigation = {
   height: auto;
   font-size: 0.9rem;
   text-transform: none;
-  color: var(--ion-color-primary); /* Cor do botão */
+  color: var(--ion-color-primary);
+  /* Cor do botão */
   font-weight: bold;
-  position: relative; /* Necessário para posicionar a linha */
+  position: relative;
+  /* Necessário para posicionar a linha */
 }
 
 .login-button::after {
   content: '';
   position: absolute;
-  bottom: 0; /* Posiciona a linha logo abaixo do texto */
-  left: 50%; /* Inicia a linha no centro horizontal do botão */
+  bottom: 0;
+  /* Posiciona a linha logo abaixo do texto */
+  left: 50%;
+  /* Inicia a linha no centro horizontal do botão */
   width: 0;
-  height: 2px; /* Espessura da linha */
-  background-color: #4f2974; /* Cor da linha */
-  transition: width 0.3s ease; /* Animação suave */
-  transform: translateX(-50%); /* Centraliza horizontalmente */
-  transform-origin: center; /* Faz a linha crescer para os dois lados */
+  height: 2px;
+  /* Espessura da linha */
+  background-color: #4f2974;
+  /* Cor da linha */
+  transition: width 0.3s ease;
+  /* Animação suave */
+  transform: translateX(-50%);
+  /* Centraliza horizontalmente */
+  transform-origin: center;
+  /* Faz a linha crescer para os dois lados */
 }
 
 .login-button:hover::after {
-  width: 100%; /* Aumenta a largura da linha para completar o botão */
+  width: 100%;
+  /* Aumenta a largura da linha para completar o botão */
 }
 
 .login-text {
@@ -218,7 +254,8 @@ const navigation = {
   display: flex;
   align-items: center;
   margin: 0;
-  color: var(--ion-color-primary); /* Cor do texto */
+  color: var(--ion-color-primary);
+  /* Cor do texto */
   padding: 20px;
 }
 </style>

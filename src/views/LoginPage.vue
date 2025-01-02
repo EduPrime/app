@@ -1,44 +1,45 @@
 <script setup lang="ts">
-import EscolaService from '@/services/EscolaService'
 import showToast from '@/utils/toast-alert'
 import { IonButton, IonIcon, IonInput, IonItem, IonList } from '@ionic/vue'
 import { eye, lockClosed, mail } from 'ionicons/icons'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useUserStore } from '../store/user'
-import { supabase } from '../supabaseClient'
+import { useAuthStore } from '../store/AuthStore'
+import { AuthService } from '@/services/AuthService'
 
 const email = ref<string>('')
 const password = ref<string>('')
 const user = ref<any>(null)
 const router = useRouter()
-const userStore = useUserStore()
+const userStore = useAuthStore()
+const authService = new AuthService()
 
 onMounted(async () => {
-  const { data: { session } } = await supabase.auth.getSession()
-  user.value = session?.user || null
-  user.value = session?.user
+  try {
+    const data = await authService.useSession()
+    user.value = data?.user || null
+  }
+  catch (err) {
+    console.log('Erro ao buscar sessão', (err as Error).message)
+  }
+ 
 })
 
 const loading = ref<boolean>(false)
 
 async function signIn() {
   loading.value = true
-  const { error, data } = await supabase.auth.signInWithPassword({
-    email: email.value,
-    password: password.value,
-  })
-  loading.value = false
-
-  if (error) {
-    showToast('Falha ao fazer login', 'top', 'warning')
-    console.error('Erro ao fazer login:', error.message)
-  }
-  else {
+  try {
+    const data = await authService.login(email.value, password.value)
     showToast('Login realizado com sucesso', 'top', 'success')
-    userStore.setUser(data.session?.user)
-    router.push(`/dashboard/${data.session?.user?.id}`)
+    userStore.login(data)
+    router.push(`/dashboard/${data?.id}`)
   }
+  catch (error) {
+    showToast('Falha ao fazer login', 'top', 'warning')
+    console.error('Erro ao fazer login:', error as Error)
+  }
+  loading.value = false
 }
 
 const navigation = {
@@ -50,22 +51,9 @@ const navigation = {
   },
 }
 
-async function fetchEscolas1960() {
-  try {
-    const data = await escolaService.getByAnoFundacao(1960)
-    escolas.value = data || []
-  }
-  catch (err) {
-    error.value = (err as Error).message
-  }
-  finally {
-    loading.value = false
-  }
-}
-
 // Buscar escolas ao montar o componente
 onMounted(() => {
-  fetchEscolas1960()
+//  fetchEscolas1960()
 })
 </script>
 
@@ -77,12 +65,12 @@ onMounted(() => {
           <ion-img src="/assets/EduPrimeChat.png" alt="Logo" class="login-logo" />
 
           <IonItem>
-            <IonInput label-placement="stacked" label="Email" placeholder="seuemail@dominio.com">
+            <IonInput v-model="email" label-placement="stacked" label="Email" placeholder="seuemail@dominio.com">
               <IonIcon slot="start" :icon="mail" aria-hidden="true" />
             </IonInput>
           </IonItem>
           <IonItem>
-            <IonInput type="password" label-placement="stacked" label="Senha" placeholder="Digite sua senha">
+            <IonInput v-model="password" type="password" label-placement="stacked" label="Senha" placeholder="Digite sua senha">
               <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
               <ion-input-password-toggle slot="end" />
             </IonInput>
@@ -148,18 +136,26 @@ onMounted(() => {
 .forgot-password-button::after {
   content: '';
   position: absolute;
-  bottom: 0; /* Posiciona a linha logo abaixo do texto */
-  left: 50%; /* Inicia a linha no centro horizontal do botão */
+  bottom: 0;
+  /* Posiciona a linha logo abaixo do texto */
+  left: 50%;
+  /* Inicia a linha no centro horizontal do botão */
   width: 0;
-  height: 2px; /* Espessura da linha */
-  background-color: #4f2974; /* Cor da linha */
-  transition: width 0.3s ease; /* Animação suave */
-  transform: translateX(-50%); /* Centraliza horizontalmente */
-  transform-origin: center; /* Faz a linha crescer para os dois lados */
+  height: 2px;
+  /* Espessura da linha */
+  background-color: #4f2974;
+  /* Cor da linha */
+  transition: width 0.3s ease;
+  /* Animação suave */
+  transform: translateX(-50%);
+  /* Centraliza horizontalmente */
+  transform-origin: center;
+  /* Faz a linha crescer para os dois lados */
 }
 
 .forgot-password-button:hover::after {
-  width: 100%; /* A linha expande para preencher a largura total */
+  width: 100%;
+  /* A linha expande para preencher a largura total */
 }
 
 .login-logo {

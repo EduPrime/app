@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useUserStore } from '@/store/user'
 import showToast from '@/utils/toast-alert'
 import { IonButton, IonIcon, IonInput, IonItem, IonList, IonSelect, IonSelectOption } from '@ionic/vue'
 import { eye, lockClosed, mail } from 'ionicons/icons'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '../supabaseClient'
+import { useAuthStore } from '../store/AuthStore'
+import { authClient } from '@/services/AuthService'
 
 const username = ref('')
 const phone = ref('')
@@ -16,7 +16,7 @@ const confirmPassword = ref('')
 const role = ref('')
 const validRoles = ['admin', 'professor', 'aluno']
 const router = useRouter()
-const userStore = useUserStore()
+const userStore = useAuthStore()
 
 const passwordsMatch = ref(true) // Variável para controlar se as senhas não coincidem
 
@@ -72,7 +72,7 @@ async function signUp() {
     return
   }
 
-  const { data, error } = await supabase.auth.signUp({
+  const { data, error } = await authClient.signUp.email({
     email: email.value,
     password: password.value,
     options: {
@@ -89,7 +89,7 @@ async function signUp() {
   else {
     const { user, session } = data
     if (user && session) {
-      userStore.setUser(user)
+      userStore.login(user)
       localStorage.setItem('user', JSON.stringify(user))
 
       router.replace(`/dashboard/${user.id}`)
@@ -214,10 +214,14 @@ function goToLogin() {
 .form-header {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Alinha os títulos à esquerda */
-  padding: 0 16px; /* Igual ao padding padrão dos IonItem */
-  width: 100%; /* Garante alinhamento com IonItem */
-  box-sizing: border-box; /* Inclui o padding na largura total */
+  align-items: flex-start;
+  /* Alinha os títulos à esquerda */
+  padding: 0 16px;
+  /* Igual ao padding padrão dos IonItem */
+  width: 100%;
+  /* Garante alinhamento com IonItem */
+  box-sizing: border-box;
+  /* Inclui o padding na largura total */
   margin-top: 20px;
 }
 
@@ -246,26 +250,36 @@ function goToLogin() {
   height: auto;
   font-size: 0.9rem;
   text-transform: none;
-  color: var(--ion-color-primary); /* Cor do botão */
+  color: var(--ion-color-primary);
+  /* Cor do botão */
   font-weight: bold;
-  position: relative; /* Necessário para posicionar a linha */
+  position: relative;
+  /* Necessário para posicionar a linha */
 }
 
 .login-button::after {
   content: '';
   position: absolute;
-  bottom: 0; /* Posiciona a linha logo abaixo do texto */
-  left: 50%; /* Inicia a linha no centro horizontal do botão */
+  bottom: 0;
+  /* Posiciona a linha logo abaixo do texto */
+  left: 50%;
+  /* Inicia a linha no centro horizontal do botão */
   width: 0;
-  height: 2px; /* Espessura da linha */
-  background-color: #4f2974; /* Cor da linha */
-  transition: width 0.3s ease; /* Animação suave */
-  transform: translateX(-50%); /* Centraliza horizontalmente */
-  transform-origin: center; /* Faz a linha crescer para os dois lados */
+  height: 2px;
+  /* Espessura da linha */
+  background-color: #4f2974;
+  /* Cor da linha */
+  transition: width 0.3s ease;
+  /* Animação suave */
+  transform: translateX(-50%);
+  /* Centraliza horizontalmente */
+  transform-origin: center;
+  /* Faz a linha crescer para os dois lados */
 }
 
 .login-button:hover::after {
-  width: 100%; /* Aumenta a largura da linha para completar o botão */
+  width: 100%;
+  /* Aumenta a largura da linha para completar o botão */
 }
 
 .login-text {
@@ -273,7 +287,8 @@ function goToLogin() {
   display: flex;
   align-items: center;
   margin: 0;
-  color: var(--ion-color-primary); /* Cor do texto */
+  color: var(--ion-color-primary);
+  /* Cor do texto */
   padding: 20px;
 }
 

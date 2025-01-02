@@ -4,12 +4,13 @@ import { IonButton, IonIcon, IonInput, IonItem, IonList, IonSpinner } from '@ion
 import { eye, key, lockClosed, mail } from 'ionicons/icons'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { supabase } from '../supabaseClient'
+import { AuthService } from '../services/AuthService'
 
 const newPassword = ref('')
 const confirmPassword = ref('')
 const loading = ref<boolean>(false)
 const router = useRouter()
+const authService = new AuthService()
 
 // Requisitos para a senha
 const minLength = 8
@@ -49,18 +50,18 @@ async function changePassword() {
   }
 
   loading.value = true
-  const { error } = await supabase.auth.updateUser({ password: newPassword.value })
-  loading.value = false
-
-  if (error) {
-    showToast('Falha ao redefinir a senha', 'top', 'warning')
-    console.error('Erro ao redefinir a senha:', error.message)
-  }
-
-  else {
+  try {
+    await authService.resetPassword(newPassword.value)
     showToast('Senha redefinida com sucesso', 'top', 'success')
     router.push('/login')
   }
+  catch (error) {
+    showToast('Falha ao redefinir a senha', 'top', 'warning')
+    console.error('Erro ao redefinir a senha:', (error as Error ).message)
+  }
+    loading.value = false
+
+
 }
 
 const navigation = {
@@ -159,10 +160,14 @@ const navigation = {
 .form-header {
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* Alinha os títulos à esquerda */
-  padding: 0 16px; /* Igual ao padding padrão dos IonItem */
-  width: 100%; /* Garante alinhamento com IonItem */
-  box-sizing: border-box; /* Inclui o padding na largura total */
+  align-items: flex-start;
+  /* Alinha os títulos à esquerda */
+  padding: 0 16px;
+  /* Igual ao padding padrão dos IonItem */
+  width: 100%;
+  /* Garante alinhamento com IonItem */
+  box-sizing: border-box;
+  /* Inclui o padding na largura total */
   margin-top: 20px;
 }
 
@@ -178,6 +183,7 @@ const navigation = {
   margin: 5px 0 20px;
   text-align: left;
 }
+
 .reset-password-content {
   display: flex;
   justify-content: center;
@@ -261,7 +267,8 @@ ion-item {
   display: flex;
   align-items: center;
   margin: 0;
-  color: var(--ion-color-primary); /* Cor do texto */
+  color: var(--ion-color-primary);
+  /* Cor do texto */
   padding: 20px;
 }
 
@@ -270,26 +277,36 @@ ion-item {
   height: auto;
   font-size: 0.9rem;
   text-transform: none;
-  color: var(--ion-color-primary); /* Cor do botão */
+  color: var(--ion-color-primary);
+  /* Cor do botão */
   font-weight: bold;
-  position: relative; /* Necessário para posicionar a linha */
+  position: relative;
+  /* Necessário para posicionar a linha */
 }
 
 .login-button::after {
   content: '';
   position: absolute;
-  bottom: 0; /* Posiciona a linha logo abaixo do texto */
-  left: 50%; /* Inicia a linha no centro horizontal do botão */
+  bottom: 0;
+  /* Posiciona a linha logo abaixo do texto */
+  left: 50%;
+  /* Inicia a linha no centro horizontal do botão */
   width: 0;
-  height: 2px; /* Espessura da linha */
-  background-color: #4f2974; /* Cor da linha */
-  transition: width 0.3s ease; /* Animação suave */
-  transform: translateX(-50%); /* Centraliza horizontalmente */
-  transform-origin: center; /* Faz a linha crescer para os dois lados */
+  height: 2px;
+  /* Espessura da linha */
+  background-color: #4f2974;
+  /* Cor da linha */
+  transition: width 0.3s ease;
+  /* Animação suave */
+  transform: translateX(-50%);
+  /* Centraliza horizontalmente */
+  transform-origin: center;
+  /* Faz a linha crescer para os dois lados */
 }
 
 .login-button:hover::after {
-  width: 100%; /* Aumenta a largura da linha para completar o botão */
+  width: 100%;
+  /* Aumenta a largura da linha para completar o botão */
 }
 
 .button-container {

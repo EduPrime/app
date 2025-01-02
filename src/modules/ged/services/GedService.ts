@@ -1,5 +1,6 @@
 import BaseService from '@/services/BaseService'
 
+const table = 'document'
 type DocumentTable = typeof table
 
 export default class DocumentService extends BaseService {

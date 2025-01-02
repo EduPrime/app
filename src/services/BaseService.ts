@@ -1,164 +1,160 @@
+import { useAuthStore } from '@/store/AuthStore'
+import { getPostgrestURL } from '@/utils/getPostgrestURL'
 import { PostgrestClient } from '@supabase/postgrest-js'
+//import { AuthService } from './AuthService'
 
-const REST_URL = import.meta.env.VITE_POSTGREST_URL
+export default class BaseService<T> {
+  public client: PostgrestClient
+  private userId: string | undefined
+  private orgId: string | undefined
+  constructor(private readonly table: string) {
+    const authStore = useAuthStore()
+    this.userId = authStore.user?.id
+    this.orgId = authStore.organization?.id
 
-const postgrest = new PostgrestClient(REST_URL, {
-  headers: {
-    'X-Client-Info': 'your-client-info',
-    'Prefer': 'return=representation',
-  },
-})
+    const token = authStore.getPostgrestToken()
+    const postgrestUrl = getPostgrestURL()
 
-export default class BaseService {
-  protected client: PostgrestClient
-  protected table
-
-  constructor(table: string) {
-    this.table = table
-    this.client = postgrest
+    try {
+      this.client = new PostgrestClient(postgrestUrl, {
+        headers: {
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
+      })
+    }
+    catch (error: any) {
+      authStore.logout()
+      throw new Error(`Failed to initialize PostgrestClient: ${error.message}`)
+    }
   }
 
-  async getById(id: string) {
-    try {
-      const { data, error } = await this.client
-        .from(this.table)
-        .select('*')
-        .eq('id', id)
-        .is('deletedAt', null)
-        .single()
+  async getById(id: string): Promise<T | null> {
+    if (!id)
+      return null
 
-      if (error)
-        throw error
-      return data
-    }
-    catch (error) {
-      console.error(`Erro ao buscar registro por ID na tabela ${this.table}:`, error)
-      throw new Error(`Failed to fetch record by ID from ${this.table}`)
-    }
+    const { data, error } = await this.client
+      .from(this.table)
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error)
+      throw new Error(error.message)
+    return data
   }
 
   async getAll(
-    orderBy?: null | string,
-    ascending: boolean = true,
+    orderBy?: string,
+    ascending = true,
     limit?: number,
-  ): Promise<[] | null> {
-    try {
-      let query = this.client.from(this.table).select('*').is('deletedAt', null)
-
-      if (orderBy) {
-        query = query.order(orderBy as string, { ascending })
-      }
-
-      if (limit) {
-        query = query.limit(limit)
-      }
-
-      const { data, error } = await query
-      if (error)
-        throw error
-
-      return data as [] | null
-    }
-    catch (error) {
-      console.error(`Erro ao buscar todos os registros na tabela ${this.table}:`, error)
-      throw new Error(`Failed to fetch all records from ${this.table}`)
-    }
-  }
-
-  async getBySchoolId(schoolId: string): Promise<[] | null> {
-    try {
-      const { data, error } = await this.client
-        .from(this.table)
-        .select('*')
-        .eq('school_id', schoolId)
-        .is('deletedAt', null)
-
-      if (error)
-        throw error
-      return data as [] | null
-    }
-    catch (error) {
-      console.error(`Erro ao buscar registros por school_id na tabela ${this.table}:`, error)
-      throw new Error(`Failed to fetch records by school_id from ${this.table}`)
-    }
-  }
-
-  async create(
-    record: any,
   ) {
-    try {
-      const { data, error } = await this.client
-        .from(this.table)
-        .insert(record)
-        .select()
-        .single()
+    let query = this.client.from(this.table).select('*')
 
-      if (error)
-        throw error
-      return data
+    if (orderBy) {
+      query = query.order(orderBy as string, { ascending })
     }
-    catch (error) {
-      console.error(`Erro ao criar registro na tabela ${this.table}:`, error)
-      throw new Error(`Failed to create record in ${this.table}`)
+
+    if (limit) {
+      query = query.limit(limit)
     }
+
+    const { data, error } = await query
+
+    if (error)
+      throw new Error(error.message)
+    return data || []
   }
 
-  async update(
-    id: string,
-    updates: any,
-  ) {
-    try {
-      const { data, error } = await this.client
-        .from(this.table)
-        .update(updates)
-        .eq('id', id)
-        .is('deletedAt', null)
-        .select()
-        .single()
+  async create(record: T): Promise<T | null> {
+    const recordWithAudit = {
+      ...record,
+      createdBy: this.userId,
+      tenantId: this.orgId,
+    } as unknown as T
 
-      if (error)
-        throw error
-      return data
+    const { data, error } = await this.client
+      .from(this.table)
+      .insert(recordWithAudit)
+      .select()
+      .single()
+
+    if (error) {
+      if (error.message.includes('JWT ')) {
+        //  new AuthService().logout()
+      }
+      throw new Error(error.message)
     }
-    catch (error) {
-      console.error(`Erro ao atualizar registro na tabela ${this.table}:`, error)
-      throw new Error(`Failed to update record in ${this.table}`)
-    }
+    return data
   }
 
-  async softDelete(id: string) {
-    try {
-      const { data, error } = await this.client
-        .from(this.table)
-        .update({ deletedAt: new Date().toISOString() })
-        .eq('id', id)
-        .select()
-        .single()
+  async update(id: string, updates: Partial<T>): Promise<T | null> {
+    const updatesWithAudit = {
+      ...updates,
+      updatedBy: this.userId,
+      updatedAt: new Date().toISOString(),
+    } as unknown as Partial<T>
 
-      if (error)
-        throw error
-      return data
-    }
-    catch (error) {
-      console.error(`Erro ao deletar registro na tabela ${this.table}:`, error)
-      throw new Error(`Failed to delete record from ${this.table}`)
-    }
+    const { data, error } = await this.client
+      .from(this.table)
+      .update(updatesWithAudit)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error)
+      throw new Error(error.message)
+    return data
+  }
+
+  async softDelete(id: string): Promise<T | null> {
+    const { data, error } = await this.client
+      .from(this.table)
+      .update({
+        deletedAt: new Date().toISOString(),
+        updatedBy: this.userId,
+      } as unknown as Partial<T>)
+      .eq('id', id)
+      .select()
+      .single()
+
+    if (error)
+      throw new Error(error.message)
+    return data
+  }
+
+  async callRpc(functionName: string, params: Record<string, unknown>): Promise<unknown> {
+    const { data, error } = await this.client.rpc(functionName, params)
+    if (error)
+      throw new Error(error.message)
+    return data
   }
 
   async countEntries(): Promise<number> {
-    try {
-      const { count, error } = await this.client
-        .from(this.table)
-        .select('*', { count: 'exact', head: true })
-        .is('deletedAt', null)
+    const { count, error } = await this.client
+      .from(this.table)
+      .select('*', { count: 'exact', head: true })
 
-      if (error)
-        throw error
-      return count || 0
+    if (error)
+      throw new Error(error.message)
+    return count || 0
+  }
+
+  async filter(filters: Partial<Record<keyof T, string | string[]>>): Promise<T[]> {
+    let query = this.client.from(this.table).select('*')
+
+    for (const [column, value] of Object.entries(filters)) {
+      if (Array.isArray(value)) {
+        query = query.in(column, value)
+      }
+      else {
+        query = query.eq(column, value)
+      }
     }
-    catch (error) {
-      console.error(`Erro ao contar registros na tabela ${this.table}:`, error)
-      throw new Error(`Failed to count entries in ${this.table}`)
-    }
+
+    const { data, error } = await query
+
+    if (error)
+      throw new Error(error.message)
+    return data || []
   }
 }

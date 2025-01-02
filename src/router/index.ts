@@ -1,6 +1,8 @@
 import type { CustomRouteRecordRaw } from '@/router/RouterType'
 import { createRouter, createWebHistory } from '@ionic/vue-router'
 import { home } from 'ionicons/icons'
+import { useAuthStore } from '@/store/AuthStore'
+import { AuthService } from '@/services/AuthService'
 
 // Função para carregar dinamicamente todas as rotas dos módulos
 const moduleRoutes: Record<string, any> = import.meta.glob('../modules/**/routes.ts', { eager: true })
@@ -153,6 +155,34 @@ const router = createRouter({
   // eslint-disable-next-line ts/ban-ts-comment
   // @ts-expect-error
   routes,
+})
+
+router.beforeEach(async (to, from, next) => {
+  try {
+    const authStore = useAuthStore()
+    const authService = new AuthService()
+    await authService.getSession()
+    if (!authStore.isAuthenticated) {
+      // Evitar redirecionamento infinito
+      if (to.path !== '/login') {
+        next('/login')
+      }
+      next()
+    } else {
+      // Usuário autenticado, permitir navegação
+      if (to.path === '/login') {
+        // Se já autenticado, redirecionar da rota de login para home ou outra página
+        next('/')
+      }
+      next()
+    }
+  } catch {
+    console.log('Failed to get session')
+    if (to.path !== "/login") {
+      next("/login");
+    }
+    next();
+  }
 })
 
 export default router
