@@ -24,6 +24,9 @@ import {
 } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { AuthService } from '@/services/AuthService'
+
+const authService = new AuthService()
 
 const tabs = ref([
   {
@@ -252,6 +255,7 @@ watch(route, (newRoute) => {
 })
 
 async function logout() {
+  await authService.logout()
   return null
 }
 </script>

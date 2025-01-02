@@ -48,7 +48,7 @@ export class AuthService {
                 throw new Error('Login failed: No data returned here')
             }
             // Get autorization token for PostgREST
-            //await this.postgrestToken()
+            await this.postgrestToken()
             useAuthStore().login(data.user)
             return data.user as UserLocal
         }
@@ -205,7 +205,7 @@ export class AuthService {
      */
     async postgrestToken(): Promise<string> {
         try {
-            const response = await fetch(`${import.meta.env.VITE_POSTGREST_URL}/postgrest/token`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL_TOKEN}/postgrest/token`, {
                 method: 'POST',
                 credentials: 'include',
             })
