@@ -31,6 +31,8 @@ async function signIn() {
   loading.value = true
   try {
     const data = await authService.login(email.value, password.value)
+    const orgs = await authService.listOrganizations()
+    await authService.setActiveOrganization(orgs[0].id)
     showToast('Login realizado com sucesso', 'top', 'success')
     userStore.login(data)
     router.push(`/dashboard/${data?.id}`)

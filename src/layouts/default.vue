@@ -256,7 +256,7 @@ watch(route, (newRoute) => {
 
 async function logout() {
   await authService.logout()
-  return null
+  router.push('/login')
 }
 </script>
 

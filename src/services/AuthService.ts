@@ -188,6 +188,7 @@ export class AuthService {
                 organizationId,
             })
             useAuthStore().setOrganization(data)
+
             const user = await this.getLocalUser()
             if (user?.id)
                 useAuthStore().login(user)
@@ -229,19 +230,21 @@ export class AuthService {
             throw new Error('No PostgREST token found')
         }
         const email = useAuthStore().user?.email
-        const response = await fetch(`${getPostgrestURL()}/user?email=eq.${email}`, {
-            method: 'GET',
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        })
-
-        if (!response.ok) {
-            console.error(`Token request failed: ${response.statusText}`)
+        const postgresturl = getPostgrestURL()
+        const url = `https://${postgresturl}/User?email=eq.${email}`
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            })
+            const data = await response.json()
+            return data[0] as UserLocal
         }
-
-        const data = await response.json()
-        return data[0] as UserLocal
+        catch (error) {
+            throw new Error(`Failed to fetch user: ${(error as Error).message}`)
+        }
     }
 
     async addMemberToOrg(userId: string, organizationId: string, role: string) {
