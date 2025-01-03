@@ -16,7 +16,7 @@ export default class BaseService<T> {
     const postgrestUrl = getPostgrestURL()
 
     try {
-      this.client = new PostgrestClient(postgrestUrl, {
+      this.client = new PostgrestClient(`https://${postgrestUrl}`, {
         headers: {
           ...(token && { Authorization: `Bearer ${token}` }),
         },
@@ -48,6 +48,7 @@ export default class BaseService<T> {
     ascending = true,
     limit?: number,
   ) {
+
     let query = this.client.from(this.table).select('*')
 
     if (orderBy) {
