@@ -229,14 +229,15 @@ export class AuthService {
         if (!token) {
             throw new Error('No PostgREST token found')
         }
-        const email = useAuthStore().user?.email
+        const userId = useAuthStore().user?.id
         const postgresturl = getPostgrestURL()
-        const url = `https://${postgresturl}/User?email=eq.${email}`
+        const url = `https://${postgresturl}/User?apiUserId=eq.${userId}`
         try {
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
                     Authorization: `Bearer ${token}`,
+                    mode: 'no-cors',
                 },
             })
             const data = await response.json()

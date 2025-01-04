@@ -60,6 +60,7 @@ export const useAuthStore = defineStore('auth', () => {
         user.value = null
         organization.value = null
         postgrestToken.value = null
+        userLocal.value = null
     }
 
     async function setPostgrestToken(token: string) {
