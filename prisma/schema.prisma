@@ -13,6 +13,7 @@ model User {
   role        String
   tenantId    String    @db.Uuid
   email       String
+  apiUserId   String
 }
 
 model AcademicYear {
@@ -23,6 +24,8 @@ model AcademicYear {
   metadata    Json?
   createdAt   DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt   DateTime? @db.Timestamptz(6)
+  updatedBy   String?   @db.Uuid
+  tenantId    String?   @db.Uuid
   deletedAt   DateTime? @db.Timestamptz(6)
   userCreated String?   @db.Uuid
 
@@ -40,6 +43,8 @@ model AcademicYearTemplate {
   updatedAt   DateTime? @db.Timestamptz(6)
   deletedAt   DateTime? @db.Timestamptz(6)
   userCreated String?   @db.Uuid
+  updatedBy   String?   @db.Uuid
+  tenantId    String?   @db.Uuid
 
   @@map("academic_year_template")
 }
@@ -64,6 +69,8 @@ model Classroom {
   deletedAt                                                         DateTime?           @db.Timestamp(6)
   updatedAt                                                         DateTime?           @db.Timestamp(6)
   schoolId                                                          String?             @db.Uuid
+  updatedBy                                                         String?             @db.Uuid
+  tenantId                                                          String?             @db.Uuid
   school                                                            School?             @relation(fields: [schoolId], references: [id], onDelete: Restrict, map: "classroom_school_id_fkey")
   series                                                            Series              @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroom_seriesid_fkey")
   enrollment                                                        Enrollment[]
@@ -83,11 +90,13 @@ model Course {
   deletedAt     DateTime?       @db.Timestamp(6)
   updatedAt     DateTime?       @db.Timestamp(6)
   userCreated   String?         @db.VarChar(255)
+  updatedBy     String?         @db.Uuid
+  tenantId      String?         @db.Uuid
   school        School          @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_schoolid_fkey")
   enrollment    Enrollment[]
   preenrollment PreEnrollment[]
   series        Series[]
-
+  
   @@map("course")
 }
 
@@ -101,6 +110,8 @@ model Discipline {
   deletedAt   DateTime? @db.Timestamptz(6)
   updatedAt   DateTime? @db.Timestamptz(6)
   workload    Decimal?  @db.Decimal
+  updatedBy   String?   @db.Uuid
+  tenantId    String?   @db.Uuid
   grade       Grade[]
 
   @@map("discipline")
@@ -117,6 +128,8 @@ model Enrollment {
   createdAt         DateTime?           @default(now()) @db.Timestamp(6)
   deletedAt         DateTime?           @db.Timestamp(6)
   updatedAt         DateTime?           @db.Timestamp(6)
+  updatedBy         String?             @db.Uuid
+  tenantId          String?             @db.Uuid
   dateEnrollment    DateTime            @db.Timestamp(6)
   observations      String?             @db.VarChar(200)
   status            status?             @default(ACTIVE)
@@ -143,6 +156,11 @@ model EnrollmentHistory {
   formerClassroomId                                         String     @db.Uuid
   currentClassroomId                                        String     @db.Uuid
   enrollmentId                                              String     @db.Uuid
+  updatedBy                                                 String?    @db.Uuid
+  tenantId                                                  String?    @db.Uuid
+  createdAt                                                 DateTime?  @default(now()) @db.Timestamp(6)
+  deletedAt                                                 DateTime?  @db.Timestamp(6)
+  updatedAt                                                 DateTime?  @db.Timestamp(6)
   classroom_enrollmenthistory_currentClassroomIdToclassroom Classroom  @relation("enrollmenthistory_currentClassroomIdToclassroom", fields: [currentClassroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollmenthistory_currentclassroomid_fkey")
   enrollment                                                Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollmenthistory_enrollmentid_fkey")
   classroom_enrollmenthistory_formerClassroomIdToclassroom  Classroom  @relation("enrollmenthistory_formerClassroomIdToclassroom", fields: [formerClassroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollmenthistory_formerclassroomid_fkey")
@@ -160,8 +178,10 @@ model Grade {
   metadata     Json?
   userCreated  String?    @db.Uuid
   createdAt    DateTime   @default(now()) @db.Timestamptz(6)
-  deletedAt    DateTime?  @db.Timestamptz(6)
-  updatedAt    DateTime?  @db.Timestamptz(6)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  updatedAt    DateTime?  @db.Timestamp(6)
+  updatedBy    String?    @db.Uuid
+  tenantId     String?    @db.Uuid
   discipline   Discipline @relation(fields: [disciplineId], references: [id], map: "grade_discipline_id_fkey")
   school       School     @relation(fields: [schoolId], references: [id], map: "grade_school_id_fkey")
   student      Student    @relation(fields: [studentId], references: [id], map: "grade_student_id_fkey")
@@ -182,6 +202,8 @@ model Institution {
   createdAt           DateTime?            @default(now()) @db.Timestamp(6)
   deletedAt           DateTime?            @db.Timestamp(6)
   updatedAt           DateTime?            @db.Timestamp(6)
+  updatedBy           String?              @db.Uuid
+  tenantId            String?              @db.Uuid
   userCreated         String?              @db.VarChar(255)
   singleton           Int?                 @default(1)
   enrollment          Enrollment[]
@@ -196,6 +218,10 @@ model Institution {
 model InstitutionSettings {
   id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   createdAt     DateTime?   @default(now()) @db.Timestamp(6)
+  deletedAt     DateTime?   @db.Timestamp(6)
+  updatedAt     DateTime?   @db.Timestamp(6)
+  updatedBy     String?     @db.Uuid
+  tenantId      String?     @db.Uuid
   institutionId String      @unique(map: "institutionsettings_institutionid_key") @db.Uuid
   dateOpening   DateTime?   @db.Timestamp(6)
   dateClosing   DateTime?   @db.Timestamp(6)
@@ -217,6 +243,8 @@ model PreEnrollment {
   createdAt         DateTime?      @default(now()) @db.Timestamp(6)
   deletedAt         DateTime?      @db.Timestamp(6)
   updatedAt         DateTime?      @db.Timestamp(6)
+  updatedBy         String?        @db.Uuid
+  tenantId          String?        @db.Uuid
   datePreenrollment DateTime       @db.Timestamp(6)
   observations      String?        @db.VarChar(200)
   status            status?        @default(ACTIVE)
@@ -269,6 +297,8 @@ model School {
   createdAt                DateTime?           @default(now()) @db.Timestamp(6)
   deletedAt                DateTime?           @db.Timestamp(6)
   updatedAt                DateTime?           @db.Timestamp(6)
+  updatedBy                String?             @db.Uuid
+  tenantId                 String?             @db.Uuid
   userCreated              String?             @db.VarChar(255)
   classroom                Classroom[]
   course                   Course[]
@@ -295,7 +325,11 @@ model SchoolSettings {
   dateEnd       DateTime?   @db.Date
   institutionId String      @db.Uuid
   schoolId      String      @db.Uuid
-  deletedAt     DateTime?   @db.Timestamptz(6)
+  updatedAt     DateTime?   @db.Timestamp(6)
+  updatedBy     String?     @db.Uuid
+  tenantId      String?     @db.Uuid
+  userCreated   String?     @db.Uuid
+  deletedAt     DateTime?   @db.Timestamp(6)
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_settings_institution_id_fkey")
   school        School      @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_settings_school_id_fkey")
 
@@ -311,6 +345,8 @@ model Series {
   createdAt     DateTime?       @default(now()) @db.Timestamp(6)
   deletedAt     DateTime?       @db.Timestamp(6)
   updatedAt     DateTime?       @db.Timestamp(6)
+  updatedBy     String?         @db.Uuid
+  tenantId      String?         @db.Uuid
   userCreated   String?         @db.VarChar(255)
   schoolId      String?         @db.Uuid
   classroom     Classroom[]
@@ -323,14 +359,20 @@ model Series {
 }
 
 model ServerAllocations {
-  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  serverId  String    @db.Uuid
-  schoolId  String    @db.Uuid
-  anoLetivo Int
-  entryDate DateTime  @db.Timestamp(6)
-  exitDate  DateTime? @db.Timestamp(6)
-  school    School    @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_school")
-  servers   Servers   @relation(fields: [serverId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_server")
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  serverId      String          @db.Uuid
+  schoolId      String          @db.Uuid
+  anoLetivo     Int
+  entryDate     DateTime        @db.Timestamp(6)
+  exitDate      DateTime?       @db.Timestamp(6)
+  createdAt     DateTime?       @default(now()) @db.Timestamp(6)
+  deletedAt     DateTime?       @db.Timestamp(6)
+  updatedAt     DateTime?       @db.Timestamp(6)
+  updatedBy     String?         @db.Uuid
+  tenantId      String?         @db.Uuid
+  userCreated   String?         @db.VarChar(255)
+  school        School          @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_school")
+  servers       Servers         @relation(fields: [serverId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_server")
 
   @@unique([serverId, schoolId, anoLetivo], map: "uq_server_allocation")
   @@map("server_allocations")
@@ -348,6 +390,9 @@ model Servers {
   createdAt          DateTime?           @default(now()) @db.Timestamp(6)
   deletedAt          DateTime?           @db.Timestamp(6)
   updatedAt          DateTime?           @db.Timestamp(6)
+  updatedBy          String?             @db.Uuid
+  tenantId           String?             @db.Uuid
+  userCreated        String?             @db.VarChar(255)
   server_allocations ServerAllocations[]
 
   @@map("servers")
@@ -369,6 +414,8 @@ model Student {
   createdAt        DateTime?          @default(now()) @db.Timestamp(6)
   deletedAt        DateTime?          @db.Timestamp(6)
   updatedAt        DateTime?          @db.Timestamp(6)
+  updatedBy        String?            @db.Uuid
+  tenantId         String?            @db.Uuid
   userCreated      String?            @db.VarChar(255)
   schoolId         String?            @db.Uuid
   postalCode       String?            @db.VarChar(100)
@@ -417,6 +464,8 @@ model Teacher {
   createdAt      DateTime  @default(now()) @db.Timestamptz(6)
   deletedAt      DateTime? @db.Timestamptz(6)
   updatedAt      DateTime? @db.Timestamptz(6)
+  updatedBy      String?   @db.Uuid
+  tenantId       String?   @db.Uuid
   showDetails    Boolean?
   school         School    @relation(fields: [schoolId], references: [id], map: "teacher_school_id_fkey")
 

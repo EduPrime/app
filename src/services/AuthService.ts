@@ -191,7 +191,7 @@ export class AuthService {
 
             const user = await this.getLocalUser()
             if (user?.id)
-                useAuthStore().login(user)
+                useAuthStore().loginLocalUser(user)
 
             return data
         }

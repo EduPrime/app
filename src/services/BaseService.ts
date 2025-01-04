@@ -9,7 +9,7 @@ export default class BaseService<T> {
   private orgId: string | undefined
   constructor(private readonly table: string) {
     const authStore = useAuthStore()
-    this.userId = authStore.user?.id
+    this.userId = authStore.userLocal?.id
     this.orgId = authStore.organization?.id
 
     const token = authStore.getPostgrestToken()
@@ -69,7 +69,7 @@ export default class BaseService<T> {
   async create(record: T): Promise<T | null> {
     const recordWithAudit = {
       ...record,
-      createdBy: this.userId,
+      userCreated: this.userId,
       tenantId: this.orgId,
     } as unknown as T
 

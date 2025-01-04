@@ -9,6 +9,7 @@ async function main() {
             email: 'user@back3nd.com',
             tenantId: self.crypto.randomUUID(),
             role: 'owner',
+            apiUserId: 'x8Tamaq9lFgVAw4H0SdoT'
         },
     })
 
@@ -16,7 +17,8 @@ async function main() {
         data: {
             name: 'Prefeitura Municipal de Araripina',
             phone: '87981331477',
-            email: ''
+            email: '',
+            tenantId: self.crypto.randomUUID(),
         }
     })
 

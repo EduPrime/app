@@ -8,6 +8,7 @@ export const useAuthStore = defineStore('auth', () => {
     const user = useLocalStorage<string | null>('auth/user', null)
     const postgrestToken = useLocalStorage<string | null>('auth/postgrestToken', null)
     const organization = useLocalStorage<string | null>('auth/organization', null)
+    const userLocal = useLocalStorage<string | null>('userLocal', null)
 
     const isAuthenticated = computed(() => {
         if (!user.value)
@@ -47,9 +48,14 @@ export const useAuthStore = defineStore('auth', () => {
 
     // Methods
     function login(userData: UserLocal) {
+        console.log('Logging in user:', userData)
         user.value = JSON.stringify(userData)
     }
 
+    function loginLocalUser(userData: UserLocal) {
+        console.log('Logging in local user:', userData)
+        userLocal.value = JSON.stringify(userData)
+    }
     function logout() {
         user.value = null
         organization.value = null
@@ -79,6 +85,7 @@ export const useAuthStore = defineStore('auth', () => {
         getPostgrestToken,
         setOrganization,
         login,
+        loginLocalUser,
         logout,
     }
 })
