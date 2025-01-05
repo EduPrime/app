@@ -2,13 +2,13 @@
 import { catchPageWidth } from '@/utils/useUtils'
 import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonItem, IonText } from '@ionic/vue'
 
-import { defineEmits, onMounted, ref, watch } from 'vue'
-import SchoolService from '../services/SchoolService'
 // import Swiper core and required modules
 import { A11y, Navigation, Pagination, Scrollbar } from 'swiper/modules'
-
 // Import Swiper Vue.js components
 import { Swiper, SwiperSlide } from 'swiper/vue'
+import { onMounted, ref, watch } from 'vue'
+
+import SchoolService from '../services/SchoolService'
 
 // Import Swiper styles
 import 'swiper/css'
@@ -34,20 +34,21 @@ const modules = [Navigation, Pagination, Scrollbar, A11y]
 //
 
 const pageWidth = ref()
-const supabase = new SchoolService()
+const postgrest = new SchoolService()
 const schoolList = ref()
 
 watch(() => props.query, async (qValue: string) => {
   if (qValue && qValue.length > 2) {
-    schoolList.value = schoolList.value = await supabase.searchSchools(qValue)
+    schoolList.value = schoolList.value = await postgrest.searchSchools(qValue)
+    console.log('schoolList:', schoolList.value)
   }
   else {
-    schoolList.value = await supabase.getSchools()
+    schoolList.value = await postgrest.getSchools()
   }
 })
 
 onMounted(async () => {
-  schoolList.value = await supabase.getSchools()
+  schoolList.value = await postgrest.getSchools()
   pageWidth.value = catchPageWidth()
 })
 </script>

@@ -27,7 +27,7 @@ watch(
 
 // Nome da tabela e campos
 const tableName = 'classroom'
-const fields = ['created_at', 'deleted_at', 'id', 'metadata', 'name', 'period', 'series_id', 'status', 'updated_at', 'user_created']
+const fields = ['createdAt', 'deletedAt', 'id', 'metadata', 'name', 'period', 'series_id', 'status', 'updatedAt', 'user_created']
 const router = useRouter()
 
 // Função que busca os dados da tabela ao montar o componente

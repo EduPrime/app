@@ -1,10 +1,9 @@
 import BaseService from '@/services/BaseService'
 
-const table = 'document' as const
-
+const table = 'document'
 type DocumentTable = typeof table
 
-export default class DocumentService extends BaseService<DocumentTable> {
+export default class DocumentService extends BaseService {
   constructor() {
     super(table)
   }

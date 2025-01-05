@@ -71,6 +71,7 @@ const app = createApp(App)
   .use(router)
   .use(pinia)
 
+
 app.component('ion-app', IonApp)
 app.component('ion-content', IonContent)
 app.component('ion-icon', IonIcon)

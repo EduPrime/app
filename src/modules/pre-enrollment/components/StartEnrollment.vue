@@ -4,16 +4,16 @@ import { catchPageWidth } from '@/utils/useUtils'
 import { IonButton, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonGrid, IonHeader, IonIcon, IonRow, IonSpinner } from '@ionic/vue'
 
 import { arrowBackOutline, checkmarkCircleOutline } from 'ionicons/icons'
-import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
-
-import PreEnrollmentService from '../services/PreEnrollmentService'
+import { onMounted, ref, watch } from 'vue'
 
 // componentes
 import formPreEnrrolment from '../components/FormPreEnrrolment.vue'
-import selectCourseSlider from '../components/SelectCourseSlider.vue'
 
+import selectCourseSlider from '../components/SelectCourseSlider.vue'
 import selectSchoolSlider from '../components/SelectSchoolSlider.vue'
+
 import selectSeriesSlider from '../components/SelectSeriesSlider.vue'
+import PreEnrollmentService from '../services/PreEnrollmentService'
 
 interface Props {
   searchbox: string
@@ -21,7 +21,7 @@ interface Props {
 const props = defineProps<Props>()
 const emits = defineEmits(['update:modelValue'])
 
-const supabase = new PreEnrollmentService()
+const postgrest = new PreEnrollmentService()
 const studentId = ref()
 const pageWidth = ref()
 const loading = ref(false)
@@ -37,17 +37,17 @@ const insertedPreEnrollment = ref()
 const postStatus = ref()
 
 const preEnrollment = ref({
-  school_id: '',
-  course_id: '',
-  series_id: '',
-  student_id: '',
+  schoolId: '',
+  courseId: '',
+  seriesId: '',
+  studentId: '',
   observations: undefined as string | null | undefined,
-  pre_enrollment_code: undefined as string | null | undefined,
-  date_enrollment: new Date().toISOString().slice(0, 10),
+  preenrollmentcode: undefined as string | null | undefined,
+  datePreenrollment: new Date().toISOString().slice(0, 10),
 })
 watch(selectedSchool, (value) => {
   if (value) {
-    preEnrollment.value.school_id = value.id
+    preEnrollment.value.schoolId = value.id
     loading.value = true
     finished.value = false
 
@@ -68,7 +68,7 @@ watch(selectedSchool, (value) => {
 
 watch(selectedCourse, (value) => {
   if (value) {
-    preEnrollment.value.course_id = value.id
+    preEnrollment.value.courseId = value.id
     loading.value = true
     finished.value = false
 
@@ -87,7 +87,7 @@ watch(selectedCourse, (value) => {
 
 watch(selectedSeries, (value) => {
   if (value) {
-    preEnrollment.value.series_id = value.id
+    preEnrollment.value.seriesId = value.id
     loading.value = true
     finished.value = false
 
@@ -113,7 +113,7 @@ watch(etapa, (value) => {
 watch(studentId, (value) => {
   if (value) {
     // loading.value = true
-    preEnrollment.value.student_id = value
+    preEnrollment.value.studentId = value
   }
   else {
     // loading.value = false
@@ -140,16 +140,16 @@ watch(postStatus, async (value) => {
       finished.value = true
     }, 500) // 1 segundo antes de loading se tornar false
 
-    preEnrollment.value.pre_enrollment_code = await supabase.generateUnicPreEnrollmentCode()
+    preEnrollment.value.preenrollmentcode = await postgrest.generateUnicPreEnrollmentCode()
 
     if (
-      preEnrollment.value.pre_enrollment_code
-      && preEnrollment.value.school_id
-      && preEnrollment.value.course_id
-      && preEnrollment.value.series_id
-      && preEnrollment.value.student_id
+      preEnrollment.value.preenrollmentcode
+      && preEnrollment.value.schoolId
+      && preEnrollment.value.courseId
+      && preEnrollment.value.seriesId
+      && preEnrollment.value.studentId
     ) {
-      insertedPreEnrollment.value = await supabase.insertPreEnrollment(preEnrollment.value)
+      insertedPreEnrollment.value = await postgrest.insertPreEnrollment(preEnrollment.value)
     }
 
     setTimeout(() => {
@@ -168,7 +168,7 @@ watch(postStatus, async (value) => {
 const teste = ref()
 onMounted(async () => {
   pageWidth.value = catchPageWidth()
-  teste.value = await supabase.getPreEnrollments()
+  teste.value = await postgrest.getPreEnrollments()
 })
 </script>
 
@@ -251,7 +251,8 @@ onMounted(async () => {
                   <p style="font-size: 14pt;" class="ion-padding-top">
                     Código da pré-matrícula: <span style="font-weight: 800;">
 
-                      {{ insertedPreEnrollment.data.at(0).pre_enrollment_code }}
+                      <!-- {{ insertedPreEnrollment.data.at(0).preenrollmentcode }} -->
+                      {{ insertedPreEnrollment.data }}
                     </span>
                   </p>
                   <div class="flex" style="min-height: 150px;">

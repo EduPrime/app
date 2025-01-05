@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonItem, IonText } from '@ionic/vue'
-import { computed, defineEmits, defineProps, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 import PreEnrollmentService from '../services/PreEnrollmentService'
 
@@ -12,11 +12,11 @@ const props = defineProps<Props>()
 const emits = defineEmits(['update:modelValue'])
 const query = computed(() => props.query)
 const result = ref()
-const supabase = new PreEnrollmentService()
+const postgrest = new PreEnrollmentService()
 
 watch(query, async (value) => {
   if (value) {
-    result.value = await supabase.getPreEnrollmentByCode(value)
+    result.value = await postgrest.getPreEnrollmentByCode(value)
   }
   else {
     result.value = null

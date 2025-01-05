@@ -1,3 +1,5 @@
+@import url(/assets/fonts/Satoshi/satoshi.css);
+
 html {
 	scroll-behavior: smooth;
   }
@@ -37,7 +39,6 @@ html {
 	margin-bottom: auto;
   }
   
-@import url(/assets/fonts/Satoshi/satoshi.css);
 
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */

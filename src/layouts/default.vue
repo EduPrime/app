@@ -1,4 +1,7 @@
 <script setup lang="ts">
+// import type CustomUser from '@/router/CustomUser'
+import type { RouteRecordNormalized } from 'vue-router'
+import NavItem from '@/components/NavItem.vue'
 import {
   barChart,
   barChartOutline,
@@ -21,14 +24,9 @@ import {
 } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-// import type CustomUser from '@/router/CustomUser'
-import type { RouteRecordNormalized } from 'vue-router'
-import NavItem from '@/components/NavItem.vue'
-import { useUserStore } from '@/store/user'
-import { supabase } from '../supabaseClient'
+import { AuthService } from '@/services/AuthService'
 
-const userStore = useUserStore()
-// const user: CustomUser = userStore.user as CustomUser
+const authService = new AuthService()
 
 const tabs = ref([
   {
@@ -257,15 +255,8 @@ watch(route, (newRoute) => {
 })
 
 async function logout() {
-  const { error } = await supabase.auth.signOut()
-  if (error) {
-    console.error('Erro ao deslogar:', error.message)
-  }
-  else {
-    userStore.logout()
-
-    router.push('/login')
-  }
+  await authService.logout()
+  router.push('/login')
 }
 </script>
 

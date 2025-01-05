@@ -1,17 +1,17 @@
 import BaseService from '@/services/BaseService'
 import { ref } from 'vue'
 
-const table = 'pre_enrollment' as const
+const table = 'preenrollment' as const
 
 interface PreEnrollmentType {
-  course_id: string
-  date_enrollment: string
+  courseId: string
+  datePreenrollment: string
   id?: string | undefined
   observations?: string | null | undefined
-  pre_enrollment_code?: string | null | undefined
-  school_id: string
-  series_id: string
-  student_id: string
+  preenrollmentcode?: string | null | undefined
+  schoolId: string
+  seriesId: string
+  studentId: string
 }
 
 type TabelaType = typeof table
@@ -48,22 +48,22 @@ export default class PreEnrollmentService extends BaseService<TabelaType> {
   async getPreEnrollmentByCode(uniqueCode: string) {
     try {
       const information = ref({
-        pre_enrollment: undefined as any,
+        preenrollment: undefined as any,
         student: undefined as any,
         course: undefined as any,
         school: undefined as any,
         series: undefined as any,
       })
-      const data: { data: { student_id: string }[] } | any = await this.client.from(table)
-        .select('pre_enrollment_code, student_id, school_id, course_id, series_id, date_enrollment, observations, status')
-        .eq('pre_enrollment_code', uniqueCode)
+      const data: { data: { studentId: string }[] } | any = await this.client.from(table)
+        .select('preenrollmentcode, studentId, schoolId, courseId, seriesId, datePreenrollment, observations, status')
+        .eq('preenrollmentcode', uniqueCode)
 
       if (data.data.length > 0) {
-        information.value.pre_enrollment = data.data[0]
-        information.value.student = await this.genericGet('student', data.data[0].student_id)
-        information.value.course = await this.genericGet('course', data.data[0].course_id)
-        information.value.school = await this.genericGet('school', data.data[0].school_id)
-        information.value.series = await this.genericGet('series', data.data[0].series_id)
+        information.value.preenrollment = data.data[0]
+        information.value.student = await this.genericGet('student', data.data[0].studentId)
+        information.value.course = await this.genericGet('course', data.data[0].courseId)
+        information.value.school = await this.genericGet('school', data.data[0].schoolId)
+        information.value.series = await this.genericGet('series', data.data[0].seriesId)
       }
 
       return information.value
@@ -94,8 +94,8 @@ export default class PreEnrollmentService extends BaseService<TabelaType> {
     try {
       do {
         data.value = await this.client.from(table)
-          .select('pre_enrollment_code')
-          .eq('pre_enrollment_code', uCode.value)
+          .select('preenrollmentcode')
+          .eq('preenrollmentcode', uCode.value)
 
         if (data.value.data && data.value.data.length > 0) {
           uCode.value = this.generateRandomPreEnrollmentCode()

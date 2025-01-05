@@ -29,7 +29,7 @@ watch(
 
 // Nome da tabela e campos
 const tableName = 'school'
-const fields = ['abbreviation', 'access', 'acronym', 'active', 'address', 'administrativedependency', 'availablearea', 'blockdiaryentriesforclosedacademicyears', 'builtarea', 'city', 'created_at', 'creationdecree', 'deleted_at', 'energymeter', 'floortype', 'hasexternalarea', 'id', 'institution_id', 'latitude', 'logourl', 'longitude', 'manager_id', 'managerposition', 'metadata', 'name', 'numberoffloors', 'operationalstatus', 'operationlocation', 'phone', 'postalcode', 'regulation', 'sharedschoolinepcode', 'state', 'totalarea', 'updated_at', 'user_created']
+const fields = ['abbreviation', 'access', 'acronym', 'active', 'address', 'administrativedependency', 'availablearea', 'blockdiaryentriesforclosedacademicyears', 'builtarea', 'city', 'createdAt', 'creationdecree', 'deletedAt', 'energymeter', 'floortype', 'hasexternalarea', 'id', 'institution_id', 'latitude', 'logourl', 'longitude', 'manager_id', 'managerposition', 'metadata', 'name', 'numberoffloors', 'operationalstatus', 'operationlocation', 'phone', 'postalcode', 'regulation', 'sharedschoolinepcode', 'state', 'totalarea', 'updatedAt', 'user_created']
 const router = useRouter()
 
 // Função que busca os dados da tabela ao montar o componente

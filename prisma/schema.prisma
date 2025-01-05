@@ -1,0 +1,555 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String
+  role        String
+  tenantId    String    @db.Uuid
+  email       String
+  apiUserId   String
+}
+
+model AcademicYear {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  schoolId    String    @db.Uuid
+  templateId  String    @db.Uuid
+  refYear     Int
+  metadata    Json?
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime? @db.Timestamptz(6)
+  updatedBy   String?   @db.Uuid
+  tenantId    String?   @db.Uuid
+  deletedAt   DateTime? @db.Timestamptz(6)
+  userCreated String?   @db.Uuid
+
+  @@map("academic_year")
+}
+
+model AcademicYearTemplate {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  refYear     Int
+  name        String    @unique @db.VarChar(100)
+  stages      Json
+  stageCount  Int?
+  metadata    Json?
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime? @db.Timestamptz(6)
+  deletedAt   DateTime? @db.Timestamptz(6)
+  userCreated String?   @db.Uuid
+  updatedBy   String?   @db.Uuid
+  tenantId    String?   @db.Uuid
+
+  @@map("academic_year_template")
+}
+
+model Classroom {
+  id                                                                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  seriesId                                                          String              @db.Uuid
+  maxStudents                                                       Int
+  startTime                                                         DateTime?           @db.Timestamp(6)
+  startTimeInterval                                                 DateTime?           @db.Timestamp(6)
+  endTimeInterval                                                   DateTime?           @db.Timestamp(6)
+  endTime                                                           DateTime?           @db.Timestamp(6)
+  dayofweek                                                         dayofweek?
+  name                                                              String              @db.VarChar(100)
+  period                                                            period?             @default(MORNING)
+  status                                                            status?             @default(ACTIVE)
+  abbreviation                                                      String?             @db.VarChar(100)
+  year                                                              Int
+  metadata                                                          Json?
+  userCreated                                                       String?             @db.VarChar(255)
+  createdAt                                                         DateTime?           @default(now()) @db.Timestamp(6)
+  deletedAt                                                         DateTime?           @db.Timestamp(6)
+  updatedAt                                                         DateTime?           @db.Timestamp(6)
+  schoolId                                                          String?             @db.Uuid
+  updatedBy                                                         String?             @db.Uuid
+  tenantId                                                          String?             @db.Uuid
+  school                                                            School?             @relation(fields: [schoolId], references: [id], onDelete: Restrict, map: "classroom_school_id_fkey")
+  series                                                            Series              @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroom_seriesid_fkey")
+  enrollment                                                        Enrollment[]
+  enrollmenthistory_enrollmenthistory_currentClassroomIdToclassroom EnrollmentHistory[] @relation("enrollmenthistory_currentClassroomIdToclassroom")
+  enrollmenthistory_enrollmenthistory_formerClassroomIdToclassroom  EnrollmentHistory[] @relation("enrollmenthistory_formerClassroomIdToclassroom")
+
+  @@map("classroom")
+}
+
+model Course {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String          @db.VarChar(100)
+  schoolId      String          @db.Uuid
+  status        status?         @default(ACTIVE)
+  metadata      Json?
+  createdAt     DateTime?       @default(now()) @db.Timestamp(6)
+  deletedAt     DateTime?       @db.Timestamp(6)
+  updatedAt     DateTime?       @db.Timestamp(6)
+  userCreated   String?         @db.VarChar(255)
+  updatedBy     String?         @db.Uuid
+  tenantId      String?         @db.Uuid
+  school        School          @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_schoolid_fkey")
+  enrollment    Enrollment[]
+  preenrollment PreEnrollment[]
+  series        Series[]
+  
+  @@map("course")
+}
+
+model Discipline {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name        String    @db.VarChar(100)
+  status      status?   @default(ACTIVE)
+  metadata    Json?
+  userCreated String?   @db.Uuid
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  deletedAt   DateTime? @db.Timestamptz(6)
+  updatedAt   DateTime? @db.Timestamptz(6)
+  workload    Decimal?  @db.Decimal
+  updatedBy   String?   @db.Uuid
+  tenantId    String?   @db.Uuid
+  grade       Grade[]
+
+  @@map("discipline")
+}
+
+model Enrollment {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  schoolId          String              @db.Uuid
+  studentId         String              @unique(map: "enrollment_studentid_key") @db.Uuid
+  courseId          String              @db.Uuid
+  classroomId       String              @db.Uuid
+  seriesId          String              @db.Uuid
+  name              String              @db.VarChar(100)
+  createdAt         DateTime?           @default(now()) @db.Timestamp(6)
+  deletedAt         DateTime?           @db.Timestamp(6)
+  updatedAt         DateTime?           @db.Timestamp(6)
+  updatedBy         String?             @db.Uuid
+  tenantId          String?             @db.Uuid
+  dateEnrollment    DateTime            @db.Timestamp(6)
+  observations      String?             @db.VarChar(200)
+  status            status?             @default(ACTIVE)
+  situation         situationtype
+  enrollmentCode    String              @unique(map: "enrollment_enrollmentcode_key") @db.VarChar(100)
+  institutionId     String?             @db.Uuid
+  preenrollmentId   String?             @unique(map: "enrollment_preenrollmentid_key") @db.Uuid
+  classroom         Classroom           @relation(fields: [classroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_classroomid_fkey")
+  course            Course              @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_courseid_fkey")
+  institution       Institution?        @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_institutionid_fkey")
+  preenrollment     PreEnrollment?      @relation(fields: [preenrollmentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_preenrollmentid_fkey")
+  school            School              @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_schoolid_fkey")
+  series            Series              @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_seriesid_fkey")
+  student           Student             @relation(fields: [studentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_studentid_fkey")
+  enrollmenthistory EnrollmentHistory[]
+
+  @@map("enrollment")
+}
+
+model EnrollmentHistory {
+  id                                                        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  startedAt                                                 DateTime   @db.Timestamp(6)
+  endedAt                                                   DateTime?  @db.Timestamp(6)
+  formerClassroomId                                         String     @db.Uuid
+  currentClassroomId                                        String     @db.Uuid
+  enrollmentId                                              String     @db.Uuid
+  updatedBy                                                 String?    @db.Uuid
+  tenantId                                                  String?    @db.Uuid
+  createdAt                                                 DateTime?  @default(now()) @db.Timestamp(6)
+  deletedAt                                                 DateTime?  @db.Timestamp(6)
+  updatedAt                                                 DateTime?  @db.Timestamp(6)
+  classroom_enrollmenthistory_currentClassroomIdToclassroom Classroom  @relation("enrollmenthistory_currentClassroomIdToclassroom", fields: [currentClassroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollmenthistory_currentclassroomid_fkey")
+  enrollment                                                Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollmenthistory_enrollmentid_fkey")
+  classroom_enrollmenthistory_formerClassroomIdToclassroom  Classroom  @relation("enrollmenthistory_formerClassroomIdToclassroom", fields: [formerClassroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollmenthistory_formerclassroomid_fkey")
+
+  @@map("enrollmenthistory")
+}
+
+model Grade {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  schoolId     String     @db.Uuid
+  studentId    String     @db.Uuid
+  disciplineId String     @db.Uuid
+  value        Decimal    @db.Decimal
+  date         DateTime   @db.Timestamptz(6)
+  metadata     Json?
+  userCreated  String?    @db.Uuid
+  createdAt    DateTime   @default(now()) @db.Timestamptz(6)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  updatedAt    DateTime?  @db.Timestamp(6)
+  updatedBy    String?    @db.Uuid
+  tenantId     String?    @db.Uuid
+  discipline   Discipline @relation(fields: [disciplineId], references: [id], map: "grade_discipline_id_fkey")
+  school       School     @relation(fields: [schoolId], references: [id], map: "grade_school_id_fkey")
+  student      Student    @relation(fields: [studentId], references: [id], map: "grade_student_id_fkey")
+
+  @@map("grade")
+}
+
+model Institution {
+  id                  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                String               @db.VarChar(100)
+  address             String?              @db.VarChar(255)
+  city                String?              @db.VarChar(100)
+  state               String?              @db.Char(2)
+  postalCode          String?              @db.Char(10)
+  phone               String?              @db.VarChar(15)
+  email               String?              @db.VarChar(255)
+  metadata            Json?
+  createdAt           DateTime?            @default(now()) @db.Timestamp(6)
+  deletedAt           DateTime?            @db.Timestamp(6)
+  updatedAt           DateTime?            @db.Timestamp(6)
+  updatedBy           String?              @db.Uuid
+  tenantId            String?              @db.Uuid
+  userCreated         String?              @db.VarChar(255)
+  singleton           Int?                 @default(1)
+  enrollment          Enrollment[]
+  institutionsettings InstitutionSettings?
+  preenrollment       PreEnrollment[]
+  school              School[]
+  school_settings     SchoolSettings[]
+
+  @@map("institution")
+}
+
+model InstitutionSettings {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt     DateTime?   @default(now()) @db.Timestamp(6)
+  deletedAt     DateTime?   @db.Timestamp(6)
+  updatedAt     DateTime?   @db.Timestamp(6)
+  updatedBy     String?     @db.Uuid
+  tenantId      String?     @db.Uuid
+  institutionId String      @unique(map: "institutionsettings_institutionid_key") @db.Uuid
+  dateOpening   DateTime?   @db.Timestamp(6)
+  dateClosing   DateTime?   @db.Timestamp(6)
+  schoolDays    Float?
+  dateStart     DateTime?   @db.Timestamp(6)
+  dateEnd       DateTime?   @db.Timestamp(6)
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "institutionsettings_institutionid_fkey")
+
+  @@map("institutionsettings")
+}
+
+model PreEnrollment {
+  id                String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  institutionId     String?        @db.Uuid
+  schoolId          String         @db.Uuid
+  studentId         String         @unique(map: "preenrollment_studentid_key") @db.Uuid
+  courseId          String         @db.Uuid
+  seriesId          String         @db.Uuid
+  createdAt         DateTime?      @default(now()) @db.Timestamp(6)
+  deletedAt         DateTime?      @db.Timestamp(6)
+  updatedAt         DateTime?      @db.Timestamp(6)
+  updatedBy         String?        @db.Uuid
+  tenantId          String?        @db.Uuid
+  datePreenrollment DateTime       @db.Timestamp(6)
+  observations      String?        @db.VarChar(200)
+  status            status?        @default(ACTIVE)
+  situation         situationtype?
+  preenrollmentcode String?        @unique @db.VarChar(100)
+  enrollment        Enrollment?
+  course            Course         @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "preenrollment_courseid_fkey")
+  institution       Institution?   @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "preenrollment_institutionid_fkey")
+  school            School         @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "preenrollment_schoolid_fkey")
+  series            Series         @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "preenrollment_seriesid_fkey")
+  student           Student        @relation(fields: [studentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "preenrollment_studentid_fkey")
+
+  @@map("preenrollment")
+}
+
+model School {
+  id                       String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                     String              @db.VarChar(100)
+  address                  String?             @db.VarChar(255)
+  city                     String?             @db.VarChar(100)
+  state                    String?             @db.Char(2)
+  postalCode               String?             @db.Char(10)
+  phone                    String?             @db.VarChar(15)
+  institutionId            String              @db.Uuid
+  active                   Boolean?            @default(true)
+  abbreviation             String?             @db.VarChar(255)
+  longitude                String?             @db.VarChar(255)
+  latitude                 String?             @db.VarChar(255)
+  totalArea                String?             @db.VarChar(255)
+  builtArea                String?             @db.VarChar(255)
+  availableArea            String?             @db.VarChar(255)
+  acronym                  String?             @db.VarChar(255)
+  blockDiaryEntries        Boolean?
+  operationalStatus        Int?
+  administrativeDependency Int?
+  regulation               Int?
+  logoUrl                  String?             @db.VarChar(255)
+  access                   Int?
+  managerid                String?             @db.Uuid
+  managerPosition          String?             @db.VarChar(255)
+  operationLocation        String?             @db.VarChar(255)
+  condition                Int?
+  sharedSchooLinePCode     Int?
+  creationDecree           String?             @db.VarChar(255)
+  numberOfFloors           Int?
+  floorType                Int?
+  energyMeter              Int?
+  hasExternalArea          Boolean?
+  metadata                 Json?
+  createdAt                DateTime?           @default(now()) @db.Timestamp(6)
+  deletedAt                DateTime?           @db.Timestamp(6)
+  updatedAt                DateTime?           @db.Timestamp(6)
+  updatedBy                String?             @db.Uuid
+  tenantId                 String?             @db.Uuid
+  userCreated              String?             @db.VarChar(255)
+  classroom                Classroom[]
+  course                   Course[]
+  enrollment               Enrollment[]
+  grade                    Grade[]
+  preenrollment            PreEnrollment[]
+  institution              Institution         @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_institutionid_fkey")
+  school_settings          SchoolSettings[]
+  series                   Series[]
+  server_allocations       ServerAllocations[]
+  student                  Student[]
+  teacher                  Teacher[]
+
+  @@map("school")
+}
+
+model SchoolSettings {
+  id            String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  createdAt     DateTime    @default(now()) @db.Timestamptz(6)
+  dateOpening   DateTime?   @db.Date
+  dateClosing   DateTime?   @db.Date
+  schoolDays    Decimal?    @db.Decimal
+  dateStart     DateTime?   @db.Date
+  dateEnd       DateTime?   @db.Date
+  institutionId String      @db.Uuid
+  schoolId      String      @db.Uuid
+  updatedAt     DateTime?   @db.Timestamp(6)
+  updatedBy     String?     @db.Uuid
+  tenantId      String?     @db.Uuid
+  userCreated   String?     @db.Uuid
+  deletedAt     DateTime?   @db.Timestamp(6)
+  institution   Institution @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_settings_institution_id_fkey")
+  school        School      @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_settings_school_id_fkey")
+
+  @@map("school_settings")
+}
+
+model Series {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String          @db.VarChar(100)
+  courseId      String          @db.Uuid
+  timetableId   String?         @db.Uuid
+  metadata      Json?
+  createdAt     DateTime?       @default(now()) @db.Timestamp(6)
+  deletedAt     DateTime?       @db.Timestamp(6)
+  updatedAt     DateTime?       @db.Timestamp(6)
+  updatedBy     String?         @db.Uuid
+  tenantId      String?         @db.Uuid
+  userCreated   String?         @db.VarChar(255)
+  schoolId      String?         @db.Uuid
+  classroom     Classroom[]
+  enrollment    Enrollment[]
+  preenrollment PreEnrollment[]
+  course        Course          @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_courseid_fkey")
+  school        School?         @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_schoolid_fkey")
+
+  @@map("series")
+}
+
+model ServerAllocations {
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  serverId      String          @db.Uuid
+  schoolId      String          @db.Uuid
+  anoLetivo     Int
+  entryDate     DateTime        @db.Timestamp(6)
+  exitDate      DateTime?       @db.Timestamp(6)
+  createdAt     DateTime?       @default(now()) @db.Timestamp(6)
+  deletedAt     DateTime?       @db.Timestamp(6)
+  updatedAt     DateTime?       @db.Timestamp(6)
+  updatedBy     String?         @db.Uuid
+  tenantId      String?         @db.Uuid
+  userCreated   String?         @db.VarChar(255)
+  school        School          @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_school")
+  servers       Servers         @relation(fields: [serverId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_server")
+
+  @@unique([serverId, schoolId, anoLetivo], map: "uq_server_allocation")
+  @@map("server_allocations")
+}
+
+model Servers {
+  id                 String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String              @db.VarChar(100)
+  email              String?             @unique @db.VarChar(255)
+  phone              String?             @db.VarChar(15)
+  cpf                String              @unique @db.VarChar(11)
+  address            String?             @db.VarChar(255)
+  position           String              @db.VarChar(255)
+  schoolId           String              @db.Uuid
+  createdAt          DateTime?           @default(now()) @db.Timestamp(6)
+  deletedAt          DateTime?           @db.Timestamp(6)
+  updatedAt          DateTime?           @db.Timestamp(6)
+  updatedBy          String?             @db.Uuid
+  tenantId           String?             @db.Uuid
+  userCreated        String?             @db.VarChar(255)
+  server_allocations ServerAllocations[]
+
+  @@map("servers")
+}
+
+model Student {
+  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name             String             @db.VarChar(100)
+  birthdate        DateTime           @db.Timestamp(6)
+  gender           String?            @db.Char(1)
+  email            String?            @db.VarChar(255)
+  phone            String?            @db.VarChar(15)
+  address          String?            @db.VarChar(255)
+  guardianName     String?            @db.VarChar(100)
+  guardianPhone    String?            @db.VarChar(15)
+  status           status?            @default(ACTIVE)
+  photo            Bytes?
+  metadata         Json?
+  createdAt        DateTime?          @default(now()) @db.Timestamp(6)
+  deletedAt        DateTime?          @db.Timestamp(6)
+  updatedAt        DateTime?          @db.Timestamp(6)
+  updatedBy        String?            @db.Uuid
+  tenantId         String?            @db.Uuid
+  userCreated      String?            @db.VarChar(255)
+  schoolId         String?            @db.Uuid
+  postalCode       String?            @db.VarChar(100)
+  residenceZone    residenceZoneType? @default(Urbana)
+  numberAddress    String?            @db.VarChar(100)
+  cpf              String?            @unique @db.VarChar(100)
+  neighborhood     String?            @db.VarChar(100)
+  city             String?            @db.VarChar(100)
+  complement       String?            @db.VarChar(100)
+  fatherName       String?            @db.VarChar(100)
+  fatherEmail      String?            @db.VarChar(100)
+  fatherCpf        String?            @db.VarChar(100)
+  fatherPhone      String?            @db.VarChar(100)
+  motherName       String?            @db.VarChar(100)
+  motherEmail      String?            @db.VarChar(100)
+  motherCpf        String?            @db.VarChar(100)
+  motherPhone      String?            @db.VarChar(100)
+  rgNumber         String?            @unique @db.VarChar(100)
+  rgState          String?            @db.Char(2)
+  rgIssueDate      DateTime?          @db.Date
+  rgIssuer         String?            @db.VarChar(100)
+  birthCertificate String?            @db.VarChar(100)
+  docsType         String?            @db.VarChar(100)
+  responsibleType  responsibleType?   @default(Pai)
+  citystate        String?            @db.VarChar
+  enrollment       Enrollment?
+  grade            Grade[]
+  preenrollment    PreEnrollment?
+  school           School?            @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "student_school")
+
+  @@map("student")
+}
+
+model Teacher {
+  id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  schoolId       String    @db.Uuid
+  name           String    @db.VarChar(100)
+  birthdate      DateTime  @db.Date
+  email          String?   @db.VarChar(255)
+  phone          String?   @db.VarChar(15)
+  address        String?   @db.VarChar(255)
+  qualifications Json?
+  status         status?   @default(ACTIVE)
+  metadata       Json?
+  user_created   String?   @db.Uuid
+  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
+  deletedAt      DateTime? @db.Timestamptz(6)
+  updatedAt      DateTime? @db.Timestamptz(6)
+  updatedBy      String?   @db.Uuid
+  tenantId       String?   @db.Uuid
+  showDetails    Boolean?
+  school         School    @relation(fields: [schoolId], references: [id], map: "teacher_school_id_fkey")
+
+  @@map("teacher")
+}
+
+enum attendancestatus {
+  PRESENT
+  ABSENT
+  EXCUSED
+}
+
+enum dayofweek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+enum genderType {
+  Masculino
+  Feminino
+}
+
+enum gendertype {
+  Masculino
+  Feminino
+}
+
+enum period {
+  MORNING
+  AFTERNOON
+  EVENING
+}
+
+enum position {
+  Professor
+  Gestor
+  Coordenador
+  Diretor
+  Vigia
+}
+
+enum residenceZoneType {
+  Urbana
+  Rural
+}
+
+enum residencezonetype {
+  Urbana
+  Rural
+}
+
+enum responsibleType {
+  Pai
+  M_e   @map("Mãe")
+  Ambos
+}
+
+enum responsibletype {
+  Pai
+  M_e   @map("Mãe")
+  Ambos
+}
+
+enum situationtype {
+  Pendente
+  Cursando
+  Aprovado
+  Aprovado_pelo_Conselho
+  Aprovado_com_Dependencia
+  Reprovado
+  Transferido
+  Abandono
+  Falecido
+}
+
+enum status {
+  ACTIVE
+  INACTIVE
+  GRADUATED
+  SUSPENDED
+  TRANSFERRED
+}

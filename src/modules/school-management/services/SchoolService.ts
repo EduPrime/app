@@ -15,7 +15,7 @@ export default class SchoolService extends BaseService<SchoolTable> {
       const { count, error } = await this.client
         .from('school') // Tabela de escolas
         .select('*', { count: 'exact', head: true }) // Conta o número de escolas ignorando os soft-deleted
-        .is('deleted_at', null) // Ignora as escolas delet
+        .is('deletedAt', null) // Ignora as escolas delet
 
       if (error)
         throw error
@@ -32,7 +32,7 @@ export default class SchoolService extends BaseService<SchoolTable> {
       const { count, error } = await this.client
         .from('classroom') // Tabela de turmas
         .select('*', { count: 'exact', head: true }) // Conta o número de turmas ignorando as soft-deleted
-        .is('deleted_at', null) // Ignora as turmas deletadas
+        .is('deletedAt', null) // Ignora as turmas deletadas
 
       if (error)
         throw error
@@ -49,7 +49,7 @@ export default class SchoolService extends BaseService<SchoolTable> {
       const { count, error } = await this.client
         .from('teacher') // Tabela de professores
         .select('*', { count: 'exact', head: true }) // Conta o número de professores ignorando os soft-deleted
-        .is('deleted_at', null) // Ignora os professores deletados
+        .is('deletedAt', null) // Ignora os professores deletados
 
       if (error)
         throw error
@@ -73,7 +73,7 @@ export default class SchoolService extends BaseService<SchoolTable> {
       const { count: approvedStudents, error: approvedError } = await this.client
         .from('student') // Tabela de estudantes
         .select('*', { count: 'exact', head: true }) // Conta o número de estudantes ignorando os soft-deleted
-        .is('deleted_at', null) // Ignora os estudantes deletados
+        .is('deletedAt', null) // Ignora os estudantes deletados
       /*   .filter({ approved: true }) // Filtra os estudantes aprovados ou .eq({ approved: true }) */
 
       if (approvedError)
@@ -94,7 +94,7 @@ export default class SchoolService extends BaseService<SchoolTable> {
       const { count, error } = await this.client
         .from('student') // Tabela de estudantes
         .select('*', { count: 'exact', head: true }) // Conta o número de estudantes ignorando os soft-deleted
-        .is('deleted_at', null) // Ignora os estudantes deletados
+        .is('deletedAt', null) // Ignora os estudantes deletados
 
       if (error)
         throw error
