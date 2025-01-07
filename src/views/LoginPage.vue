@@ -80,7 +80,7 @@ onMounted(() => {
 
           <ion-row class="ion-justify-content-start">
             <ion-col size="auto">
-              <IonButton fill="clear" class="forgot-password-button">
+              <IonButton fill="clear" class="forgot-password-button" @click="navigation.resetPassword">
                 Esqueceu a senha?
               </IonButton>
             </ion-col>

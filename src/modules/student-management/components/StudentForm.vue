@@ -238,39 +238,51 @@ async function registerStudent() {
   else {
     const formData = {
       name: values.name,
-      gender: values.gender,
+      id: '', // Add a default or generated ID
+      schoolId: null,
+      createdAt: null,
+      deletedAt: null,
+      updatedAt: null,
+      updatedBy: null,
+      tenantId: null,
       status: values.status,
       address: values.address,
-      phone: values.phone,
-      email: values.email,
       birthdate: values.birthdate,
-      place_of_birth: values.place_of_birth,
-      postalcode: values.postalcode,
-      residence_zone: values.residence_zone,
-      number_address: values.number_address,
-      complement: values.complement,
+      gender: values.gender,
+      email: values.email,
+      phone: values.phone,
+      guardianName: null,
+      guardianPhone: null,
+      photo: null,
+      metadata: {},
+      userCreated: null,
+      postalCode: values.postalcode,
+      residenceZone: values.residence_zone,
+      numberAddress: values.number_address,
+      cpf: values.cpf,
       neighborhood: values.neighborhood,
       city: values.city,
-      cpf: values.cpf,
-      rg_number: values.rg_number,
-      rg_state: values.rg_state,
-      rg_issue_date: values.rg_issue_date,
-      rg_issuer: values.rg_issuer,
-      birth_certificate: values.birth_certificate,
-      father_name: values.father_name,
-      father_cpf: values.father_cpf,
-      father_email: values.father_email,
-      father_phone: values.father_phone,
-      mother_name: values.mother_name,
-      mother_cpf: values.mother_cpf,
-      mother_email: values.mother_email,
-      mother_phone: values.mother_phone,
-      responsibleType: values.responsibleType,
+      complement: values.complement,
+      fatherName: values.father_name,
+      fatherEmail: values.father_email,
+      fatherCpf: values.father_cpf,
+      fatherPhone: values.father_phone,
+      motherName: values.mother_name,
+      motherEmail: values.mother_email,
+      motherCpf: values.mother_cpf,
+      motherPhone: values.mother_phone,
+      rgNumber: values.rg_number,
+      rgState: values.rg_state,
+      rgIssueDate: values.rg_issue_date,
+      rgIssuer: values.rg_issuer,
+      birthCertificate: values.birth_certificate,
       docsType: values.docsType,
+      responsibleType: values.responsibleType,
+      citystate: null,
       ethnicity: values.ethnicity,
       deficiency: values.deficiency,
       deficiency_description: values.deficiency_description,
-
+      placeOfBirth: values.place_of_birth,
     }
     try {
       let result
@@ -346,33 +358,33 @@ async function getStudentData() {
       setFieldValue('email', studentDbData.email)
       setFieldValue('phone', studentDbData.phone)
       setFieldValue('address', studentDbData.address)
-      setFieldValue('number_address', studentDbData.number_address)
+      setFieldValue('number_address', studentDbData.numberAddress)
       setFieldValue('status', studentDbData.status)
-      setFieldValue('place_of_birth', studentDbData.place_of_birth)
+      setFieldValue('place_of_birth', studentDbData.placeOfBirth)
       setFieldValue('complement', studentDbData.complement)
       setFieldValue('neighborhood', studentDbData.neighborhood)
-      setFieldValue('postalcode', studentDbData.postalcode)
-      setFieldValue('residence_zone', studentDbData.residence_zone)
+      setFieldValue('postalcode', studentDbData.postalCode)
+      setFieldValue('residence_zone', studentDbData.residenceZone)
       setFieldValue('city', studentDbData.city)
       setFieldValue('cpf', studentDbData.cpf)
-      setFieldValue('father_name', studentDbData.father_name)
-      setFieldValue('father_cpf', studentDbData.father_cpf)
-      setFieldValue('father_email', studentDbData.father_email)
-      setFieldValue('father_phone', studentDbData.father_phone)
-      setFieldValue('mother_name', studentDbData.mother_name)
-      setFieldValue('mother_cpf', studentDbData.mother_cpf)
-      setFieldValue('mother_email', studentDbData.mother_email)
-      setFieldValue('mother_phone', studentDbData.mother_phone)
+      setFieldValue('father_name', studentDbData.fatherName)
+      setFieldValue('father_cpf', studentDbData.fatherCpf)
+      setFieldValue('father_email', studentDbData.fatherEmail)
+      setFieldValue('father_phone', studentDbData.fatherPhone)
+      setFieldValue('mother_name', studentDbData.motherName)
+      setFieldValue('mother_cpf', studentDbData.motherCpf)
+      setFieldValue('mother_email', studentDbData.motherEmail)
+      setFieldValue('mother_phone', studentDbData.motherPhone)
       setFieldValue('responsibleType', studentDbData.responsibleType)
       setFieldValue('docsType', studentDbData.docsType)
-      setFieldValue('birth_certificate', studentDbData.birth_certificate)
-      setFieldValue('rg_number', studentDbData.rg_number)
-      setFieldValue('rg_state', studentDbData.rg_state)
-      setFieldValue('rg_issue_date', studentDbData.rg_issue_date)
-      setFieldValue('rg_issuer', studentDbData.rg_issuer)
-      setFieldValue('ethnicity', studentDbData.ethnicity)
-      setFieldValue('deficiency', studentDbData.deficiency)
-      setFieldValue('deficiency_description', studentDbData.deficiency_description)
+      setFieldValue('birth_certificate', studentDbData.birthCertificate)
+      setFieldValue('rg_number', studentDbData.rgNumber)
+      setFieldValue('rg_state', studentDbData.rgState)
+      setFieldValue('rg_issue_date', studentDbData.rgIssueDate)
+      setFieldValue('rg_issuer', studentDbData.rgIssuer)
+      //setFieldValue('ethnicity', studentDbData.ethnicity)
+      //setFieldValue('deficiency', studentDbData.deficiency)
+      //setFieldValue('deficiency_description', studentDbData.deficiency_description)
     }
     else {
       console.error(`Dados do aluno não encontrados para o ID: ${studentId.value}`)

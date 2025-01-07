@@ -1,12 +1,10 @@
 import BaseService from '@/services/BaseService'
+import type { PreEnrollment } from '@prisma/client'
 
-const table = 'preenrollment' as const
 
-type TabelaType = typeof table
-
-export default class Pre_enrollmentService extends BaseService<TabelaType> {
+export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
   constructor() {
-    super(table)
+    super('preenrollment')
   }
 
   // Método para buscar pré-matrículas com dados do aluno

@@ -30,7 +30,7 @@ function formatPreEnrollments(pre_enrollments: any[]): (Tables<'pre_enrollment'>
   }))
 }
 
-const filteredDataList = computed(() => {
+const filteredDataList = computed<(Tables<'pre_enrollment'> & { student: { name: string, address: string } })[]>(() => {
   if (!searchQuery.value) {
     return dataList.value
   }

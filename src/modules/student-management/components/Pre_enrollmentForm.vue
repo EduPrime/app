@@ -144,7 +144,7 @@ async function registerPre_enrollment() {
         seriesId: seriesId.value,
         studentId: studentId.value,
         courseId: courseId.value,
-        datePreenrollment: values.date_enrollment,
+        datePreenrollment: values.dateEnrollment,
         observations: values.observations,
         status: values.status,
         situation: values.situation,
@@ -309,10 +309,10 @@ async function getPre_enrollmentData() {
   if (pre_enrollmentId.value) {
     const enrollmentDbData = await pre_enrollmentService.getById(pre_enrollmentId.value)
     if (enrollmentDbData) {
-      schoolId.value = enrollmentDbData.school_id
-      seriesId.value = enrollmentDbData.series_id
-      studentId.value = enrollmentDbData.student_id
-      courseId.value = enrollmentDbData.course_id
+      schoolId.value = enrollmentDbData.schoolId
+      seriesId.value = enrollmentDbData.seriesId
+      studentId.value = enrollmentDbData.studentId
+      courseId.value = enrollmentDbData.courseId
       preenrollmentcode.value = enrollmentDbData.preenrollmentcode ?? ''
       setFieldValue('datePreenrollment', enrollmentDbData.datePreenrollment)
       setFieldValue('observations', enrollmentDbData.observations)
@@ -324,7 +324,7 @@ async function getPre_enrollmentData() {
       setFieldValue('situation', enrollmentDbData.situation)
       setFieldValue('preenrollmentcode', enrollmentDbData.preenrollmentcode)
 
-      const student = await studentService.getById(enrollmentDbData.student_id)
+      const student = await studentService.getById(enrollmentDbData.studentId)
       if (student) {
         setFieldValue('name', student.name)
         searchQuery.value = ''
@@ -346,11 +346,11 @@ async function generateCodeEnrollment() {
   const lettersRandom = Array.from({ length: 3 }, () => String.fromCharCode(65 + Math.floor(Math.random() * 26))).join('')
   const numbersRandom = Array.from({ length: 3 }, () => Math.floor(Math.random() * 10)).join('')
   const currentYear = new Date().getFullYear()
-  pre_enrollment_code.value = `MAT-${lettersRandom}${numbersRandom}-${currentYear}`
+  preenrollmentcode.value = `MAT-${lettersRandom}${numbersRandom}-${currentYear}`
 }
 
 watch(studentId, (newValue) => {
-  if (!pre_enrollment_code.value && !pre_enrollmentId.value) { // Gera código apenas para novas matrículas
+  if (!preenrollmentcode.value && !pre_enrollmentId.value) { // Gera código apenas para novas matrículas
     // generateCodeEnrollment()
   }
 })
@@ -375,11 +375,11 @@ watch(schoolId, async (newSchoolId) => {
   }
 })
 
-watch(() => values.deficiency, (newValue) => {
-  if (newValue === 'Outros') {
-    valuesDeficiency.value.deficiency_description = ''
-  }
-})
+//watch(() => values.deficiency, (newValue) => {
+//  if (newValue === 'Outros') {
+//    valuesDeficiency.value.deficiency_description = ''
+//  }
+//})
 
 onMounted(async () => {
   const defaultDate = `${currentYear}-01-01`
@@ -602,7 +602,7 @@ onMounted(async () => {
         Código de Pré-Matrícula (Somente Leitura):
       </IonLabel>
       <ion-input
-        v-model="pre_enrollment_code"
+        v-model="pre_enrollmentId"
         type="text"
         placeholder="Código gerado após finalizar a pré-matrícula"
         :disabled="true"
@@ -655,7 +655,7 @@ onMounted(async () => {
       </IonSelect>
     </ion-list> -->
 
-    <ion-list id="deficiency">
+    <!-- ion-list id="deficiency">
       <IonSelect
         v-model="values.deficiency"
         fill="outline"
@@ -670,18 +670,18 @@ onMounted(async () => {
       >
         <IonSelectOption v-for="deficiency in deficiency" :key="deficiency" :value="deficiency">
           {{ deficiency }}
-        </IonSelectOption>
+        </IonSelectOption >
       </IonSelect>
-    </ion-list>
+    </ion-list -->
     <!-- Outras deficiências -->
-    <div v-show="values.deficiency === 'Outros'">
+    <!--div v-show="values.deficiency === 'Outros'">
       <EpInput
         v-model="values.deficiency_description"
         name="deficiency_description"
         label="Descrição da Necessidade"
         placeholder="Digite a descrição da necessidade"
       />
-    </div>
+    </div -->
   </div>
 </template>
 

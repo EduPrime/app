@@ -3,46 +3,26 @@ import showToast from '@/utils/toast-alert'
 import { IonButton, IonIcon, IonInput, IonItem, IonList, IonSelect, IonSelectOption, IonSpinner } from '@ionic/vue'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { auth } from 'better-auth'
-import { authClient } from '../services/AuthService'
-
-async function sendEmail({ to, subject, text }) {
-  console.log('Sending email to:', to)
-  console.log('Subject:', subject)
-  console.log('Text:', text)
-}
-
-const auth = betterAuth({
-  emailAndPassword: {
-    enabled: true,
-    sendResetPassword: async ({ user, url, token }, request) => {
-      await sendEmail({
-        to: user.email,
-        subject: "Reset your password",
-        text: `Click the link to reset your password: ${url}`,
-      });
-    },
-  },
-});
+import { AuthService } from '../services/AuthService'
 
 
 const email = ref<string>('')
 const loading = ref<boolean>(false)
 const router = useRouter()
+const authService = new AuthService()
 
 async function resetPassword() {
   loading.value = true
-  const { error } = await authClient.forgetPassword(email.value)
-  loading.value = false
-
-  if (error) {
-    showToast('Falha ao enviar email de redefinição de senha', 'top', 'warning')
-    console.error('Erro ao enviar email de redefinição de senha:', error.message)
-  }
-  else {
+  try {
+    await authService.forgetPassword(email.value)
     showToast('Email de redefinição de senha enviado com sucesso', 'top', 'success')
     router.push('/login')
   }
+  catch (error) {
+    showToast('Falha ao enviar email de redefinição de senha', 'top', 'warning')
+    console.error('Erro ao enviar email de redefinição de senha:', (error as Error).message)
+  }
+  loading.value = false
 }
 
 const navigation = {
@@ -85,7 +65,7 @@ const navigation = {
 
           <div class="button-container ion-margin-top">
             <!-- Bot�o de Sign Up -->
-            <IonButton expand="block" class="forgot-password-button">
+            <IonButton expand="block" class="forgot-password-button" @click="resetPassword">
               Solicitar Recuperação
             </IonButton>
 

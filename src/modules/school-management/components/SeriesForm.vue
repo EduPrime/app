@@ -24,7 +24,6 @@ defineExpose({
 const selectedSegment = ref('general-info')
 const router = useRouter()
 const route = useRouter()
-const seriesData = ref< Tables<'series'> | []>([])
 const seriesId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const schoolService = new SchoolService()
 const seriesService = new SeriesService()
@@ -36,10 +35,8 @@ const institutionId = ref('')
 const schoolId = ref('')
 const institutionList = ref()
 const seriesList = ref()
-const serieId = ref('')
 const courseList = ref()
 const courseId = ref('')
-const timetable_Id = ref('')
 const formSchema = yup.object ({
   name: yup
     .string()
@@ -48,7 +45,7 @@ const formSchema = yup.object ({
     .required('Instituição é obrigatória'),
   courseId: yup.string()
     .required('Curso é obrigatório'),
-  course_stage: yup
+  courseStage: yup
     .string()
     .required('Etapa Curso é obrigatório'),
   graduate: yup
@@ -71,7 +68,7 @@ const formSchema = yup.object ({
     .positive('A carga horária deve ser um número positivo')
     .integer('A carga horária deve ser um número inteiro')
     .min(1, 'A carga horária deve ser pelo menos 1 hora'),
-  school_days: yup
+  schoolDays: yup
     .number()
     .transform((value, originalValue) => {
     // Verifica se o originalValue é uma string e tenta convertê-la em número
@@ -90,7 +87,17 @@ const formSchema = yup.object ({
     .min(1, 'Os dias letivos devem ser pelo menos 1 dia'),
 })
 
-const { values, errors, validate, setFieldValue } = useForm<any>({
+interface SeriesForm {
+  name: string
+  institutionId: string
+  courseId: string
+  courseStage: string
+  graduate: string
+  workload: string
+  schoolDays: string
+}
+
+const { values, errors, validate, setFieldValue } = useForm<SeriesForm>({
   validationSchema: formSchema,
 })
 
@@ -103,14 +110,17 @@ async function registerSeries() {
   }
   else {
     const formData = {
-      /* school_id: schoolId.value, */
-      course_id: courseId.value,
-      institution_id: institutionId.value,
-      course_stage: values.course_stage,
+      schoolId: schoolId.value,
+      courseId: courseId.value,
+      institutionId: institutionId.value,
+      courseStage: values.courseStage,
       graduate: values.graduate,
       name: values.name,
       workload: values.workload,
-      school_days: values.school_days,
+      schoolDays: values.schoolDays,
+      timetableId: null,
+
+
     }
     console.log('FormData:', formData)
     try {
@@ -161,10 +171,10 @@ async function loadSeries() {
         targetList.value = data.map((item: any) => ({
           id: item.id,
           name: item.name,
-          course_stage: item.course_stage,
+          courseStage: item.courseStage,
           graduate: item.graduate,
           workload: item.workload,
-          school_days: item.school_days,
+          schoolDays: item.schoolDays,
         }))
       }
     }
@@ -181,19 +191,17 @@ async function getSeriesData() {
   if (seriesId.value) {
     const seriesDbData = await seriesService.getById(seriesId.value)
     if (seriesDbData) {
-      institutionId.value = seriesDbData.institution_id || ''
-      courseId.value = seriesDbData.course_id
-      /* schoolId.value = seriesDbData.school_id */
-      setFieldValue('institutionId', seriesDbData.institution_id)
-      /* setFieldValue('schoolId', seriesDbData.school_id) */
-      setFieldValue('courseId', seriesDbData.course_id)
-      setFieldValue('institution', seriesDbData.institution_id)
-      setFieldValue('course', seriesDbData.course_id)
+      institutionId.value = seriesDbData.institutionId
+      courseId.value = seriesDbData.courseId
+      schoolId.value = seriesDbData.schoolId
+      setFieldValue('institutionId', seriesDbData.institutionId) 
+      setFieldValue('schoolId', seriesDbData.schoolId) 
+      setFieldValue('courseId', seriesDbData.courseId)
       setFieldValue('name', seriesDbData.name)
-      setFieldValue('course_stage', seriesDbData.course_stage)
+      setFieldValue('courseStage', seriesDbData.courseStage)
       setFieldValue('graduate', seriesDbData.graduate)
       setFieldValue('workload', seriesDbData.workload)
-      setFieldValue('school_days', seriesDbData.school_days)
+      setFieldValue('schoolDays', seriesDbData.schoolDays)
     }
     else {
       console.error(`Dados da série não encontrados para o ID: ${seriesId.value}`)
@@ -222,7 +230,7 @@ async function loadInstitution() {
 }
 
 onMounted(async () => {
-  /* schoolId.value = (await schoolService.getAll())?.at(0)?.id */
+  schoolId.value = (await schoolService.getAll())?.at(0)?.id 
   await loadSeries()
   await loadInstitution()
   if (seriesId.value) {

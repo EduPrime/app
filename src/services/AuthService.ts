@@ -6,6 +6,7 @@ import { betterAuth } from 'better-auth'
 import { createAuthClient } from 'better-auth/vue'
 import { ClientOptions } from 'better-auth/types'
 import { organizationClient } from 'better-auth/client/plugins'
+import { sendEmail } from '../utils/send-email'
 
 
 const AUTH_API = import.meta.env.VITE_API_URL
@@ -21,6 +22,13 @@ export class AuthService {
         this.auth = betterAuth({
             emailAndPassword: {
                 enabled: true,
+            },
+            sendResetPassword: async ({ user, url, token }: { user: UserLocal, url: string, token: string }, request: any) => {
+                await sendEmail({
+                    to: user.email,
+                    subject: "Reset your password",
+                    text: `Click the link to reset your password: ${url}`,
+                });
             },
         });
 
@@ -144,6 +152,15 @@ export class AuthService {
         }
         catch (error) {
             throw new Error(`Failed to use session: ${(error as Error).message}`)
+        }
+    }
+
+    async forgetPassword(email: string) {
+        try {
+            await this.client.forgetPassword({ email })
+        }
+        catch (error) {
+            throw new Error(`Password reset failed: ${(error as Error).message}`)
         }
     }
 

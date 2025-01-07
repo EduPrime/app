@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/*
 import ThemeFilterButtons from '@/components/theme/FilterButtons.vue'
 import ThemeFilterExpansor from '@/components/theme/FilterExpansor.vue'
 import ThemeOverlayModal from '@/components/theme/OverlayModal.vue'
@@ -27,7 +28,7 @@ function openModal(val: string) {
   if (triggerButton) {
     triggerButton.click()
   }
-}
+
 </script>
 
 <template>
@@ -77,3 +78,5 @@ function openModal(val: string) {
     </IonContent>
   </IonPage>
 </template>
+*/
+</script>

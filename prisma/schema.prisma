@@ -211,6 +211,7 @@ model Institution {
   preenrollment       PreEnrollment[]
   school              School[]
   school_settings     SchoolSettings[]
+  series              Series[]
 
   @@map("institution")
 }
@@ -348,13 +349,18 @@ model Series {
   updatedBy     String?         @db.Uuid
   tenantId      String?         @db.Uuid
   userCreated   String?         @db.VarChar(255)
-  schoolId      String?         @db.Uuid
+  schoolId      String          @db.Uuid
+  institutionId String          @db.Uuid
+  courseStage   String?
+  graduate      String?
+  workload      String?
+  schoolDays    String?
   classroom     Classroom[]
   enrollment    Enrollment[]
   preenrollment PreEnrollment[]
   course        Course          @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_courseid_fkey")
   school        School?         @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_schoolid_fkey")
-
+  institution   Institution?    @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_institution_fkey")
   @@map("series")
 }
 
@@ -438,6 +444,7 @@ model Student {
   rgIssueDate      DateTime?          @db.Date
   rgIssuer         String?            @db.VarChar(100)
   birthCertificate String?            @db.VarChar(100)
+  placeOfBirth     String?            @db.VarChar(100)
   docsType         String?            @db.VarChar(100)
   responsibleType  responsibleType?   @default(Pai)
   citystate        String?            @db.VarChar

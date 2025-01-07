@@ -84,8 +84,8 @@ function isBusinessDay(dateString: string) {
 watch(selectedSchoolId, async (newValue: any) => {
   if (newValue) {
     const academicYear = await academicYearService.getBySchoolId(newValue?.id)
-    if (academicYear && academicYear.length > 0) {
-      selectedTemplate.value = academicYear[academicYear.length - 1].template_id
+    if (academicYear) {
+      selectedTemplate.value = academicYear.templateId
       await loadTemplateDetails()
     }
     else {

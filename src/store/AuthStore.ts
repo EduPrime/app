@@ -79,6 +79,7 @@ export const useAuthStore = defineStore('auth', () => {
         // Exposing parsed/computed values
         user: skipHydrate(parsedUser),
         organization: skipHydrate(parsedOrganization),
+        userLocal: skipHydrate(userLocal),
         isAuthenticated,
 
         // Exposing methods
