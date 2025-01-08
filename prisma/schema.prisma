@@ -476,7 +476,7 @@ model Teacher {
   qualifications Json?
   status         status?   @default(ACTIVE)
   metadata       Json?
-  user_created   String?   @db.Uuid
+  userCreated   String?   @db.Uuid
   createdAt      DateTime  @default(now()) @db.Timestamptz(6)
   deletedAt      DateTime? @db.Timestamptz(6)
   updatedAt      DateTime? @db.Timestamptz(6)

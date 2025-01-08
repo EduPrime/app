@@ -2,8 +2,48 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import SchoolForm from '../../school-management/components/SchoolForm.vue'
-import type { SchoolSettings } from '@prisma/client'
+import type { School, SchoolSettings } from '@prisma/client'
 
+const school = ref<School>({
+  id: '',
+  name: '',
+  address: null,
+  city: null,
+  state: null,
+  postalCode: null,
+  phone: null,
+  institutionId: '',
+  active: null,
+  abbreviation: null,
+  longitude: null,
+  latitude: null,
+  totalArea: null,
+  builtArea: null,
+  availableArea: null,
+  acronym: null,
+  blockDiaryEntries: null,
+  operationalStatus: null,
+  administrativeDependency: null,regulation: null,
+  logoUrl: null,
+  access: null,
+  managerid: null,
+  managerPosition: null,
+  operationLocation: null,
+  condition: null,
+  sharedSchooLinePCode: null,
+  creationDecree: null,
+  numberOfFloors: null,
+  floorType: null,
+  energyMeter: null,
+  hasExternalArea: null,
+  metadata: null,
+  createdAt: null,
+  deletedAt: null,
+  updatedAt: null,
+  updatedBy: null,
+  tenantId: null,
+  userCreated: null,
+  })
 const schoolSettings = ref<SchoolSettings>({
   id: '',
   createdAt: new Date(),
@@ -45,7 +85,7 @@ function handleSave() {
       Todos os campos são obrigatórios, a menos que indicado de outra forma.
     </template>
     <div id="school-form">
-      <SchoolForm :schoolSettings="schoolSettings" ref="schoolFormRef" @cancel="handleCancel" @save="handleSave" />
+      <SchoolForm :school="school" :schoolSettings="schoolSettings" ref="schoolFormRef" @cancel="handleCancel" @save="handleSave" />
     </div>
 
     <template #footer>

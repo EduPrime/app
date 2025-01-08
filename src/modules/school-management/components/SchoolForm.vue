@@ -13,10 +13,7 @@ import School_settingsService from '../services/School_settingsService'
 import type { School, SchoolSettings } from '@prisma/client'
 
 const schoolProps = defineProps<{
-  school: School
-}>()
-
-const schoolSettingsProps = defineProps<{
+  school: School,
   schoolSettings: SchoolSettings
 }>()
 
@@ -44,7 +41,7 @@ const schoolForm = computed(() => {
   return { ...schoolProps.school }
 })
 const schoolSettingsForm = computed(() => {
-  return { ...schoolSettingsProps.schoolSettings }
+  return { ...schoolProps.schoolSettings }
 })
 
 const formSchema = yup.object({

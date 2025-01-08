@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tables } from '@/types/database.types'
+import type { PreEnrollment } from '@prisma/client'
 import showToast from '@/utils/toast-alert'
 import { IonAlert } from '@ionic/vue'
 import { pencil, trash } from 'ionicons/icons'
@@ -7,8 +7,10 @@ import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import Pre_enrollmentService from '../services/Pre_enrollmentService'
 
+type PreEnrollmentWithStudent = Partial<PreEnrollment> & { name: string; address: string }
+
 const props = defineProps<{
-  dataList: Tables<'preenrollment'>[]
+  dataList: PreEnrollmentWithStudent[]
 }>()
 
 // Instanciando o serviço da tabela
@@ -18,7 +20,7 @@ const service = new Pre_enrollmentService()
 const dataList = ref()
 
 // Nome da tabela e campos
-const pre_enrollment = ref< Tables<'preenrollment'> | []>([])
+// const pre_enrollment = ref<PreEnrollmentWithStudent> | []>([])
 const tableName = 'pre_enrollment'
 const fields = ['courseId', 'createdAt', 'datePreenrollment', 'deletedAt', 'id', 'observations', 'preenrollmentcode', 'schoolId', 'seriesId', 'situation', 'status', 'studentId', 'updatedAt']
 const router = useRouter()
@@ -78,7 +80,7 @@ async function deleteItem(item: any) {
     const result = await service.softDelete(item.id)
     if (result) {
       showToast(`${item.student?.name} excluído com sucesso`)
-      dataList.value = dataList.value.filter((i: Tables<'preenrollment'>) => i.id !== item.id)
+      dataList.value = dataList.value.filter((i: PreEnrollmentWithStudent) => i.id !== item.id)
       isAlertOpen.value = false
       itemToDelete.value = null
     }

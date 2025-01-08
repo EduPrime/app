@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tables } from '@/types/database.types'
+import type { Teacher } from '@prisma/client'
 import EpInput from '@/components/EpInput.vue'
 import EpTextarea from '@/components/EpTextarea.vue'
 import { isValidDDD } from '@/utils/ddd-validator'
@@ -15,9 +15,7 @@ import SchoolService from '../services/SchoolService'
 import TeacherService from '../services/TeacherService'
 import QualificationForm from './QualificationForm.vue'
 
-type TeacherPartial = Omit<Pick<Tables<'teacher'>, 'name' | 'birthdate' | 'email' | 'phone' | 'address' | 'qualifications' | 'school_id'>, 'birthdate'> & {
-  birthdate: Date | string // Redefinindo o campo birthdate para ser do tipo Date
-}
+type TeacherPartial = Pick<Teacher, 'name' | 'birthdate' | 'email' | 'phone' | 'address' | 'qualifications' | 'schoolId'>
 
 defineEmits<{
   (e: 'cancel'): void
@@ -50,7 +48,7 @@ const formSchema = object({
     .optional(),
   qualifications: string()
     .optional(),
-  school_id: string()
+  schoolId: string()
     .required('Selecionar escola é obrigatório'),
 })
 
@@ -67,11 +65,11 @@ function handleEntriesUpdate(updatedEntries: never[]) {
   qualifications.value = updatedEntries
 }
 const schoolId = computed({
-  get: () => values.school_id,
-  set: newValue => setFieldValue('school_id', newValue),
+  get: () => values.schoolId,
+  set: newValue => setFieldValue('schoolId', newValue),
 })
 function handleSchoolChange(event: { detail: { value: string } }) {
-  setFieldValue('school_id', event.detail.value)
+  setFieldValue('schoolId', event.detail.value)
 }
 
 async function loadSchools() {
@@ -99,17 +97,28 @@ async function registerTeacher() {
   }
   else {
   // Verifique se 'birthdate' é uma instância de Date, caso contrário, converta
-    const birthdateValue = values.birthdate instanceof Date ? values.birthdate : new Date(values.birthdate)
+    // const birthdateValue = values.birthdate instanceof Date ? values.birthdate : new Date(values.birthdate)
 
     const validQualifications = filterValidQualifications(qualifications.value)
     const formData = {
+      id: teacherId.value,
       name: values.name,
-      birthdate: birthdateValue.toISOString().split('T')[0],
+      birthdate: values.birthdate,
       email: values.email,
       phone: values.phone,
       address: values.address,
       qualifications: validQualifications,
-      school_id: values.school_id,
+      schoolId: values.schoolId,
+      userCreated: null,
+      metadata: null,
+      status: null,  
+      createdAt: new Date(),
+      deletedAt: null,
+      updatedAt: null,
+      updatedBy: null,
+      tenantId: null,
+      showDetails: null,
+
     }
     try {
       let result
@@ -152,7 +161,7 @@ async function getTeacherData() {
       setFieldValue('email', teacherDbData.email)
       setFieldValue('phone', applyPhoneMask(teacherDbData.phone))
       setFieldValue('address', teacherDbData.address)
-      setFieldValue('school_id', teacherDbData.school_id)
+      setFieldValue('schoolId', teacherDbData.schoolId)
 
       if (teacherDbData.qualifications && typeof teacherDbData.qualifications === 'object') {
         qualifications.value = teacherDbData.qualifications as any
