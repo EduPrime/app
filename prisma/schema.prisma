@@ -92,6 +92,14 @@ model Course {
   userCreated   String?         @db.VarChar(255)
   updatedBy     String?         @db.Uuid
   tenantId      String?         @db.Uuid
+  courseStage   Int
+  graduate      String?
+  workload      Int
+  teachingType  String
+  regimeType    String?
+  courseModality  String
+  institutionId String          @db.Uuid
+  institution   Institution     @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_institutionId_fkey")
   school        School          @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_schoolid_fkey")
   enrollment    Enrollment[]
   preenrollment PreEnrollment[]
@@ -212,6 +220,7 @@ model Institution {
   school              School[]
   school_settings     SchoolSettings[]
   series              Series[]
+  course              Course[]
 
   @@map("institution")
 }
