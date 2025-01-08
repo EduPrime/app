@@ -30,7 +30,7 @@ model AcademicYear {
   deletedAt   DateTime? @db.Timestamptz(6)
   userCreated String?   @db.Uuid
 
-  @@map("academic_year")
+  @@map("academicYear")
 }
 
 model AcademicYearTemplate {
@@ -47,7 +47,7 @@ model AcademicYearTemplate {
   updatedBy   String?   @db.Uuid
   tenantId    String?
 
-  @@map("academic_year_template")
+  @@map("academicYearTemplate")
 }
 
 model Classroom {
@@ -110,50 +110,60 @@ model Course {
 }
 
 model Discipline {
-  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name        String    @db.VarChar(100)
-  status      status?   @default(ACTIVE)
-  metadata    Json?
-  userCreated String?   @db.Uuid
-  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
-  deletedAt   DateTime? @db.Timestamptz(6)
-  updatedAt   DateTime? @db.Timestamptz(6)
-  workload    Decimal?  @db.Decimal
-  updatedBy   String?   @db.Uuid
-  tenantId    String?
-  grade       Grade[]
+  id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                    String                    @db.VarChar(100)
+  status                  status?                   @default(ACTIVE)
+  metadata                Json?
+  userCreated             String?                   @db.Uuid
+  createdAt               DateTime                  @default(now()) @db.Timestamptz(6)
+  deletedAt               DateTime?                 @db.Timestamptz(6)
+  updatedAt               DateTime?                 @db.Timestamptz(6)
+  workload                Decimal?                  @db.Decimal
+  updatedBy               String?                   @db.Uuid
+  tenantId                String?
+  grade                   Grade[]
+  DisciplineAttendance    DisciplineAttendance[]    @relation(map: "faltacc_discipline_id_fkey")
+  ExamGrade               ExamGrade[]               @relation(map: "notaexame_discipline_id_fkey")
+  DisciplineGrade         DisciplineGrade[]         @relation(map: "notadisciplina_discipline_id_fkey")
+  DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "pareceretapadisciplina_discipline_id_fkey")
 
   @@map("discipline")
 }
 
 model Enrollment {
-  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  schoolId          String              @db.Uuid
-  studentId         String              @unique(map: "enrollment_studentid_key") @db.Uuid
-  courseId          String              @db.Uuid
-  classroomId       String              @db.Uuid
-  seriesId          String              @db.Uuid
-  name              String              @db.VarChar(100)
-  createdAt         DateTime?           @default(now()) @db.Timestamp(6)
-  deletedAt         DateTime?           @db.Timestamp(6)
-  updatedAt         DateTime?           @db.Timestamp(6)
-  updatedBy         String?             @db.Uuid
-  tenantId          String?
-  dateEnrollment    DateTime            @db.Timestamp(6)
-  observations      String?             @db.VarChar(200)
-  status            status?             @default(ACTIVE)
-  situation         situationType
-  enrollmentCode    String              @unique(map: "enrollment_enrollmentcode_key") @db.VarChar(100)
-  institutionId     String?             @db.Uuid
-  preenrollmentId   String?             @unique(map: "enrollment_preenrollmentid_key") @db.Uuid
-  classroom         Classroom           @relation(fields: [classroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_classroomid_fkey")
-  course            Course              @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_courseid_fkey")
-  institution       Institution?        @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_institutionid_fkey")
-  preenrollment     PreEnrollment?      @relation(fields: [preenrollmentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_preenrollmentid_fkey")
-  school            School              @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_schoolid_fkey")
-  series            Series              @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_seriesid_fkey")
-  student           Student             @relation(fields: [studentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_studentid_fkey")
-  enrollmenthistory EnrollmentHistory[]
+  id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  schoolId                String                    @db.Uuid
+  studentId               String                    @unique(map: "enrollment_studentid_key") @db.Uuid
+  courseId                String                    @db.Uuid
+  classroomId             String                    @db.Uuid
+  seriesId                String                    @db.Uuid
+  name                    String                    @db.VarChar(100)
+  createdAt               DateTime?                 @default(now()) @db.Timestamp(6)
+  deletedAt               DateTime?                 @db.Timestamp(6)
+  updatedAt               DateTime?                 @db.Timestamp(6)
+  updatedBy               String?                   @db.Uuid
+  tenantId                String?
+  dateEnrollment          DateTime                  @db.Timestamp(6)
+  observations            String?                   @db.VarChar(200)
+  status                  status?                   @default(ACTIVE)
+  situation               situationType
+  enrollmentCode          String                    @unique(map: "enrollment_enrollmentcode_key") @db.VarChar(100)
+  institutionId           String?                   @db.Uuid
+  preenrollmentId         String?                   @unique(map: "enrollment_preenrollmentid_key") @db.Uuid
+  classroom               Classroom                 @relation(fields: [classroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_classroomid_fkey")
+  course                  Course                    @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_courseid_fkey")
+  institution             Institution?              @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_institutionid_fkey")
+  preenrollment           PreEnrollment?            @relation(fields: [preenrollmentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_preenrollmentid_fkey")
+  school                  School                    @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_schoolid_fkey")
+  series                  Series                    @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_seriesid_fkey")
+  student                 Student                   @relation(fields: [studentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_studentid_fkey")
+  enrollmenthistory       EnrollmentHistory[]
+  StudentAttendance       StudentAttendance[]       @relation(map: "faltaaluno_enrollment_id_fkey")
+  ExamGrade               ExamGrade[]               @relation(map: "notaexame_enrollment_id_fkey")
+  DisciplineGrade         DisciplineGrade[]         @relation(map: "notadisciplina_enrollment_id_fkey")
+  StudentFeedback         StudentFeedback[]         @relation(map: "feedbackaluno_enrollment_id_fkey")
+  StudentStageFeedback    StudentStageFeedback[]    @relation(map: "feedbacketapaaluno_enrollment_id_fkey")
+  DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "feedbacketapadisciplina_enrollment_id_fkey")
 
   @@map("enrollment")
 }
@@ -196,6 +206,179 @@ model Grade {
   student      Student    @relation(fields: [studentId], references: [id], map: "grade_student_id_fkey")
 
   @@map("grade")
+}
+
+model StudentAttendance {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  enrollmentId String     @db.Uuid
+  missType     Int
+  schoolId     String     @db.Uuid
+  updatedAt    DateTime?  @db.Timestamp(6)
+  updatedBy    String?    @db.Uuid
+  createdAt    DateTime   @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  tenantId     String?
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], map: "faltaaluno_enrollment_id_fkey")
+  school       School     @relation(fields: [schoolId], references: [id], map: "faltaaluno_school_id_fkey")
+
+  @@map("studentAttendance")
+}
+
+model GeneralAttendance {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId String    @db.Uuid
+  numMissed Int
+  stage     Int
+  schoolId  String    @db.Uuid
+  updatedAt DateTime? @db.Timestamp(6)
+  updatedBy String?   @db.Uuid
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt DateTime? @db.Timestamp(6)
+  tenantId  String?
+  student   Student   @relation(fields: [studentId], references: [id], map: "faltageral_student_id_fkey")
+  school    School    @relation(fields: [schoolId], references: [id], map: "faltageral_school_id_fkey")
+
+  @@map("generalAttendance")
+}
+
+model DisciplineAttendance {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId    String     @db.Uuid
+  disciplineId String     @db.Uuid
+  numMissed    Int
+  stage        Int
+  schoolId     String     @db.Uuid
+  updatedAt    DateTime?  @db.Timestamp(6)
+  updatedBy    String?    @db.Uuid
+  createdAt    DateTime   @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  tenantId     String?
+  student      Student    @relation(fields: [studentId], references: [id], map: "faltacc_student_id_fkey")
+  discipline   Discipline @relation(fields: [disciplineId], references: [id], map: "faltacc_discipline_id_fkey")
+  school       School     @relation(fields: [schoolId], references: [id], map: "faltacc_school_id_fkey")
+
+  @@map("disciplineAttendance")
+}
+
+model GeneralGrade {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId    String    @db.Uuid
+  schoolId     String    @db.Uuid
+  grade        Decimal   @db.Decimal
+  roundedGrade Decimal?  @db.Decimal
+  etapa        Decimal   @db.Decimal
+  updatedAt    DateTime? @db.Timestamp(6)
+  updatedBy    String?   @db.Uuid
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime? @db.Timestamp(6)
+  tenantId     String?
+  student      Student   @relation(fields: [studentId], references: [id], map: "notageral_student_id_fkey")
+  school       School    @relation(fields: [schoolId], references: [id], map: "notageral_school_id_fkey")
+
+  @@map("generalGrade")
+}
+
+model ExamGrade {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  enrollmentId String     @db.Uuid
+  disciplineId String     @db.Uuid
+  grade        Decimal    @db.Decimal
+  stage        Int
+  schoolId     String     @db.Uuid
+  updatedAt    DateTime?  @db.Timestamp(6)
+  updatedBy    String?    @db.Uuid
+  createdAt    DateTime   @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  tenantId     String?
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], map: "notaexame_enrollment_id_fkey")
+  discipline   Discipline @relation(fields: [disciplineId], references: [id], map: "notaexame_discipline_id_fkey")
+  school       School     @relation(fields: [schoolId], references: [id], map: "notaexame_school_id_fkey")
+
+  @@map("examGrade")
+}
+
+model DisciplineGrade {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId    String     @db.Uuid
+  enrollmentId String     @db.Uuid
+  disciplineId String     @db.Uuid
+  schoolId     String     @db.Uuid
+  stage        Int
+  at1          Decimal    @db.Decimal
+  at2          Decimal    @db.Decimal
+  at3          Decimal    @db.Decimal
+  at4          Decimal    @db.Decimal
+  eval         Decimal    @db.Decimal
+  avg          Decimal    @db.Decimal
+  updatedAt    DateTime?  @db.Timestamp(6)
+  updatedBy    String?    @db.Uuid
+  createdAt    DateTime   @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  tenantId     String?
+  student      Student    @relation(fields: [studentId], references: [id], map: "notadisciplina_student_id_fkey")
+  discipline   Discipline @relation(fields: [disciplineId], references: [id], map: "notadisciplina_discipline_id_fkey")
+  school       School     @relation(fields: [schoolId], references: [id], map: "notadisciplina_school_id_fkey")
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], map: "notadisciplina_enrollment_id_fkey")
+
+  @@map("disciplineGrade")
+}
+
+model StudentFeedback {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId    String     @db.Uuid
+  enrollmentId String     @db.Uuid
+  schoolId     String     @db.Uuid
+  parecer      String     @db.VarChar(255)
+  updatedAt    DateTime?  @db.Timestamp(6)
+  updatedBy    String?    @db.Uuid
+  createdAt    DateTime   @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  tenantId     String?
+  student      Student    @relation(fields: [studentId], references: [id], map: "pareceraluno_student_id_fkey")
+  school       School     @relation(fields: [schoolId], references: [id], map: "pareceraluno_school_id_fkey")
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], map: "pareceraluno_enrollment_id_fkey")
+
+  @@map("studentFeedback")
+}
+
+model StudentStageFeedback {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId    String     @db.Uuid
+  enrollmentId String     @db.Uuid
+  schoolId     String     @db.Uuid
+  stage        Int
+  feedback     String     @db.VarChar(255)
+  updatedAt    DateTime?  @db.Timestamp(6)
+  updatedBy    String?    @db.Uuid
+  createdAt    DateTime   @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  tenantId     String?
+  student      Student    @relation(fields: [studentId], references: [id], map: "pareceretapaaluno_student_id_fkey")
+  school       School     @relation(fields: [schoolId], references: [id], map: "pareceretapaaluno_school_id_fkey")
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], map: "pareceretapaaluno_enrollment_id_fkey")
+
+  @@map("studentStageFeedback")
+}
+
+model DisciplineStageFeedback {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId    String     @db.Uuid
+  enrollmentId String     @db.Uuid
+  disciplineId String     @db.Uuid
+  schoolId     String     @db.Uuid
+  stage        Int
+  feedback     String     @db.VarChar(255)
+  updatedAt    DateTime?  @db.Timestamp(6)
+  updatedBy    String?    @db.Uuid
+  createdAt    DateTime   @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  tenantId     String?
+  student      Student    @relation(fields: [studentId], references: [id], map: "pareceretapadisciplina_student_id_fkey")
+  school       School     @relation(fields: [schoolId], references: [id], map: "pareceretapadisciplina_school_id_fkey")
+  enrollment   Enrollment @relation(fields: [enrollmentId], references: [id], map: "pareceretapadisciplina_enrollment_id_fkey")
+  discipline   Discipline @relation(fields: [disciplineId], references: [id], map: "pareceretapadisciplina_discipline_id_fkey")
+
+  @@map("disciplineStageFeedback")
 }
 
 model Institution {
@@ -242,7 +425,7 @@ model InstitutionSettings {
   dateEnd       DateTime?   @db.Timestamp(6)
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "institutionsettings_institutionid_fkey")
 
-  @@map("institutionsettings")
+  @@map("institutionSettings")
 }
 
 model PreEnrollment {
@@ -273,56 +456,65 @@ model PreEnrollment {
 }
 
 model School {
-  id                       String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                     String              @db.VarChar(100)
-  address                  String?             @db.VarChar(255)
-  city                     String?             @db.VarChar(100)
-  state                    String?             @db.Char(2)
-  postalCode               String?             @db.Char(10)
-  phone                    String?             @db.VarChar(15)
-  institutionId            String              @db.Uuid
-  active                   Boolean?            @default(true)
-  abbreviation             String?             @db.VarChar(255)
-  longitude                String?             @db.VarChar(255)
-  latitude                 String?             @db.VarChar(255)
-  totalArea                String?             @db.VarChar(255)
-  builtArea                String?             @db.VarChar(255)
-  availableArea            String?             @db.VarChar(255)
-  acronym                  String?             @db.VarChar(255)
+  id                       String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                     String                    @db.VarChar(100)
+  address                  String?                   @db.VarChar(255)
+  city                     String?                   @db.VarChar(100)
+  state                    String?                   @db.Char(2)
+  postalCode               String?                   @db.Char(10)
+  phone                    String?                   @db.VarChar(15)
+  institutionId            String                    @db.Uuid
+  active                   Boolean?                  @default(true)
+  abbreviation             String?                   @db.VarChar(255)
+  longitude                String?                   @db.VarChar(255)
+  latitude                 String?                   @db.VarChar(255)
+  totalArea                String?                   @db.VarChar(255)
+  builtArea                String?                   @db.VarChar(255)
+  availableArea            String?                   @db.VarChar(255)
+  acronym                  String?                   @db.VarChar(255)
   blockDiaryEntries        Boolean?
   operationalStatus        Int?
   administrativeDependency Int?
   regulation               Int?
-  logoUrl                  String?             @db.VarChar(255)
+  logoUrl                  String?                   @db.VarChar(255)
   access                   Int?
-  managerid                String?             @db.Uuid
-  managerPosition          String?             @db.VarChar(255)
-  operationLocation        String?             @db.VarChar(255)
+  managerid                String?                   @db.Uuid
+  managerPosition          String?                   @db.VarChar(255)
+  operationLocation        String?                   @db.VarChar(255)
   condition                Int?
   sharedSchooLinePCode     Int?
-  creationDecree           String?             @db.VarChar(255)
+  creationDecree           String?                   @db.VarChar(255)
   numberOfFloors           Int?
   floorType                Int?
   energyMeter              Int?
   hasExternalArea          Boolean?
   metadata                 Json?
-  createdAt                DateTime?           @default(now()) @db.Timestamp(6)
-  deletedAt                DateTime?           @db.Timestamp(6)
-  updatedAt                DateTime?           @db.Timestamp(6)
-  updatedBy                String?             @db.Uuid
+  createdAt                DateTime?                 @default(now()) @db.Timestamp(6)
+  deletedAt                DateTime?                 @db.Timestamp(6)
+  updatedAt                DateTime?                 @db.Timestamp(6)
+  updatedBy                String?                   @db.Uuid
   tenantId                 String?
-  userCreated              String?             @db.VarChar(255)
+  userCreated              String?                   @db.VarChar(255)
   classroom                Classroom[]
   course                   Course[]
   enrollment               Enrollment[]
   grade                    Grade[]
   preenrollment            PreEnrollment[]
-  institution              Institution         @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_institutionid_fkey")
+  institution              Institution               @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_institutionid_fkey")
   school_settings          SchoolSettings[]
   series                   Series[]
   server_allocations       ServerAllocations[]
   student                  Student[]
   teacher                  Teacher[]
+  GeneralAttendance        GeneralAttendance[]       @relation(map: "faltageral_school_id_fkey")
+  DisciplineAttendance     DisciplineAttendance[]    @relation(map: "faltacc_school_id_fkey")
+  StudentAttendance        StudentAttendance[]       @relation(map: "faltaaluno_school_id_fkey")
+  GeneralGrade             GeneralGrade[]            @relation(map: "notageral_school_id_fkey")
+  ExamGrade                ExamGrade[]               @relation(map: "ExamGrade_school_id_fkey")
+  DisciplineGrade          DisciplineGrade[]         @relation(map: "notadisciplina_school_id_fkey")
+  StudentFeedback          StudentFeedback[]         @relation(map: "pareceraluno_school_id_fkey")
+  StudentStageFeedback     StudentStageFeedback[]    @relation(map: "pareceretapaaluno_school_id_fkey")
+  DisciplineStageFeedback  DisciplineStageFeedback[] @relation(map: "pareceretapadisciplina_school_id_fkey")
 
   @@map("school")
 }
@@ -345,7 +537,7 @@ model SchoolSettings {
   institution   Institution @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_settings_institution_id_fkey")
   school        School      @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_settings_school_id_fkey")
 
-  @@map("school_settings")
+  @@map("schoolSettings")
 }
 
 model Series {
@@ -394,7 +586,7 @@ model ServerAllocations {
   servers     Servers   @relation(fields: [serverId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_server")
 
   @@unique([serverId, schoolId, anoLetivo], map: "uq_server_allocation")
-  @@map("server_allocations")
+  @@map("serverAllocations")
 }
 
 model Servers {
@@ -424,53 +616,60 @@ model Servers {
 }
 
 model Student {
-  id               String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name             String             @db.VarChar(100)
-  birthdate        DateTime           @db.Timestamp(6)
-  gender           String?            @db.Char(1)
-  email            String?            @db.VarChar(255)
-  phone            String?            @db.VarChar(15)
-  address          String?            @db.VarChar(255)
-  guardianName     String?            @db.VarChar(100)
-  guardianPhone    String?            @db.VarChar(15)
-  status           status?            @default(ACTIVE)
-  photo            Bytes?
-  metadata         Json?
-  createdAt        DateTime?          @default(now()) @db.Timestamp(6)
-  deletedAt        DateTime?          @db.Timestamp(6)
-  updatedAt        DateTime?          @db.Timestamp(6)
-  updatedBy        String?            @db.Uuid
-  tenantId         String?
-  userCreated      String?            @db.VarChar(255)
-  schoolId         String?            @db.Uuid
-  postalCode       String?            @db.VarChar(100)
-  residenceZone    residenceZoneType? @default(URBANA)
-  numberAddress    String?            @db.VarChar(100)
-  cpf              String?            @unique @db.VarChar(100)
-  neighborhood     String?            @db.VarChar(100)
-  city             String?            @db.VarChar(100)
-  complement       String?            @db.VarChar(100)
-  fatherName       String?            @db.VarChar(100)
-  fatherEmail      String?            @db.VarChar(100)
-  fatherCpf        String?            @db.VarChar(100)
-  fatherPhone      String?            @db.VarChar(100)
-  motherName       String?            @db.VarChar(100)
-  motherEmail      String?            @db.VarChar(100)
-  motherCpf        String?            @db.VarChar(100)
-  motherPhone      String?            @db.VarChar(100)
-  rgNumber         String?            @unique @db.VarChar(100)
-  rgState          String?            @db.Char(2)
-  rgIssueDate      DateTime?          @db.Date
-  rgIssuer         String?            @db.VarChar(100)
-  birthCertificate String?            @db.VarChar(100)
-  placeOfBirth     String?            @db.VarChar(100)
-  docsType         String?            @db.VarChar(100)
-  responsibleType  responsibleType?   @default(PAI)
-  citystate        String?            @db.VarChar
-  enrollment       Enrollment?
-  grade            Grade[]
-  preenrollment    PreEnrollment?
-  school           School?            @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "student_school")
+  id                      String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                    String                    @db.VarChar(100)
+  birthdate               DateTime                  @db.Timestamp(6)
+  gender                  String?                   @db.Char(1)
+  email                   String?                   @db.VarChar(255)
+  phone                   String?                   @db.VarChar(15)
+  address                 String?                   @db.VarChar(255)
+  guardianName            String?                   @db.VarChar(100)
+  guardianPhone           String?                   @db.VarChar(15)
+  status                  status?                   @default(ACTIVE)
+  photo                   Bytes?
+  metadata                Json?
+  createdAt               DateTime?                 @default(now()) @db.Timestamp(6)
+  deletedAt               DateTime?                 @db.Timestamp(6)
+  updatedAt               DateTime?                 @db.Timestamp(6)
+  updatedBy               String?                   @db.Uuid
+  tenantId                String?
+  userCreated             String?                   @db.VarChar(255)
+  schoolId                String?                   @db.Uuid
+  postalCode              String?                   @db.VarChar(100)
+  residenceZone           residenceZoneType?        @default(URBANA)
+  numberAddress           String?                   @db.VarChar(100)
+  cpf                     String?                   @unique @db.VarChar(100)
+  neighborhood            String?                   @db.VarChar(100)
+  city                    String?                   @db.VarChar(100)
+  complement              String?                   @db.VarChar(100)
+  fatherName              String?                   @db.VarChar(100)
+  fatherEmail             String?                   @db.VarChar(100)
+  fatherCpf               String?                   @db.VarChar(100)
+  fatherPhone             String?                   @db.VarChar(100)
+  motherName              String?                   @db.VarChar(100)
+  motherEmail             String?                   @db.VarChar(100)
+  motherCpf               String?                   @db.VarChar(100)
+  motherPhone             String?                   @db.VarChar(100)
+  rgNumber                String?                   @unique @db.VarChar(100)
+  rgState                 String?                   @db.Char(2)
+  rgIssueDate             DateTime?                 @db.Date
+  rgIssuer                String?                   @db.VarChar(100)
+  birthCertificate        String?                   @db.VarChar(100)
+  placeOfBirth            String?                   @db.VarChar(100)
+  docsType                String?                   @db.VarChar(100)
+  responsibleType         responsibleType?          @default(PAI)
+  citystate               String?                   @db.VarChar
+  enrollment              Enrollment?
+  grade                   Grade[]
+  preenrollment           PreEnrollment?
+  school                  School?                   @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "student_school")
+  GeneralAttendance       GeneralAttendance[]       @relation(map: "faltageral_student_id_fkey")
+  DisciplineAttendance    DisciplineAttendance[]    @relation(map: "faltacc_student_id_fkey")
+  GeneralGrade            GeneralGrade[]            @relation(map: "notageral_student_id_fkey")
+  DisciplineGrade         DisciplineGrade[]         @relation(map: "notadisciplina_student_id_fkey")
+  StudentFeedback         StudentFeedback[]         @relation(map: "pareceraluno_student_id_fkey")
+  StudentStageFeedback    StudentStageFeedback[]    @relation(map: "pareceretapaaluno_student_id_fkey")
+  DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "pareceretapadisciplina_student_id_fkey")
 
   @@map("student")
 }
