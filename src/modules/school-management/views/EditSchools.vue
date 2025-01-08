@@ -2,8 +2,26 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import SchoolForm from '../../school-management/components/SchoolForm.vue'
+import { SchoolSettings } from '@prisma/client'
 
 const schoolFormRef = ref<InstanceType<typeof SchoolForm> | null>(null)
+const schoolSettings = ref<SchoolSettings>({
+  id: '',
+  createdAt: new Date(),
+  dateOpening: null,
+  dateClosing: null,
+  schoolDays: null,
+  dateStart: null,
+  dateEnd: null,
+  institutionId: '',
+  schoolId: '',
+  updatedAt: null,
+  updatedBy: null,
+  tenantId: null,
+  userCreated: null,
+  deletedAt: null
+})
+
 const router = useRouter()
 function handleCancel() {
   router.push({ name: 'InstitutionListInstitutions' })
@@ -25,7 +43,7 @@ function handleSave() {
       Todos os campos são obrigatórios, a menos que indicado de outra forma.
     </template>
     <div id="school-form">
-      <SchoolForm ref="schoolFormRef" @cancel="handleCancel" @save="handleSave" />
+      <SchoolForm ref="schoolFormRef" :schoolSettings="schoolSettings" @cancel="handleCancel" @save="handleSave" />
     </div>
 
     <template #footer>

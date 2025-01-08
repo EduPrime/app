@@ -351,10 +351,10 @@ model Series {
   userCreated   String?         @db.VarChar(255)
   schoolId      String          @db.Uuid
   institutionId String          @db.Uuid
-  courseStage   String?
-  graduate      String?
-  workload      String?
-  schoolDays    String?
+  courseStage   String
+  graduate      String
+  workload      String
+  schoolDays    String
   classroom     Classroom[]
   enrollment    Enrollment[]
   preenrollment PreEnrollment[]

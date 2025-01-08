@@ -1,13 +1,10 @@
-import type { Tables } from '@/types/database.types'
 import BaseService from '@/services/BaseService'
+import type { School } from '@prisma/client'
 
-const table = 'school' as const
 
-type SchoolTable = typeof table
-
-export default class SchoolService extends BaseService<SchoolTable> {
+export default class SchoolService extends BaseService<School> {
   constructor() {
-    super(table) // Passando o nome da tabela para a classe base
+    super('school') // Passando o nome da tabela para a classe base
   }
 
   async getSchoolCount(): Promise<number> {

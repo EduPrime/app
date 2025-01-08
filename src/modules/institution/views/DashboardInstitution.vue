@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Tables } from '@/types/database.types'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import InstitutionCards from '@/modules/institution/components/InstitutionCards.vue'
 import showToast from '@/utils/toast-alert'
@@ -7,9 +6,10 @@ import { onMounted, ref } from 'vue'
 import InstitutionService from '../services/InstitutionService'
 import ReadInstitution from './crud/ReadInstitution.vue'
 import UpdateInstitution from './crud/UpdateInstitution.vue'
+import type { Institution } from '@prisma/client'
 
 // Estados para os dados da instituição e carregamento
-const institution = ref< Tables<'institution'> | null>()
+const institution = ref<Institution>()
 const loading = ref(true)
 const isEditing = ref(false)
 
@@ -50,24 +50,12 @@ onMounted(() => {
 
 <template>
   <ContentLayout>
-    <InstitutionCards
-      :school-count="schoolCount"
-      :class-count="classCount"
-      :series-count="seriesCount"
-      :teacher-count="teacherCount"
-    />
-    <ReadInstitution
-      v-if="!isEditing && institution"
-      :key="institution.id + Date.now()"
-      :institution="institution"
-      @click="clickToEdit"
-    />
-    <UpdateInstitution
-      v-else-if="isEditing && institution"
-      :institution="institution"
-      @cancel="isEditing = false"
-      @save="updatedInstitution"
-    />
+    <InstitutionCards :school-count="schoolCount" :class-count="classCount" :series-count="seriesCount"
+      :teacher-count="teacherCount" />
+    <ReadInstitution v-if="!isEditing && institution" :key="institution.id + Date.now()" :institution="institution"
+      @click="clickToEdit" />
+    <UpdateInstitution v-else-if="isEditing && institution" :institution="institution" @cancel="isEditing = false"
+      @save="updatedInstitution" />
   </ContentLayout>
 </template>
 

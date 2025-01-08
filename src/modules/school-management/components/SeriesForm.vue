@@ -95,6 +95,7 @@ interface SeriesForm {
   graduate: string
   workload: string
   schoolDays: string
+  schoolId: string
 }
 
 const { values, errors, validate, setFieldValue } = useForm<SeriesForm>({
@@ -110,6 +111,7 @@ async function registerSeries() {
   }
   else {
     const formData = {
+      id: seriesId.value,
       schoolId: schoolId.value,
       courseId: courseId.value,
       institutionId: institutionId.value,
@@ -119,8 +121,13 @@ async function registerSeries() {
       workload: values.workload,
       schoolDays: values.schoolDays,
       timetableId: null,
-
-
+      metadata: null,
+      createdAt: null,
+      updatedAt: null,
+      deletedAt: null,
+      updatedBy: null,
+      userCreated: null,
+      tenantId: null,
     }
     console.log('FormData:', formData)
     try {
@@ -296,14 +303,14 @@ onMounted(async () => {
 
     <ion-list id="course_stage">
       <IonSelect
-        v-model="values.course_stage"
+        v-model="values.courseStage"
         fill="outline"
         cancel-text="Cancelar"
         label-placement="floating"
         justify="space-between"
         label="Etapa Curso*"
         placeholder="Selecione"
-        @ion-change="(e) => setFieldValue('course_stage', e.target.value)"
+        @ion-change="(e) => setFieldValue('courseStage', e.target.value)"
       >
         <IonSelectOption v-for="stage in course_stage" :key="stage" :value="stage">
           {{ stage }}
@@ -329,6 +336,6 @@ onMounted(async () => {
     </ion-list>
 
     <EpInput v-model="values.workload" name="workload" label="Carga Horária*" placeholder="Digite a carga horária" />
-    <EpInput v-model="values.school_days" name="school_days" label="Dias Letivos*" placeholder="Digite os dias letivos" />
+    <EpInput v-model="values.schoolDays" name="schoolDays" label="Dias Letivos*" placeholder="Digite os dias letivos" />
   </div>
 </template>

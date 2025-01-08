@@ -1,10 +1,9 @@
 import BaseService from '@/services/BaseService'
+import type { Classroom } from '@prisma/client'
 
 const table = 'classroom' as const
 
-type TabelaType = typeof table
-
-export default class ClassroomService extends BaseService<TabelaType> {
+export default class ClassroomService extends BaseService<Classroom> {
   constructor() {
     super(table)
   }

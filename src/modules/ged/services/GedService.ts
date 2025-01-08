@@ -16,6 +16,7 @@ export default class DocumentService extends BaseService<DocumentTable> {
    * @param options - Optional settings like cache control and upsert
    * @returns An object containing the upload data or an error
    */
+  /*
   async uploadFile(
     bucketName: string,
     path: string,
@@ -41,4 +42,6 @@ export default class DocumentService extends BaseService<DocumentTable> {
       return { data: null, error }
     }
   }
+}
+*/
 }

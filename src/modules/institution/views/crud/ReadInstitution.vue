@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Tables } from '@/types/database.types'
+import type { Institution } from '@prisma/client'
 import { IonButton, IonButtons, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon } from '@ionic/vue'
 import { pencil } from 'ionicons/icons'
 import { computed, ref } from 'vue'
 
 const props = defineProps<{
-  institution: Tables<'institution'> | undefined
+  institution: Institution
 }>()
 const emit = defineEmits<{
   (e: 'click'): void
@@ -37,28 +37,28 @@ function editBtn() {
       <p><strong>Endereço:</strong> {{ institution.address }}</p>
       <p><strong>Cidade:</strong> {{ institution.city }}</p>
       <p><strong>UF:</strong> {{ institution.state }}</p>
-      <p><strong>CEP:</strong> {{ institution.postalcode }}</p>
+      <p><strong>CEP:</strong> {{ institution.postalCode }}</p>
     </IonCardContent>
   </IonCard>
 </template>
 
-  <style scoped>
-  #create-button {
-    margin: 16px;
-  }
+<style scoped>
+#create-button {
+  margin: 16px;
+}
 
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
-  .card-title-container {
-    display: flex;
-    align-items: center;
-  }
+.card-title-container {
+  display: flex;
+  align-items: center;
+}
 
-  .card-title-container ion-buttons {
-    margin-left: 8px;
-  }
-  </style>
+.card-title-container ion-buttons {
+  margin-left: 8px;
+}
+</style>

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Tables } from '@/types/database.types'
 import { debounce } from '@/utils/debounce'
 import showToast from '@/utils/toast-alert'
 import { IonAccordion, IonAccordionGroup, IonBackButton, IonButton, IonCol, IonGrid, IonInput, IonItem, IonLabel, IonList, IonRow } from '@ionic/vue'
@@ -12,7 +11,7 @@ const router = useRouter()
 const academicTemplateService = new AcademicTemplateService()
 
 const refYear = ref(new Date().getFullYear())
-const modelName = ref< Tables<'academic_year_template'>['name']>('')
+const modelName = ref('')
 
 const stages = ref< { startDate: string, endDate: string, teachingDays: number }[]>([])
 
@@ -27,9 +26,18 @@ function removeStage(index: number) {
 async function saveAcademicYearTemplate() {
   try {
     const newTemplate = {
-      ref_year: refYear.value,
+      refYear: refYear.value,
       name: modelName.value || 'Modelo de Ano Letivo', // Verifica se tem nome
-      stages: stages.value as unknown as Tables<'academic_year_template'>['stages'],
+      stages: stages.value,
+      stageCount: null,
+      createdAt: new Date(),
+      updatedAt: null,
+      deletedAt: null,
+      updatedBy: null,
+      userCreated: null,
+      metadata: null,
+      tenantId: null,
+      id: self.crypto.randomUUID()
     }
     const result = await academicTemplateService.create(newTemplate)
     if (result) {
