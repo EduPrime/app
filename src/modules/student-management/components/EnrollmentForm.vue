@@ -41,7 +41,7 @@ const seriesId = ref('')
 const studentId = ref('')
 const classroomId = ref('')
 const courseId = ref('')
-const enrollmentData = ref< Tables<'enrollment'> | []>([])
+const enrollmentData = ref<Tables<'enrollment'> | []>([])
 const gender = ['Masculino', 'Feminino']
 const status = ['Ativo', 'Inativo']
 const situation = ['Pendente', 'Cursando', 'Aprovado', 'Aprovado pelo Conselho', 'Aprovado com Dependência', 'Reprovado', 'Transferido', 'Abandono', 'Falecido']
@@ -61,7 +61,7 @@ const maxDate = `${currentYear}-12-31`
 function enforceYear() {
   const selectedDate = new Date(values.date_enrollment)
   if (selectedDate.getFullYear() !== currentYear) {
-    setFieldValue('date_enrollment', `${currentYear}-01-01`)
+    setFieldValue('dateEnrollment', `${currentYear}-01-01`)
   }
 }
 const searchQuery = ref('')
@@ -72,7 +72,7 @@ const seriesList = ref()
 const courseList = ref()
 const enrollmentId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const formSchema = yup.object({
-  date_enrollment: yup.date()
+  dateEnrollment: yup.date()
     .required('Data de matrícula é obrigatória')
     .typeError('Data de matrícula inválida'),
   observations: yup.string()
@@ -110,18 +110,18 @@ async function registerEnrollment() {
   }
   else {
     try {
-    // Garante que o código de matrícula seja único antes de salvar
+      // Garante que o código de matrícula seja único antes de salvar
       if (!enrollmentId.value) {
         await ensureUniqueEnrollmentCode()
       }
 
       const formData = {
-        school_id: schoolId.value,
-        classroom_id: classroomId.value,
-        series_id: seriesId.value,
-        student_id: studentId.value,
-        course_id: courseId.value,
-        date_enrollment: values.date_enrollment,
+        schoolId: schoolId.value,
+        classroomId: classroomId.value,
+        seriesId: seriesId.value,
+        studentId: studentId.value,
+        courseId: courseId.value,
+        dateEnrollment: values.dateEnrollment,
         observations: values.observations,
         name: values.name,
         status: values.status,
@@ -279,27 +279,25 @@ async function getEnrollmentData() {
   if (enrollmentId.value) {
     const enrollmentDbData = await enrollmentService.getById(enrollmentId.value)
     if (enrollmentDbData) {
-      schoolId.value = enrollmentDbData.school_id
-      classroomId.value = enrollmentDbData.classroom_id
-      seriesId.value = enrollmentDbData.series_id
-      studentId.value = enrollmentDbData.student_id
-      courseId.value = enrollmentDbData.course_id
+      schoolId.value = enrollmentDbData.schoolId
+      classroomId.value = enrollmentDbData.classroomId
+      seriesId.value = enrollmentDbData.seriesId
+      studentId.value = enrollmentDbData.studentId
+      courseId.value = enrollmentDbData.courseId
       enrollmentCode.value = enrollmentDbData.enrollmentCode ?? ''
-      setFieldValue('date_enrollment', enrollmentDbData.date_enrollment)
+      setFieldValue('dateEnrollment', enrollmentDbData.dateEnrollment)
       setFieldValue('observations', enrollmentDbData.observations)
-      setFieldValue('school_id', enrollmentDbData.school_id)
-      setFieldValue('schoolId', enrollmentDbData.school_id)
-      setFieldValue('seriesId', enrollmentDbData.series_id)
-      setFieldValue('classroom_id', enrollmentDbData.classroom_id)
-      setFieldValue('classroomId', enrollmentDbData.classroom_id)
-      setFieldValue('studentId', enrollmentDbData.student_id)
-      setFieldValue('courseId', enrollmentDbData.course_id)
+      setFieldValue('schoolId', enrollmentDbData.schoolId)
+      setFieldValue('seriesId', enrollmentDbData.seriesId)
+      setFieldValue('classroomId', enrollmentDbData.classroomId)
+      setFieldValue('studentId', enrollmentDbData.studentId)
+      setFieldValue('courseId', enrollmentDbData.courseId)
       setFieldValue('name', enrollmentDbData.name)
       setFieldValue('status', enrollmentDbData.status)
       setFieldValue('situation', enrollmentDbData.situation)
       setFieldValue('enrollmentCode', enrollmentDbData.enrollmentCode)
 
-      const student = await studentService.getById(enrollmentDbData.student_id)
+      const student = await studentService.getById(enrollmentDbData.studentId)
       if (student) {
         setFieldValue('name', student.name)
         searchQuery.value = ''
@@ -379,25 +377,15 @@ onMounted(async () => {
   </IonSegment>
   <div v-show="selectedSegment === 'general-info'">
     <ion-list v-if="!enrollmentId" id="studentList">
-      <IonSearchbar
-        v-model="searchQuery"
-        placeholder="Pesquise o aluno..."
-        :animated="true"
-        :debounce="400"
-      />
+      <IonSearchbar v-model="searchQuery" placeholder="Pesquise o aluno..." :animated="true" :debounce="400" />
     </ion-list>
 
     <!-- Renderiza a lista de alunos apenas se houver resultados -->
     <div v-if="searchQuery.length >= 3 && filteredStudents.length > 0">
       <ul class="list-container">
-        <li
-          v-for="student in filteredStudents"
-          :key="student.id"
-          class="list-item"
-          :class="{ 'enrolled-item': student.enrolled }"
-          :title="student.enrolled ? 'Aluno já matriculado' : ''"
-          @click="!student.enrolled && selectStudent(student)"
-        >
+        <li v-for="student in filteredStudents" :key="student.id" class="list-item"
+          :class="{ 'enrolled-item': student.enrolled }" :title="student.enrolled ? 'Aluno já matriculado' : ''"
+          @click="!student.enrolled && selectStudent(student)">
           {{ student.name }}
           <span v-if="student.enrolled" class="enrolled-label">(Já matriculado)</span>
         </li>
@@ -408,27 +396,16 @@ onMounted(async () => {
       <IonLabel position="stacked" color="medium">
         Nome do Aluno (Somente Leitura):
       </IonLabel>
-      <ion-input
-        v-model="values.name"
-        type="text"
-        placeholder="Aluno Matriculado"
-        readonly
-        :disabled="true"
-        class="readonly-input"
-      />
+      <ion-input v-model="values.name" type="text" placeholder="Aluno Matriculado" readonly :disabled="true"
+        class="readonly-input" />
     </ion-item>
 
     <ion-list id="schoolList">
       <ion-item>
-        <IonSelect
-          v-model="schoolId"
-          justify="space-between"
-          label="Escola*"
-          placeholder="Selecione a escola"
+        <IonSelect v-model="schoolId" justify="space-between" label="Escola*" placeholder="Selecione a escola"
           @ion-change="(e) => {
             setFieldValue('schoolId', e.detail.value)
-          }"
-        >
+          }">
           <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
             {{ school.name }}
           </IonSelectOption>
@@ -438,15 +415,10 @@ onMounted(async () => {
 
     <ion-list v-if="schoolId" id="courseList">
       <ion-item>
-        <IonSelect
-          v-model="courseId"
-          justify="space-between"
-          label="Curso*"
-          placeholder="Selecione o curso"
+        <IonSelect v-model="courseId" justify="space-between" label="Curso*" placeholder="Selecione o curso"
           @ion-change="(e) => {
             setFieldValue('courseId', e.detail.value)
-          }"
-        >
+          }">
           <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
             {{ course.name }}
           </IonSelectOption>
@@ -456,15 +428,10 @@ onMounted(async () => {
 
     <ion-list v-if="schoolId" id="seriesList">
       <ion-item>
-        <IonSelect
-          v-model="seriesId"
-          justify="space-between"
-          label="Série*"
-          placeholder="Selecione a série"
+        <IonSelect v-model="seriesId" justify="space-between" label="Série*" placeholder="Selecione a série"
           @ion-change="(e) => {
             setFieldValue('seriesId', e.detail.value)
-          }"
-        >
+          }">
           <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
             {{ series.name }}
           </IonSelectOption>
@@ -474,15 +441,10 @@ onMounted(async () => {
 
     <ion-list v-if="schoolId" id="classroomList">
       <ion-item>
-        <IonSelect
-          v-model="classroomId"
-          justify="space-between"
-          label="Turma*"
-          placeholder="Selecione a turma"
+        <IonSelect v-model="classroomId" justify="space-between" label="Turma*" placeholder="Selecione a turma"
           @ion-change="(e) => {
             setFieldValue('classroomId', e.detail.value)
-          }"
-        >
+          }">
           <IonSelectOption v-for="classroom in classroomList" :key="classroom.id" :value="classroom.id">
             {{ classroom.name }}
           </IonSelectOption>
@@ -490,16 +452,8 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
 
-    <EpInput
-      v-model="values.date_enrollment"
-      name="date_enrollment"
-      label="Data da Matrícula*"
-      type="date"
-      :max="maxDate"
-      :min="minDate"
-      placeholder="Digite a data de matrícula"
-      @change="enforceYear"
-    />
+    <EpInput v-model="values.dateEnrollment" name="dateEnrollment" label="Data da Matrícula*" type="date" :max="maxDate"
+      :min="minDate" placeholder="Digite a data de matrícula" @change="enforceYear" />
 
     <!-- <ion-list id="status">
       <ion-item>
@@ -522,15 +476,10 @@ onMounted(async () => {
 
     <ion-list id="situation">
       <ion-item>
-        <IonSelect
-          v-model="values.situation"
-          justify="space-between"
-          label="Situação da Matrícula*"
-          placeholder="Selecione a situação"
-          @ion-change="(e) => {
+        <IonSelect v-model="values.situation" justify="space-between" label="Situação da Matrícula*"
+          placeholder="Selecione a situação" @ion-change="(e) => {
             setFieldValue('situation', e.detail.value)
-          }"
-        >
+          }">
           <IonSelectOption v-for="situation in situation" :key="situation" :value="situation">
             {{ situation }}
           </IonSelectOption>
@@ -542,30 +491,29 @@ onMounted(async () => {
       <IonLabel position="stacked" color="medium">
         Código de Matrícula (Somente Leitura):
       </IonLabel>
-      <ion-input
-        v-model="enrollmentCode"
-        type="text"
-        placeholder="Código gerado após finalizar a matrícula"
-        :disabled="true"
-        readonly
-        class="readonly-input"
-      />
+      <ion-input v-model="enrollmentCode" type="text" placeholder="Código gerado após finalizar a matrícula"
+        :disabled="true" readonly class="readonly-input" />
     </ion-item>
 
-    <EpInput v-model="values.observations" name="observations" label="Observações" placeholder="Digite observações sobre a matrícula" />
+    <EpInput v-model="values.observations" name="observations" label="Observações"
+      placeholder="Digite observações sobre a matrícula" />
   </div>
 </template>
 
 <style scoped>
 .readonly-item {
-  --background: #e0e0e0; /* Cor de fundo mais clara para o item */
-  border: 1px solid #d1d1d1; /* Borda para destacar */
-  border-radius: 8px; /* Bordas arredondadas */
+  --background: #e0e0e0;
+  /* Cor de fundo mais clara para o item */
+  border: 1px solid #d1d1d1;
+  /* Borda para destacar */
+  border-radius: 8px;
+  /* Bordas arredondadas */
 }
 
 .readonly-input {
   --background: transparent;
-  pointer-events: none; /* Desativa interações no campo */
+  pointer-events: none;
+  /* Desativa interações no campo */
 }
 
 ion-searchbar {
@@ -574,20 +522,27 @@ ion-searchbar {
 
 /* Contêiner da lista */
 .list-container {
-  max-height: 200px; /* Altura máxima da lista */
-  overflow-y: auto; /* Adiciona rolagem quando necessário */
-  background-color: var(--ion-color-light); /* Cor de fundo */
-  border: 1px solid #d1d1d1; /* Borda para definir a lista */
-  border-radius: 8px; /* Bordas arredondadas */
+  max-height: 200px;
+  /* Altura máxima da lista */
+  overflow-y: auto;
+  /* Adiciona rolagem quando necessário */
+  background-color: var(--ion-color-light);
+  /* Cor de fundo */
+  border: 1px solid #d1d1d1;
+  /* Borda para definir a lista */
+  border-radius: 8px;
+  /* Bordas arredondadas */
   padding: 0;
-  margin-top: 8px; /* Pequeno espaço entre a searchbar e a lista */
+  margin-top: 8px;
+  /* Pequeno espaço entre a searchbar e a lista */
 }
 
 /* Cada item da lista */
 .list-item {
   padding: 10px;
   cursor: pointer;
-  border-bottom: 1px solid #d1d1d1; /* Linha separadora entre os itens */
+  border-bottom: 1px solid #d1d1d1;
+  /* Linha separadora entre os itens */
 }
 
 /* Efeito de hover para os itens */
@@ -603,14 +558,18 @@ ion-searchbar {
 
 /* Estilo para os alunos matriculados */
 .enrolled-item {
-  background-color: #e0e0e0; /* Cor de fundo diferente */
-  color: #757575; /* Cor de texto desabilitada */
-  cursor: not-allowed; /* Cursor de n�o permitido */
+  background-color: #e0e0e0;
+  /* Cor de fundo diferente */
+  color: #757575;
+  /* Cor de texto desabilitada */
+  cursor: not-allowed;
+  /* Cursor de n�o permitido */
 }
 
 .enrolled-label {
   font-size: 0.85rem;
-  color: red; /* Texto em vermelho para indicar a matr�cula */
+  color: red;
+  /* Texto em vermelho para indicar a matr�cula */
   margin-left: 8px;
 }
 </style>
