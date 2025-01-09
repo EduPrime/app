@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Tables } from '@/types/database.types'
+import type { PreEnrollment } from '@prisma/client'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import Pre_enrollmentList from '@/modules/student-management/components/Pre_enrollmentList.vue'
@@ -12,38 +12,41 @@ const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
 const pre_enrollmentService = new Pre_enrollmentService()
-const dataList = ref<(Tables<'pre_enrollment'> & { student: { name: string, address: string } })[]>([])
+const dataList = ref<PreEnrollmentWithStudent[]>([])
 const schoolCount = ref(154)
 const classCount = ref(25)
 const approvalRate = ref(48)
 const teacherCount = ref(30)
 const searchQuery = ref('')
 
-// Função para garantir que os dados tenham 'name' e 'address'
-function formatPreEnrollments(pre_enrollments: any[]): (Tables<'pre_enrollment'> & { student: { name: string, address: string } })[] {
-  return pre_enrollments.map(enrollment => ({
-    ...enrollment,
-    student: {
-      name: enrollment.student?.name ?? '',
-      address: enrollment.student?.address ?? '',
-    },
-  }))
-}
+type PreEnrollmentWithStudent = Partial<PreEnrollment> & { name: string; address: string }
 
-const filteredDataList = computed(() => {
+
+// Função para garantir que os dados tenham 'name' e 'address'
+// function formatPreEnrollments(pre_enrollments: PreEnrollmentWithStudent []): PreEnrollment & { student: { name: string, address: string }}[] {
+//   return pre_enrollments.map(enrollment => ({
+//     ...enrollment,
+//     student: {
+//       name: enrollment.student?.name ?? '',
+//       address: enrollment.student?.address ?? '',
+//     },
+//   }))
+// }
+
+const filteredDataList = computed<PreEnrollmentWithStudent[]>(() => {
   if (!searchQuery.value) {
     return dataList.value
   }
 
-  return dataList.value.filter(pre_enrollment =>
-    pre_enrollment.student?.name && pre_enrollment.student?.name.toLowerCase().includes(searchQuery.value.toLowerCase()), // Verifica se enrollment.name existe antes de usar toLowerCase()
+  return dataList.value?.filter((pre_enrollment: { name: string }) =>
+    pre_enrollment?.name && pre_enrollment?.name.toLowerCase().includes(searchQuery.value.toLowerCase()), // Verifica se enrollment.name existe antes de usar toLowerCase()
   )
 })
 
 async function loadPre_enrollment() {
   try {
     const pre_enrollments = await pre_enrollmentService.getAllWithStudents() // getAll() pode retornar null
-    dataList.value = formatPreEnrollments(pre_enrollments ?? []) // Se for null, atribuímos um array vazio
+    dataList.value = pre_enrollments ?? [] // Se for null, atribuímos um array vazio
   }
   catch (error) {
     console.error('Erro ao carregar as pre-matrículas:', error)

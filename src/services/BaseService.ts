@@ -1,7 +1,6 @@
 import { useAuthStore } from '@/store/AuthStore'
 import { getPostgrestURL } from '@/utils/getPostgrestURL'
 import { PostgrestClient } from '@supabase/postgrest-js'
-//import { AuthService } from './AuthService'
 
 export default class BaseService<T> {
   public client: PostgrestClient
@@ -9,7 +8,7 @@ export default class BaseService<T> {
   private orgId: string | undefined
   constructor(private readonly table: string) {
     const authStore = useAuthStore()
-    this.userId = authStore.userLocal?.id
+    this.userId = (authStore.userLocal as unknown as { id: string | undefined })?.id
     this.orgId = authStore.organization?.id
 
     const token = authStore.getPostgrestToken()
@@ -42,6 +41,23 @@ export default class BaseService<T> {
       throw new Error(error.message)
     return data
   }
+
+  async getBySchoolId(schoolId: string): Promise<T | null> {
+    if (!schoolId)
+      return null
+
+    const { data, error } = await this.client
+      .from(this.table)
+      .select('*')
+      .eq('schoolId', schoolId)
+      .single()
+
+    if (error)
+      throw new Error(error.message)
+    return data
+  }
+
+
 
   async getAll(
     orderBy?: string,

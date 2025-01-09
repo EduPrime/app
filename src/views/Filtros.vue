@@ -1,4 +1,5 @@
 <script setup lang="ts">
+/*
 import ThemeFilterButtons from '@/components/theme/FilterButtons.vue'
 import ThemeFilterExpansor from '@/components/theme/FilterExpansor.vue'
 import ThemeOverlayModal from '@/components/theme/OverlayModal.vue'
@@ -27,10 +28,10 @@ function openModal(val: string) {
   if (triggerButton) {
     triggerButton.click()
   }
-}
+*/
 </script>
 
-<template>
+<!--template>
   <IonPage>
     <IonContent :fullscreen="true">
       <IonHeader :translucent="true">
@@ -55,7 +56,6 @@ function openModal(val: string) {
       </ion-button>
 
       <ThemeOverlayModal v-model="modalClean" trigger="open-modal" :action-name="`Selecione ${chosenButton === 'school' ? 'uma Escola' : chosenButton === 'series' ? 'uma Série' : 'um Turno'}`">
-        <!-- Ver somente se school -->
         <div v-if="chosenButton === 'school'">
           <ion-searchbar placeholder="Search" @click="$refs.modal.setCurrentBreakpoint(0.75)" />
           <ion-list>
@@ -67,13 +67,9 @@ function openModal(val: string) {
             </IonItem>
           </ion-list>
         </div>
-
-        <!-- Ver somente se series -->
         <div v-else-if="chosenButton === 'series'" />
-
-        <!-- Ver somente se shift -->
         <div v-else-if="chosenButton === 'shift'" />
       </ThemeOverlayModal>
     </IonContent>
   </IonPage>
-</template>
+</template-->

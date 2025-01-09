@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { Database, Tables } from '@/types/database.types'
 import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonInput, IonItem, IonLabel } from '@ionic/vue'
 import { computed } from 'vue'
 import InstitutionService from '../../services/InstitutionService'
+import type { Institution } from '@prisma/client'
 
 const props = defineProps<{
-  institution: Tables<'institution'>
+  institution: Institution
 }>()
 
 const emit = defineEmits<{
@@ -19,16 +19,16 @@ const form = computed(() => {
 })
 async function submitForm() {
   try {
-    let result: Tables<'institution'> | null = null
     if (form.value?.id) {
-      result = await institutionService.update(form.value.id, form.value as Database['public']['Tables']['institution']['Update'])
-    }
-    if (result !== null) {
-      console.info('Instituição salva com sucesso:', result)
-      emit('save')
-    }
-    else {
-      console.error('Falha ao salvar a instituição')
+      let result = await institutionService.update(form.value.id, form.value)
+
+      if (result) {
+        console.info('Instituição salva com sucesso:', result)
+        emit('save')
+      }
+      else {
+        console.error('Falha ao salvar a instituição')
+      }
     }
   }
   catch (error) {
@@ -95,7 +95,7 @@ function cancelEdit() {
           <IonLabel position="stacked">
             CEP
           </IonLabel>
-          <IonInput v-model="form.postalcode as string" placeholder="CEP" type="text" />
+          <IonInput v-model="form.postalCode as string" placeholder="CEP" type="text" />
         </IonItem>
 
         <IonButton expand="block" type="submit">

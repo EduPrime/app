@@ -3,7 +3,7 @@ import BaseService from '@/services/BaseService'
 const table = 'document'
 type DocumentTable = typeof table
 
-export default class DocumentService extends BaseService {
+export default class DocumentService extends BaseService<DocumentTable> {
   constructor() {
     super(table)
   }
@@ -16,6 +16,7 @@ export default class DocumentService extends BaseService {
    * @param options - Optional settings like cache control and upsert
    * @returns An object containing the upload data or an error
    */
+  /*
   async uploadFile(
     bucketName: string,
     path: string,
@@ -41,4 +42,6 @@ export default class DocumentService extends BaseService {
       return { data: null, error }
     }
   }
+}
+*/
 }

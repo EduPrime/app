@@ -5,7 +5,7 @@ import { eye, lockClosed, mail } from 'ionicons/icons'
 import { ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store/AuthStore'
-import { authClient } from '@/services/AuthService'
+import { AuthService } from '@/services/AuthService'
 
 const username = ref('')
 const phone = ref('')
@@ -17,6 +17,7 @@ const role = ref('')
 const validRoles = ['admin', 'professor', 'aluno']
 const router = useRouter()
 const userStore = useAuthStore()
+const authService = new AuthService()
 
 const passwordsMatch = ref(true) // Variável para controlar se as senhas não coincidem
 
@@ -72,15 +73,11 @@ async function signUp() {
     return
   }
 
-  const { data, error } = await authClient.signUp.email({
-    email: email.value,
-    password: password.value,
-    options: {
-      data: {
-        role: role.value,
-      },
-    },
-  })
+  const { data, error } = await authService.register(
+    username.value,
+    email.value,
+    password.value,
+)
 
   if (error) {
     console.error('Error creating user:', error.message)

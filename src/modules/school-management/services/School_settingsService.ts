@@ -1,19 +1,17 @@
 import BaseService from '@/services/BaseService'
+import type { SchoolSettings } from '@prisma/client'
 
-const table = 'school_settings' as const
 
-type TabelaType = typeof table
-
-export default class School_settingsService extends BaseService<TabelaType> {
+export default class School_settingsService extends BaseService<SchoolSettings> {
   constructor() {
-    super(table)
+    super('school_settings')
   }
 
   async updateSettings(id: string, data: any) {
     const { data: updated, error } = await this.client
       .from('school_settings')
       .update(data)
-      .eq('school_id', id)
+      .eq('schoolId', id)
       .select() // Certifique-se de que esse select existe para obter a linha atualizada
 
     if (error)

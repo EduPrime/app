@@ -92,6 +92,14 @@ model Course {
   userCreated   String?         @db.VarChar(255)
   updatedBy     String?         @db.Uuid
   tenantId      String?         @db.Uuid
+  courseStage   Int
+  graduate      String?
+  workload      Int
+  teachingType  String
+  regimeType    String?
+  courseModality  String
+  institutionId String          @db.Uuid
+  institution   Institution     @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_institutionId_fkey")
   school        School          @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_schoolid_fkey")
   enrollment    Enrollment[]
   preenrollment PreEnrollment[]
@@ -211,6 +219,8 @@ model Institution {
   preenrollment       PreEnrollment[]
   school              School[]
   school_settings     SchoolSettings[]
+  series              Series[]
+  course              Course[]
 
   @@map("institution")
 }
@@ -348,13 +358,18 @@ model Series {
   updatedBy     String?         @db.Uuid
   tenantId      String?         @db.Uuid
   userCreated   String?         @db.VarChar(255)
-  schoolId      String?         @db.Uuid
+  schoolId      String          @db.Uuid
+  institutionId String          @db.Uuid
+  courseStage   String
+  graduate      String
+  workload      String
+  schoolDays    String
   classroom     Classroom[]
   enrollment    Enrollment[]
   preenrollment PreEnrollment[]
   course        Course          @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_courseid_fkey")
   school        School?         @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_schoolid_fkey")
-
+  institution   Institution?    @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_institution_fkey")
   @@map("series")
 }
 
@@ -438,6 +453,7 @@ model Student {
   rgIssueDate      DateTime?          @db.Date
   rgIssuer         String?            @db.VarChar(100)
   birthCertificate String?            @db.VarChar(100)
+  placeOfBirth     String?            @db.VarChar(100)
   docsType         String?            @db.VarChar(100)
   responsibleType  responsibleType?   @default(Pai)
   citystate        String?            @db.VarChar
@@ -460,7 +476,7 @@ model Teacher {
   qualifications Json?
   status         status?   @default(ACTIVE)
   metadata       Json?
-  user_created   String?   @db.Uuid
+  userCreated   String?   @db.Uuid
   createdAt      DateTime  @default(now()) @db.Timestamptz(6)
   deletedAt      DateTime? @db.Timestamptz(6)
   updatedAt      DateTime? @db.Timestamptz(6)

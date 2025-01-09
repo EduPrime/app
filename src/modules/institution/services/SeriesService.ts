@@ -1,11 +1,9 @@
 import BaseService from '@/services/BaseService'
+import type { Series } from '@prisma/client'
 
-const table = 'series' as const
 
-type SeriesTable = typeof table
-
-export default class SeriesService extends BaseService<SeriesTable> {
+export default class SeriesService extends BaseService<Series> {
   constructor() {
-    super(table) // Passando o nome da tabela para a classe base
+    super('series') // Passando o nome da tabela para a classe base
   }
 }

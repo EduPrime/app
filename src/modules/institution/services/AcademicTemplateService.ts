@@ -1,12 +1,9 @@
 import BaseService from '@/services/BaseService'
+import type { AcademicYearTemplate } from '@prisma/client'
 
-const table = 'academic_year_template' as const
-
-type AcademicTemplateTable = typeof table
-
-export default class AcademicTemplateService extends BaseService<AcademicTemplateTable> {
+export default class AcademicTemplateService extends BaseService<AcademicYearTemplate> {
   constructor() {
-    super(table) // Passando o nome da tabela para a classe base
+    super('academic_year_template') // Passando o nome da tabela para a classe base
   }
 
   /**

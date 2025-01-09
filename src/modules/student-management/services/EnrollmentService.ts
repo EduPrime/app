@@ -1,12 +1,10 @@
 import BaseService from '@/services/BaseService'
+import type { Enrollment } from '@prisma/client'
 
-const table = 'enrollment' as const
 
-type TabelaType = typeof table
-
-export default class EnrollmentService extends BaseService<TabelaType> {
+export default class EnrollmentService extends BaseService<Enrollment> {
   constructor() {
-    super(table)
+    super('enrollment')
   }
 
   // Método para verificar se o código de matrícula é único
