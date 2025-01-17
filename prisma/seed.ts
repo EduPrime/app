@@ -8,7 +8,7 @@ async function main() {
             name: 'Evilásio Mateus',
             email: 'user@back3nd.com',
             tenantId: self.crypto.randomUUID(),
-            role: 'owner',
+            role: 'ADMIN',
             apiUserId: 'x8Tamaq9lFgVAw4H0SdoT'
         },
     })

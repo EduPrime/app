@@ -8,12 +8,13 @@ datasource db {
 }
 
 model User {
-  id        String  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name      String
-  role      String
+  role      roleType  @default(PUBLICO)
   tenantId  String?
-  email     String
+  email     String?
   apiUserId String
+  servers   Servers[]
 }
 
 model AcademicYear {
@@ -94,7 +95,7 @@ model Course {
   tenantId       String?
   courseStage    Int
   graduate       String?
-  workload       Int
+  workload       Decimal?        @db.Decimal
   teachingType   String
   regimeType     String?
   courseModality String
@@ -141,7 +142,7 @@ model Enrollment {
   dateEnrollment    DateTime            @db.Timestamp(6)
   observations      String?             @db.VarChar(200)
   status            status?             @default(ACTIVE)
-  situation         situationtype
+  situation         situationType
   enrollmentCode    String              @unique(map: "enrollment_enrollmentcode_key") @db.VarChar(100)
   institutionId     String?             @db.Uuid
   preenrollmentId   String?             @unique(map: "enrollment_preenrollmentid_key") @db.Uuid
@@ -221,6 +222,7 @@ model Institution {
   school_settings     SchoolSettings[]
   series              Series[]
   course              Course[]
+  servers             Servers[]
 
   @@map("institution")
 }
@@ -258,7 +260,7 @@ model PreEnrollment {
   datePreenrollment DateTime       @db.Timestamp(6)
   observations      String?        @db.VarChar(200)
   status            status?        @default(ACTIVE)
-  situation         situationtype?
+  situation         situationType?
   preenrollmentcode String?        @unique @db.VarChar(100)
   enrollment        Enrollment?
   course            Course         @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "preenrollment_courseid_fkey")
@@ -362,7 +364,7 @@ model Series {
   institutionId String          @db.Uuid
   courseStage   String
   graduate      String
-  workload      String
+  workload      Decimal?        @db.Decimal
   schoolDays    String
   classroom     Classroom[]
   enrollment    Enrollment[]
@@ -387,6 +389,7 @@ model ServerAllocations {
   updatedBy   String?   @db.Uuid
   tenantId    String?
   userCreated String?   @db.VarChar(255)
+  workload    Decimal?  @db.Decimal
   school      School    @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_school")
   servers     Servers   @relation(fields: [serverId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_server")
 
@@ -402,13 +405,19 @@ model Servers {
   cpf                String              @unique @db.VarChar(11)
   address            String?             @db.VarChar(255)
   position           String              @db.VarChar(255)
-  schoolId           String              @db.Uuid
+  schoolId           String?             @db.Uuid
   createdAt          DateTime?           @default(now()) @db.Timestamp(6)
   deletedAt          DateTime?           @db.Timestamp(6)
   updatedAt          DateTime?           @db.Timestamp(6)
   updatedBy          String?             @db.Uuid
   tenantId           String?
   userCreated        String?             @db.VarChar(255)
+  userId             String?             @db.Uuid
+  institutionId      String              @db.Uuid
+  contract           contractType?       @default(INDETERMINADO)
+  defficiency        defficiencyType?
+  user               User?               @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_server_fkey")
+  institution        Institution         @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "server_institution_fkey")
   server_allocations ServerAllocations[]
 
   @@map("servers")
@@ -435,7 +444,7 @@ model Student {
   userCreated      String?            @db.VarChar(255)
   schoolId         String?            @db.Uuid
   postalCode       String?            @db.VarChar(100)
-  residenceZone    residenceZoneType? @default(Urbana)
+  residenceZone    residenceZoneType? @default(URBANA)
   numberAddress    String?            @db.VarChar(100)
   cpf              String?            @unique @db.VarChar(100)
   neighborhood     String?            @db.VarChar(100)
@@ -456,7 +465,7 @@ model Student {
   birthCertificate String?            @db.VarChar(100)
   placeOfBirth     String?            @db.VarChar(100)
   docsType         String?            @db.VarChar(100)
-  responsibleType  responsibleType?   @default(Pai)
+  responsibleType  responsibleType?   @default(PAI)
   citystate        String?            @db.VarChar
   enrollment       Enrollment?
   grade            Grade[]
@@ -506,13 +515,8 @@ enum dayofweek {
 }
 
 enum genderType {
-  Masculino
-  Feminino
-}
-
-enum gendertype {
-  Masculino
-  Feminino
+  MASCULINO
+  FEMININO
 }
 
 enum period {
@@ -522,45 +526,34 @@ enum period {
 }
 
 enum position {
-  Professor
-  Gestor
-  Coordenador
-  Diretor
-  Vigia
+  PROFESSOR
+  GESTOR
+  COORDENADOR
+  DIRETOR
+  VIGIA
 }
 
 enum residenceZoneType {
-  Urbana
-  Rural
-}
-
-enum residencezonetype {
-  Urbana
-  Rural
+  URBANA
+  RURAL
 }
 
 enum responsibleType {
-  Pai
-  M_e   @map("Mãe")
-  Ambos
+  PAI
+  MAE   @map("MÃE")
+  AMBOS
 }
 
-enum responsibletype {
-  Pai
-  M_e   @map("Mãe")
-  Ambos
-}
-
-enum situationtype {
-  Pendente
-  Cursando
-  Aprovado
-  Aprovado_pelo_Conselho
-  Aprovado_com_Dependencia
-  Reprovado
-  Transferido
-  Abandono
-  Falecido
+enum situationType {
+  PENDENTE
+  CURSANDO
+  APROVADO
+  APROVADO_PELO_CONSELHO
+  APROVADO_COM_DEPENDENCIA
+  REPROVADO
+  TRANSFERIDO
+  ABANDONO
+  FALECIDO
 }
 
 enum status {
@@ -569,4 +562,40 @@ enum status {
   GRADUATED
   SUSPENDED
   TRANSFERRED
+}
+
+enum roleType {
+  ADMIN
+  GESTORMUNICIPAL
+  GESTORESCOLAR
+  PROFESSOR
+  PUBLICO
+}
+
+enum contractType {
+  INDETERMINADO
+  CONTRATADO
+  PERMUTA
+  ESTAGIARIO
+  COMISSIONADO
+  EFETIVO
+}
+
+enum defficiencyType {
+  TRANSTORNO_DO_ESPECTRO_AUTISTA
+  TRANSTORNO_DESINTEGRATIVO_DA_INFANCIA_PSICOSE_INFANTIL
+  TDAH
+  SINDROME_DE_RETT
+  SINDROME_DE_ASPERGER
+  SURDOCEGUEIRA
+  SURDEZ
+  DEFICIENCIA_MULTIPLA
+  DEFICIENCIA_MENTAL
+  DEFICIENCIA_INTELECTUAL
+  DEFICIENCIA_FISICA
+  DEFICIENCIA_AUDITIVA
+  CEGUEIRA
+  BAIXA_VISAO
+  AUTISMO_CLASSICO
+  ALTAS_HABILIDADES_SUPERDOTACAO
 }
