@@ -38,7 +38,9 @@ html {
   .mb-auto {
 	margin-bottom: auto;
   }
-  
+  .bg-light {
+	background-color: #F9D3E333;
+  }
 
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
@@ -64,7 +66,7 @@ http://ionicframework.com/docs/theming/ */
 	--ion-color-tertiary-shade: #b84b8c;
 	--ion-color-tertiary-tint: #d666a9;
 
-	--ion-color-accent: #d1559f;
+	--ion-color-accent: #ED6466;
 	--ion-color-accent-rgb: 209, 85, 159;
 	--ion-color-accent-contrast: #fad3e4;
 	--ion-color-accent-contrast-rgb: 250, 211, 228;
