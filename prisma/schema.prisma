@@ -607,7 +607,7 @@ model Servers {
   userId             String?             @db.Uuid
   institutionId      String              @db.Uuid
   contract           contractType?       @default(INDETERMINADO)
-  defficiency        defficiencyType?
+  disability         disabilityType?
   user               User?               @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_server_fkey")
   institution        Institution         @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "server_institution_fkey")
   server_allocations ServerAllocations[]
@@ -626,6 +626,7 @@ model Student {
   guardianName            String?                   @db.VarChar(100)
   guardianPhone           String?                   @db.VarChar(15)
   status                  status?                   @default(ACTIVE)
+  disability              disabilityType?
   photo                   Bytes?
   metadata                Json?
   createdAt               DateTime?                 @default(now()) @db.Timestamp(6)
@@ -780,7 +781,7 @@ enum contractType {
   EFETIVO
 }
 
-enum defficiencyType {
+enum disabilityType {
   TRANSTORNO_DO_ESPECTRO_AUTISTA
   TRANSTORNO_DESINTEGRATIVO_DA_INFANCIA_PSICOSE_INFANTIL
   TDAH

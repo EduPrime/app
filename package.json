@@ -12,7 +12,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --config ./eslint.config.js . --fix",
     "type-check": "vue-tsc --noEmit",
-    "prisma-deploy": "bunx prisma migrate deploy && bun prisma/seed.ts"
+    "prisma-dataload": "bun prisma/roles.ts && bun prisma/seed.ts"
   },
   "dependencies": {
     "@antfu/eslint-config": "^3.12.1",
