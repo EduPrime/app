@@ -6,7 +6,7 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = "postgresql://softagon:Araripina@2024@seda-araripina-postgres.canopus.softagon.io:5435/ieducar"
-  schemas  = ["cadastro", "modules", "pmieducar", "portal", "public", "relatorio", "softagon", "urbano"]
+  schemas  = ["public", "cadastro", "modules", "pmieducar", "portal", "oldpublic", "relatorio", "softagon", "urbano"]
 }
 
 model codigo_cartorio_inep {
@@ -4313,7 +4313,7 @@ model cities {
   districts  districts[]
   places     places[]
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model countries {
@@ -4325,7 +4325,7 @@ model countries {
   deleted_at DateTime? @db.Timestamp(0)
   states     states[]
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model districts {
@@ -4338,7 +4338,7 @@ model districts {
   deleted_at DateTime? @db.Timestamp(0)
   cities     cities    @relation(fields: [city_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "public_districts_city_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model educacenso_imports {
@@ -4352,7 +4352,7 @@ model educacenso_imports {
   updated_at        DateTime? @db.Timestamp(0)
   registration_date DateTime? @db.Date
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model employee_graduation_disciplines {
@@ -4360,7 +4360,7 @@ model employee_graduation_disciplines {
   name                 String                 @db.VarChar(191)
   employee_graduations employee_graduations[]
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model employee_graduations {
@@ -4376,7 +4376,7 @@ model employee_graduations {
   educacenso_curso_superior       educacenso_curso_superior        @relation(fields: [course_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_graduations_course_id_foreign")
   employee_graduation_disciplines employee_graduation_disciplines? @relation(fields: [discipline_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "employee_graduations_discipline_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model employee_posgraduate {
@@ -4390,7 +4390,7 @@ model employee_posgraduate {
   updated_at      DateTime? @db.Timestamp(0)
   servidor        servidor  @relation(fields: [employee_id, entity_id], references: [cod_servidor, ref_cod_instituicao], onDelete: NoAction, onUpdate: NoAction, map: "employee_posgraduate_employee_id_entity_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 /// This model has been renamed to 'Renamedexport' during introspection, because the original name 'export' is reserved.
@@ -4407,7 +4407,7 @@ model Renamedexport {
   filters    Json?     @db.Json
 
   @@map("export")
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model failed_jobs {
@@ -4419,7 +4419,7 @@ model failed_jobs {
   exception  String
   failed_at  DateTime @default(now()) @db.Timestamp(0)
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model files {
@@ -4432,7 +4432,7 @@ model files {
   updated_at      DateTime?         @db.Timestamp(0)
   files_relations files_relations[]
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model files_relations {
@@ -4444,7 +4444,7 @@ model files_relations {
   updated_at  DateTime? @db.Timestamp(0)
   files       files     @relation(fields: [file_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "files_relations_file_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model ieducar_audit {
@@ -4456,7 +4456,7 @@ model ieducar_audit {
   table   String   @db.VarChar(191)
   date    DateTime @db.Timestamp(0)
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model log_unification_old_data {
@@ -4467,7 +4467,7 @@ model log_unification_old_data {
   old_data         Json             @db.Json
   log_unifications log_unifications @relation(fields: [unification_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "log_unification_old_data_unification_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model log_unifications {
@@ -4483,7 +4483,7 @@ model log_unifications {
   duplicates_name          Json?                      @db.Json
   log_unification_old_data log_unification_old_data[]
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model manager_access_criterias {
@@ -4491,7 +4491,7 @@ model manager_access_criterias {
   name            String            @db.VarChar(191)
   school_managers school_managers[]
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model manager_link_types {
@@ -4499,7 +4499,7 @@ model manager_link_types {
   name            String            @db.VarChar(191)
   school_managers school_managers[]
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model manager_roles {
@@ -4507,7 +4507,7 @@ model manager_roles {
   name            String            @db.VarChar(191)
   school_managers school_managers[]
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model menus {
@@ -4527,7 +4527,7 @@ model menus {
   updated_at        DateTime?           @db.Timestamp(0)
   menu_tipo_usuario menu_tipo_usuario[]
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model migrated_disciplines {
@@ -4542,7 +4542,7 @@ model migrated_disciplines {
   componente_curricular_migrated_disciplines_new_discipline_idTocomponente_curricular componente_curricular @relation("migrated_disciplines_new_discipline_idTocomponente_curricular", fields: [new_discipline_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "public_migrated_disciplines_new_discipline_id_foreign")
   componente_curricular_migrated_disciplines_old_discipline_idTocomponente_curricular componente_curricular @relation("migrated_disciplines_old_discipline_idTocomponente_curricular", fields: [old_discipline_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "public_migrated_disciplines_old_discipline_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model migrations {
@@ -4550,14 +4550,14 @@ model migrations {
   migration String @db.VarChar(191)
   batch     Int
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model notification_type {
   id   BigInt @id @default(autoincrement())
   name String @db.VarChar(191)
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model notifications {
@@ -4570,7 +4570,7 @@ model notifications {
   created_at DateTime? @db.Timestamp(0)
   updated_at DateTime? @db.Timestamp(0)
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
@@ -4581,7 +4581,7 @@ model password_resets {
 
   @@index([email], map: "password_resets_email_index")
   @@ignore
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model person_has_place {
@@ -4596,7 +4596,7 @@ model person_has_place {
   places     places    @relation(fields: [place_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "public_person_has_place_place_id_foreign")
 
   @@unique([person_id, type], map: "public_person_has_place_person_id_type_unique")
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model personal_access_tokens {
@@ -4611,7 +4611,7 @@ model personal_access_tokens {
   updated_at     DateTime? @db.Timestamp(0)
 
   @@index([tokenable_type, tokenable_id], map: "personal_access_tokens_tokenable_type_tokenable_id_index")
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model places {
@@ -4630,7 +4630,7 @@ model places {
   person_has_place person_has_place[]
   cities           cities             @relation(fields: [city_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "public_places_city_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model release_period_dates {
@@ -4640,7 +4640,7 @@ model release_period_dates {
   release_period_id BigInt
   release_periods   release_periods @relation(fields: [release_period_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "release_period_dates_release_period_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model release_period_schools {
@@ -4649,7 +4649,7 @@ model release_period_schools {
   release_period_id BigInt
   release_periods   release_periods @relation(fields: [release_period_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "release_period_schools_release_period_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model release_periods {
@@ -4662,7 +4662,7 @@ model release_periods {
   release_period_dates   release_period_dates[]
   release_period_schools release_period_schools[]
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model school_managers {
@@ -4681,14 +4681,14 @@ model school_managers {
   manager_roles               manager_roles?            @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_managers_role_id_foreign")
   escola                      escola                    @relation(fields: [school_id], references: [cod_escola], onDelete: NoAction, onUpdate: NoAction, map: "school_managers_school_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model setor_bai {
   idsetorbai Decimal @id(map: "pk_setorbai") @default(dbgenerated("nextval(('public.seq_setor_bai'::text)::regclass)")) @db.Decimal(6, 0)
   nome       String  @db.VarChar(80)
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model settings {
@@ -4703,7 +4703,7 @@ model settings {
   hint                String?             @db.VarChar(191)
   settings_categories settings_categories @relation(fields: [setting_category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "settings_setting_category_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model settings_categories {
@@ -4714,7 +4714,7 @@ model settings_categories {
   updated_at DateTime?  @db.Timestamp(0)
   settings   settings[]
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model states {
@@ -4729,7 +4729,7 @@ model states {
   cities       cities[]
   countries    countries @relation(fields: [country_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "public_states_country_id_foreign")
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model users {
@@ -4742,7 +4742,7 @@ model users {
   created_at        DateTime? @db.Timestamp(0)
   updated_at        DateTime? @db.Timestamp(0)
 
-  @@schema("public")
+  @@schema("oldpublic")
 }
 
 model situacao_matricula {
