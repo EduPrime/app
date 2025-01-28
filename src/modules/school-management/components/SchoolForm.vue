@@ -119,6 +119,9 @@ const { values, errors, validate, setFieldValue } = useForm<any>({
 async function registerSchool() {
   const validationResult = await validate()
 
+  
+  console.log('Register School ', validationResult)
+
   if (!validationResult.valid) {
     const displayErrors = Object.values(errors.value).join(', ')
     showToast(displayErrors, 'top', 'warning')
@@ -315,20 +318,20 @@ onMounted(async () => {
     </ion-list> -->
     <EpInput v-model="values.state" :maxlength="2" name="state" :mask="stateMask" label="Estado*"
       placeholder="Digite o estado" />
-    <EpInput v-model="values.postalcode" name="postalcode" :mask="postalCodeMask" inputmode="number" label="CEP*"
+    <EpInput v-model="values.postalCode" name="postalCode" :mask="postalCodeMask" inputmode="number" label="CEP*"
       placeholder="00000-000" />
   </div>
 
   <div v-show="selectedSegment === 'school-settings'">
-    <EpInput v-model="values.school_days" name="school_days" label="Dias Letivos"
+    <EpInput v-model="values.schoolDays" name="schoolDays" label="Dias Letivos"
       placeholder="Digite os dias letivos" />
-    <EpInput v-model="values.date_opening" name="date_opening" label="Data de Abertura" type="date"
+    <EpInput v-model="values.dateOpening" name="dateOpening" label="Data de Abertura" type="date"
       placeholder="Digite a data de abertura" />
-    <EpInput v-model="values.date_closing" name="date_closing" label="Data de Encerramento" type="date"
+    <EpInput v-model="values.dateClosing" name="dateClosing" label="Data de Encerramento" type="date"
       placeholder="Digite a data de encerramento" />
-    <EpInput v-model="values.date_start" name="date_start" label="Data de Início" type="date"
+    <EpInput v-model="values.dateStart" name="dateStart" label="Data de Início" type="date"
       placeholder="Digite a data de início" />
-    <EpInput v-model="values.date_end" name="date_end" label="Data de Término" type="date"
+    <EpInput v-model="values.dateEnd" name="dateEnd" label="Data de Término" type="date"
       placeholder="Digite a data de término" />
   </div>
 </template>
