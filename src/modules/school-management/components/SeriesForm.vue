@@ -11,6 +11,7 @@ import InstitutionService from '../../institution/services/InstitutionService'
 import SchoolService from '../../institution/services/SchoolService'
 import SeriesService from '../../institution/services/SeriesService'
 import CourseService from '../services/CourseService'
+import { Decimal } from '@prisma/client/runtime/library'
 
 defineEmits<{
   (e: 'cancel'): void
@@ -37,7 +38,7 @@ const institutionList = ref()
 const seriesList = ref()
 const courseList = ref()
 const courseId = ref('')
-const formSchema = yup.object ({
+const formSchema = yup.object({
   name: yup
     .string()
     .required('Nome é obrigatório'),
@@ -54,7 +55,7 @@ const formSchema = yup.object ({
   workload: yup
     .number()
     .transform((value, originalValue) => {
-    // Verifica se o originalValue é uma string e tenta convertê-la em número
+      // Verifica se o originalValue é uma string e tenta convertê-la em número
       if (typeof originalValue === 'string') {
         const trimmedValue = originalValue.trim()
         // Se a string não é vazia e pode ser convertida em um número, retorna o número
@@ -71,7 +72,7 @@ const formSchema = yup.object ({
   schoolDays: yup
     .number()
     .transform((value, originalValue) => {
-    // Verifica se o originalValue é uma string e tenta convertê-la em número
+      // Verifica se o originalValue é uma string e tenta convertê-la em número
       if (typeof originalValue === 'string') {
         const trimmedValue = originalValue.trim()
         // Se a string não é vazia e pode ser convertida em um número, retorna o número
@@ -93,7 +94,7 @@ interface SeriesForm {
   courseId: string
   courseStage: string
   graduate: string
-  workload: string
+  workload: Decimal | null
   schoolDays: string
   schoolId: string
 }
@@ -201,8 +202,8 @@ async function getSeriesData() {
       institutionId.value = seriesDbData.institutionId
       courseId.value = seriesDbData.courseId
       schoolId.value = seriesDbData.schoolId
-      setFieldValue('institutionId', seriesDbData.institutionId) 
-      setFieldValue('schoolId', seriesDbData.schoolId) 
+      setFieldValue('institutionId', seriesDbData.institutionId)
+      setFieldValue('schoolId', seriesDbData.schoolId)
       setFieldValue('courseId', seriesDbData.courseId)
       setFieldValue('name', seriesDbData.name)
       setFieldValue('courseStage', seriesDbData.courseStage)
@@ -237,7 +238,7 @@ async function loadInstitution() {
 }
 
 onMounted(async () => {
-  schoolId.value = (await schoolService.getAll())?.at(0)?.id 
+  schoolId.value = (await schoolService.getAll())?.at(0)?.id
   await loadSeries()
   await loadInstitution()
   if (seriesId.value) {
@@ -261,19 +262,10 @@ onMounted(async () => {
 
   <div v-show="selectedSegment === 'general-info'">
     <ion-list id="institutionList">
-      <IonSelect
-        v-model="institutionId"
-        :disabled="true"
-        fill="outline"
-        cancel-text="Cancelar"
-        label-placement="floating"
-        justify="space-between"
-        label="Instituição*"
-        placeholder="Selecione"
-        @ion-change="(e) => {
+      <IonSelect v-model="institutionId" :disabled="true" fill="outline" cancel-text="Cancelar"
+        label-placement="floating" justify="space-between" label="Instituição*" placeholder="Selecione" @ion-change="(e) => {
           setFieldValue('institutionId', e.detail.value)
-        }"
-      >
+        }">
         <IonSelectOption v-for="institution in institutionList" :key="institution.id" :value="institution.id">
           {{ institution.name }}
         </IonSelectOption>
@@ -281,18 +273,10 @@ onMounted(async () => {
     </ion-list>
 
     <ion-list id="courseList">
-      <IonSelect
-        v-model="courseId"
-        fill="outline"
-        cancel-text="Cancelar"
-        label-placement="floating"
-        justify="space-between"
-        label="Curso*"
-        placeholder="Selecione"
-        @ion-change="(e) => {
+      <IonSelect v-model="courseId" fill="outline" cancel-text="Cancelar" label-placement="floating"
+        justify="space-between" label="Curso*" placeholder="Selecione" @ion-change="(e) => {
           setFieldValue('courseId', e.detail.value)
-        }"
-      >
+        }">
         <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
           {{ course.name }}
         </IonSelectOption>
@@ -302,16 +286,9 @@ onMounted(async () => {
     <EpInput v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome da série" />
 
     <ion-list id="course_stage">
-      <IonSelect
-        v-model="values.courseStage"
-        fill="outline"
-        cancel-text="Cancelar"
-        label-placement="floating"
-        justify="space-between"
-        label="Etapa Curso*"
-        placeholder="Selecione"
-        @ion-change="(e) => setFieldValue('courseStage', e.target.value)"
-      >
+      <IonSelect v-model="values.courseStage" fill="outline" cancel-text="Cancelar" label-placement="floating"
+        justify="space-between" label="Etapa Curso*" placeholder="Selecione"
+        @ion-change="(e) => setFieldValue('courseStage', e.target.value)">
         <IonSelectOption v-for="stage in course_stage" :key="stage" :value="stage">
           {{ stage }}
         </IonSelectOption>
@@ -319,16 +296,9 @@ onMounted(async () => {
     </ion-list>
 
     <ion-list id="graduate">
-      <IonSelect
-        v-model="values.graduate"
-        fill="outline"
-        cancel-text="Cancelar"
-        label-placement="floating"
-        justify="space-between"
-        label="Concluinte*"
-        placeholder="Selecione"
-        @ion-change="(e) => setFieldValue('graduate', e.target.value)"
-      >
+      <IonSelect v-model="values.graduate" fill="outline" cancel-text="Cancelar" label-placement="floating"
+        justify="space-between" label="Concluinte*" placeholder="Selecione"
+        @ion-change="(e) => setFieldValue('graduate', e.target.value)">
         <IonSelectOption v-for="graduate in graduate" :key="graduate" :value="graduate">
           {{ graduate }}
         </IonSelectOption>
