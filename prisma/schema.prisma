@@ -60,6 +60,9 @@ model Classroom {
   id                                                                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   seriesId                                                          String              @db.Uuid
   maxStudents                                                       Int
+  exceededStudents                                                  Int                 @default(0)
+  totalStudents                                                     Int                 @default(0)
+  pcdStudents                                                       Int                 @default(0)
   startTime                                                         DateTime?           @db.Timestamp(6)
   startTimeInterval                                                 DateTime?           @db.Timestamp(6)
   endTimeInterval                                                   DateTime?           @db.Timestamp(6)
@@ -466,6 +469,7 @@ model PreEnrollment {
   datePreenrollment DateTime       @db.Timestamp(6)
   observations      String?        @db.VarChar(200)
   status            status?        @default(ACTIVE)
+  preferShift       period?
   situation         situationType?
   preenrollmentcode String?        @unique @db.VarChar(100)
   enrollment        Enrollment?
@@ -481,7 +485,9 @@ model PreEnrollment {
 
 model School {
   id                       String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  idpes                    Int?
   name                     String                    @db.VarChar(100)
+  cnpj                     Decimal?                  @db.Decimal(14, 0)
   address                  String?                   @db.VarChar(255)
   city                     String?                   @db.VarChar(100)
   state                    String?                   @db.Char(2)
@@ -634,6 +640,7 @@ model Servers {
   userCreated        String?             @db.VarChar(255)
   userId             String?             @db.Uuid
   institutionId      String              @db.Uuid
+  codServidor        Int
   contract           contractType?       @default(INDETERMINADO)
   disability         disabilityType?
   user               User?               @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_server_fkey")
@@ -1067,7 +1074,7 @@ model fone_pessoa {
   tipo                                 Decimal   @db.Decimal(1, 0)
   ddd                                  Decimal   @db.Decimal(3, 0)
   fone                                 Decimal   @db.Decimal(11, 0)
-  idpes_rev                            Int
+  idpes_rev                            Int?
   data_rev                             DateTime? @db.Timestamp(6)
   origem_gravacao                      String    @db.Char(1)
   idpes_cad                            Int
@@ -1086,13 +1093,13 @@ model juridica {
   idpes                             Int                          @id(map: "pk_juridica")
   cnpj                              Decimal?                     @unique(map: "un_juridica_cnpj") @db.Decimal(14, 0)
   insc_estadual                     Decimal?                     @db.Decimal(20, 0)
-  idpes_rev                         Int
+  idpes_rev                         Int?
   data_rev                          DateTime?                    @db.Timestamp(6)
   origem_gravacao                   String                       @db.Char(1)
   idpes_cad                         Int?
   data_cad                          DateTime                     @db.Timestamp(6)
   operacao                          String                       @db.Char(1)
-  fantasia                          String?                      @db.VarChar(255)
+  fantasia                          String                       @db.VarChar(255)
   capital_social                    String?                      @db.VarChar(255)
   pessoa_juridica_idpes_cadTopessoa pessoa?                      @relation("juridica_idpes_cadTopessoa", fields: [idpes_cad], references: [idpes], onUpdate: NoAction, map: "cadastro_juridica_idpes_cad_foreign")
   pessoa_juridica_idpesTopessoa     pessoa                       @relation("juridica_idpesTopessoa", fields: [idpes], references: [idpes], onDelete: NoAction, onUpdate: NoAction, map: "cadastro_juridica_idpes_foreign")

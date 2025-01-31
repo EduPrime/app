@@ -51,6 +51,21 @@ async function main() {
         skipDuplicates: true
     })
 
+    const teacher = await prisma.teacher.createMany({
+        data: [
+            {
+                id: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890', // teacher paulo random uuid
+                name: 'Paulo de paula',
+                email: 'paulo@back3nd.com',
+                phone: '87981331477',
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                birthdate: new Date('1980-04-11'),
+            }
+        ],
+        skipDuplicates: true
+    })
+
     const course = await prisma.course.createMany({
         data: [
             {
@@ -150,6 +165,7 @@ async function main() {
                 schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
                 courseId: '23ca0e75-5344-42c6-9640-97cc5bad6e94', // Ensino Fundamental I
                 seriesId: '352a5857-193f-4672-9abf-c5302afd1c37', // 1º Ano
+                preferShift: 'MORNING',
                 datePreenrollment: new Date()
             },
             {
@@ -158,6 +174,7 @@ async function main() {
                 schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
                 courseId: '23ca0e75-5344-42c6-9640-97cc5bad6e94', // Ensino Fundamental I
                 seriesId: '352a5857-193f-4672-9abf-c5302afd1c37', // 1º Ano
+                preferShift: 'AFTERNOON',
                 datePreenrollment: new Date()
             },
             {
@@ -166,6 +183,7 @@ async function main() {
                 schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
                 courseId: '23ca0e75-5344-42c6-9640-97cc5bad6e94', // Ensino Fundamental I
                 seriesId: 'a1eed49f-2832-467f-ae6f-7270244971ba', // 2º Ano
+                preferShift: 'MORNING',
                 datePreenrollment: new Date()
             },
         ],
