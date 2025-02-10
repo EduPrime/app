@@ -150,6 +150,27 @@ function checkNextSlide(swiper: any) {
   }
 }
 
+function translateDay(day: string) {
+  switch (day) {
+    case 'SUN':
+      return 'Dom'
+    case 'MON':
+      return 'Seg'
+    case 'TUE':
+      return 'Ter'
+    case 'WED':
+      return 'Qua'
+    case 'THU':
+      return 'Qui'
+    case 'FRI':
+      return 'Sex'
+    case 'SAT':
+      return 'Sab'
+    default:
+      return ''
+  }
+}
+
 loadVisibleMonth()
 </script>
 
@@ -164,12 +185,56 @@ loadVisibleMonth()
 
     </ion-content>
   </ion-page> -->
-  <content-layout>
-    <IonItem button lines="none">
-      <IonLabel position="stacked">
-        Select Date
-      </IonLabel>
-    </IonItem>
+
+  <content-layout class="ion-no-padding" style="background-color: pink;">
+    <ion-grid class="ion-no-padding">
+      <ion-row>
+        <!-- aqui vai o filtro ou algo assim <ion-col size="12" size-xl="6"></ion-col> -->
+        <ion-col size="12" size-xl="6">
+          <ion-row>
+            <ion-col style="display: flex;" class="ion-justify-content-start ion-align-items-center" size="7">
+              <IonDatetimeButton datetime="datetime" presentation="year-month" />
+            </ion-col>
+            <ion-col style="display: flex;" class=" ion-align-items-center ion-justify-content-end" size="5">
+              <IonButtons class="ion-justify-content-end">
+                <IonButton color="tertiary" class="navigation-btn" @click="prevMonth">
+                  <IonIcon slot="icon-only" :icon="arrowBackOutline" />
+                </IonButton>
+                <IonButton color="tertiary" class="navigation-btn" style="margin-left: 10px;" @click="nextMonth">
+                  <IonIcon slot="icon-only" :icon="arrowForwardOutline" />
+                </IonButton>
+              </IonButtons>
+            </ion-col>
+            <ion-col size="12">
+              <Swiper
+                :options="slideOpts" :slides-per-view="1" :space-between="8" @ion-slide-will-change="handleSlideChange"
+                @swiper="onSwiper" @touch-end="(swiper: any) => checkNextSlide(swiper)"
+              >
+                <SwiperSlide v-for="(week, index) in weeksInMonth" :key="index">
+                  <div class="date-selector">
+                    <div v-for="day in week" :key="day.date.format('YYYY-MM-DD')" :style="day.weekday !== 'SUN' ? '' : 'display: none;'" class="day-chip">
+                      <IonChip
+                        :disabled="isDateDisabled(day.date)" shape="rounded"
+                        :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
+                      >
+                        <div>
+                          <div class="day-name">
+                            {{ translateDay(day.weekday) }}
+                          </div>
+                          <div class="day-number ">
+                            {{ day.date.date() }}
+                          </div>
+                        </div>
+                      </IonChip>
+                    </div>
+                  </div>
+                </SwiperSlide>
+              </Swiper>
+            </ion-col>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
 
     <IonToolbar>
       <template #start>
@@ -192,31 +257,6 @@ loadVisibleMonth()
         </IonButtons>
       </template>
     </IonToolbar>
-
-    <Swiper
-      :options="slideOpts" :slides-per-view="1" :space-between="8" @ion-slide-will-change="handleSlideChange"
-      @swiper="onSwiper" @touch-end="(swiper: any) => checkNextSlide(swiper)"
-    >
-      <SwiperSlide v-for="(week, index) in weeksInMonth" :key="index">
-        <div class="date-selector">
-          <div v-for="day in week" :key="day.date.format('YYYY-MM-DD')" class="day-chip">
-            <IonChip
-              :disabled="isDateDisabled(day.date)" shape="rounded"
-              :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
-            >
-              <div>
-                <div class="day-name">
-                  {{ day.weekday }}
-                </div>
-                <div class="day-number">
-                  {{ day.date.date() }}
-                </div>
-              </div>
-            </IonChip>
-          </div>
-        </div>
-      </SwiperSlide>
-    </Swiper>
 
     <IonList>
       <IonListHeader>Events on {{ selectedDate.format('YYYY-MM-DD') }}</IonListHeader>
@@ -244,15 +284,19 @@ ion-chip {
 }
 
 .day-name {
-    margin-top: 25px;
+    margin-top: 20px;
     font-weight: normal;
-    font-size: 13px;
-    margin-bottom: 15px;
+    font-size: 12px;
+    margin-bottom: 12px;
 }
 
 .day-number {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 25px;
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.navigation-btn {
+  background-color: var(--ion-color-lightaccent); border-radius: 100%
 }
 </style>
