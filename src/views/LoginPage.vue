@@ -7,7 +7,7 @@ import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store/AuthStore'
 import { AuthService } from '@/services/AuthService'
 import { updateRoutes } from '@/utils/updateRoutes'
-import { r } from 'better-auth/dist/index-4d8GiU4g'
+
 
 const email = ref<string>('')
 const password = ref<string>('')
