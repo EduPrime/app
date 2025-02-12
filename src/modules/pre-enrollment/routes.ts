@@ -13,7 +13,7 @@ const routes = [
       name: 'Pré-Matrículas',
       layout: 'blank',
       order: 4,
-      requiredRole: ['public', 'admin'],
+      requiredRole: ['ADMIN'],
     },
   },
 ]

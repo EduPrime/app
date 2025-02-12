@@ -39,7 +39,7 @@ watch(
 
 <template>
   <ion-page>
-    <IonHeader :translucent="true">
+    <IonHeader :translucent="true" class="">
       <IonToolbar>
         <IonButtons slot="start">
           <IonMenuButton color="primary" />
@@ -61,17 +61,17 @@ watch(
         </IonToolbar>
       </IonHeader>
 
-      <div id="main-content-box" class="ion-margin">
-        <ion-row v-if="props.showDescription" class="ion-margin">
+      <div id="main-content-box" class="ion-no-padding ion-no-margin">
+        <ion-row v-if="props.showDescription" class="ion-no-padding ion-no-margin">
           <ion-col style="background-color: #aa86ff; box-shadow: 5px 5px 0px 0px rgba(110, 68, 255, 0.4); border-radius: 3px;">
-            <IonNote class="ion-padding" style="color: #ffffff; display: flex; align-items: center; justify-content: center;">
+            <IonNote class="ion-no-padding ion-no-margin" style="color: #ffffff; display: flex; align-items: center; justify-content: center;">
               <slot name="description" />
             </IonNote>
           </ion-col>
         </ion-row>
 
-        <ion-row>
-          <ion-col>
+        <ion-row class="ion-no-padding ion-no-margin">
+          <ion-col class="ion-no-padding ion-no-margin">
             <slot />
           </ion-col>
         </ion-row>
@@ -97,5 +97,6 @@ ion-header.md{
 }
 ion-title{
   font-weight: 800;
+  color: var(--ion-color-secondary);
 }
 </style>

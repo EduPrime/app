@@ -21,7 +21,7 @@ const routes = [
       icon: folder,
       name: 'Alunos',
       order: 1,
-      requiredRole: ['public', 'admin'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -33,7 +33,7 @@ const routes = [
       icon: folder,
       name: 'Cadastrar Aluno',
       order: 2,
-      requiredRole: ['public', 'admin'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -45,7 +45,7 @@ const routes = [
       icon: folder,
       name: 'Editar Aluno',
       order: 3,
-      requiredRole: ['public', 'admin'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -58,7 +58,7 @@ const routes = [
       icon: create,
       name: 'Matrículas',
       order: 2,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -70,7 +70,7 @@ const routes = [
       icon: create,
       name: 'Matricular Aluno',
       order: 3,
-      requiredRole: ['public', 'admin'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -82,7 +82,7 @@ const routes = [
       icon: create,
       name: 'Editar Matrícula',
       order: 4,
-      requiredRole: ['public', 'admin'],
+      requiredRole: ['ADMIN'],
     },
   },
   /*   {
@@ -107,7 +107,7 @@ const routes = [
       icon: documentText,
       name: 'Pré-matrícula',
       order: 5,
-      requiredRole: ['public', 'admin'],
+      requiredRole: ['ADMIN'],
     },
   },
   /*   {
@@ -131,7 +131,7 @@ const routes = [
       icon: documentText,
       name: 'Editar Pré-matrícula',
       order: 6,
-      requiredRole: ['public', 'admin'],
+      requiredRole: ['ADMIN'],
     },
   },
 ]

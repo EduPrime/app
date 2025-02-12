@@ -19,7 +19,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: list,
       name: 'Gerenciar Professores',
       order: 1,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -32,7 +32,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: create,
       name: 'Registrar Novo Professor',
       order: 2,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -45,7 +45,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: person,
       name: 'Editar Professor',
       order: 3,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -58,7 +58,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: calendar,
       name: 'Grade de Aula',
       order: 4,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -71,7 +71,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: document,
       name: 'Documentação',
       order: 5,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -84,7 +84,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: star,
       name: 'Avaliações e Feedback',
       order: 6,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -97,7 +97,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: school,
       name: 'Relatórios e Monitoramento',
       order: 8,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -110,7 +110,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: chatbubbles,
       name: 'Mensagens',
       order: 9,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
 ]
