@@ -25,7 +25,7 @@ export class AuthService {
             },
             sendResetPassword: async ({ user, url, token }: { user: UserLocal, url: string, token: string }, request: any) => {
                 await sendEmail({
-                    to: user.email,
+                    to: user.email || '',
                     subject: "Reset your password",
                     text: `Click the link to reset your password: ${url}`,
                 });

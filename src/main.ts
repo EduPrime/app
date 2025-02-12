@@ -34,13 +34,13 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/vue'
-import { createPinia } from 'pinia'
-import { createPersistedStatePlugin } from 'pinia-plugin-persistedstate-2'
 import { createApp } from 'vue'
 import App from './App.vue'
 import ContentLayout from './components/theme/ContentLayout.vue'
 
+import pinia from './store/pinia'
 import router from './router'
+
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
@@ -62,14 +62,12 @@ import './theme/variables.css'
 // Dynamically import modules
 const modules = import.meta.glob('./modules/*/index.ts', { eager: true })
 
-const pinia = createPinia()
-const installPersistedStatePlugin = createPersistedStatePlugin()
-pinia.use(context => installPersistedStatePlugin(context))
+
 
 const app = createApp(App)
   .use(IonicVue)
-  .use(router)
   .use(pinia)
+  .use(router)
 
 
 app.component('ion-app', IonApp)
