@@ -7,6 +7,8 @@ import { School, SchoolSettings } from '@prisma/client'
 const schoolFormRef = ref<InstanceType<typeof SchoolForm> | null>(null)
 const school = ref<School>({
   id: '',
+  idpes: null,
+  cnpj: null,
   name: '',
   address: null,
   city: null,

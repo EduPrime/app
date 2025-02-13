@@ -36,6 +36,3 @@ Thumbs.db
 /.sass-cache
 /.sourcemaps
 /.versions
-
-# Ignore bun.lockb file
-bun.lockb

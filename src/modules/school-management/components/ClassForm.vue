@@ -117,7 +117,7 @@ async function registerClass() {
       abbreviation: values.abbreviation,
       year: values.year,
       status: values.status,
-      maxStudents: values.maxStudents,
+      totalStudents: values.totalStudents,
       startTime: values.startTime,
       startTimeInterval: values.startTimeInterval,
       endTimeInterval: values.endTimeInterval,
@@ -131,7 +131,10 @@ async function registerClass() {
       userCreated: values.userCreated,
       id: classId.value,
       metadata: values.metadata,
-      tenantId: values.tenantId
+      tenantId: values.tenantId,
+      exceededStudents: values.exceededStudents,
+      pcdStudents: values.pcdStudents,
+      maxStudents: values.maxStudents,
     }
     try {
       let result

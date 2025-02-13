@@ -102,6 +102,7 @@ async function registerTeacher() {
     const validQualifications = filterValidQualifications(qualifications.value)
     const formData = {
       id: teacherId.value,
+      userId: null,
       name: values.name,
       birthdate: values.birthdate,
       email: values.email,

@@ -54,7 +54,7 @@ const valuesDocs = ref({
   birth_certificate: '',
 
 })
-const studentData = ref< Tables<'student'> | []>([])
+const studentData = ref<Tables<'student'> | []>([])
 const states = [
   'AC', // Acre
   'AL', // Alagoas
@@ -280,9 +280,11 @@ async function registerStudent() {
       responsibleType: values.responsibleType,
       citystate: null,
       ethnicity: values.ethnicity,
-      deficiency: values.deficiency,
+      disability: values.deficiency,
       deficiency_description: values.deficiency_description,
       placeOfBirth: values.place_of_birth,
+      guardianCpf: null,
+      guardianEmail: null,
     }
     try {
       let result
@@ -474,20 +476,17 @@ onMounted(async () => {
   <div v-show="selectedSegment === 'general-info'">
     <EpInput v-model="values.name" name="name" label="Nome do Aluno*" placeholder="Digite o nome do Aluno" />
     <EpInput v-model="values.email" name="email" label="Email" type="email" placeholder="Digite o email" />
-    <EpInput v-model="values.birthdate" name="birthdate" label="Data de Nascimento*" type="date" placeholder="Digite a data de nascimento" />
-    <EpInput v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone*" placeholder="(99) 99999-9999" />
+    <EpInput v-model="values.birthdate" name="birthdate" label="Data de Nascimento*" type="date"
+      placeholder="Digite a data de nascimento" />
+    <EpInput v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone*"
+      placeholder="(99) 99999-9999" />
 
     <ion-list id="gender">
       <ion-item>
-        <IonSelect
-          v-model="values.gender"
-          justify="space-between"
-          label="Gênero*"
-          placeholder="Selecione o gênero"
+        <IonSelect v-model="values.gender" justify="space-between" label="Gênero*" placeholder="Selecione o gênero"
           @ion-change="(e) => {
             setFieldValue('gender', e.detail.value)
-          }"
-        >
+          }">
           <IonSelectOption v-for="gender in gender" :key="gender" :value="gender">
             {{ gender }}
           </IonSelectOption>
@@ -497,15 +496,10 @@ onMounted(async () => {
 
     <ion-list id="ethnicity">
       <ion-item>
-        <IonSelect
-          v-model="values.ethnicity"
-          justify="space-between"
-          label="Raça*"
-          placeholder="Selecione a raça"
+        <IonSelect v-model="values.ethnicity" justify="space-between" label="Raça*" placeholder="Selecione a raça"
           @ion-change="(e) => {
             setFieldValue('ethnicity', e.detail.value)
-          }"
-        >
+          }">
           <IonSelectOption v-for="ethnicity in ethnicity" :key="ethnicity" :value="ethnicity">
             {{ ethnicity }}
           </IonSelectOption>
@@ -515,15 +509,10 @@ onMounted(async () => {
 
     <ion-list id="deficiency">
       <ion-item>
-        <IonSelect
-          v-model="values.deficiency"
-          justify="space-between"
-          label="Necessidade Especial*"
-          placeholder="Selecione a necessidade"
-          @ion-change="(e) => {
+        <IonSelect v-model="values.deficiency" justify="space-between" label="Necessidade Especial*"
+          placeholder="Selecione a necessidade" @ion-change="(e) => {
             setFieldValue('deficiency', e.detail.value)
-          }"
-        >
+          }">
           <IonSelectOption v-for="deficiency in deficiency" :key="deficiency" :value="deficiency">
             {{ deficiency }}
           </IonSelectOption>
@@ -533,24 +522,16 @@ onMounted(async () => {
 
     <!-- Outras deficiências -->
     <div v-show="values.deficiency === 'Outros'">
-      <EpInput
-        v-model="values.deficiency_description"
-        name="deficiency_description"
-        label="Descrição da Necessidade"
-        placeholder="Digite a descrição da necessidade"
-      />
+      <EpInput v-model="values.deficiency_description" name="deficiency_description" label="Descrição da Necessidade"
+        placeholder="Digite a descrição da necessidade" />
     </div>
 
     <ion-list id="responsibleType">
       <ion-item>
-        <IonSelect
-          v-model="values.responsibleType"
-          label="Responsável*"
-          placeholder="Escolha o responsável"
+        <IonSelect v-model="values.responsibleType" label="Responsável*" placeholder="Escolha o responsável"
           @ion-change="(e) => {
             setFieldValue('responsibleType', e.detail.value)
-          }"
-        >
+          }">
           <IonSelectOption value="Pai">
             Pai
           </IonSelectOption>
@@ -566,68 +547,24 @@ onMounted(async () => {
 
     <!-- Campos do Pai -->
     <div v-show="values.responsibleType === 'Pai' && values.responsibleType !== 'Ambos'">
-      <EpInput
-        v-model="values.father_name"
-        name="father_name"
-        label="Nome"
-        placeholder="Digite o nome do pai"
-      />
-      <EpInput
-        v-model="values.father_cpf"
-        name="father_cpf"
-        :mask="cpfMask"
-        label="CPF"
-        placeholder="000.000.000-00"
-        inputmode="numeric"
-      />
-      <EpInput
-        v-model="values.father_email"
-        name="father_email"
-        type="email"
-        label="Email"
-        placeholder="Digite o email do pai"
-      />
-      <EpInput
-        v-model="values.father_phone"
-        name="father_phone"
-        :mask="phoneMask"
-        inputmode="tel"
-        label="Telefone"
-        placeholder="(99) 99999-9999"
-      />
+      <EpInput v-model="values.father_name" name="father_name" label="Nome" placeholder="Digite o nome do pai" />
+      <EpInput v-model="values.father_cpf" name="father_cpf" :mask="cpfMask" label="CPF" placeholder="000.000.000-00"
+        inputmode="numeric" />
+      <EpInput v-model="values.father_email" name="father_email" type="email" label="Email"
+        placeholder="Digite o email do pai" />
+      <EpInput v-model="values.father_phone" name="father_phone" :mask="phoneMask" inputmode="tel" label="Telefone"
+        placeholder="(99) 99999-9999" />
     </div>
 
     <!-- Campos da Mãe -->
     <div v-show="values.responsibleType === 'Mãe' && values.responsibleType !== 'Ambos'">
-      <EpInput
-        v-model="values.mother_name"
-        name="mother_name"
-        label="Nome"
-        placeholder="Digite o nome da mãe"
-      />
-      <EpInput
-        v-model="values.mother_cpf"
-        name="mother_cpf"
-        :mask="cpfMask"
-        label="CPF"
-        placeholder="000.000.000-00"
-        inputmode="numeric"
-      />
-      <EpInput
-        v-model="values.mother_email"
-        name="mother_email"
-        type="email"
-        label="Email"
-        placeholder="Digite o email da mãe"
-      />
-      <EpInput
-        v-model="values.mother_phone"
-        name="mother_phone"
-        :mask="phoneMask"
-        inputmode="tel"
-        label="Telefone"
-        placeholder="(99) 99999-9999"
-      />
+      <EpInput v-model="values.mother_name" name="mother_name" label="Nome" placeholder="Digite o nome da mãe" />
+      <EpInput v-model="values.mother_cpf" name="mother_cpf" :mask="cpfMask" label="CPF" placeholder="000.000.000-00"
+        inputmode="numeric" />
+      <EpInput v-model="values.mother_email" name="mother_email" type="email" label="Email"
+        placeholder="Digite o email da mãe" />
+      <EpInput v-model="values.mother_phone" name="mother_phone" :mask="phoneMask" inputmode="tel" label="Telefone"
+        placeholder="(99) 99999-9999" />
     </div>
     <!-- Container flex para Pai e Mãe quando "Ambos" for selecionado -->
     <div v-show="values.responsibleType === 'Ambos'" class="responsible-container">
@@ -635,35 +572,13 @@ onMounted(async () => {
       <ion-item>
         <div class="responsible-section">
           <h3>Pai</h3>
-          <EpInput
-            v-model="values.father_name"
-            name="father_name"
-            label="Nome"
-            placeholder="Digite o nome do pai"
-          />
-          <EpInput
-            v-model="values.father_cpf"
-            name="father_cpf"
-            :mask="cpfMask"
-            label="CPF"
-            placeholder="000.000.000-00"
-            inputmode="numeric"
-          />
-          <EpInput
-            v-model="values.father_email"
-            name="father_email"
-            type="email"
-            label="Email"
-            placeholder="Digite o email do pai"
-          />
-          <EpInput
-            v-model="values.father_phone"
-            name="father_phone"
-            :mask="phoneMask"
-            inputmode="tel"
-            label="Telefone"
-            placeholder="(99) 99999-9999"
-          />
+          <EpInput v-model="values.father_name" name="father_name" label="Nome" placeholder="Digite o nome do pai" />
+          <EpInput v-model="values.father_cpf" name="father_cpf" :mask="cpfMask" label="CPF"
+            placeholder="000.000.000-00" inputmode="numeric" />
+          <EpInput v-model="values.father_email" name="father_email" type="email" label="Email"
+            placeholder="Digite o email do pai" />
+          <EpInput v-model="values.father_phone" name="father_phone" :mask="phoneMask" inputmode="tel" label="Telefone"
+            placeholder="(99) 99999-9999" />
         </div>
       </ion-item>
 
@@ -673,59 +588,35 @@ onMounted(async () => {
       <!-- Campos da Mãe -->
       <div class="responsible-section">
         <h3>Mãe</h3>
-        <EpInput
-          v-model="values.mother_name"
-          name="mother_name"
-          label="Nome"
-          placeholder="Digite o nome da mãe"
-        />
-        <EpInput
-          v-model="values.mother_cpf"
-          name="mother_cpf"
-          :mask="cpfMask"
-          label="CPF"
-          placeholder="000.000.000-00"
-          inputmode="numeric"
-        />
-        <EpInput
-          v-model="values.mother_email"
-          name="mother_email"
-          type="email"
-          label="Email"
-          placeholder="Digite o email da mãe"
-        />
-        <EpInput
-          v-model="values.mother_phone"
-          name="mother_phone"
-          :mask="phoneMask"
-          inputmode="tel"
-          label="Telefone"
-          placeholder="(99) 99999-9999"
-        />
+        <EpInput v-model="values.mother_name" name="mother_name" label="Nome" placeholder="Digite o nome da mãe" />
+        <EpInput v-model="values.mother_cpf" name="mother_cpf" :mask="cpfMask" label="CPF" placeholder="000.000.000-00"
+          inputmode="numeric" />
+        <EpInput v-model="values.mother_email" name="mother_email" type="email" label="Email"
+          placeholder="Digite o email da mãe" />
+        <EpInput v-model="values.mother_phone" name="mother_phone" :mask="phoneMask" inputmode="tel" label="Telefone"
+          placeholder="(99) 99999-9999" />
       </div>
     </div>
   </div>
 
   <div v-show="selectedSegment === 'address-info'">
-    <EpInput v-model="values.postalcode" name="postalcode" :mask="postalCodeMask" inputmode="number" label="CEP*" placeholder="00000-000" />
+    <EpInput v-model="values.postalcode" name="postalcode" :mask="postalCodeMask" inputmode="number" label="CEP*"
+      placeholder="00000-000" />
     <EpInput v-model="values.city" name="city" label="Cidade" placeholder="Ex: São Paulo, Rio de Janeiro" />
-    <EpInput v-model="values.place_of_birth" name="place_of_birth" label="Naturalidade*" placeholder="Digite o local de nascimento" />
+    <EpInput v-model="values.place_of_birth" name="place_of_birth" label="Naturalidade*"
+      placeholder="Digite o local de nascimento" />
     <EpInput v-model="values.address" name="address" label="Endereço" placeholder="Digite o nome da rua ou avenida" />
-    <EpInput v-model="values.number_address" name="number_address" label="Número" placeholder="Digite o número da residência" />
+    <EpInput v-model="values.number_address" name="number_address" label="Número"
+      placeholder="Digite o número da residência" />
     <EpInput v-model="values.complement" name="complement" label="Complemento" placeholder="Apartamento, bloco, etc." />
     <EpInput v-model="values.neighborhood" name="neighborhood" label="Bairro" placeholder="Digite o bairro" />
 
     <ion-list id="residence_zone">
       <ion-item>
-        <IonSelect
-          v-model="values.residence_zone"
-          justify="space-between"
-          label="Zona de Residência*"
-          placeholder="Selecione a zona de residência"
-          @ion-change="(e) => {
+        <IonSelect v-model="values.residence_zone" justify="space-between" label="Zona de Residência*"
+          placeholder="Selecione a zona de residência" @ion-change="(e) => {
             setFieldValue('residence_zone', e.detail.value)
-          }"
-        >
+          }">
           <IonSelectOption v-for="residence_zone in residence_zone" :key="residence_zone" :value="residence_zone">
             {{ residence_zone }}
           </IonSelectOption>
@@ -737,14 +628,9 @@ onMounted(async () => {
   <div v-show="selectedSegment === 'docs-info'" class="upload-container">
     <ion-list id="docsType">
       <ion-item>
-        <IonSelect
-          v-model="values.docsType"
-          label="Documentos*"
-          placeholder="Escolha o documento"
-          @ion-change="(e) => {
-            setFieldValue('docsType', e.detail.value)
-          }"
-        >
+        <IonSelect v-model="values.docsType" label="Documentos*" placeholder="Escolha o documento" @ion-change="(e) => {
+          setFieldValue('docsType', e.detail.value)
+        }">
           <IonSelectOption value="RG">
             RG
           </IonSelectOption>
@@ -760,60 +646,39 @@ onMounted(async () => {
 
     <!-- Campos do RG -->
     <div v-show="values.docsType === 'RG'">
-      <EpInput
-        v-model="values.rg_number"
-        name="rg_number"
-        label="RG"
-        placeholder="Digite o número do RG"
-      />
+      <EpInput v-model="values.rg_number" name="rg_number" label="RG" placeholder="Digite o número do RG" />
       <ion-list id="rg_state">
         <ion-item>
-          <IonSelect
-            v-model="values.rg_state"
-            justify="space-between"
-            label="Estado de Emissão"
-            placeholder="Selecione o estado"
-            @ion-change="(e) => {
+          <IonSelect v-model="values.rg_state" justify="space-between" label="Estado de Emissão"
+            placeholder="Selecione o estado" @ion-change="(e) => {
               setFieldValue('rg_state', e.detail.value)
-            }"
-          >
+            }">
             <IonSelectOption v-for="rg_state in rg_state" :key="rg_state" :value="rg_state">
               {{ rg_state }}
             </IonSelectOption>
           </IonSelect>
         </ion-item>
       </ion-list>
-      <EpInput v-model="values.rg_issue_date" name="rg_issue_date" label="Data de Emissão" type="date" placeholder="Selecione a data de emissão" />
-      <EpInput
-        v-model="values.rg_issuer"
-        name="rg_issuer"
-        label="Órgão Emissor"
-        placeholder="Digite o órgão emissor"
-      />
+      <EpInput v-model="values.rg_issue_date" name="rg_issue_date" label="Data de Emissão" type="date"
+        placeholder="Selecione a data de emissão" />
+      <EpInput v-model="values.rg_issuer" name="rg_issuer" label="Órgão Emissor" placeholder="Digite o órgão emissor" />
     </div>
 
     <!-- Campos de CPF -->
     <div v-show="values.docsType === 'CPF'">
-      <EpInput v-model="values.cpf" name="cpf" :mask="cpfMask" inputmode="numeric" label="CPF" placeholder="000.000.000-00" />
+      <EpInput v-model="values.cpf" name="cpf" :mask="cpfMask" inputmode="numeric" label="CPF"
+        placeholder="000.000.000-00" />
     </div>
 
     <!-- Campos da Certidão de Nascimento (Novo Formato) -->
     <div v-show="values.docsType === 'Certidão de Nascimento (Novo Formato)'">
-      <EpInput
-        v-model="values.birth_certificate"
-        name="birth_certificate"
-        label="Matrícula"
-        placeholder="Digite a Matrícula da Certidão"
-      />
+      <EpInput v-model="values.birth_certificate" name="birth_certificate" label="Matrícula"
+        placeholder="Digite a Matrícula da Certidão" />
     </div>
     <ion-item>
       <div v-if="values.docsType">
         <div class="file-upload-container">
-          <FileUpload
-            :bucket-name="bucketName"
-            :max-file-size="500"
-            @upload-success="handleUploadSuccess"
-          />
+          <FileUpload :bucket-name="bucketName" :max-file-size="500" @upload-success="handleUploadSuccess" />
         </div>
         <FilesList :files="documentFiles" />
       </div>
@@ -825,18 +690,21 @@ onMounted(async () => {
 .responsible-container {
   display: flex;
   justify-content: space-between;
-  gap: 20px; /* Espaço entre Pai e Mãe */
+  gap: 20px;
+  /* Espaço entre Pai e Mãe */
 }
 
 .responsible-section {
   flex: 1;
-  min-width: 45%; /* Garante que cada coluna ocupe 45% do espaço */
+  min-width: 45%;
+  /* Garante que cada coluna ocupe 45% do espaço */
 }
 
 .separator {
   width: 2px;
   background-color: #ccc;
-  height: 100%; /* Altura total da seção para atuar como divisória visual */
+  height: 100%;
+  /* Altura total da seção para atuar como divisória visual */
 }
 
 .file-upload-container {
@@ -844,39 +712,50 @@ onMounted(async () => {
   align-items: center;
   justify-content: flex-start;
   width: 100%;
-  margin-top: 8px; /* Diminui o espaço superior */
+  margin-top: 8px;
+  /* Diminui o espaço superior */
 }
 
 .file-upload-container .uppy-Dashboard {
   width: 100%;
-  max-width: 300px; /* Largura reduzida */
-  height: 180px; /* Altura mínima reduzida */
-  padding: 0; /* Remove preenchimento extra */
+  max-width: 300px;
+  /* Largura reduzida */
+  height: 180px;
+  /* Altura mínima reduzida */
+  padding: 0;
+  /* Remove preenchimento extra */
 }
 
 .file-upload-container .uppy-Dashboard-inner {
-  height: 100px; /* Reduz a altura da área interna */
-  padding: 4px; /* Diminui o preenchimento para deixar compacto */
+  height: 100px;
+  /* Reduz a altura da área interna */
+  padding: 4px;
+  /* Diminui o preenchimento para deixar compacto */
 }
 
 .file-upload-container .uppy-Dashboard-tabs {
-  display: none; /* Remove as abas desnecessárias */
+  display: none;
+  /* Remove as abas desnecessárias */
 }
 
 .file-upload-container .uppy-Dashboard-dropFilesHereHint {
-  display: none; /* Remove o texto de "arrastar arquivos" */
+  display: none;
+  /* Remove o texto de "arrastar arquivos" */
 }
 
 .file-upload-container .uppy-DashboardStatusBar {
-  height: 18px; /* Reduz ainda mais a barra de status */
-  font-size: 10px; /* Fonte menor para a barra de status */
+  height: 18px;
+  /* Reduz ainda mais a barra de status */
+  font-size: 10px;
+  /* Fonte menor para a barra de status */
   display: flex;
   justify-content: flex-start;
 }
 
 .upload-container ion-item {
   width: 100%;
-  margin-bottom: 8px; /* Reduz a margem inferior */
+  margin-bottom: 8px;
+  /* Reduz a margem inferior */
 }
 
 .upload-container ion-select {
@@ -884,6 +763,7 @@ onMounted(async () => {
 }
 
 .upload-container .file-list-container {
-  margin-top: 8px; /* Reduz o espaço acima da lista de arquivos */
+  margin-top: 8px;
+  /* Reduz o espaço acima da lista de arquivos */
 }
 </style>
