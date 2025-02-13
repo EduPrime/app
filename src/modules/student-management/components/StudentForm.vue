@@ -283,6 +283,8 @@ async function registerStudent() {
       disability: values.deficiency,
       deficiency_description: values.deficiency_description,
       placeOfBirth: values.place_of_birth,
+      guardianCpf: null,
+      guardianEmail: null,
     }
     try {
       let result

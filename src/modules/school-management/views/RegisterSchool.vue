@@ -9,6 +9,8 @@ const schoolFormRef = ref<InstanceType<typeof SchoolForm> | null>(null)
 const router = useRouter()
 const school = ref<School>({
 id: '',
+idpes: null,
+cnpj: null,
 name: '',
 address: null,
 city: null,

@@ -33,7 +33,7 @@ const institutionService = new InstitutionService()
 const course_stage = ['Etapa 1', 'Etapa 2', 'Etapa 3', 'Etapa 4', 'Etapa 5', 'Etapa 6']
 const graduate = ['Sim', 'Não']
 const institutionId = ref('')
-const schoolId = ref('')
+const schoolId = ref()
 const institutionList = ref()
 const seriesList = ref()
 const courseList = ref()
@@ -96,7 +96,7 @@ interface SeriesForm {
   graduate: string
   workload: Decimal | null
   schoolDays: string
-  schoolId: string
+  schoolId: string | null
 }
 
 const { values, errors, validate, setFieldValue } = useForm<SeriesForm>({
