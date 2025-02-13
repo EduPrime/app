@@ -1,16 +1,8 @@
 <script setup lang="ts">
 import { IonAlert, IonButton, IonCol, IonGrid, IonIcon, IonInput, IonItem, IonRow, IonSelect, IonSelectOption } from '@ionic/vue'
-// import GedService from '@/modules/ged/services/GedService'
-// import FileUpload from '@/modules/ged/components/FileUpload.vue'
-
-// import type { Tables } from '@/types/database.types'
-
 import { checkmarkCircleOutline } from 'ionicons/icons'
 import { onMounted, ref, watch } from 'vue'
 import StudentService from '../services/StudentService'
-
-// const gedService = new GedService()
-// const documentFiles = ref<Tables<'document'>[]>([])
 
 interface Props {
   pageWidth: string
@@ -33,63 +25,75 @@ const studentId = ref()
 const someProblems = ref(false)
 
 const docModel = ref('')
-// const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED']
 const docs = [{ title: 'RG', value: 'rg' }, { title: 'CPF', value: 'cpf' }, { title: 'Certidão de Nascimento', value: 'certidao' }]
 const states = [
-  'AC', // Acre
-  'AL', // Alagoas
-  'AP', // Amapá
-  'AM', // Amazonas
-  'BA', // Bahia
-  'CE', // Ceará
-  'DF', // Distrito Federal
-  'ES', // Espírito Santo
-  'GO', // Goiás
-  'MA', // Maranhão
-  'MT', // Mato Grosso
-  'MS', // Mato Grosso do Sul
-  'MG', // Minas Gerais
-  'PA', // Pará
-  'PB', // Paraíba
-  'PR', // Paraná
-  'PE', // Pernambuco
-  'PI', // Piauí
-  'RJ', // Rio de Janeiro
-  'RN', // Rio Grande do Norte
-  'RS', // Rio Grande do Sul
-  'RO', // Rondônia
-  'RR', // Roraima
-  'SC', // Santa Catarina
-  'SP', // São Paulo
-  'SE', // Sergipe
-  'TO', // Tocantins
+  'AC',
+  'AL',
+  'AP',
+  'AM',
+  'BA',
+  'CE',
+  'DF',
+  'ES',
+  'GO',
+  'MA',
+  'MT',
+  'MS',
+  'MG',
+  'PA',
+  'PB',
+  'PR',
+  'PE',
+  'PI',
+  'RJ',
+  'RN',
+  'RS',
+  'RO',
+  'RR',
+  'SC',
+  'SP',
+  'SE',
+  'TO',
 ]
 const genders = ['M', 'F']
 const responsibles = ['Pai', 'Mãe', 'Ambos', 'Outro']
 const residenceZone = ['Urbana', 'Rural']
-// const races = ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena', 'Não declarada']
-// const deficiencies = ['Visual', 'Auditiva', 'Física', 'Intelectual', 'Mental', 'Múltipla', 'Outros', 'Não possui']
 
-const student = ref(
-  {
-    name: undefined as string | undefined,
-    birthdate: undefined as string | number | undefined,
-    phone: undefined as string | number | undefined,
-    email: undefined as string | undefined,
-    city: undefined as string | undefined,
-    citystate: undefined as string | undefined,
-    address: undefined as string | undefined,
-    postalCode: undefined as string | number | undefined,
-    // deficiency: undefined as string | undefined,
-    // ethnicity: undefined as string | undefined,
-    gender: undefined as string | undefined,
-    residenceZone: undefined as string | undefined,
-    responsibleType: undefined as string | undefined,
-    birthCertificate: undefined as string | number | undefined,
-    rgNumber: undefined as string | number | undefined,
-    cpf: undefined as string | number | undefined,
-  },
-)
+const student = ref({
+  name: undefined as string | undefined,
+  birthdate: undefined as string | number | undefined,
+  phone: undefined as string | number | undefined,
+  email: undefined as string | undefined,
+  cidade: undefined as string | undefined,
+  endereco: undefined as string | undefined,
+  address: undefined as string | undefined,
+  CEP: undefined as string | number | undefined,
+  gender: undefined as string | undefined,
+  residenceZone: undefined as string | undefined,
+  responsibleType: undefined as string | undefined,
+  birthCertificate: undefined as string | number | undefined,
+  rgNumber: undefined as string | number | undefined,
+  cpf: undefined as string | number | undefined,
+  foto: undefined as string | undefined,
+  fone: undefined as string | number | undefined,
+  disabilty: undefined as string | undefined,
+  bairro: undefined as string | undefined,
+  paiNome: undefined as string | undefined,
+  paiCPF: undefined as string | number | undefined,
+  paiFone: undefined as string | number | undefined,
+  paiEmail: undefined as string | undefined,
+  maeNome: undefined as string | undefined,
+  maeCPF: undefined as string | number | undefined,
+  maeFone: undefined as string | number | undefined,
+  maeEmail: undefined as string | undefined,
+  lancamentoRG: undefined as string | undefined,
+  estadoRG: undefined as string | undefined,
+  emissorRG: undefined as string | undefined,
+  naturalidade: undefined as string | undefined,
+  certificadoNascenca: undefined as string | undefined,
+  guardiaoNome: undefined as string | undefined,
+  guardiaoFone: undefined as string | number | undefined,
+})
 
 const postgrest = new StudentService()
 const studentList = ref()
@@ -114,7 +118,7 @@ watch(result, async (value) => {
     studentId.value = await postgrest.getStudentId(student.value)
   }
   else {
-    someProblems.value = true // eu adicionei um valor ( true ) estava sem modificação de valor
+    someProblems.value = true
     finished.value = false
   }
 })
@@ -137,6 +141,7 @@ async function submitForm() {
     if (result.value && result.value.status === 201) {
       emits('postStatus', { loading: true })
     }
+    next.value = true
     adicionalRequired.value = false
   }
   else {
@@ -146,24 +151,14 @@ async function submitForm() {
   }
 }
 
-// function handleUploadSuccess(file: any) {
-//   if (file && file.storage_path) {
-//     gedService.create(file)
-//     documentFiles.value.push(file)
-//   }
-// }
-
-// async function loadDocumentFiles() {
-//   documentFiles.value = await gedService.getAll() as Tables<'document'>[]
-// }
-
 function generateRandomCode(): string {
   return Math.random().toString().slice(2, 10).padStart(8, '0')
 }
 
 function nextStep() {
   if (student.value.name && student.value.birthdate) {
-    return next.value = true
+    // return next.value = true
+    submitForm()
   }
   else {
     incompleteStep.value = true
@@ -173,7 +168,6 @@ function nextStep() {
 async function postStudent(studentObject: any) {
   try {
     const data = await postgrest.insertStudent(studentObject)
-
     return data
   }
   catch (error) {
@@ -183,7 +177,6 @@ async function postStudent(studentObject: any) {
 
 function closeDialog() {
   duplicated.value = false
-
   return emits('postStatus', {
     loading: true,
   })
@@ -191,8 +184,25 @@ function closeDialog() {
 
 onMounted(async () => {
   studentList.value = await postgrest.getStudents()
-  // await loadDocumentFiles()
 })
+const disabilities = [
+  'TRANSTORNO_DO_ESPECTRO_AUTISTA',
+  'TRANSTORNO_DESINTEGRATIVO_DA_INFANCIA_PSICOSE_INFANTIL',
+  'TDAH',
+  'SINDROME_DE_RETT',
+  'SINDROME_DE_ASPERGER',
+  'SURDOCEGUEIRA',
+  'SURDEZ',
+  'DEFICIENCIA_MULTIPLA',
+  'DEFICIENCIA_MENTAL',
+  'DEFICIENCIA_INTELECTUAL',
+  'DEFICIENCIA_FISICA',
+  'DEFICIENCIA_AUDITIVA',
+  'CEGUEIRA',
+  'BAIXA_VISAO',
+  'AUTISMO_CLASSICO',
+  'ALTAS_HABILIDADES_SUPERDOTACAO',
+]
 </script>
 
 <template>
@@ -206,40 +216,9 @@ onMounted(async () => {
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonSelect v-model="student.gender" label="Genero de nascimento" label-placement="floating">
+          <IonSelect v-model="student.gender" label="Sexo" label-placement="floating">
             <IonSelectOption v-for="gender in genders" :key="gender" :value="gender">
               {{ gender }}
-            </IonSelectOption>
-          </IonSelect>
-        </IonItem>
-      </IonCol>
-
-      <!-- <IonCol size="12" size-md="6">
-        <IonItem>
-          <IonSelect v-model="student.ethnicity" label="Etnia" label-placement="floating">
-            <IonSelectOption v-for="race in races" :key="race" :value="race">
-              {{ race }}
-            </IonSelectOption>
-          </IonSelect>
-        </IonItem>
-      </IonCol> -->
-
-      <!-- <IonCol size="12" size-md="6">
-        <IonItem>
-          <IonSelect v-model="student.deficiency" label="Necessidade especial" label-placement="floating">
-            <IonSelectOption v-for="deficiency in deficiencies" :key="deficiency" :value="deficiency">
-              {{ deficiency
-              }}
-            </IonSelectOption>
-          </IonSelect>
-        </IonItem>
-      </IonCol> -->
-
-      <IonCol size="12" size-md="6">
-        <IonItem>
-          <IonSelect v-model="student.responsibleType" label="Responsável" label-placement="floating">
-            <IonSelectOption v-for="r in responsibles" :key="r" :value="r">
-              {{ r }}
             </IonSelectOption>
           </IonSelect>
         </IonItem>
@@ -260,79 +239,19 @@ onMounted(async () => {
             <IonSelectOption value="tarde">
               Tarde
             </IonSelectOption>
-            <IonSelectOption value="noite">
-              Noite
-            </IonSelectOption>
           </IonSelect>
         </IonItem>
       </IonCol>
 
-      <!-- <ion-item>
-      <div >
-        <div class="file-upload-container">
-          <FileUpload
-            :bucket-name="'ged'"
-            :max-file-size="960"
-            @upload-success="handleUploadSuccess"
-          />
-        </div>
-        <FilesList :files="documentFiles" />
-      </div>
-    </ion-item> -->
-
-      <IonCol>
-        <IonButton expand="full" color="tertiary" @click="nextStep()">
-          Continuar
-        </IonButton>
-      </IonCol>
-
-      <!-- <ion-col size="12" size-md="6">
-        <ion-item>
-          <ion-select label="Documentos Selecionados" label-placement="floating">
-            <ion-select-option value="rg">RG</ion-select-option>
-            <ion-select-option value="cpf">CPF</ion-select-option>
-            <ion-select-option value="certidao">Certidão de Nascimento</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-      </ion-col> -->
-    </IonRow>
-
-    <IonRow v-else>
-      <IonCol size="12" :size-md="docModel ? '6' : '12'">
+      <!-- <IonCol size="12" size-md="6">
         <IonItem>
-          <IonSelect v-model="docModel" label="Documento Selecionado" label-placement="floating">
-            <IonSelectOption v-for="doc in docs" :key="doc.value" :value="doc.value">
-              {{ doc.title
-              }}
-            </IonSelectOption>
-          </IonSelect>
+          <IonInput v-model="student.foto" type="text" label="Foto" label-placement="floating" />
         </IonItem>
-      </IonCol>
-
-      <IonCol v-if="docModel" size="12" size-md="6">
-        <IonItem>
-          <IonInput
-            v-if="docModel === 'cpf'" v-model="student.cpf" type="text" label="Numero do CPF"
-            label-placement="floating"
-          />
-          <IonInput
-            v-else-if="docModel === 'rg'" v-model="student.rgNumber" type="text" label="Numero do RG"
-            label-placement="floating"
-          />
-          <IonInput
-            v-else-if="docModel === 'certidao'" v-model="student.birthCertificate" type="text"
-            label="Certidão de Nascimento" label-placement="floating"
-          />
-        </IonItem>
-      </IonCol>
+      </IonCol> -->
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonInput
-            v-model="student.phone" v-mask="'(##) #####-####'" type="text" label="Telefone"
-            label-placement="floating"
-          />
+          <IonInput v-model="student.fone" type="text" label="Telefone" label-placement="floating" />
         </IonItem>
       </IonCol>
 
@@ -344,53 +263,143 @@ onMounted(async () => {
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonInput
-            v-model="student.postalCode" v-mask="'#####-###'" type="text" label="CEP"
-            label-placement="floating"
-          />
+          <IonSelect v-model="student.disabilty" label="Deficiência" label-placement="floating">
+            <IonSelectOption v-for="disabilty in disabilities" :key="disabilty" :value="disabilty">
+              {{ disabilty }}
+            </IonSelectOption>
+          </IonSelect>
         </IonItem>
       </IonCol>
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonSelect v-model="student.residenceZone" label="Zona Residencial" label-placement="floating">
-            <IonSelectOption v-for="zone in residenceZone" :key="zone" :value="zone">
-              {{ zone }}
-            </IonSelectOption>
-          </IonSelect>
+          <IonInput v-model="student.bairro" type="text" label="Bairro" label-placement="floating" />
         </IonItem>
       </IonCol>
 
-      <IonCol size="8" size-md="10">
+      <IonCol size="12" size-md="6">
         <IonItem>
-          <IonInput v-model="student.city" label="Cidade" label-placement="floating" />
+          <IonInput v-model="student.cidade" type="text" label="Cidade" label-placement="floating" />
         </IonItem>
       </IonCol>
 
-      <IonCol size="4" size-md="2">
+      <IonCol size="12" size-md="6">
         <IonItem>
-          <IonSelect v-model="student.citystate" label="Estado" label-placement="floating">
-            <IonSelectOption v-for="state in states" :key="state" :value="state">
-              {{ state }}
-            </IonSelectOption>
-          </IonSelect>
+          <IonInput v-model="student.endereco" type="text" label="Endereço" label-placement="floating" />
         </IonItem>
       </IonCol>
 
-      <IonCol size="12">
+      <IonCol size="12" size-md="6">
         <IonItem>
-          <IonInput v-model="student.address" label="Endereço" label-placement="floating" />
+          <IonInput v-model="student.CEP" type="text" label="CEP" label-placement="floating" />
         </IonItem>
       </IonCol>
 
-      <IonCol size="12">
-        <IonButton expand="full" color="primary" @click="next = false">
-          Voltar
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.cpf" type="text" label="CPF" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.paiNome" type="text" label="Nome do Pai" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.paiCPF" type="text" label="CPF do Pai" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.paiFone" type="text" label="Telefone do Pai" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.paiEmail" type="email" label="E-Mail do Pai" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.maeNome" type="text" label="Nome da Mãe" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.maeCPF" type="text" label="CPF da Mãe" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.maeFone" type="text" label="Telefone da Mãe" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.maeEmail" type="email" label="E-Mail da Mãe" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.lancamentoRG" type="text" label="Lançamento do RG" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.estadoRG" type="text" label="Estado do RG" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.emissorRG" type="text" label="Emissor do RG" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <!-- <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.naturalidade" type="text" label="Naturalidade" label-placement="floating" />
+        </IonItem>
+      </IonCol> -->
+
+      <!-- <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.certificadoNascenca" type="text" label="Certidão de Nascimento" label-placement="floating" />
+        </IonItem>
+      </IonCol> -->
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.guardiaoNome" type="text" label="Nome do Guardião" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.guardiaoFone" type="text" label="Telefone do Guardião" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol>
+        <IonButton expand="full" color="tertiary" @click="nextStep()">
+          Continuar
         </IonButton>
-        <IonButton expand="full" color="tertiary" @click="submitForm">
-          Salvar
-        </IonButton>
       </IonCol>
+    </IonRow>
+
+    <IonRow v-else>
+      <!-- Second step fields here -->
     </IonRow>
   </IonGrid>
 
@@ -415,9 +424,6 @@ onMounted(async () => {
       </IonCol>
     </IonRow>
   </IonGrid>
-  <!-- <pre>
-  incompleteStep: {{ incompleteStep }}
-</pre> -->
 
   <IonAlert
     :is-open="duplicated" trigger="present-alert" header="Aluno já cadastrado"
