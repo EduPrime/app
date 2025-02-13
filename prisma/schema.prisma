@@ -17,6 +17,7 @@ model User {
   email     String?
   apiUserId String
   servers   Servers[]
+  Teacher   Teacher[] @relation(map: "user_teacher_fkey")
 
   @@schema("public")
 }
@@ -722,6 +723,8 @@ model Student {
   address          String?            @db.VarChar(255)
   guardianName     String?            @db.VarChar(100)
   guardianPhone    String?            @db.VarChar(15)
+  guardianCpf      String?            @db.VarChar(100)
+  guardianEmail    String?            @db.VarChar(100)
   status           status?            @default(ACTIVE)
   disability       disabilityType?
   photo            Bytes?
@@ -776,6 +779,7 @@ model Student {
 model Teacher {
   id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   schoolId       String    @db.Uuid
+  userId         String?   @db.Uuid
   name           String    @db.VarChar(100)
   birthdate      DateTime  @db.Date
   email          String?   @db.VarChar(255)
@@ -792,6 +796,7 @@ model Teacher {
   tenantId       String?
   showDetails    Boolean?
 
+  user     User?      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_teacher_fkey")
   school   School     @relation(fields: [schoolId], references: [id], map: "teacher_school_id_fkey")
   Schedule Schedule[] @relation(map: "schedule_teacher_id_fkey")
 
@@ -855,6 +860,7 @@ enum responsibleType {
   PAI
   MAE   @map("MÃE")
   AMBOS
+  OUTRO
 
   @@schema("public")
 }
