@@ -12,6 +12,7 @@ import {
   IonList,
   IonListHeader,
   IonModal,
+  IonText,
   IonToolbar,
 } from '@ionic/vue'
 import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
@@ -221,10 +222,12 @@ watch(selectedDate, (newValue: any) => {
       <!-- aqui vai o filtro ou algo assim <ion-col size="12" size-xl="6"></ion-col> -->
       <ion-col size="12" size-xl="6">
         <ion-row>
-          <ion-col style="display: flex;" class="ion-justify-content-start ion-align-items-center" size="7">
-            <IonButton id="open-custom-dialog" expand="block">
-              {{ luxonFormatDate(monthYearValue) }}
-            </IonButton>
+          <ion-col style="display: flex; padding-left: 10px;" class="ion-justify-content-start ion-align-items-center" size="7">
+            <IonChip id="open-custom-dialog" shape="rounded">
+              <IonText style="height: 28px; display: flex; padding-bottom: 2px; font-weight: medium;" class="ion-justify-content-center ion-align-items-center">
+                {{ luxonFormatDate(monthYearValue) }}
+              </IonText>
+            </IonChip>
 
             <IonModal id="month-year-modal" ref="modal" trigger="open-custom-dialog">
               <div class="wrapper">
@@ -242,7 +245,7 @@ watch(selectedDate, (newValue: any) => {
               </div>
             </IonModal>
           </ion-col>
-          <ion-col style="display: flex;" class=" ion-align-items-center ion-justify-content-end" size="5">
+          <ion-col style="display: flex; padding-right: 10px;" class=" ion-align-items-center ion-justify-content-end" size="5">
             <IonButtons style="scale: 0.9;" class="ion-justify-content-end">
               <IonButton color="tertiary" class="navigation-btn" @click="prevMonth">
                 <IonIcon slot="icon-only" :icon="arrowBackOutline" />
@@ -259,7 +262,7 @@ watch(selectedDate, (newValue: any) => {
             >
               <SwiperSlide v-for="(week, index) in weeksInMonth" :key="index">
                 <div class="date-selector">
-                  <div v-for="day in week" :key="day.date.format('YYYY-MM-DD')" :style="day.weekday !== 'SUN' ? '' : 'display: none;'" class="day-chip">
+                  <div v-for="(day, i) in week" :key="day.date.format('YYYY-MM-DD')" :style="day.weekday !== 'SUN' ? '' : 'display: none;'" class="day-chip">
                     <!-- <div class="ion-padding">
                         {{ day.date.format('YYYY-MM-DD') }}
                         <br>
@@ -267,6 +270,7 @@ watch(selectedDate, (newValue: any) => {
                       </div> -->
 
                     <IonChip
+                      :style="i === 0 ? 'margin-left: 10px;' : undefined"
                       :disabled="isDateDisabled(day.date)" shape="rounded"
                       :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
                     >
@@ -307,9 +311,10 @@ ion-chip {
 }
 
 .day-name {
+  width: 29px;
     margin-top: 20px;
     font-weight: normal;
-    font-size: 12px;
+    font-size: 14px;
     margin-bottom: 12px;
 }
 
