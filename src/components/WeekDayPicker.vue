@@ -1,28 +1,33 @@
 <script lang="ts" setup>
 import type { Moment } from 'moment'
+import { hexToRgb } from '@/utils/hex-to-rgb'
+
 import {
   IonButton,
   IonButtons,
   IonChip,
   IonDatetime,
-  IonDatetimeButton,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonListHeader,
   IonModal,
   IonText,
-  IonToolbar,
 } from '@ionic/vue'
 import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
 
 import { DateTime } from 'luxon'
 import moment from 'moment'
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { computed, defineEmits, ref, watch } from 'vue'
+import { computed, defineEmits, ref, defineProps, type Ref, watch } from 'vue'
 
 import 'swiper/css'
+
+// @TODO: Quando possível implementar a prop feriados para receber o valor de forma dinamica e aposentar a variável ref() events
+// 
+// interface Props {
+//   feriados: { date: string; type: string; title: string }[]
+// }
+
+// const props = defineProps<Props>()
+
 
 const emits = defineEmits(['update:modelValue'])
 
@@ -50,13 +55,19 @@ const slideOpts = {
 
 const modal = ref()
 
-// const dismiss = () => modal.value.$el.dismiss()
+//  Esta função serve para fechar o modal
+//  const dismiss = () => modal.value.$el.dismiss()
 
 // Variável para armazenar o valor de mês e ano selecionado
 const monthYearValue = ref(`${new Date().toISOString().slice(0, 8)}01`)
 
+const colorStyle = ref({
+  primary: getComputedStyle(document.documentElement).getPropertyValue('--ion-color-primary').trim(),
+  secondary: getComputedStyle(document.documentElement).getPropertyValue('--ion-color-secondary').trim(),
+  tertiary: getComputedStyle(document.documentElement).getPropertyValue('--ion-color-tertiary').trim(),
+})
 // Função para atualizar o valor de mês e ano selecionado
-function updateDate(event) {
+function updateDate(event: Event | any) {
   monthYearValue.value = event.detail.value
 }
 
@@ -109,7 +120,7 @@ function selectDate(date: Moment) {
 function getColorForDate(date: Moment) {
   const formattedDate = date.format('YYYY-MM-DD')
   if (formattedDate === selectedDate.value.format('YYYY-MM-DD')) {
-    return 'primary'
+    return ''
   }
   else if (events.value.some(event => event.date === formattedDate)) {
     const event = events.value.find(event => event.date === formattedDate)
@@ -123,7 +134,7 @@ function getColorForDate(date: Moment) {
     }
   }
   else {
-    return ''
+    return 'primary'
   }
 }
 
@@ -133,11 +144,13 @@ function isDateDisabled(date: Moment) {
   return event?.type === 'disabled'
 }
 
-function onMonthYearChange(event: any) {
-  const selectedDate = moment(event.detail.value)
-  currentDate.value = selectedDate.startOf('month')
-  loadVisibleMonth()
-}
+//  @TODO: Atenção, estudar melhor o uso desta função posteriormente
+
+// function onMonthYearChange(event: any) {
+//   const selectedDate = moment(event.detail.value)
+//   currentDate.value = selectedDate.startOf('month')
+//   loadVisibleMonth()
+// }
 
 function updateDatetimeButton() {
   monthYear.value = currentDate.value.format('YYYY-MM-DD')
@@ -171,19 +184,19 @@ function checkNextSlide(swiper: any) {
 function translateDay(day: string) {
   switch (day) {
     case 'SUN':
-      return 'Dom'
+      return 'DOM'
     case 'MON':
-      return 'Seg'
+      return 'SEG'
     case 'TUE':
-      return 'Ter'
+      return 'TER'
     case 'WED':
-      return 'Qua'
+      return 'QUA'
     case 'THU':
-      return 'Qui'
+      return 'QUI'
     case 'FRI':
-      return 'Sex'
+      return 'SEX'
     case 'SAT':
-      return 'Sab'
+      return 'SAB'
     default:
       return ''
   }
@@ -223,8 +236,8 @@ watch(selectedDate, (newValue: any) => {
       <ion-col size="12" size-xl="6">
         <ion-row>
           <ion-col style="display: flex; padding-left: 10px;" class="ion-justify-content-start ion-align-items-center" size="7">
-            <IonChip id="open-custom-dialog" shape="rounded">
-              <IonText style="height: 28px; display: flex; padding-bottom: 2px; font-weight: medium;" class="ion-justify-content-center ion-align-items-center">
+            <IonChip id="open-custom-dialog" color="primary" class="ion-padding-horizontal" shape="rounded">
+              <IonText style="height: 28px; display: flex; padding-bottom: 2px; font-size: medium; font-weight: medium;" class="ion-justify-content-center ion-align-items-center">
                 {{ luxonFormatDate(monthYearValue) }}
               </IonText>
             </IonChip>
@@ -247,10 +260,10 @@ watch(selectedDate, (newValue: any) => {
           </ion-col>
           <ion-col style="display: flex; padding-right: 10px;" class=" ion-align-items-center ion-justify-content-end" size="5">
             <IonButtons style="scale: 0.9;" class="ion-justify-content-end">
-              <IonButton color="tertiary" class="navigation-btn" @click="prevMonth">
+              <IonButton color="primary" class="navigation-btn" :style="`background-color:  ${hexToRgb(colorStyle.primary, '0.1')};`" @click="prevMonth">
                 <IonIcon slot="icon-only" :icon="arrowBackOutline" />
               </IonButton>
-              <IonButton color="tertiary" class="navigation-btn" style="margin-left: 10px;" @click="nextMonth">
+              <IonButton color="primary" class="navigation-btn" style="margin-left: 10px;" :style="`background-color:  ${hexToRgb(colorStyle.primary, '0.1')};`" @click="nextMonth">
                 <IonIcon slot="icon-only" :icon="arrowForwardOutline" />
               </IonButton>
             </IonButtons>
@@ -263,15 +276,10 @@ watch(selectedDate, (newValue: any) => {
               <SwiperSlide v-for="(week, index) in weeksInMonth" :key="index">
                 <div class="date-selector">
                   <div v-for="(day, i) in week" :key="day.date.format('YYYY-MM-DD')" :style="day.weekday !== 'SUN' ? '' : 'display: none;'" class="day-chip">
-                    <!-- <div class="ion-padding">
-                        {{ day.date.format('YYYY-MM-DD') }}
-                        <br>
-                        {{ monthYearValue }}
-                      </div> -->
-
+                    <!-- valor padrão de disabled :disabled="isDateDisabled(day.date)" shape="rounded" -->
                     <IonChip
+                      :disabled="day.weekday === 'SAT' || isDateDisabled(day.date)"
                       :style="i === 0 ? 'margin-left: 10px;' : undefined"
-                      :disabled="isDateDisabled(day.date)" shape="rounded"
                       :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
                     >
                       <div>
@@ -313,8 +321,8 @@ ion-chip {
 .day-name {
   width: 29px;
     margin-top: 20px;
-    font-weight: normal;
-    font-size: 14px;
+    font-size: 13px;
+    font-weight: lighter;
     margin-bottom: 12px;
 }
 
@@ -325,7 +333,12 @@ ion-chip {
 }
 
 .navigation-btn {
-  background-color: var(--ion-color-lightaccent); border-radius: 100%
+  border-radius: 100%
+}
+
+ion-chip {
+  --background: var(--ion-color-tertiary);
+  --color: var(--ion-color-lightaccent);
 }
 
 ion-modal#month-year-modal {
