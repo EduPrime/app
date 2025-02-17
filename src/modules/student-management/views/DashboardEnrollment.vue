@@ -1,67 +1,88 @@
 <script setup lang="ts">
 import type { Tables } from '@/types/database.types'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
-import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
-import EnrollmentList from '@/modules/student-management/components/EnrollmentList.vue'
 import { useAuthStore } from '@/store/AuthStore'
-import { IonButton, IonCol, IonIcon, IonItem, IonRow, IonSelect, IonSelectOption } from '@ionic/vue'
-import { businessOutline, menu } from 'ionicons/icons'
-import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
-import EnrollmentService from '../services/EnrollmentService'
+import { IonButton, IonCol, IonIcon, IonItem, IonRow, IonSelect, IonSelectOption, IonText, toastController } from '@ionic/vue'
+import dayjs from 'dayjs'
+import { alertCircleOutline, arrowDownOutline, arrowUpOutline, businessOutline, menu } from 'ionicons/icons'
+import { computed, onMounted, ref, watch } from 'vue'
+import EnrollmentService from '../services/Pre_enrollmentService'
 
-const router = useRouter()
 const authStore = useAuthStore()
-console.log(authStore.organization)
-// Estados para os dados da instituição e carregamento
 const enrollmentService = new EnrollmentService()
-const dataList = ref<Tables<'enrollment'>[]>([])
-const schoolCount = ref(154)
-const classCount = ref(25)
-const approvalRate = ref(48)
-const teacherCount = ref(30)
-const searchQuery = ref('')
-
-const filteredDataList = computed(() => {
-  if (!searchQuery.value) {
-    return dataList.value
-  }
-
-  return dataList.value.filter((enrollment: Tables<'enrollment'>) =>
-    enrollment.name && enrollment.name.toLowerCase().includes(searchQuery.value.toLowerCase()), // Verifica se enrollment.name existe antes de usar toLowerCase()
-  )
-})
 
 async function loadEnrollment() {
   try {
-    const enrollments = await enrollmentService.getAll() // getAll() pode retornar null
-    dataList.value = enrollments ?? [] // Se for null, atribuímos um array vazio
+    const enrollments = await enrollmentService.getFilteredWithStudents(filter.value)
+    students.value = enrollments.map(enrollment => ({
+      pcd: enrollment.student?.disability ?? false,
+      name: enrollment.student?.name ?? '',
+      age: dayjs().diff(dayjs(enrollment.student?.birthdate), 'year') ?? 0,
+    }
+    ))
   }
+
   catch (error) {
     console.error('Erro ao carregar as matrículas:', error)
   }
 }
 const students = ref([
-  { name: 'João Otávio da Silva', age: 13, gender: 'masculino', pcd: true, selected: true },
-  { name: 'Mariana Almeida Carvalho', age: 16, gender: 'feminino', pcd: false, selected: false },
-  { name: 'Josué Amorim dos Santos', age: 14, gender: 'masculino', pcd: false, selected: false },
-  { name: 'Antônio Jardel Alencar Souza', age: 10, gender: 'masculino', pcd: false, selected: false },
-  { name: 'Itamar Batista Filho', age: 12, gender: 'masculino', pcd: false, selected: false },
-  { name: 'Emanuela', age: 11, gender: 'feminino', pcd: false, selected: false },
+
 ])
+const selectedStudents = computed(() => students.value.filter(student => !!student.selected))
 function handleSelectAll($event) {
   students.value.forEach((element) => {
-    element.selected = $event.detail.checked
+    element.selected = $event?.detail?.checked ?? false
   })
 }
-function navigateToRegister() {
-  router.push({ name: 'EnrollmentRegister' })
-}
-const filter = ref('')
-const filterBy = ref('name')
-onMounted(() => {
+const series = ref([])
+const filter = ref({
+  direction: 'asc',
+  by: 'name',
+  value: '',
+  serie: undefined,
+})
+watch(filter, () => {
+  loadEnrollment()
+}, { deep: true })
+onMounted(async () => {
+  await getSeries()
   loadEnrollment()
 })
+async function getSeries() {
+  const data = await enrollmentService.getSeries()
+  series.value = data
+  filter.value.serie = data[0].id
+}
+const allSelected = computed(() => students.value.length === selectedStudents.value.length)
+const finishEnrollmentOpened = ref(false)
+const classes = ref([])
+const selectedClass = ref()
+const selectClassOpened = ref(false)
+async function handleSelectClass() {
+  const data = await enrollmentService.getClasses(filter.value.serie)
+  classes.value = data
+  selectClassOpened.value = true
+}
+function selectClass(classroom) {
+  selectedClass.value = classroom.id
+  selectClassOpened.value = false
+  finishEnrollmentOpened.value = true
+}
+const classInfo = computed(() => {
+  const [classroom] = classes.value.filter(room => room.id === selectedClass.value)
+  console.log(classroom)
+  return classroom
+})
+async function presentToast() {
+  const toast = await toastController.create({
+    message: 'Aluno matriculado com sucesso',
+    duration: 5000,
+    position: 'top',
+    color: 'primary',
+  })
+  await toast.present()
+}
 </script>
 
 <template>
@@ -76,30 +97,34 @@ onMounted(() => {
             Preencha os filtros abaixo para uma mais acertiva
           </div>
         </div>
-        <IonItem color="primary">
-          <ion-label>{{ authStore.organization.name }}</ion-label>
-          <IonIcon slot="start" :icon="businessOutline" />
-        </IonItem>
+        <div style="height: 57px; background: var(--ion-color-primary); display: flex; align-items: center;">
+          <IonItem style="width: 100%;" color="primary">
+            <ion-label>{{ authStore.organization.name }}</ion-label>
+            <IonIcon slot="start" :icon="businessOutline" />
+          </IonItem>
+        </div>
         <IonItem color="tertiary">
           <IonIcon slot="start" class="cursor-pointer" :icon="menu" @click="handleMenu" />
-          <ion-label>
-            1º Ano
-          </ion-label>
+          <IonSelect class="hide-icon" :value="filter.serie" :toggle-icon="undefined" label-placement="floating"
+            @ion-change="($event) => filter.serie = $event.detail.value">
+            <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
+              {{ serie.name }}
+            </IonSelectOption>
+          </IonSelect>
         </IonItem>
       </div>
     </div>
-    <ion-card class="requests mx-0">
-      <div class="text-md">
-        Solicitações de matrículas ({{ 99 }}+)
+    <ion-card class="requests m-0">
+      <div class="text-md" style="padding-top: 0px; font-size: 20px;">
+        Solicitações de matrículas ({{ students.length }})
       </div>
-      {{ filter }}
       <IonRow>
-        <IonCol size="9">
-          <ion-searchbar v-model="filter" placeholder="Filtrar" />
+        <IonCol class="p-0" size="8">
+          <ion-searchbar v-model="filter.value" class="custom-search" placeholder="Filtrar" />
         </IonCol>
-        <IonCol size="3">
-          <IonSelect :value="filterBy" label="Filtrar por" label-placement="floating"
-            @ion-change="($event) => filterBy = $event.detail.value">
+        <IonCol class="p-0" size="4">
+          <IonSelect :toggle-icon="arrowDownOutline" :expanded-icon="arrowUpOutline" class="custom-select"
+            :value="filter.by" @ion-change="($event) => filter.by = $event.detail.value">
             <IonSelectOption value="name">
               Nome
             </IonSelectOption>
@@ -110,8 +135,17 @@ onMounted(() => {
         </IonCol>
       </IonRow>
       <IonRow class="checkbox-row">
-        <ion-checkbox @ion-change="handleSelectAll" />
-        <IonIcon slot="end" name="filter" />
+        <IonCol size="10">
+          <ion-checkbox :checked="allSelected" @ion-change="handleSelectAll" />
+        </IonCol>
+        <IonCol size="auto">
+          <IonRow>
+            <IonIcon class="cursor-pointer" :color="filter.direction === 'asc' ? 'accent' : ''" :icon="arrowUpOutline"
+              @click="filter.direction = 'asc'" />
+            <IonIcon class="cursor-pointer" :color="filter.direction === 'desc' ? 'accent' : ''"
+              :icon="arrowDownOutline" @click="filter.direction = 'desc'" />
+          </IonRow>
+        </IonCol>
       </IonRow>
 
       <ion-list>
@@ -133,21 +167,81 @@ onMounted(() => {
         </IonItem>
       </ion-list>
     </ion-card>
+
     <template #footer>
-      <IonRow>
+      <IonRow class="" style="padding-top: 0px; padding-bottom: 0px;">
         <IonCol>
-          <IonButton expand="block" color="accent">
+          <IonButton :disabled="!selectedStudents.length" expand="block" color="accent" @click="handleSelectAll(false)">
             Cancelar
           </IonButton>
         </IonCol>
         <IonCol>
-          <IonButton expand="block" color="primary">
+          <IonButton :disabled="!selectedStudents.length" expand="block" color="primary" @click="handleSelectClass">
             Matrícula
           </IonButton>
         </IonCol>
       </IonRow>
     </template>
   </ContentLayout>
+  <ion-modal :is-open="finishEnrollmentOpened" :initial-breakpoint="0.9" :breakpoints="[0.9]" handle-behavior="cycle"
+    @did-dismiss="finishEnrollmentOpened = false">
+    <ion-content style="position: relative;" class="ion-padding">
+      <IonRow style="margin-bottom: 12px;">
+        <IonCol class="p-0" size="8">
+          <IonSelect fill="outline" :value="selectedClass" :toggle-icon="undefined" label-placement="floating"
+            @ion-change="($event) => selectedClass.serie = $event.detail.value">
+            <IonSelectOption v-for="classroom, i in classes" :key="i" :value="classroom.id">
+              {{ classroom.name }}
+            </IonSelectOption>
+          </IonSelect>
+        </IonCol>
+      </IonRow>
+
+      <IonText color="primary" class="info">
+        <IonItem v-if="classInfo?.exceededStudents" color="primary">
+          <IonIcon slot="start" :icon="alertCircleOutline" />
+          <IonLabel>
+            <div style="font-size: 14px;">
+              Atenção
+            </div>
+            <div>
+              Lotação alcançada e excede em ({{ classInfo?.exceededStudents }}) alunos
+            </div>
+          </IonLabel>
+        </IonItem>
+        <ul style="padding-left: 25px;">
+          <li>Turmo {{ classInfo?.period === 'MORNING' ? 'Matutino' : 'Vespertino' }}</li>
+          <li>{{ classInfo?.totalStudents }} alunos matriculados</li>
+          <li>{{ classInfo?.maxStudents - classInfo?.totalStudents }} vagas disponíveis</li>
+          <li>Excedente ({{ classInfo?.exceededStudents }})</li>
+          <li>{{ classInfo?.pcdStudents }} PCD</li>
+        </ul>
+      </IonText>
+      <IonRow style="position: absolute; bottom: 10%; width: 100%; left: 0px;">
+        <IonCol>
+          <IonButton expand="block" color="accent" @click="finishEnrollmentOpened = false">
+            Cancelar
+          </IonButton>
+        </IonCol>
+        <IonCol>
+          <IonButton expand="block" color="primary" @click="() => {
+            finishEnrollmentOpened = false
+            presentToast()
+          }">
+            Matrícula
+          </IonButton>
+        </IonCol>
+      </IonRow>
+    </ion-content>
+  </ion-modal>
+  <ion-modal :is-open="selectClassOpened" :initial-breakpoint="0.50" :breakpoints="[0, 0.25, 0.5, 0.75]"
+    handle-behavior="cycle" @did-dismiss="selectClassOpened = false">
+    <ion-content class="ion-padding">
+      <IonButton v-for="(classroom, i) in classes" :key="i" class="select-class-btn" @click="selectClass(classroom)">
+        {{ classroom.name }} ({{ classroom.maxStudents }})
+      </IonButton>
+    </ion-content>
+  </ion-modal>
 </template>
 
 <style scoped lang="scss">
@@ -156,21 +250,40 @@ ion-label h2 {
   font-weight: bold;
 }
 
+ion-icon[slot=start] {
+  margin-right: 12px !important;
+}
+
+ion-select.hide-icon::part(icon) {
+  display: none;
+}
+
 ion-searchbar {
   --background: var(--ion-color-light);
 }
 
-.mx-0 {
+ion-button.select-class-btn {
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  height: 50px;
+}
+
+.m-0 {
   margin-left: 0px;
   margin-right: 0px;
+  margin-bottom: 0px;
+  margin-top: 0px;
+  padding: 20px 14px;
 }
 
 .header {
-  padding-bottom: 16px;
+  padding: 16px 14px 24px 14px;
 
   ion-label {
     font-size: 14px;
   }
+
+  background: #F9D3E333;
 }
 
 .header-info {
@@ -183,13 +296,12 @@ ion-searchbar {
 }
 
 .text-md {
-  padding-left: 10px;
   padding-top: 20px;
-  padding-bottom: 8px;
+  padding-bottom: 16px;
 }
 
 .text-sm {
-  font-size: 12px;
+  font-size: 14px;
   margin: 10px 0px;
   font-weight: 300;
 }
@@ -218,6 +330,10 @@ ion-searchbar {
   font-size: 10px;
 }
 
+.p-0 {
+  padding: 0px;
+}
+
 .badge {
   background: #D0549F59;
   color: #D0549F;
@@ -228,6 +344,21 @@ ion-searchbar {
   padding: 3px 0px;
 }
 
+.info {
+  ion-item {
+    background-color: var(--ion-color-primary);
+    padding: 10px 0px;
+  }
+
+  ion-icon {
+    margin-inline-end: 14px
+  }
+
+  li {
+    margin-bottom: 5px;
+  }
+}
+
 ion-checkbox {
   --size: 10px;
   --checkbox-background-checked: #D0549F;
@@ -235,8 +366,40 @@ ion-checkbox {
 }
 
 .checkbox-row {
-  margin: 10px 16px 2px 16px;
+  margin: 10px 10px 2px 10px;
   border-bottom: 1px solid #72428EB2;
   padding-bottom: 8px;
+  justify-content: space-between;
+}
+
+ion-searchbar.custom-search {
+  --background: white;
+  --color: var(--ion-color-primary);
+  --placeholder-color: var(--ion-color-primary);
+  --icon-color: var(--ion-color-primary);
+  --clear-button-color: var(--ion-color-primary);
+  --border-radius: 4px;
+  padding: 0px 16px 0px 0px;
+}
+
+ion-select.custom-select {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  --border-radius: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+
+}
+
+ion-select.custom-select::part(icon) {
+  position: absolute;
+  right: 0px;
+}
+
+ion-searchbar.ios.custom-search {
+  --cancel-button-color: var(--ion-color-primary);
+}
+
+ion-searchbar.md.custom-search {
+  --cancel-button-color: var(--ion-color-primary);
 }
 </style>

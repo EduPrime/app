@@ -8,6 +8,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  noPadding: {
+    type: Boolean,
+    default: false,
+  },
   showDescription: {
     type: Boolean,
     default: false,
@@ -65,7 +69,7 @@ watch(
         </IonToolbar>
       </IonHeader>
 
-      <div id="main-content-box" class="ion-padding" :class="classes">
+      <div id="main-content-box" :class="classes + noPadding ? '' : ' ion-padding'">
         <ion-row v-if="props.showDescription" class="ion-margin">
           <ion-col
             style="background-color: #aa86ff; box-shadow: 5px 5px 0px 0px rgba(110, 68, 255, 0.4); border-radius: 3px;">
@@ -77,7 +81,7 @@ watch(
         </ion-row>
 
         <ion-row>
-          <ion-col>
+          <ion-col class="p-0">
             <slot />
           </ion-col>
         </ion-row>
@@ -105,5 +109,9 @@ ion-header.md {
 
 ion-title {
   font-weight: 800;
+}
+
+.p-0 {
+  padding: 0px;
 }
 </style>
