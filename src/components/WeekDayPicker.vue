@@ -236,7 +236,7 @@ watch(selectedDate, (newValue: any) => {
       <ion-col size="12" size-xl="6">
         <ion-row>
           <ion-col style="display: flex; padding-left: 10px;" class="ion-justify-content-start ion-align-items-center" size="7">
-            <IonChip id="open-custom-dialog" color="primary" class="ion-padding-horizontal" shape="rounded">
+            <IonChip id="open-custom-dialog" color="primary" class="ion-padding-horizontal ion-no-margin" shape="rounded">
               <IonText style="height: 28px; display: flex; padding-bottom: 2px; font-size: medium; font-weight: medium;" class="ion-justify-content-center ion-align-items-center">
                 {{ luxonFormatDate(monthYearValue) }}
               </IonText>
@@ -258,7 +258,7 @@ watch(selectedDate, (newValue: any) => {
               </div>
             </IonModal>
           </ion-col>
-          <ion-col style="display: flex; padding-right: 10px;" class=" ion-align-items-center ion-justify-content-end" size="5">
+          <ion-col style="display: flex; padding-right: 5px;" class="ion-align-items-center ion-justify-content-end" size="5">
             <IonButtons style="scale: 0.9;" class="ion-justify-content-end">
               <IonButton color="primary" class="navigation-btn" :style="`background-color:  ${hexToRgb(colorStyle.primary, '0.1')};`" @click="prevMonth">
                 <IonIcon slot="icon-only" :icon="arrowBackOutline" />
