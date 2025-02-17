@@ -14,6 +14,7 @@ import selectSchoolSlider from '../components/SelectSchoolSlider.vue'
 
 import selectSeriesSlider from '../components/SelectSeriesSlider.vue'
 import PreEnrollmentService from '../services/PreEnrollmentService'
+import InstitutionService from '../services/InstitutionService'
 
 interface Props {
   searchbox: string
@@ -22,6 +23,7 @@ const props = defineProps<Props>()
 const emits = defineEmits(['update:modelValue'])
 
 const postgrest = new PreEnrollmentService()
+const institutionService = new InstitutionService()
 const studentId = ref()
 const pageWidth = ref()
 const loading = ref(false)
@@ -37,13 +39,23 @@ const insertedPreEnrollment = ref()
 const postStatus = ref()
 
 const preEnrollment = ref({
+  id: '',
+  institutionId: '',
   schoolId: '',
   courseId: '',
   seriesId: '',
   studentId: '',
-  observations: undefined as string | null | undefined,
-  preenrollmentcode: undefined as string | null | undefined,
-  datePreenrollment: new Date().toISOString().slice(0, 10),
+  observations: '',
+  preenrollmentcode: '',
+  datePreenrollment: new Date(),
+  preferShift: null,
+  createdAt: new Date(),
+  updatedAt: null,
+  tenantId: null,
+  deletedAt: null,
+  updatedBy: null,
+  status: null,
+  situation: null,
 })
 watch(selectedSchool, (value) => {
   if (value) {
@@ -123,6 +135,7 @@ watch(studentId, (value) => {
 watch(shiftPreference, (value) => {
   if (value) {
     preEnrollment.value.observations = `A preferência de turno é: ${value}`
+    preEnrollment.value.preferShift = value
   }
 })
 
@@ -139,7 +152,7 @@ watch(postStatus, async (value) => {
     setTimeout(() => {
       finished.value = true
     }, 500) // 1 segundo antes de loading se tornar false
-
+    console.log('preEnrollment:', preEnrollment.value)
     preEnrollment.value.preenrollmentcode = await postgrest.generateUnicPreEnrollmentCode()
 
     if (
@@ -149,7 +162,9 @@ watch(postStatus, async (value) => {
       && preEnrollment.value.seriesId
       && preEnrollment.value.studentId
     ) {
-      insertedPreEnrollment.value = await postgrest.insertPreEnrollment(preEnrollment.value)
+      const data = await postgrest.insertPreEnrollment(preEnrollment.value)
+      console.log('data:', data)
+      insertedPreEnrollment.value = data
     }
 
     setTimeout(() => {
@@ -169,6 +184,7 @@ const teste = ref()
 onMounted(async () => {
   pageWidth.value = catchPageWidth()
   teste.value = await postgrest.getPreEnrollments()
+  preEnrollment.value.institutionId = await institutionService.getInstitutionId()
 })
 </script>
 
@@ -229,7 +245,7 @@ onMounted(async () => {
           <IonGrid style="padding: 0;">
             <IonRow>
               <IonCol style="padding: 0;" size="12">
-                <formPreEnrrolment v-model="studentId" :page-width="pageWidth?.pageWidth" @preference="($event) => shiftPreference = $event" @post-status="($event) => postStatus = $event" />
+                <formPreEnrrolment v-model="studentId" :page-width="pageWidth?.pageWidth" @preference="($event) => shiftPreference = $event" @post-status="($event) => postStatus = $event" @studentId="($event) => studentId = $event"/>
               </IonCol>
             </IonRow>
           </IonGrid>
@@ -252,7 +268,7 @@ onMounted(async () => {
                     Código da pré-matrícula: <span style="font-weight: 800;">
 
                       <!-- {{ insertedPreEnrollment.data.at(0).preenrollmentcode }} -->
-                      {{ insertedPreEnrollment.data }}
+                      {{ insertedPreEnrollment?.data }}
                     </span>
                   </p>
                   <div class="flex" style="min-height: 150px;">

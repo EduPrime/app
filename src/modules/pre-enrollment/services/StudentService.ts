@@ -28,8 +28,10 @@ export default class StudentService extends BaseService<TabelaType> {
     }
   }
 
-  async insertStudent(student: { name: any, birthdate: any, phone: any }) {
+  async insertStudent(student: { [key: string]: any, tenantId?: string, createdAt?: string }) {
     try {
+      student['tenantId'] = self.crypto.randomUUID();
+      student['createdAt'] = new Date().toISOString();
       const data = await this.client
         .from('student')
         .insert([student])
