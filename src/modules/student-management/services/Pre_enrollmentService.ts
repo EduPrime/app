@@ -94,34 +94,12 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
   }
 
   async getSeries(filter) {
-    const { by, value, direction } = filter || {}
-
+    const { by, value, direction, school } = filter || {}
+    console.log(filter, school)
     const query = this.client.from('series').select(`
       *
-  `)
+  `).eq('schoolId', school)
 
-    // Excluir registros onde "student" é null
-    // query = query.not('student', 'is', null)
-
-    // Aplicar filtro de "by" e "value"
-    // if (by && value) {
-    //   if (by === 'name') {
-    //     // Busca por nome usando ILIKE (insensível a maiúsculas/minúsculas)
-    //     query = query.ilike('student.name', `%${value}%`)
-    //   }
-    //   else if (by === 'age') {
-    //     // Busca por idade exata
-    //     query = query.eq('student.age', value)
-    //   }
-    // }
-
-    // Aplicar ordenação
-    // if (by && direction) {
-    //   const orderColumn = by === 'name' ? 'student.name' : 'student.age'
-    //   query = query.order(`${orderColumn}.${direction}`) // Corrigido: sem duplicação
-    // }
-
-    // Executar query
     const { data, error } = await query
 
     if (error) {

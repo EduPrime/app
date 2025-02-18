@@ -6,18 +6,20 @@ import { IonButton, IonCol, IonIcon, IonItem, IonRow, IonSelect, IonSelectOption
 import dayjs from 'dayjs'
 import { alertCircleOutline, arrowDownOutline, arrowUpOutline, businessOutline, menu } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
-import EnrollmentService from '../services/Pre_enrollmentService'
+import Pre_enrollmentService from '../services/Pre_enrollmentService'
+import SchoolService from '../services/SchoolService'
 
 const authStore = useAuthStore()
-const enrollmentService = new EnrollmentService()
-
+const preEnrollmentService = new Pre_enrollmentService()
+const schoolService = new SchoolService()
 async function loadEnrollment() {
   try {
-    const enrollments = await enrollmentService.getFilteredWithStudents(filter.value)
+    const enrollments = await preEnrollmentService.getFilteredWithStudents(filter.value)
     students.value = enrollments.map(enrollment => ({
       pcd: enrollment.student?.disability ?? false,
       name: enrollment.student?.name ?? '',
       age: dayjs().diff(dayjs(enrollment.student?.birthdate), 'year') ?? 0,
+      shift: enrollment.preferShift,
     }
     ))
   }
@@ -36,31 +38,55 @@ function handleSelectAll($event) {
   })
 }
 const series = ref([])
+
 const filter = ref({
   direction: 'asc',
   by: 'name',
   value: '',
   serie: undefined,
+  school: undefined,
 })
-watch(filter, () => {
-  loadEnrollment()
+
+watch(filter, async () => {
+  // try {
+  //   ()
+  // }
+  // catch {
+  //   students.value = []
+  // }
 }, { deep: true })
+
 onMounted(async () => {
-  await getSeries()
-  loadEnrollment()
+  await getSchools()
+  // await getSeries()
+  // loadEnrollment()
 })
-async function getSeries() {
-  const data = await enrollmentService.getSeries()
-  series.value = data
-  filter.value.serie = data[0].id
+async function getSchools() {
+  console.log(filter.value)
+  const data = await schoolService.getSchools()
+  schools.value = data
 }
+async function getSeries() {
+  try {
+    const data = await preEnrollmentService.getSeries(filter.value)
+    series.value = data
+    filter.value.serie = data[0].id
+    loadEnrollment()
+  }
+  catch {
+    students.value = []
+    series.value = []
+    filter.value.serie = undefined
+  }
+}
+const schools = ref([])
 const allSelected = computed(() => students.value.length === selectedStudents.value.length)
 const finishEnrollmentOpened = ref(false)
 const classes = ref([])
 const selectedClass = ref()
 const selectClassOpened = ref(false)
 async function handleSelectClass() {
-  const data = await enrollmentService.getClasses(filter.value.serie)
+  const data = await preEnrollmentService.getClasses(filter.value.serie)
   classes.value = data
   selectClassOpened.value = true
 }
@@ -83,6 +109,16 @@ async function presentToast() {
   })
   await toast.present()
 }
+function getTurno(turno: string) {
+  switch (turno) {
+    case ('MORNING'):
+      return 'manhã'
+    case ('AFTERNOON'):
+      return 'tarde'
+    case ('EVENING'):
+      return 'noite'
+  }
+}
 </script>
 
 <template>
@@ -97,16 +133,26 @@ async function presentToast() {
             Preencha os filtros abaixo para uma mais acertiva
           </div>
         </div>
-        <div style="height: 57px; background: var(--ion-color-primary); display: flex; align-items: center;">
+        <!-- <div style="height: 57px; background: var(--ion-color-primary); display: flex; align-items: center;">
           <IonItem style="width: 100%;" color="primary">
             <ion-label>{{ authStore.organization.name }}</ion-label>
             <IonIcon slot="start" :icon="businessOutline" />
           </IonItem>
-        </div>
+        </div> -->
+        <IonItem color="primary">
+          <IonIcon slot="start" :icon="businessOutline" />
+          <IonSelect class="hide-icon" :value="filter.school" label-placement="floating" @ion-change="($event) => {
+            filter.school = $event.detail.value; getSeries()
+          }">
+            <IonSelectOption v-for="school, i in schools" :key="i" :value="school.id">
+              {{ school.name }}
+            </IonSelectOption>
+          </IonSelect>
+        </IonItem>
         <IonItem color="tertiary">
-          <IonIcon slot="start" class="cursor-pointer" :icon="menu" @click="handleMenu" />
-          <IonSelect class="hide-icon" :value="filter.serie" :toggle-icon="undefined" label-placement="floating"
-            @ion-change="($event) => filter.serie = $event.detail.value">
+          <IonIcon slot="start" class="cursor-pointer" :icon="menu" />
+          <IonSelect class="hide-icon" :value="filter.serie" label-placement="floating"
+            @ion-change="($event) => { filter.serie = $event.detail.value; loadEnrollment() }">
             <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
               {{ serie.name }}
             </IonSelectOption>
@@ -158,7 +204,7 @@ async function presentToast() {
               {{ student.name }}
             </div>
             <div class="description">
-              {{ student.age }} anos, sexo {{ student.gender }}
+              {{ student.age }} anos, {{ getTurno(student.shift) }}
             </div>
           </ion-label>
           <div v-if="student.pcd" slot="end" class="badge">
