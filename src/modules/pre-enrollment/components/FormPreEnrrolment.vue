@@ -321,7 +321,7 @@ const handleFileChange = async (event: Event) => {
       <IonCol size="12" size-md="6">
         <IonItem>
           <IonSelect v-model="student.responsibleType" label="Responsável" label-placement="floating">
-            <IonSelectOption value="MAE">
+            <IonSelectOption value="MÃE">
               Mãe
             </IonSelectOption>
             <IonSelectOption value="PAI">
@@ -361,25 +361,25 @@ const handleFileChange = async (event: Event) => {
         </IonItem>
       </IonCol>
 
-      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MAE' || student.responsibleType === 'AMBOS'">
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MÃE' || student.responsibleType === 'AMBOS'">
         <IonItem>
           <IonInput v-model="student.motherName" type="text" label="Nome da Mãe" label-placement="floating" />
         </IonItem>
       </IonCol>
 
-      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MAE' || student.responsibleType === 'AMBOS'">
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MÃE' || student.responsibleType === 'AMBOS'">
         <IonItem>
           <IonInput v-model="student.motherCpf" type="text" label="CPF da Mãe" label-placement="floating" />
         </IonItem>
       </IonCol>
 
-      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MAE' || student.responsibleType === 'AMBOS'">
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MÃE' || student.responsibleType === 'AMBOS'">
         <IonItem>
           <IonInput v-model="student.motherPhone" type="text" label="Telefone da Mãe" label-placement="floating" />
         </IonItem>
       </IonCol>
 
-      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MAE' || student.responsibleType === 'AMBOS'">
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MÃE' || student.responsibleType === 'AMBOS'">
         <IonItem>
           <IonInput v-model="student.motherEmail" type="email" label="E-Mail da Mãe" label-placement="floating" />
         </IonItem>

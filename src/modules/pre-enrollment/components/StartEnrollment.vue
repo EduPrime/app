@@ -15,6 +15,7 @@ import selectSchoolSlider from '../components/SelectSchoolSlider.vue'
 import selectSeriesSlider from '../components/SelectSeriesSlider.vue'
 import PreEnrollmentService from '../services/PreEnrollmentService'
 import InstitutionService from '../services/InstitutionService'
+import { status } from '@prisma/client'
 
 interface Props {
   searchbox: string
@@ -54,7 +55,7 @@ const preEnrollment = ref({
   tenantId: null,
   deletedAt: null,
   updatedBy: null,
-  status: null,
+  status: status.ACTIVE,
   situation: null,
 })
 watch(selectedSchool, (value) => {
