@@ -16,18 +16,17 @@ import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
 import { DateTime } from 'luxon'
 import moment from 'moment'
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { computed, defineEmits, ref, defineProps, type Ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, ref, type Ref, watch } from 'vue'
 
 import 'swiper/css'
 
 // @TODO: Quando possível implementar a prop feriados para receber o valor de forma dinamica e aposentar a variável ref() events
-// 
+//
 // interface Props {
 //   feriados: { date: string; type: string; title: string }[]
 // }
 
 // const props = defineProps<Props>()
-
 
 const emits = defineEmits(['update:modelValue'])
 
@@ -41,6 +40,7 @@ const selectedDate = ref(moment())
 const events = ref([
   { date: '2024-06-01', type: 'holiday', title: 'Holiday' },
   { date: '2024-06-05', type: 'event', title: 'Event' },
+  { date: '2025-02-04', type: 'holiday', title: 'Carnaval' },
   { date: '2024-06-08', type: 'disabled', title: 'Event' },
   { date: '2024-06-10', type: 'event', title: 'Event' },
   { date: '2024-06-25', type: 'disabled', title: 'Event' },
@@ -172,7 +172,7 @@ function handleSlideChange(event: any) {
   }
 }
 function onSwiper(swiper: any) {
-  console.log(swiper)
+  // console.log(swiper)
   getSwiper.value = swiper
 }
 function checkNextSlide(swiper: any) {
@@ -226,7 +226,7 @@ watch(selectedDate, (newValue: any) => {
       dayEvents: eventsForSelectedDate.value,
     })
   }
-})
+}, { immediate: true })
 </script>
 
 <template>
@@ -275,9 +275,12 @@ watch(selectedDate, (newValue: any) => {
             >
               <SwiperSlide v-for="(week, index) in weeksInMonth" :key="index">
                 <div class="date-selector">
-                  <div v-for="(day, i) in week" :key="day.date.format('YYYY-MM-DD')" :style="day.weekday !== 'SUN' ? '' : 'display: none;'" class="day-chip">
+                  <div v-for="(day, i) in week" :key="day.date.format('YYYY-MM-DD')" class="day-chip">
                     <!-- valor padrão de disabled :disabled="isDateDisabled(day.date)" shape="rounded" -->
+                    <!-- :style="day.weekday !== 'SUN' ? '' : 'display: none;'" -->
                     <IonChip
+                      class="ion-no-padding"
+                      style="padding: 10px;"
                       :disabled="day.weekday === 'SAT' || isDateDisabled(day.date)"
                       :style="i === 0 ? 'margin-left: 10px;' : undefined"
                       :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
@@ -319,9 +322,9 @@ ion-chip {
 }
 
 .day-name {
-  width: 29px;
+  width: 24px;
     margin-top: 20px;
-    font-size: 13px;
+    font-size: 10px;
     font-weight: lighter;
     margin-bottom: 12px;
 }
