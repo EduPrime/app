@@ -64,7 +64,7 @@ export default class PreEnrollmentService extends BaseService<PreEnrollment> {
   }
 
   async insertPreEnrollment(
-    preEnrollmentData: PreEnrollment,
+    preEnrollmentData: any,
   ) {
     try {
       if (preEnrollmentData.id === '') {

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonItem, IonText } from '@ionic/vue'
 import { computed, ref, watch } from 'vue'
-import { situationType } from '@prisma/client'
+//import type { situationType } from '@prisma/client'
 
 import StudentService from '../services/StudentService'
 
@@ -9,6 +9,7 @@ interface Props {
   query: string
 }
 
+//const situations: situationType[] = ["PENDENTE" , "CURSANDO" , "APROVADO" , "APROVADO_PELO_CONSELHO" , "APROVADO_COM_DEPENDENCIA" , "REPROVADO" , "TRANSFERIDO" , "ABANDONO" , "FALECIDO"]
 const props = defineProps<Props>()
 const emits = defineEmits(['update:modelValue'])
 const query = computed(() => props.query)
@@ -38,10 +39,8 @@ watch(result, (value) => {
 <template>
   <IonCard v-if="result && result.student">
     <div style="display: flex;">
-      <img
-        src="../assets/images/default_user.png" width="70px" alt="" class="ion-padding-start ion-padding-top"
-        style="display: block; object-fit: contain; margin-top: auto; margin-bottom: auto;"
-      >
+      <img src="../assets/images/default_user.png" width="70px" alt="" class="ion-padding-start ion-padding-top"
+        style="display: block; object-fit: contain; margin-top: auto; margin-bottom: auto;">
       <IonCardHeader class="ion-padding-top">
         <IonCardTitle>
           <IonText color="primary">
@@ -86,13 +85,11 @@ watch(result, (value) => {
         <span style="display: flex; margin-left: auto">
           <IonCardSubtitle class="ion-padding-end">
             <IonText color="primary">
-              {{ result.situation === situationType.PENDENTE ? 'Em Analise' : 'Finalizado' }}
+              {{ result.situation === 'PENDENTE' ? 'Em Analise' : 'Finalizado' }}
             </IonText>
           </IonCardSubtitle>
-          <div
-            :style="result.situation === situationType.PENDENTE ? 'background-color: orange' : 'background-color: gray'"
-            style="height: 16px; width: 16px; border-radius: 100%; margin-top: auto; margin-bottom: auto;"
-          />
+          <div :style="result.situation === 'PENDENTE' ? 'background-color: orange' : 'background-color: gray'"
+            style="height: 16px; width: 16px; border-radius: 100%; margin-top: auto; margin-bottom: auto;" />
         </span>
       </IonItem>
     </IonCardContent>
@@ -104,6 +101,7 @@ watch(result, (value) => {
       <IonCardSubtitle>Não foi possível encontrar cadastro {{ props.query ? `${props.query}` : '' }}</IonCardSubtitle>
     </IonCardHeader>
 
-    <IonCardContent> Verifique se o código foi digitado corretamente ou selecione uma das opções abaixo </IonCardContent>
+    <IonCardContent> Verifique se o código foi digitado corretamente ou selecione uma das opções abaixo
+    </IonCardContent>
   </IonCard>
 </template>
