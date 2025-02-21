@@ -34,7 +34,7 @@ const emits = defineEmits(['update:modelValue'])
 
 const scheduleService = new ScheduleService()
 const validDays = ref()
-const pulseClass = ref('')
+const pulseAtEnd = ref('')
 
 const getSwiper: Ref<any> = ref(null)
 const currentDate = ref(moment())
@@ -121,6 +121,7 @@ function prevMonth() {
   else {
     getSwiper.value.slidePrev()
   }
+  monthYearValue.value = monthYear.value
 }
 
 function nextMonth() {
@@ -132,6 +133,7 @@ function nextMonth() {
   else {
     getSwiper.value.slideNext()
   }
+  monthYearValue.value = monthYear.value
 }
 
 function selectDate(date: Moment) {
@@ -247,9 +249,9 @@ watch(monthYearValue, (newValue: any, oldValue: any) => {
 })
 
 function pulse() {
-  pulseClass.value = 'pulseButton'
+  pulseAtEnd.value = 'pulseButton'
   setTimeout(() => {
-    pulseClass.value = ''
+    pulseAtEnd.value = ''
 
     // Nome da classe que você deseja adicionar
   }, 2000) // 2000 milissegundos = 2 segundos de delay
@@ -305,7 +307,7 @@ watch(() => props.teacherId, async (newValue: any) => {
               <IonButton color="primary" class="navigation-btn" :style="`background-color:  ${hexToRgb(colorStyle.primary, '0.1')};`" @click="prevMonth">
                 <IonIcon slot="icon-only" :icon="arrowBackOutline" />
               </IonButton>
-              <IonButton color="primary" class="navigation-btn" :class="pulseClass" style="margin-left: 10px;" :style="`background-color:  ${hexToRgb(colorStyle.primary, pulseClass ? '0.5' : '0.1')};`" @click="nextMonth">
+              <IonButton color="primary" class="navigation-btn" :class="pulseAtEnd" style="margin-left: 10px;" :style="`background-color:  ${hexToRgb(colorStyle.primary, pulseAtEnd ? '0.5' : '0.1')};`" @click="nextMonth">
                 <IonIcon slot="icon-only" :icon="arrowForwardOutline" />
               </IonButton>
             </IonButtons>
