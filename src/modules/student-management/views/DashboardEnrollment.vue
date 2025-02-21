@@ -9,7 +9,6 @@ import SchoolService from '../services/SchoolService'
 import { useRouter } from 'vue-router'
 import EnrollmentService from '../services/EnrollmentService'
 import type { Enrollment } from '@prisma/client'
-import { status, situationType } from '@prisma/client'
 import StudentService from '../services/StudentService'
 
 
@@ -175,7 +174,7 @@ function getTurno(turno: string) {
 
 async function lastStepEnrollment() {
   const enrollmentData = {
-    id: self.crypto.randomUUID(), // Add appropriate value
+    id: self.crypto.randomUUID(),
     institutionId: selectedStudents.value[0].institutionId,
     schoolId: selectedStudents.value[0].schoolId,
     seriesId: selectedStudents.value[0].seriesId,
@@ -184,19 +183,19 @@ async function lastStepEnrollment() {
     courseId: selectedStudents.value[0].courseId,
     name: selectedStudents.value[0].name,
     dateEnrollment: new Date(),
-    situation: situationType.CURSANDO,
+    situation: "CURSANDO",
     enrollmentCode: selectedStudents.value[0].code.replace('pre-', ''),
-    createdAt: null,
+    createdAt: new Date(),
     deletedAt: null,
     updatedAt: null,
     updatedBy: null,
     tenantId: null,
     observations: null,
-    status: status.ACTIVE,
-    preenrollmentId: null,
+    status: "ACTIVE",
+    preenrollmentId: selectedStudents.value[0].id,
   }
-  await enrollmentService.create(enrollmentData)
-  await preEnrollmentService.update(selectedStudents.value[0].id, { situation: situationType.CURSANDO })
+  await enrollmentService.createEnrollment(enrollmentData)
+  await preEnrollmentService.update(selectedStudents.value[0].id, { situation: "CURSANDO" })
   await studentService.update(selectedStudents.value[0].studentId, { schoolId: selectedStudents.value[0].schoolId })
   loadEnrollment()
 
