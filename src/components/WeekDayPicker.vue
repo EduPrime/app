@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import type { Moment } from 'moment'
 import { hexToRgb } from '@/utils/hex-to-rgb'
-
 import {
   IonButton,
   IonButtons,
@@ -11,24 +10,31 @@ import {
   IonModal,
   IonText,
 } from '@ionic/vue'
-import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
 
+import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
 import { DateTime } from 'luxon'
+
 import moment from 'moment'
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { computed, defineEmits, defineProps, ref, type Ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, onMounted, ref, type Ref, watch } from 'vue'
+import ScheduleService from '../services/ScheduleService'
 
 import 'swiper/css'
 
 // @TODO: Quando possível implementar a prop feriados para receber o valor de forma dinamica e aposentar a variável ref() events
 //
-// interface Props {
-//   feriados: { date: string; type: string; title: string }[]
-// }
+interface Props {
+  // feriados: { date: string; type: string; title: string }[]
+  teacherId: string
+}
 
-// const props = defineProps<Props>()
+const props = defineProps<Props>()
 
 const emits = defineEmits(['update:modelValue'])
+
+const scheduleService = new ScheduleService()
+const validDays = ref()
+const pulseClass = ref('')
 
 const getSwiper: Ref<any> = ref(null)
 const currentDate = ref(moment())
@@ -66,6 +72,23 @@ const colorStyle = ref({
   secondary: getComputedStyle(document.documentElement).getPropertyValue('--ion-color-secondary').trim(),
   tertiary: getComputedStyle(document.documentElement).getPropertyValue('--ion-color-tertiary').trim(),
 })
+
+async function getValidDaysInScheduleService() {
+  try {
+    const data = await scheduleService.getSchedule(props.teacherId)
+
+    // Passa um map nas informações vindas de getSchedule e retorna apenas os dias da semana
+    // validDays.value = data.map((day: any) => {
+    //   return day.weekday
+    // })
+    return data
+    // console.log('Dados carregados loadDataSchedule:', data)
+  }
+  catch (error) {
+    console.error('Erro ao carregar os dados:', error)
+  }
+}
+
 // Função para atualizar o valor de mês e ano selecionado
 function updateDate(event: Event | any) {
   monthYearValue.value = event.detail.value
@@ -138,11 +161,13 @@ function getColorForDate(date: Moment) {
   }
 }
 
-function isDateDisabled(date: Moment) {
-  const formattedDate = date.format('YYYY-MM-DD')
-  const event = events.value.find(event => event.date === formattedDate)
-  return event?.type === 'disabled'
-}
+// Metodo para lidar com datas desabilitadas
+
+// function isDateDisabled(date: Moment) {
+//   const formattedDate = date.format('YYYY-MM-DD')
+//   const event = events.value.find(event => event.date === formattedDate)
+//   return event?.type === 'disabled'
+// }
 
 //  @TODO: Atenção, estudar melhor o uso desta função posteriormente
 
@@ -175,11 +200,13 @@ function onSwiper(swiper: any) {
   // console.log(swiper)
   getSwiper.value = swiper
 }
-function checkNextSlide(swiper: any) {
-  if (swiper.isEnd) {
-    nextMonth()
-  }
-}
+
+// Era usado para mudar o mês quando chegava ao vim do slide ( clicando )
+// function checkNextSlide(swiper: any) {
+//   if (swiper.isEnd) {
+//     nextMonth()
+//   }
+// }
 
 function translateDay(day: string) {
   switch (day) {
@@ -219,12 +246,27 @@ watch(monthYearValue, (newValue: any, oldValue: any) => {
   }
 })
 
+function pulse() {
+  pulseClass.value = 'pulseButton'
+  setTimeout(() => {
+    pulseClass.value = ''
+
+    // Nome da classe que você deseja adicionar
+  }, 2000) // 2000 milissegundos = 2 segundos de delay
+}
+
 watch(selectedDate, (newValue: any) => {
   if (newValue) {
     emits('update:modelValue', {
       selectedDate: newValue.format('YYYY-MM-DD'),
       dayEvents: eventsForSelectedDate.value,
     })
+  }
+}, { immediate: true })
+
+watch(() => props.teacherId, async (newValue: any) => {
+  if (newValue) {
+    validDays.value = await getValidDaysInScheduleService()
   }
 }, { immediate: true })
 </script>
@@ -263,15 +305,19 @@ watch(selectedDate, (newValue: any) => {
               <IonButton color="primary" class="navigation-btn" :style="`background-color:  ${hexToRgb(colorStyle.primary, '0.1')};`" @click="prevMonth">
                 <IonIcon slot="icon-only" :icon="arrowBackOutline" />
               </IonButton>
-              <IonButton color="primary" class="navigation-btn" style="margin-left: 10px;" :style="`background-color:  ${hexToRgb(colorStyle.primary, '0.1')};`" @click="nextMonth">
+              <IonButton color="primary" class="navigation-btn" :class="pulseClass" style="margin-left: 10px;" :style="`background-color:  ${hexToRgb(colorStyle.primary, pulseClass ? '0.5' : '0.1')};`" @click="nextMonth">
                 <IonIcon slot="icon-only" :icon="arrowForwardOutline" />
               </IonButton>
             </IonButtons>
           </ion-col>
           <ion-col size="12">
+            <!-- isso fazia com que quando clicasse em páginas do slide com menos de 7 itens scrollar automático
+             porem não registrava o dia que clicou ( estudar maneira de trocar o array do mês ao tentar scrollar para o lado )
+              @touch-end="(swiper: any) => checkNextSlide(swiper)" -->
             <Swiper
               :options="slideOpts" :slides-per-view="1" :space-between="8" @ion-slide-will-change="handleSlideChange"
-              @swiper="onSwiper" @touch-end="(swiper: any) => checkNextSlide(swiper)"
+              @swiper="onSwiper"
+              @reach-end="() => pulse()"
             >
               <SwiperSlide v-for="(week, index) in weeksInMonth" :key="index">
                 <div class="date-selector">
@@ -281,7 +327,7 @@ watch(selectedDate, (newValue: any) => {
                     <IonChip
                       class="ion-no-padding"
                       style="padding: 10px;"
-                      :disabled="day.weekday === 'SAT' || isDateDisabled(day.date)"
+                      :disabled="validDays && validDays.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0"
                       :style="i === 0 ? 'margin-left: 10px;' : undefined"
                       :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
                     >
@@ -306,6 +352,21 @@ watch(selectedDate, (newValue: any) => {
 </template>
 
 <style scoped>
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulseButton {
+  animation: pulse 1s ease-in-out infinite; /* Tempo de 1 segundo e animação contínua */
+}
 .date-selector {
     display: flex;
     justify-content: flex-start;
