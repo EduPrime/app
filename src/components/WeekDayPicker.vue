@@ -25,7 +25,7 @@ import 'swiper/css'
 
 const emits = defineEmits(['update:modelValue'])
 
-const getSwiper: Ref<any> = ref(null)
+const getSwiper:any = ref(null)
 const currentDate = ref(moment())
 const monthYear = ref(new Date()
   .toISOString())
@@ -55,7 +55,7 @@ const modal = ref()
 const monthYearValue = ref(`${new Date().toISOString().slice(0, 8)}01`)
 
 // Função para atualizar o valor de mês e ano selecionado
-function updateDate(event) {
+function updateDate(event: any) {
   monthYearValue.value = event.detail.value
 }
 
