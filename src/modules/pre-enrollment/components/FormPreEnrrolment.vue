@@ -1,23 +1,16 @@
 <script setup lang="ts">
 import { IonAlert, IonButton, IonCol, IonGrid, IonIcon, IonInput, IonItem, IonRow, IonSelect, IonSelectOption } from '@ionic/vue'
-// import GedService from '@/modules/ged/services/GedService'
-// import FileUpload from '@/modules/ged/components/FileUpload.vue'
-
-// import type { Tables } from '@/types/database.types'
-
 import { checkmarkCircleOutline } from 'ionicons/icons'
 import { onMounted, ref, watch } from 'vue'
 import StudentService from '../services/StudentService'
-
-// const gedService = new GedService()
-// const documentFiles = ref<Tables<'document'>[]>([])
+import PreEnrollmentService from '../services/PreEnrollmentService'
 
 interface Props {
   pageWidth: string
 }
 
 const props = defineProps<Props>()
-const emits = defineEmits(['update:modelValue', 'preference', 'postStatus'])
+const emits = defineEmits(['update:modelValue', 'preference', 'postStatus', 'studentId'])
 
 const next = ref(false)
 const incompleteStep = ref(false)
@@ -25,85 +18,104 @@ const adicionalRequired = ref(false)
 const duplicated = ref(false)
 const finished = ref(false)
 
-const codPreEnrollment = ref()
 const shiftPreference = ref()
+const preenrollmentcode = ref(`PRE-${generateRandomCode()}`)
 
+const fileName = ref('')
 const result = ref()
 const studentId = ref()
 const someProblems = ref(false)
 
+const studentService = new StudentService()
+const preenrollmentService = new PreEnrollmentService()
+const studentList = ref()
+
 const docModel = ref('')
-// const status = ['ACTIVE', 'INACTIVE', 'GRADUATED', 'SUSPENDED', 'TRANSFERRED']
 const docs = [{ title: 'RG', value: 'rg' }, { title: 'CPF', value: 'cpf' }, { title: 'Certidão de Nascimento', value: 'certidao' }]
 const states = [
-  'AC', // Acre
-  'AL', // Alagoas
-  'AP', // Amapá
-  'AM', // Amazonas
-  'BA', // Bahia
-  'CE', // Ceará
-  'DF', // Distrito Federal
-  'ES', // Espírito Santo
-  'GO', // Goiás
-  'MA', // Maranhão
-  'MT', // Mato Grosso
-  'MS', // Mato Grosso do Sul
-  'MG', // Minas Gerais
-  'PA', // Pará
-  'PB', // Paraíba
-  'PR', // Paraná
-  'PE', // Pernambuco
-  'PI', // Piauí
-  'RJ', // Rio de Janeiro
-  'RN', // Rio Grande do Norte
-  'RS', // Rio Grande do Sul
-  'RO', // Rondônia
-  'RR', // Roraima
-  'SC', // Santa Catarina
-  'SP', // São Paulo
-  'SE', // Sergipe
-  'TO', // Tocantins
+  'AC',
+  'AL',
+  'AP',
+  'AM',
+  'BA',
+  'CE',
+  'DF',
+  'ES',
+  'GO',
+  'MA',
+  'MT',
+  'MS',
+  'MG',
+  'PA',
+  'PB',
+  'PR',
+  'PE',
+  'PI',
+  'RJ',
+  'RN',
+  'RS',
+  'RO',
+  'RR',
+  'SC',
+  'SP',
+  'SE',
+  'TO',
 ]
 const genders = ['M', 'F']
 const responsibles = ['Pai', 'Mãe', 'Ambos', 'Outro']
 const residenceZone = ['Urbana', 'Rural']
-// const races = ['Branca', 'Preta', 'Parda', 'Amarela', 'Indígena', 'Não declarada']
-// const deficiencies = ['Visual', 'Auditiva', 'Física', 'Intelectual', 'Mental', 'Múltipla', 'Outros', 'Não possui']
 
-const student = ref(
-  {
-    name: undefined as string | undefined,
-    birthdate: undefined as string | number | undefined,
-    phone: undefined as string | number | undefined,
-    email: undefined as string | undefined,
-    city: undefined as string | undefined,
-    citystate: undefined as string | undefined,
-    address: undefined as string | undefined,
-    postalCode: undefined as string | number | undefined,
-    // deficiency: undefined as string | undefined,
-    // ethnicity: undefined as string | undefined,
-    gender: undefined as string | undefined,
-    residenceZone: undefined as string | undefined,
-    responsibleType: undefined as string | undefined,
-    birthCertificate: undefined as string | number | undefined,
-    rgNumber: undefined as string | number | undefined,
-    cpf: undefined as string | number | undefined,
-  },
-)
+const student = ref({
+  name: undefined as string | undefined,
+  birthdate: undefined as string | number | undefined,
+  phone: undefined as string | number | undefined,
+  email: undefined as string | undefined,
+  city: undefined as string | undefined,
+  address: undefined as string | undefined,
+  postalCode: undefined as string | number | undefined,
+  gender: undefined as string | undefined,
+  residenceZone: undefined as string | undefined,
+  responsibleType: undefined as string | undefined,
+  birthCertificate: undefined as string | number | undefined,
+  rgNumber: undefined as string | number | undefined,
+  cpf: undefined as string | number | undefined,
+  photo: undefined as Uint8Array | undefined,
+  disability: undefined as string | undefined,
+  neighborhood: undefined as string | undefined,
+  fatherName: undefined as string | undefined,
+  fatherCpf: undefined as string | number | undefined,
+  fatherPhone: undefined as string | number | undefined,
+  fatherEmail: undefined as string | undefined,
+  motherName: undefined as string | undefined,
+  motherCpf: undefined as string | number | undefined,
+  motherPhone: undefined as string | number | undefined,
+  motherEmail: undefined as string | undefined,
+  rgIssuer: undefined as string | undefined,
+  rgState: undefined as string | undefined,
+  rgIssueDate: undefined as string | undefined,
+  placeOfBirth: undefined as string | undefined,
+  guardianName: undefined as string | undefined,
+  guardianPhone: undefined as string | number | undefined,
+  guardianCpf: undefined as string | number | undefined,
+  guardianEmail: undefined as string | undefined,
 
-const postgrest = new StudentService()
-const studentList = ref()
+})
+
+
+
+
 
 watch(result, async (value) => {
   finished.value = false
 
   if (value && value.status === 201) {
+    console.log('value.data', value.data)
     studentId.value = value.data.at(0).id
     finished.value = true
   }
   else if (value && value.status === 409) {
     finished.value = false
-    codPreEnrollment.value = `PRE-${generateRandomCode()}`
+    preenrollmentcode.value = `PRE-${generateRandomCode()}`
     if (value.error.code === '23505') {
       emits('postStatus', {
         loading: false,
@@ -111,32 +123,37 @@ watch(result, async (value) => {
       duplicated.value = true
     }
 
-    studentId.value = await postgrest.getStudentId(student.value)
+    studentId.value = await studentService.getStudentId(student.value)
   }
   else {
-    someProblems.value = true // eu adicionei um valor ( true ) estava sem modificação de valor
+    someProblems.value = true
     finished.value = false
   }
 })
 
 watch(studentId, (value) => {
   if (value) {
-    emits('update:modelValue', value)
+    console.log('studentId.value', value)
+    emits('studentId', value)
   }
 }, { immediate: true })
 
 watch(shiftPreference, (value) => {
   if (value) {
+    console.log('shiftPreference.value', value)
     emits('preference', value)
   }
 }, { immediate: true })
 
 async function submitForm() {
+  console.log('student.value', student.value)
   if (student.value.name && student.value.birthdate && student.value.phone && (student.value.cpf || student.value.rgNumber || student.value.birthCertificate)) {
     result.value = await postStudent(student.value)
     if (result.value && result.value.status === 201) {
+      emits('studentId', result.value.data.at(0).id)
       emits('postStatus', { loading: true })
     }
+    next.value = true
     adicionalRequired.value = false
   }
   else {
@@ -146,24 +163,14 @@ async function submitForm() {
   }
 }
 
-// function handleUploadSuccess(file: any) {
-//   if (file && file.storage_path) {
-//     gedService.create(file)
-//     documentFiles.value.push(file)
-//   }
-// }
-
-// async function loadDocumentFiles() {
-//   documentFiles.value = await gedService.getAll() as Tables<'document'>[]
-// }
-
 function generateRandomCode(): string {
   return Math.random().toString().slice(2, 10).padStart(8, '0')
 }
 
 function nextStep() {
   if (student.value.name && student.value.birthdate) {
-    return next.value = true
+    // return next.value = true
+    submitForm()
   }
   else {
     incompleteStep.value = true
@@ -172,8 +179,7 @@ function nextStep() {
 
 async function postStudent(studentObject: any) {
   try {
-    const data = await postgrest.insertStudent(studentObject)
-
+    const data = await studentService.insertStudent(studentObject)
     return data
   }
   catch (error) {
@@ -183,16 +189,43 @@ async function postStudent(studentObject: any) {
 
 function closeDialog() {
   duplicated.value = false
-
   return emits('postStatus', {
     loading: true,
   })
 }
 
 onMounted(async () => {
-  studentList.value = await postgrest.getStudents()
-  // await loadDocumentFiles()
+  studentList.value = await studentService.getStudents()
 })
+const disabilities = [
+  'TRANSTORNO_DO_ESPECTRO_AUTISTA',
+  'TRANSTORNO_DESINTEGRATIVO_DA_INFANCIA_PSICOSE_INFANTIL',
+  'TDAH',
+  'SINDROME_DE_RETT',
+  'SINDROME_DE_ASPERGER',
+  'SURDOCEGUEIRA',
+  'SURDEZ',
+  'DEFICIENCIA_MULTIPLA',
+  'DEFICIENCIA_MENTAL',
+  'DEFICIENCIA_INTELECTUAL',
+  'DEFICIENCIA_FISICA',
+  'DEFICIENCIA_AUDITIVA',
+  'CEGUEIRA',
+  'BAIXA_VISAO',
+  'AUTISMO_CLASSICO',
+  'ALTAS_HABILIDADES_SUPERDOTACAO',
+]
+const handleFileChange = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  // Converter a imagem para ArrayBuffer
+  const arrayBuffer = await file.arrayBuffer()
+  student.value.photo = new Uint8Array(arrayBuffer)
+  fileName.value = file.name
+}
+
 </script>
 
 <template>
@@ -206,40 +239,9 @@ onMounted(async () => {
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonSelect v-model="student.gender" label="Genero de nascimento" label-placement="floating">
+          <IonSelect v-model="student.gender" label="Sexo" label-placement="floating">
             <IonSelectOption v-for="gender in genders" :key="gender" :value="gender">
-              {{ gender }}
-            </IonSelectOption>
-          </IonSelect>
-        </IonItem>
-      </IonCol>
-
-      <!-- <IonCol size="12" size-md="6">
-        <IonItem>
-          <IonSelect v-model="student.ethnicity" label="Etnia" label-placement="floating">
-            <IonSelectOption v-for="race in races" :key="race" :value="race">
-              {{ race }}
-            </IonSelectOption>
-          </IonSelect>
-        </IonItem>
-      </IonCol> -->
-
-      <!-- <IonCol size="12" size-md="6">
-        <IonItem>
-          <IonSelect v-model="student.deficiency" label="Necessidade especial" label-placement="floating">
-            <IonSelectOption v-for="deficiency in deficiencies" :key="deficiency" :value="deficiency">
-              {{ deficiency
-              }}
-            </IonSelectOption>
-          </IonSelect>
-        </IonItem>
-      </IonCol> -->
-
-      <IonCol size="12" size-md="6">
-        <IonItem>
-          <IonSelect v-model="student.responsibleType" label="Responsável" label-placement="floating">
-            <IonSelectOption v-for="r in responsibles" :key="r" :value="r">
-              {{ r }}
+              {{ gender === 'M' ? 'Masculino' : 'Feminino' }}
             </IonSelectOption>
           </IonSelect>
         </IonItem>
@@ -254,85 +256,29 @@ onMounted(async () => {
       <IonCol size="12" size-md="6">
         <IonItem>
           <IonSelect v-model="shiftPreference" label="Preferência de turno" label-placement="floating">
-            <IonSelectOption value="manha">
+            <IonSelectOption value="MORNING">
               Manhã
             </IonSelectOption>
-            <IonSelectOption value="tarde">
+            <IonSelectOption value="AFTERNOON">
               Tarde
             </IonSelectOption>
-            <IonSelectOption value="noite">
+            <IonSelectOption value="EVENING">
               Noite
             </IonSelectOption>
           </IonSelect>
         </IonItem>
       </IonCol>
 
-      <!-- <ion-item>
-      <div >
-        <div class="file-upload-container">
-          <FileUpload
-            :bucket-name="'ged'"
-            :max-file-size="960"
-            @upload-success="handleUploadSuccess"
-          />
-        </div>
-        <FilesList :files="documentFiles" />
-      </div>
-    </ion-item> -->
-
-      <IonCol>
-        <IonButton expand="full" color="tertiary" @click="nextStep()">
-          Continuar
-        </IonButton>
-      </IonCol>
-
-      <!-- <ion-col size="12" size-md="6">
-        <ion-item>
-          <ion-select label="Documentos Selecionados" label-placement="floating">
-            <ion-select-option value="rg">RG</ion-select-option>
-            <ion-select-option value="cpf">CPF</ion-select-option>
-            <ion-select-option value="certidao">Certidão de Nascimento</ion-select-option>
-          </ion-select>
-        </ion-item>
-
-      </ion-col> -->
-    </IonRow>
-
-    <IonRow v-else>
-      <IonCol size="12" :size-md="docModel ? '6' : '12'">
+      <IonCol size="12" size-md="6">
         <IonItem>
-          <IonSelect v-model="docModel" label="Documento Selecionado" label-placement="floating">
-            <IonSelectOption v-for="doc in docs" :key="doc.value" :value="doc.value">
-              {{ doc.title
-              }}
-            </IonSelectOption>
-          </IonSelect>
-        </IonItem>
-      </IonCol>
-
-      <IonCol v-if="docModel" size="12" size-md="6">
-        <IonItem>
-          <IonInput
-            v-if="docModel === 'cpf'" v-model="student.cpf" type="text" label="Numero do CPF"
-            label-placement="floating"
-          />
-          <IonInput
-            v-else-if="docModel === 'rg'" v-model="student.rgNumber" type="text" label="Numero do RG"
-            label-placement="floating"
-          />
-          <IonInput
-            v-else-if="docModel === 'certidao'" v-model="student.birthCertificate" type="text"
-            label="Certidão de Nascimento" label-placement="floating"
-          />
+          <label for="upPhoto">{{ fileName || "Foto 📷 " }}</label>
+          <input id="upPhoto" @change="handleFileChange" type="file" accept="image/*" hidden />
         </IonItem>
       </IonCol>
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonInput
-            v-model="student.phone" v-mask="'(##) #####-####'" type="text" label="Telefone"
-            label-placement="floating"
-          />
+          <IonInput v-model="student.phone" type="text" label="Telefone" label-placement="floating" />
         </IonItem>
       </IonCol>
 
@@ -344,32 +290,161 @@ onMounted(async () => {
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonInput
-            v-model="student.postalCode" v-mask="'#####-###'" type="text" label="CEP"
-            label-placement="floating"
-          />
+          <IonInput v-model="student.neighborhood" type="text" label="Bairro" label-placement="floating" />
         </IonItem>
       </IonCol>
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonSelect v-model="student.residenceZone" label="Zona Residencial" label-placement="floating">
-            <IonSelectOption v-for="zone in residenceZone" :key="zone" :value="zone">
+          <IonInput v-model="student.city" type="text" label="Cidade" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.address" type="text" label="Endereço" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.postalCode" type="text" label="CEP" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.cpf" type="text" label="CPF" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonSelect v-model="student.responsibleType" label="Responsável" label-placement="floating">
+            <IonSelectOption value="MÃE">
+              Mãe
+            </IonSelectOption>
+            <IonSelectOption value="PAI">
+              Pai
+            </IonSelectOption>
+            <IonSelectOption value="AMBOS">
+              Ambos
+            </IonSelectOption>
+            <IonSelectOption value="OUTRO">
+              Guardião
+            </IonSelectOption>
+          </IonSelect>
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'PAI' || student.responsibleType === 'AMBOS'">
+        <IonItem>
+          <IonInput v-model="student.fatherName" type="text" label="Nome do Pai" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'PAI' || student.responsibleType === 'AMBOS'">
+        <IonItem>
+          <IonInput v-model="student.fatherCpf" type="text" label="CPF do Pai" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'PAI' || student.responsibleType === 'AMBOS'">
+        <IonItem>
+          <IonInput v-model="student.fatherPhone" type="text" label="Telefone do Pai" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'PAI' || student.responsibleType === 'AMBOS'">
+        <IonItem>
+          <IonInput v-model="student.fatherEmail" type="email" label="E-Mail do Pai" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MÃE' || student.responsibleType === 'AMBOS'">
+        <IonItem>
+          <IonInput v-model="student.motherName" type="text" label="Nome da Mãe" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MÃE' || student.responsibleType === 'AMBOS'">
+        <IonItem>
+          <IonInput v-model="student.motherCpf" type="text" label="CPF da Mãe" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MÃE' || student.responsibleType === 'AMBOS'">
+        <IonItem>
+          <IonInput v-model="student.motherPhone" type="text" label="Telefone da Mãe" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'MÃE' || student.responsibleType === 'AMBOS'">
+        <IonItem>
+          <IonInput v-model="student.motherEmail" type="email" label="E-Mail da Mãe" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'OUTRO'">
+        <IonItem>
+          <IonInput v-model="student.guardianName" type="text" label="Nome do Guardião" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'OUTRO'">
+        <IonItem>
+          <IonInput v-model="student.guardianPhone" type="text" label="Telefone do Guardião"
+            label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'OUTRO'">
+        <IonItem>
+          <IonInput v-model="student.guardianCpf" type="text" label="CPF do Guardião" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6" v-if="student.responsibleType === 'OUTRO'">
+        <IonItem>
+          <IonInput v-model="student.guardianEmail" type="text" label="Email do Guardião" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonSelect v-model="student.residenceZone" label="Zona de Residência" label-placement="floating">
+            <IonSelectOption v-for="zone in residenceZone" :key="zone" :value="zone.toUpperCase()">
               {{ zone }}
             </IonSelectOption>
           </IonSelect>
         </IonItem>
       </IonCol>
 
-      <IonCol size="8" size-md="10">
+      <IonCol size="12" size-md="6">
         <IonItem>
-          <IonInput v-model="student.city" label="Cidade" label-placement="floating" />
+          <IonSelect v-model="student.disability" label="Deficiência" label-placement="floating">
+            <IonSelectOption v-for="disability in disabilities" :key="disability" :value="disability">
+              {{ disability.toLowerCase().replaceAll('_', ' ') }}
+            </IonSelectOption>
+          </IonSelect>
         </IonItem>
       </IonCol>
 
-      <IonCol size="4" size-md="2">
+      <IonCol size="12" size-md="6">
         <IonItem>
-          <IonSelect v-model="student.citystate" label="Estado" label-placement="floating">
+          <IonInput v-model="student.rgNumber" type="text" label="RG" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.rgIssueDate" type="date" label="Lançamento do RG" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonSelect v-model="student.rgState" label="Estado do RG" label-placement="floating">
             <IonSelectOption v-for="state in states" :key="state" :value="state">
               {{ state }}
             </IonSelectOption>
@@ -377,20 +452,38 @@ onMounted(async () => {
         </IonItem>
       </IonCol>
 
-      <IonCol size="12">
+      <IonCol size="12" size-md="6">
         <IonItem>
-          <IonInput v-model="student.address" label="Endereço" label-placement="floating" />
+          <IonInput v-model="student.rgIssuer" type="text" label="Emissor do RG" label-placement="floating" />
         </IonItem>
       </IonCol>
 
-      <IonCol size="12">
-        <IonButton expand="full" color="primary" @click="next = false">
-          Voltar
-        </IonButton>
-        <IonButton expand="full" color="tertiary" @click="submitForm">
-          Salvar
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonSelect v-model="student.placeOfBirth" label="Naturalidade" label-placement="floating">
+            <IonSelectOption v-for="state in states" :key="state" :value="state">
+              {{ state }}
+            </IonSelectOption>
+          </IonSelect>
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
+          <IonInput v-model="student.birthCertificate" type="text" label="Certidão de Nascimento"
+            label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol>
+        <IonButton expand="full" color="tertiary" @click="nextStep()">
+          Continuar
         </IonButton>
       </IonCol>
+    </IonRow>
+
+    <IonRow v-else>
+      <!-- Second step fields here -->
     </IonRow>
   </IonGrid>
 
@@ -403,24 +496,17 @@ onMounted(async () => {
           </ion-card-header>
           <ion-card-content>
             <p>Os dados do aluno foram salvos com sucesso.</p>
-            <p>Código de pré-matrícula: {{ codPreEnrollment }}</p>
             <div class="flex" style="min-height: 150px;">
-              <IonIcon
-                :icon="checkmarkCircleOutline" class="my-auto mx-auto"
-                style="font-size: 130px; color:lawngreen;"
-              />
+              <IonIcon :icon="checkmarkCircleOutline" class="my-auto mx-auto"
+                style="font-size: 130px; color:lawngreen;" />
             </div>
           </ion-card-content>
         </ion-card>
       </IonCol>
     </IonRow>
   </IonGrid>
-  <!-- <pre>
-  incompleteStep: {{ incompleteStep }}
-</pre> -->
 
-  <IonAlert
-    :is-open="duplicated" trigger="present-alert" header="Aluno já cadastrado"
+  <IonAlert :is-open="duplicated" trigger="present-alert" header="Aluno já cadastrado"
     sub-header="Desculpe mas este aluno já foi cadastrado anteriormente."
     message="Caso deseje você pode clicar em 'atualizar' para atualizar os dados que já foram cadastrados anteriormente."
     :buttons="[{
@@ -428,22 +514,17 @@ onMounted(async () => {
       handler: () => {
         console.info('Função (Atualizar cadastro) ainda não implementada')
       },
-    }, 'Continuar']" @did-dismiss="closeDialog()"
-  />
+    }, 'Continuar']" @did-dismiss="closeDialog()" />
 
-  <IonAlert
-    :is-open="someProblems" trigger="present-alert" header="Desculpe, ocorreu um erro ao salvar os dados"
+  <IonAlert :is-open="someProblems" trigger="present-alert" header="Desculpe, ocorreu um erro ao salvar os dados"
     sub-header="Erro ao salvar os dados do aluno"
     message="Por favor, recarregue a página ou tente novamente mais tarde." :buttons="['Fechar']"
-    @did-dismiss="someProblems = false"
-  />
+    @did-dismiss="someProblems = false" />
 
-  <IonAlert
-    :is-open="incompleteStep" trigger="present-alert" header="Preencha os campos obrigatórios para continuar"
+  <IonAlert :is-open="incompleteStep" trigger="present-alert" header="Preencha os campos obrigatórios para continuar"
     sub-header="Campos obrigatórios tem um asterisco (*)"
     :message="adicionalRequired ? `Preencha também Telefone e RG, CPF ou Certidão de Nascimento para efetuar a pré-matrícula` : `Os campos Nome e Data de Nascimento são obrigatórios`"
-    :buttons="['Fechar']" @did-dismiss="incompleteStep = false"
-  />
+    :buttons="['Fechar']" @did-dismiss="incompleteStep = false" />
 </template>
 
 <style scoped>

@@ -8,9 +8,17 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  noPadding: {
+    type: Boolean,
+    default: false,
+  },
   showDescription: {
     type: Boolean,
     default: false,
+  },
+  classes: {
+    type: String,
+    default: '',
   },
 })
 
@@ -61,17 +69,19 @@ watch(
         </IonToolbar>
       </IonHeader>
 
-      <div id="main-content-box" class="ion-margin">
+      <div id="main-content-box" :class="classes + noPadding ? '' : ' ion-padding'">
         <ion-row v-if="props.showDescription" class="ion-margin">
-          <ion-col style="background-color: #aa86ff; box-shadow: 5px 5px 0px 0px rgba(110, 68, 255, 0.4); border-radius: 3px;">
-            <IonNote class="ion-padding" style="color: #ffffff; display: flex; align-items: center; justify-content: center;">
+          <ion-col
+            style="background-color: #aa86ff; box-shadow: 5px 5px 0px 0px rgba(110, 68, 255, 0.4); border-radius: 3px;">
+            <IonNote class="ion-padding"
+              style="color: #ffffff; display: flex; align-items: center; justify-content: center;">
               <slot name="description" />
             </IonNote>
           </ion-col>
         </ion-row>
 
         <ion-row>
-          <ion-col>
+          <ion-col class="p-0">
             <slot />
           </ion-col>
         </ion-row>
@@ -91,11 +101,17 @@ ion-grid {
   display: flex;
   align-items: center;
 }
-ion-header.md{
+
+ion-header.md {
   box-shadow: 0 4px 8px rgba(var(--ion-color-dark-rgb), 0.1);
   /* border-bottom:1px solid  #0000001f */
 }
-ion-title{
+
+ion-title {
   font-weight: 800;
+}
+
+.p-0 {
+  padding: 0px;
 }
 </style>

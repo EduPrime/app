@@ -55,6 +55,7 @@ function groupCourses(courses: any[]): any[] {
 onMounted(async () => {
   gSeries.value = await postgrest.getSeries(props.course)
   boundledSeries.value = groupCourses(gSeries.value)
+  console.log('boundledSeries:', boundledSeries.value)
 })
 </script>
 
@@ -63,8 +64,9 @@ onMounted(async () => {
         @slideChange="onSlideChange" -->
   <div :style="pageWidth?.pageWidth > 992 ? 'max-width: 992px' : 'width: 100vw;'">
     <Swiper
-      :modules="modules" :slides-per-view="pageWidth?.pageWidth > 992 ? 2 : 1.4" :space-between="5"
+      :modules="modules" :slides-per-view="pageWidth?.pageWidth > 992 ? 1.4 : 1" :space-between="5"
       :scrollbar="{ draggable: true }"
+      style="width: 100vw"
     >
       <SwiperSlide v-for="series in boundledSeries" :key="series">
         <div>
@@ -76,7 +78,7 @@ onMounted(async () => {
             <IonCardHeader>
               <div class="flex" style="height: 90px;">
                 <span class="my-auto mx-auto" style="font-size: 22pt;">
-                  <IonText color="primary" :style="serie.name.length < 8 ? 'font-weight: 700;' : 'font-weight: 500;'">
+                  <IonText color="primary">
                     {{ serie.name }}
                   </IonText>
                 </span>
