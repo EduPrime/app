@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonItem, IonText } from '@ionic/vue'
 import { computed, ref, watch } from 'vue'
+import { situationType } from '@prisma/client'
 
 import StudentService from '../services/StudentService'
 
@@ -79,17 +80,17 @@ watch(result, (value) => {
       <IonItem>
         <div>
           <IonText color="primary">
-            <p>Situação da pré-matrícula</p>
+            <p>Situação da matrícula</p>
           </IonText>
         </div>
         <span style="display: flex; margin-left: auto">
           <IonCardSubtitle class="ion-padding-end">
             <IonText color="primary">
-              {{ result.status === 'ACTIVE' ? 'Em Analise' : 'Finalizado' }}
+              {{ result.situation === situationType.PENDENTE ? 'Em Analise' : 'Finalizado' }}
             </IonText>
           </IonCardSubtitle>
           <div
-            :style="result.status === 'ACTIVE' ? 'background-color: orange' : 'background-color: gray'"
+            :style="result.situation === situationType.PENDENTE ? 'background-color: orange' : 'background-color: gray'"
             style="height: 16px; width: 16px; border-radius: 100%; margin-top: auto; margin-bottom: auto;"
           />
         </span>

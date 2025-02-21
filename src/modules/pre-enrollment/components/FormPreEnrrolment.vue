@@ -241,7 +241,7 @@ const handleFileChange = async (event: Event) => {
         <IonItem>
           <IonSelect v-model="student.gender" label="Sexo" label-placement="floating">
             <IonSelectOption v-for="gender in genders" :key="gender" :value="gender">
-              {{ gender }}
+              {{ gender === 'M' ? 'Masculino' : 'Feminino' }}
             </IonSelectOption>
           </IonSelect>
         </IonItem>
@@ -432,13 +432,23 @@ const handleFileChange = async (event: Event) => {
 
       <IonCol size="12" size-md="6">
         <IonItem>
+          <IonInput v-model="student.rgNumber" type="text" label="RG" label-placement="floating" />
+        </IonItem>
+      </IonCol>
+
+      <IonCol size="12" size-md="6">
+        <IonItem>
           <IonInput v-model="student.rgIssueDate" type="date" label="Lançamento do RG" label-placement="floating" />
         </IonItem>
       </IonCol>
 
       <IonCol size="12" size-md="6">
         <IonItem>
-          <IonInput v-model="student.rgState" type="text" label="Estado do RG" label-placement="floating" />
+          <IonSelect v-model="student.rgState" label="Estado do RG" label-placement="floating">
+            <IonSelectOption v-for="state in states" :key="state" :value="state">
+              {{ state }}
+            </IonSelectOption>
+          </IonSelect>
         </IonItem>
       </IonCol>
 
@@ -486,7 +496,6 @@ const handleFileChange = async (event: Event) => {
           </ion-card-header>
           <ion-card-content>
             <p>Os dados do aluno foram salvos com sucesso.</p>
-            <p>Código de pré-matrícula: {{ preenrollmentcode }}</p>
             <div class="flex" style="min-height: 150px;">
               <IonIcon :icon="checkmarkCircleOutline" class="my-auto mx-auto"
                 style="font-size: 130px; color:lawngreen;" />

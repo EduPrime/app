@@ -15,7 +15,7 @@ import selectSchoolSlider from '../components/SelectSchoolSlider.vue'
 import selectSeriesSlider from '../components/SelectSeriesSlider.vue'
 import PreEnrollmentService from '../services/PreEnrollmentService'
 import InstitutionService from '../services/InstitutionService'
-import { status } from '@prisma/client'
+import { status, situationType } from '@prisma/client'
 
 interface Props {
   searchbox: string
@@ -56,7 +56,7 @@ const preEnrollment = ref({
   deletedAt: null,
   updatedBy: null,
   status: status.ACTIVE,
-  situation: null,
+  situation: situationType.PENDENTE,
 })
 watch(selectedSchool, (value) => {
   if (value) {
@@ -263,15 +263,8 @@ onMounted(async () => {
                   </IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent>
-                  <p>Os dados do aluno foram salvos com sucesso! Salve o código de pré-matrícula caso deseje acompanhar a situação.</p>
+                  <p>Os dados do aluno foram salvos com sucesso! Digite o CPF do responsável caso deseje acompanhar a situação.</p>
 
-                  <p style="font-size: 14pt;" class="ion-padding-top">
-                    Código da pré-matrícula: <span style="font-weight: 800;">
-
-                      <!-- {{ insertedPreEnrollment.data.at(0).preenrollmentcode }} -->
-                      {{ insertedPreEnrollment?.data }}
-                    </span>
-                  </p>
                   <div class="flex" style="min-height: 150px;">
                     <IonIcon
                       :icon="checkmarkCircleOutline" class="my-auto mx-auto"

@@ -105,7 +105,7 @@ export default class StudentService extends BaseService<TabelaType> {
         course: undefined as any,
         school: undefined as any,
         series: undefined as any,
-        status: undefined as any,
+        situation: undefined as any,
       })
 
       const { data } = await this.client
@@ -113,7 +113,7 @@ export default class StudentService extends BaseService<TabelaType> {
         .select(`
           name,
           preenrollment:preenrollment(
-            status, 
+            situation, 
             preenrollmentcode, 
             schoolId,
             courseId,
@@ -128,7 +128,7 @@ export default class StudentService extends BaseService<TabelaType> {
         information.value.course = await this.genericGet('course', data[0].preenrollment[0].courseId)
         information.value.school = await this.genericGet('school', data[0].preenrollment[0].schoolId)
         information.value.series = await this.genericGet('series', data[0].preenrollment[0].seriesId)
-        information.value.status = data[0].preenrollment[0].status
+        information.value.situation = data[0].preenrollment[0].situation
       }
 
       return information.value;
