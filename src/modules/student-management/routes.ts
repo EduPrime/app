@@ -21,7 +21,7 @@ const routes = [
       icon: folder,
       name: 'Alunos',
       order: 1,
-      requiredRole: ['public', 'admin'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -33,7 +33,7 @@ const routes = [
       icon: folder,
       name: 'Cadastrar Aluno',
       order: 2,
-      requiredRole: ['public', 'admin'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -45,7 +45,7 @@ const routes = [
       icon: folder,
       name: 'Editar Aluno',
       order: 3,
-      requiredRole: ['public', 'admin'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -57,8 +57,8 @@ const routes = [
       moduleIcon: create,
       icon: create,
       name: 'Matrículas',
-      order: 4,
-      requiredRole: ['public'],
+      order: 2,
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -69,8 +69,8 @@ const routes = [
       moduleName: 'Student',
       icon: create,
       name: 'Matricular Aluno',
-      order: 5,
-      requiredRole: ['public', 'admin'],
+      order: 3,
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -81,8 +81,8 @@ const routes = [
       moduleName: 'Student',
       icon: create,
       name: 'Editar Matrícula',
-      order: 6,
-      requiredRole: ['public', 'admin'],
+      order: 4,
+      requiredRole: ['ADMIN'],
     },
   },
   /*   {
@@ -106,8 +106,8 @@ const routes = [
       moduleIcon: documentText,
       icon: documentText,
       name: 'Pré-matrícula',
-      order: 7,
-      requiredRole: ['public', 'admin'],
+      order: 5,
+      requiredRole: ['ADMIN'],
     },
   },
   /*   {
@@ -130,8 +130,8 @@ const routes = [
       moduleName: 'Student',
       icon: documentText,
       name: 'Editar Pré-matrícula',
-      order: 8,
-      requiredRole: ['public', 'admin'],
+      order: 6,
+      requiredRole: ['ADMIN'],
     },
   },
 ]

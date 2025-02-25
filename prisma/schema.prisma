@@ -705,9 +705,9 @@ model Servers {
   contract      contractType?   @default(INDETERMINADO)
   disability    disabilityType?
 
-  user               User?               @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_server_fkey")
   institution        Institution         @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "server_institution_fkey")
   server_allocations ServerAllocations[]
+  User               User?               @relation(fields: [userId], references: [id])
 
   @@map("servers")
   @@schema("public")
@@ -779,12 +779,12 @@ model Student {
 model Teacher {
   id             String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   schoolId       String    @db.Uuid
-  userId         String?   @db.Uuid
   name           String    @db.VarChar(100)
   birthdate      DateTime  @db.Date
   email          String?   @db.VarChar(255)
   phone          String?   @db.VarChar(15)
   address        String?   @db.VarChar(255)
+  userId         String?   @db.Uuid
   qualifications Json?
   status         status?   @default(ACTIVE)
   metadata       Json?
@@ -793,7 +793,7 @@ model Teacher {
   deletedAt      DateTime? @db.Timestamptz(6)
   updatedAt      DateTime? @db.Timestamptz(6)
   updatedBy      String?   @db.Uuid
-  tenantId       String?
+  tenantId       String?   @db.Uuid
   showDetails    Boolean?
 
   user     User?      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_teacher_fkey")

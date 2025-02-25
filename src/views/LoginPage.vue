@@ -6,6 +6,8 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store/AuthStore'
 import { AuthService } from '@/services/AuthService'
+import { updateRoutes } from '@/utils/updateRoutes'
+
 
 const email = ref<string>('')
 const password = ref<string>('')
@@ -22,7 +24,7 @@ onMounted(async () => {
   catch (err) {
     console.log('Erro ao buscar sessão', (err as Error).message)
   }
- 
+
 })
 
 const loading = ref<boolean>(false)
@@ -35,6 +37,9 @@ async function signIn() {
     await authService.setActiveOrganization(orgs[0].id)
     showToast('Login realizado com sucesso', 'top', 'success')
     userStore.login(data)
+    console.log('router antes do update', router.getRoutes())
+    updateRoutes(router)
+    console.log('router depois do update', router.getRoutes())
     router.push(`/dashboard/${data?.id}`)
   }
   catch (error) {
@@ -55,7 +60,7 @@ const navigation = {
 
 // Buscar escolas ao montar o componente
 onMounted(() => {
-//  fetchEscolas1960()
+  //  fetchEscolas1960()
 })
 </script>
 
@@ -72,7 +77,8 @@ onMounted(() => {
             </IonInput>
           </IonItem>
           <IonItem>
-            <IonInput v-model="password" type="password" label-placement="stacked" label="Senha" placeholder="Digite sua senha">
+            <IonInput v-model="password" type="password" label-placement="stacked" label="Senha"
+              placeholder="Digite sua senha">
               <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
               <ion-input-password-toggle slot="end" />
             </IonInput>

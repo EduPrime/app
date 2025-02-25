@@ -25,7 +25,7 @@ import 'swiper/css'
 
 const emits = defineEmits(['update:modelValue'])
 
-const getSwiper:any = ref(null)
+const getSwiper: any = ref(null)
 const currentDate = ref(moment())
 const monthYear = ref(new Date()
   .toISOString())
@@ -229,15 +229,9 @@ watch(selectedDate, (newValue: any) => {
             <IonModal id="month-year-modal" ref="modal" trigger="open-custom-dialog">
               <div class="wrapper">
                 <h1>Selecione o ano e mês</h1>
-                <IonDatetime
-                  v-model="monthYearValue"
-                  done-text="Confirmar" cancel-text="Cancelar"
-                  presentation="month-year"
-                  datetime="datetime"
-                  display-format="MMMM YYYY"
-                  :show-default-buttons="true"
-                  @ion-change="updateDate"
-                />
+                <IonDatetime v-model="monthYearValue" done-text="Confirmar" cancel-text="Cancelar"
+                  presentation="month-year" datetime="datetime" display-format="MMMM YYYY" :show-default-buttons="true"
+                  @ion-change="updateDate" />
                 <!-- dismiss() -->
               </div>
             </IonModal>
@@ -253,23 +247,21 @@ watch(selectedDate, (newValue: any) => {
             </IonButtons>
           </ion-col>
           <ion-col size="12">
-            <Swiper
-              :options="slideOpts" :slides-per-view="1" :space-between="8" @ion-slide-will-change="handleSlideChange"
-              @swiper="onSwiper" @touch-end="(swiper: any) => checkNextSlide(swiper)"
-            >
+            <Swiper :options="slideOpts" :slides-per-view="1" :space-between="8"
+              @ion-slide-will-change="handleSlideChange" @swiper="onSwiper"
+              @touch-end="(swiper: any) => checkNextSlide(swiper)">
               <SwiperSlide v-for="(week, index) in weeksInMonth" :key="index">
                 <div class="date-selector">
-                  <div v-for="day in week" :key="day.date.format('YYYY-MM-DD')" :style="day.weekday !== 'SUN' ? '' : 'display: none;'" class="day-chip">
+                  <div v-for="day in week" :key="day.date.format('YYYY-MM-DD')"
+                    :style="day.weekday !== 'SUN' ? '' : 'display: none;'" class="day-chip">
                     <!-- <div class="ion-padding">
                         {{ day.date.format('YYYY-MM-DD') }}
                         <br>
                         {{ monthYearValue }}
                       </div> -->
 
-                    <IonChip
-                      :disabled="isDateDisabled(day.date)" shape="rounded"
-                      :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
-                    >
+                    <IonChip :disabled="isDateDisabled(day.date)" shape="rounded" :color="getColorForDate(day.date)"
+                      @click="() => selectDate(day.date)">
                       <div>
                         <div class="day-name">
                           {{ translateDay(day.weekday) }}
@@ -292,61 +284,62 @@ watch(selectedDate, (newValue: any) => {
 
 <style scoped>
 .date-selector {
-    display: flex;
-    justify-content: flex-start;
-    padding: 4px;
+  display: flex;
+  justify-content: flex-start;
+  padding: 4px;
 }
 
 .day-chip {
-    text-align: center;
-    flex-basis: 13%;
+  text-align: center;
+  flex-basis: 13%;
 }
 
 ion-chip {
-    border-radius: 45px;
+  border-radius: 45px;
 }
 
 .day-name {
-    margin-top: 20px;
-    font-weight: normal;
-    font-size: 12px;
-    margin-bottom: 12px;
+  margin-top: 20px;
+  font-weight: normal;
+  font-size: 12px;
+  margin-bottom: 12px;
 }
 
 .day-number {
-    font-size: 16px;
-    font-weight: 800;
-    margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 20px;
 }
 
 .navigation-btn {
-  background-color: var(--ion-color-lightaccent); border-radius: 100%
+  background-color: var(--ion-color-lightaccent);
+  border-radius: 100%
 }
 
 ion-modal#month-year-modal {
-    --width: fit-content;
-    --min-width: 250px;
-    --height: fit-content;
-    --border-radius: 6px;
-    --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
-  }
+  --width: fit-content;
+  --min-width: 250px;
+  --height: fit-content;
+  --border-radius: 6px;
+  --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
+}
 
-  ion-modal#month-year-modal h1 {
-    margin: 20px 20px 10px 20px;
-  }
+ion-modal#month-year-modal h1 {
+  margin: 20px 20px 10px 20px;
+}
 
-  ion-modal#month-year-modal ion-icon {
-    margin-right: 6px;
+ion-modal#month-year-modal ion-icon {
+  margin-right: 6px;
 
-    width: 48px;
-    height: 48px;
+  width: 48px;
+  height: 48px;
 
-    padding: 4px 0;
+  padding: 4px 0;
 
-    color: #aaaaaa;
-  }
+  color: #aaaaaa;
+}
 
-  ion-modal#month-year-modal .wrapper {
-    margin-bottom: 10px;
-  }
+ion-modal#month-year-modal .wrapper {
+  margin-bottom: 10px;
+}
 </style>

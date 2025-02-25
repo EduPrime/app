@@ -280,11 +280,11 @@ async function registerStudent() {
       responsibleType: values.responsibleType,
       citystate: null,
       ethnicity: values.ethnicity,
-      disability: values.deficiency,
       deficiency_description: values.deficiency_description,
-      placeOfBirth: values.place_of_birth,
-      guardianCpf: null,
-      guardianEmail: null,
+      placeOfBirth: values.placeOfBirth,
+      guardianCpf: values.guardianCpf,
+      guardianEmail: values.guardianEmail,
+      disability: values.disability
     }
     try {
       let result

@@ -17,7 +17,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: business,
       name: 'Instituição',
       order: 1,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -30,7 +30,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: business,
       name: 'Cad Instituição',
       order: 2,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -43,7 +43,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: layers,
       name: 'Ano Letivo',
       order: 6,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
 
     },
   },
@@ -57,7 +57,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: layers,
       name: 'Modelo ano letivo',
       order: 7,
-      requiredRole: ['public'],
+      requiredRole: ['ADMIN'],
     },
   },
 ]

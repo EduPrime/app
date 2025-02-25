@@ -13,6 +13,7 @@ import SeriesService from '../../institution/services/SeriesService'
 import CourseService from '../services/CourseService'
 import { Decimal } from '@prisma/client/runtime/library'
 
+
 defineEmits<{
   (e: 'cancel'): void
   (e: 'save'): void
@@ -32,12 +33,12 @@ const courseService = new CourseService()
 const institutionService = new InstitutionService()
 const course_stage = ['Etapa 1', 'Etapa 2', 'Etapa 3', 'Etapa 4', 'Etapa 5', 'Etapa 6']
 const graduate = ['Sim', 'Não']
-const institutionId = ref('')
+const institutionId = ref()
 const schoolId = ref()
 const institutionList = ref()
 const seriesList = ref()
 const courseList = ref()
-const courseId = ref('')
+const courseId = ref()
 const formSchema = yup.object({
   name: yup
     .string()
@@ -56,6 +57,7 @@ const formSchema = yup.object({
     .number()
     .transform((value, originalValue) => {
       // Verifica se o originalValue é uma string e tenta convertê-la em número
+      // Verifica se o originalValue é uma string e tenta convertê-la em número
       if (typeof originalValue === 'string') {
         const trimmedValue = originalValue.trim()
         // Se a string não é vazia e pode ser convertida em um número, retorna o número
@@ -72,6 +74,7 @@ const formSchema = yup.object({
   schoolDays: yup
     .number()
     .transform((value, originalValue) => {
+      // Verifica se o originalValue é uma string e tenta convertê-la em número
       // Verifica se o originalValue é uma string e tenta convertê-la em número
       if (typeof originalValue === 'string') {
         const trimmedValue = originalValue.trim()
@@ -90,7 +93,7 @@ const formSchema = yup.object({
 
 interface SeriesForm {
   name: string
-  institutionId: string
+  institutionId: string | null
   courseId: string
   courseStage: string
   graduate: string
@@ -202,6 +205,8 @@ async function getSeriesData() {
       institutionId.value = seriesDbData.institutionId
       courseId.value = seriesDbData.courseId
       schoolId.value = seriesDbData.schoolId
+      setFieldValue('institutionId', seriesDbData.institutionId)
+      setFieldValue('schoolId', seriesDbData.schoolId)
       setFieldValue('institutionId', seriesDbData.institutionId)
       setFieldValue('schoolId', seriesDbData.schoolId)
       setFieldValue('courseId', seriesDbData.courseId)
