@@ -40,7 +40,8 @@ function handleClick() {
   <div>
     <IonAccordionGroup v-if="item.children && item.children.length" multiple>
       <IonAccordion>
-        <IonItem slot="header" button lines="none" :disabled="isDisabled" :class="isActive ? 'menu-active' : '' " @click="handleClick">
+        <IonItem slot="header" button lines="none" :disabled="isDisabled" :class="isActive ? 'menu-active' : ''"
+          @click="handleClick">
           <IonIcon slot="start" :color="item.color" :icon="item.icon" />
           <IonLabel>{{ item.name }}</IonLabel>
         </IonItem>
@@ -49,7 +50,8 @@ function handleClick() {
         </div>
       </IonAccordion>
     </IonAccordionGroup>
-    <IonItem v-else button lines="none" :router-link="item.url" :disabled="isDisabled" :class="isActive ? 'menu-active' : '' " @click="handleClick">
+    <IonItem v-else button lines="none" :router-link="item.url" :disabled="isDisabled"
+      :class="isActive ? 'menu-active' : ''" @click="handleClick">
       <IonIcon slot="start" :color="item.color" :icon="item.icon" />
       <IonLabel>{{ item.name }}</IonLabel>
     </IonItem>
@@ -58,7 +60,7 @@ function handleClick() {
 
 <style scoped>
 .tree-view ion-item {
-  --background : #00000000;
+  --background: #00000000;
   --min-height: 32px;
   --padding-top: 0;
   --padding-bottom: 0;
@@ -66,13 +68,16 @@ function handleClick() {
   --inner-padding-bottom: 0;
   /* margin-bottom: 5px; */
 }
-.tree-view ion-item ion-icon{
+
+.tree-view ion-item ion-icon {
   margin-inline-end: 15px;
 }
-ion-accordion div[slot="content"] ion-item{
+
+ion-accordion div[slot="content"] ion-item {
   --padding-start: 25px;
 }
-ion-accordion div[slot="content"] ion-item::before{
+
+ion-accordion div[slot="content"] ion-item::before {
   position: absolute;
   top: 0;
   left: 10px;
@@ -81,7 +86,8 @@ ion-accordion div[slot="content"] ion-item::before{
   content: "";
   background: var(--ion-color-lightaccent);
 }
-ion-accordion div[slot="content"]  ion-item.menu-active::after{
+
+ion-accordion div[slot="content"] ion-item.menu-active::after {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -89,10 +95,11 @@ ion-accordion div[slot="content"]  ion-item.menu-active::after{
   height: 7px;
   width: 7px;
   content: "";
-  background: var(--ion-color-accent);
+  background: var(--ion-color-tertiary);
   border-radius: 50%;
   border: 2px solid var(--sidemenu-background);
 }
+
 ion-item.menu-active {
   --background: rgba(var(--ion-color-primary-rgb), .08) !important;
   font-weight: bold;

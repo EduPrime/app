@@ -280,7 +280,6 @@ async function registerStudent() {
       responsibleType: values.responsibleType,
       citystate: null,
       ethnicity: values.ethnicity,
-      deficiency: values.deficiency,
       deficiency_description: values.deficiency_description,
       placeOfBirth: values.placeOfBirth,
       guardianCpf: values.guardianCpf,

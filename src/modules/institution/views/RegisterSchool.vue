@@ -6,9 +6,9 @@ import type { School, SchoolSettings } from '@prisma/client'
 
 const school = ref<School>({
   id: '',
-  name: '',
   idpes: null,
   cnpj: null,
+  name: '',
   address: null,
   city: null,
   state: null,

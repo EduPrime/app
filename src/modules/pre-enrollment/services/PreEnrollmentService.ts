@@ -1,22 +1,11 @@
 import BaseService from '@/services/BaseService'
 import { ref } from 'vue'
+import type { PreEnrollment } from '@prisma/client'
 
 const table = 'preenrollment' as const
 
-interface PreEnrollmentType {
-  courseId: string
-  datePreenrollment: string
-  id?: string | undefined
-  observations?: string | null | undefined
-  preenrollmentcode?: string | null | undefined
-  schoolId: string
-  seriesId: string
-  studentId: string
-}
 
-type TabelaType = typeof table
-
-export default class PreEnrollmentService extends BaseService<TabelaType> {
+export default class PreEnrollmentService extends BaseService<PreEnrollment> {
   constructor() {
     super(table)
   }
@@ -75,9 +64,12 @@ export default class PreEnrollmentService extends BaseService<TabelaType> {
   }
 
   async insertPreEnrollment(
-    preEnrollmentData: PreEnrollmentType,
+    preEnrollmentData: any,
   ) {
     try {
+      if (preEnrollmentData.id === '') {
+        preEnrollmentData.id = self.crypto.randomUUID()
+      }
       const data = await this.client.from(table).insert(preEnrollmentData).select('*')
 
       return data

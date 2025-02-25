@@ -30,23 +30,7 @@ function handleTrackInput(event: { target: any }) {
 
   queryBlock3.value = query
 }
-// import { createClient } from '@supabase/supabase-js'
 
-// const supabaseUrl = 'https://hokeopsqpxnvfhczdhzc.supabase.co'
-// const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhva2VvcHNxcHhudmZoY3pkaHpjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MjQ2NzkyNzksImV4cCI6MjA0MDI1NTI3OX0.JC5yB090108l04qPkDYL_gvDQJQX6yH8QwsIEQ58oEg'
-// const postgrest = createClient(supabaseUrl, supabaseKey)
-
-// const dados = ref()
-
-// onMounted(async () => {
-//     const { data, error } = await supabase
-//         .from('school')
-//         .select('*')
-//         dados.value = data
-
-//         console.log(error);
-
-// })
 onMounted(async () => {
   pageWidth.value = catchPageWidth()
 })
@@ -88,16 +72,13 @@ onMounted(async () => {
                     </IonText>
                   </IonCol>
                   <IonCol size="12">
-                    <remainingTime t-date="2024-12-31T23:59:59" />
+                    <remainingTime t-date="2025-02-28T23:59:59" />
                   </IonCol>
                   <IonCol size="12">
                     <IonText color="primary">
                       <p>
-                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Sit blanditiis
-                        suscipit
-                        itaque vel explicabo ducimus dolor rerum, velit soluta fugit sunt
-                        repudiandae id
-                        ipsam, quos perferendis voluptatem reiciendis officiis odio?
+                        Clique em começar agora para iniciar a matrícula ou acompanhe
+                         a pré-matrícula já realizada digitando o CPF do responsável.
                       </p>
                     </IonText>
                   </IonCol>
@@ -160,14 +141,14 @@ onMounted(async () => {
               <IonCol v-if="trackNotFound !== true && trackNotFound !== false">
                 <IonText color="primary">
                   <p>
-                    Digite o nome do aluno para acompanhar a pré-matrícula ou clique no botão "Começar Agora" para iniciar uma nova pré-matrícula.
+                    Digite o CPF do responsável para acompanhar a pré-matrícula ou clique no botão "Começar Agora" para iniciar uma nova pré-matrícula.
                   </p>
                 </IonText>
               </IonCol>
             </IonRow>
           </div>
           <div :class="trackNotFound === true && trackNotFound === false ? 'ion-padding-top' : '' ">
-            <IonSearchbar v-model="queryBlock3" placeholder="Buscar Aluno..." @ion-input="handleTrackInput($event)" />
+            <IonSearchbar v-model="queryBlock3" placeholder="Digite o CPF..." @ion-input="handleTrackInput($event)" />
           </div>
           <div class="ion-padding-bottom ion-padding-top">
             <trackEnrollment v-model="trackNotFound" :query="queryBlock3" />

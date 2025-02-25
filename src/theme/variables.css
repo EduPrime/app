@@ -13,7 +13,6 @@ html {
 	flex-wrap: wrap;
 }
 
-/* 
 .mx-auto {
 	margin-left: auto;
 	margin-right: auto;
@@ -38,8 +37,11 @@ html {
 
 .mb-auto {
 	margin-bottom: auto;
-} */
+}
 
+.bg-light {
+	background-color: #e9e2e2;
+}
 
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
@@ -65,7 +67,7 @@ http://ionicframework.com/docs/theming/ */
 	--ion-color-tertiary-shade: #b84b8c;
 	--ion-color-tertiary-tint: #d666a9;
 
-	--ion-color-accent: #d1559f;
+	--ion-color-accent: #ED6466;
 	--ion-color-accent-rgb: 209, 85, 159;
 	--ion-color-accent-contrast: #fad3e4;
 	--ion-color-accent-contrast-rgb: 250, 211, 228;
@@ -93,12 +95,12 @@ http://ionicframework.com/docs/theming/ */
 	--ion-color-warning-shade: #e0ac08;
 	--ion-color-warning-tint: #ffca22;
 
-	--ion-color-danger: #ed6466;
-	--ion-color-danger-rgb: 237, 100, 102;
+	--ion-color-danger: #c5000f;
+	--ion-color-danger-rgb: 197, 0, 15;
 	--ion-color-danger-contrast: #ffffff;
 	--ion-color-danger-contrast-rgb: 255, 255, 255;
-	--ion-color-danger-shade: #b35254;
-	--ion-color-danger-tint: #ee494c;
+	--ion-color-danger-shade: #ad000d;
+	--ion-color-danger-tint: #cb1a27;
 
 	--ion-color-light: #ebebeb;
 	--ion-color-light-rgb: 235, 235, 235;
