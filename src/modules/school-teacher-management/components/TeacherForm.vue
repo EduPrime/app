@@ -15,7 +15,7 @@ import SchoolService from '../services/SchoolService'
 import TeacherService from '../services/TeacherService'
 import QualificationForm from './QualificationForm.vue'
 
-type TeacherPartial = Pick<Teacher, 'name' | 'birthdate' | 'email' | 'phone' | 'address' | 'qualifications' | 'schoolId'>
+type TeacherPartial = Pick<Teacher, 'userId' | 'name' | 'birthdate' | 'email' | 'phone' | 'address' | 'qualifications' | 'schoolId'>
 
 defineEmits<{
   (e: 'cancel'): void
@@ -96,12 +96,13 @@ async function registerTeacher() {
     showToast(displayErrors, 'top', 'warning')
   }
   else {
-  // Verifique se 'birthdate' é uma instância de Date, caso contrário, converta
+    // Verifique se 'birthdate' é uma instância de Date, caso contrário, converta
     // const birthdateValue = values.birthdate instanceof Date ? values.birthdate : new Date(values.birthdate)
 
     const validQualifications = filterValidQualifications(qualifications.value)
     const formData = {
       id: teacherId.value,
+      userId: values.userId,
       name: values.name,
       birthdate: values.birthdate,
       email: values.email,
@@ -111,7 +112,7 @@ async function registerTeacher() {
       schoolId: values.schoolId,
       userCreated: null,
       metadata: null,
-      status: null,  
+      status: null,
       createdAt: new Date(),
       deletedAt: null,
       updatedAt: null,
@@ -205,13 +206,8 @@ onMounted(async () => {
   <div v-show="selectedSegment === 'general-info'">
     <ion-list id="schoolList">
       <ion-item>
-        <IonSelect
-          v-model="schoolId"
-          justify="space-between"
-          label="Escola do Professor"
-          placeholder="Selecione a escola"
-          @ion-change="handleSchoolChange"
-        >
+        <IonSelect v-model="schoolId" justify="space-between" label="Escola do Professor"
+          placeholder="Selecione a escola" @ion-change="handleSchoolChange">
           <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
             {{ school.name }}
           </IonSelectOption>
@@ -219,9 +215,11 @@ onMounted(async () => {
       </ion-item>
     </ion-list>
     <EpInput v-model="values.name" name="name" label="Nome" placeholder="Digite o nome do professor" />
-    <EpInput v-model="values.birthdate" name="birthdate" label="Data de Nascimento" type="date" placeholder="YYYY-MM-DD" />
+    <EpInput v-model="values.birthdate" name="birthdate" label="Data de Nascimento" type="date"
+      placeholder="YYYY-MM-DD" />
     <EpInput v-model="values.email" name="email" label="Email" placeholder="Digite o email" />
-    <EpInput v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone" placeholder="(99) 99999-9999" />
+    <EpInput v-model="values.phone" name="phone" :mask="phoneMask" inputmode="tel" label="Telefone"
+      placeholder="(99) 99999-9999" />
     <EpTextarea v-model="values.address" name="address" label="Endereço" placeholder="Digite o endereço" />
   </div>
   <!-- another tab -->

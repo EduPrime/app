@@ -8,6 +8,8 @@ const schoolFormRef = ref<InstanceType<typeof SchoolForm> | null>(null)
 const school = ref<School>({
   id: '',
   name: '',
+  idpes: null,
+  cnpj: null,
   address: null,
   city: null,
   state: null,
@@ -24,7 +26,7 @@ const school = ref<School>({
   acronym: null,
   blockDiaryEntries: null,
   operationalStatus: null,
-  administrativeDependency: null,regulation: null,
+  administrativeDependency: null, regulation: null,
   logoUrl: null,
   access: null,
   managerid: null,
@@ -44,7 +46,7 @@ const school = ref<School>({
   updatedBy: null,
   tenantId: null,
   userCreated: null,
-  })
+})
 const schoolSettings = ref<SchoolSettings>({
   id: '',
   createdAt: new Date(),
@@ -83,7 +85,8 @@ function handleSave() {
       Todos os campos são obrigatórios, a menos que indicado de outra forma.
     </template>
     <div id="school-form">
-      <SchoolForm ref="schoolFormRef" :school="school" :schoolSettings="schoolSettings" @cancel="handleCancel" @save="handleSave" />
+      <SchoolForm ref="schoolFormRef" :school="school" :schoolSettings="schoolSettings" @cancel="handleCancel"
+        @save="handleSave" />
     </div>
 
     <template #footer>

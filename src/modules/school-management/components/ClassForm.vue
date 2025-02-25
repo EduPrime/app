@@ -131,7 +131,10 @@ async function registerClass() {
       userCreated: values.userCreated,
       id: classId.value,
       metadata: values.metadata,
-      tenantId: values.tenantId
+      tenantId: values.tenantId,
+      exceededStudents: values.exceededStudents,
+      totalStudents: values.totalStudents,
+      pcdStudents: values.pcdStudents
     }
     try {
       let result
