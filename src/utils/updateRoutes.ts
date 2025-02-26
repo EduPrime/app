@@ -1,27 +1,26 @@
 import { useAuthStore } from '@/store/AuthStore'
 
-export function updateRoutes(router: any) {
+export async function updateRoutes(router: any, role: string) {
     const routes = router.getRoutes()
-    const authStore = useAuthStore()
+    // const authStore = useAuthStore()
 
+    // console.log('updateRoutes', routes)
     // Filtrar as rotas com base na role do usuário
     const filteredRoutes = routes.filter((route: { meta: { requiredRole: any } }) => {
         const requiredRoles = Array.isArray(route.meta?.requiredRole) ? route.meta.requiredRole : []
-
+        console.log('updateRoutes requiredRoles', requiredRoles)
         if (requiredRoles.length === 0 || requiredRoles.includes('public')) {
             return true
         }
-        if (!authStore.userLocal) {
+        if (!role) {
             return false
         }
-        return requiredRoles.includes(JSON.parse(authStore.userLocal).role)
+        return requiredRoles.includes(role)
     })
 
     // Remover todas as rotas atuais
     router.getRoutes().forEach((route: { name: any }) => {
-        if (route.name) {
-            router.removeRoute(route.name)
-        }
+        router.removeRoute(route.name)
     })
 
     // Adicionar as novas rotas

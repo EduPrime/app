@@ -42,7 +42,7 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     meta: {
       icon: home,
       name: 'Main Dashboard',
-      requiredRole: ['ADMIN', 'PROFESSOR'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -79,12 +79,12 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     },
   },
   {
-    path: '/dashboard/:id',
+    path: '/dashboard/Home',
     component: () => import('../views/HomePage.vue'),
     meta: {
       icon: home,
       name: 'Main Dashboard',
-      requiredRole: ['ADMIN', 'PROFESSOR'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -152,6 +152,13 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
       requiredRole: ['ADMIN'],
     },
   },
+  // {
+  //   path: '/:pathMatch(.*)*',
+  //   redirect: '/dashboard/Home',
+  //   meta: {
+  //     requiredRole: ['ADMIN', 'PROFESSOR'],
+  //   },
+  // },
 ]
 
 const routes = [...staticRoutes, ...dynamicRoutes]

@@ -237,7 +237,7 @@ dynamicTabs.forEach((tab) => {
   tab.children.sort((a: { order: number }, b: { order: number }) => a.order - b.order)
 })
 
-tabs.value.push(...dynamicTabs)
+tabs.value = dynamicTabs
 tabs.value.sort((a, b) => a.order - b.order)
 
 const isPublicPage = ref(route.path === '/login' || route.path === '/signup' || route.path === '/forgot-password' || route.path === '/change-password')
@@ -294,21 +294,21 @@ async function logout() {
               <!-- Profile and Notifications button -->
             </ion-list>
             <div class="bottom-items">
-              <ion-item
+              <!-- <ion-item
                 lines="full" button class="vertical-tab-button" router-link="/notifications"
                 :detail="false"
               >
                 <ion-icon :icon="notificationsOutline" />
-              </ion-item>
+              </ion-item> -->
               <ion-item lines="full" button class="vertical-tab-button" :detail="false" @click="logout">
                 <ion-icon :icon="logOutOutline" />
               </ion-item>
-              <ion-item
+              <!-- <ion-item
                 lines="full" button class="vertical-tab-button" router-link="/profile"
                 :detail="false"
               >
                 <ion-icon :icon="personCircleOutline" />
-              </ion-item>
+              </ion-item> -->
             </div>
           </div>
           <div class="tree-view">

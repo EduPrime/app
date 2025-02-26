@@ -37,10 +37,18 @@ async function signIn() {
     await authService.setActiveOrganization(orgs[0].id)
     showToast('Login realizado com sucesso', 'top', 'success')
     userStore.login(data)
-    console.log('router antes do update', router.getRoutes())
-    updateRoutes(router)
-    console.log('router depois do update', router.getRoutes())
-    router.push(`/dashboard/${data?.id}`)
+    if (userStore.userLocal) {
+      const localUserRole = JSON.parse(userStore.userLocal).role
+      console.log('router antes do update', router.getRoutes())
+      await updateRoutes(router, localUserRole)
+      console.log('router depois do update', router.getRoutes())
+      if (localUserRole === 'PROFESSOR') {
+        router.push('/teacherjourney')
+      } else {
+        router.push(`/dashboard/Home`)
+      }
+    }
+    // router.push(`/dashboard/${data?.id}`)
   }
   catch (error) {
     showToast('Falha ao fazer login', 'top', 'warning')
