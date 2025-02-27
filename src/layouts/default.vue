@@ -29,10 +29,11 @@ import { useAuthStore } from '@/store/AuthStore'
 
 const authService = new AuthService()
 const authStore = useAuthStore()
-
-
-const userRole = JSON.parse(authStore.userLocal) ? JSON.parse(authStore.userLocal).role : "public"
-const homeRoute = userRole === "PROFESSOR" ? "/home" : "/dashboard/Home"
+const userRole = ref('')
+if (authStore.userLocal) {
+  userRole.value = JSON.parse(authStore.userLocal) ? JSON.parse(authStore.userLocal).role : "public"
+}
+const homeRoute = userRole.value === "PROFESSOR" ? "/home" : "/dashboard/Home"
 
 const tabs = ref([
   {
