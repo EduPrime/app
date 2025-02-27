@@ -85,6 +85,7 @@ async function loadEnrollment() {
 
   catch (error) {
     console.error('Erro ao carregar as matrículas:', error)
+    students.value = []
   }
 }
 
