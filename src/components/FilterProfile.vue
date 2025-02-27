@@ -1,6 +1,7 @@
 <script setup lang="ts">
+import ClassroomService from '@/services/ClassroomService'
 import ScheduleService from '@/services/ScheduleService'
-import SeriesService from '@/services/SeriesService'
+// import SeriesService from '@/services/SeriesService'
 import TeacherService from '@/services/TeacherService'
 
 import { hexToRgb } from '@/utils/hex-to-rgb'
@@ -14,26 +15,29 @@ import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 // }
 
 interface Occupation {
-  school?: string
-  series?: string[]
+  schoolId?: string
+  schoolName?: string
+  classes?: { classId: string, className: string }[]
 }
 
 // const props = defineProps<Props>()
 
 const teacherService = new TeacherService()
-const seriesService = new SeriesService()
+// const seriesService = new SeriesService()
 const scheduleService = new ScheduleService()
+const classroomService = new ClassroomService()
 // const emits = defineEmits(['update:modelValue'])
 
 const isFilterCollapse = ref(true)
 const filteredOcupation = ref<Occupation>({})
+const filteredClasses = ref<{ classId: string, className: string }[]>([])
 
 const isModalSchool = ref(false)
 const isModalSerie = ref(false)
 const ocupation = ref<Occupation[]>()
-const userid = ref(loadDataTeacher())
+const userid = ref(loadDataUser())
 const teacherid = ref('')
-const schools = ref<string[] | undefined>([])
+const scheduleClass = ref<string[] | undefined>([])
 
 const colorStyle = ref({
   primary: getComputedStyle(document.documentElement).getPropertyValue('--ion-color-primary').trim(),
@@ -46,16 +50,25 @@ const setModalSchool = (open: boolean) => (isModalSchool.value = open)
 const setModalSerie = (open: boolean) => (isModalSerie.value = open)
 
 function setSchool(school: Occupation): void {
-  filteredOcupation.value.school = school.school
+  filteredOcupation.value.schoolName = school.schoolName
+  filteredOcupation.value.schoolId = school.schoolId
+  filteredClasses.value = school.classes || []
   setModalSchool(false)
 }
 
-function setSerie(serie: Occupation): void {
-  filteredOcupation.value.series = serie.series
+function setClasses(classItem: { classId: string, className: string }): void {
+  if (!filteredOcupation.value.classes) {
+    filteredOcupation.value.classes = []
+  }
+
+  if (!filteredOcupation.value.classes.some(cls => cls.classId === classItem.classId)) {
+    filteredOcupation.value.classes.push(classItem)
+  }
+
   setModalSerie(false)
 }
 
-function loadDataTeacher() {
+function loadDataUser() {
   const storedData = localStorage.getItem('userLocal')
 
   if (storedData) {
@@ -63,9 +76,10 @@ function loadDataTeacher() {
   }
 }
 
-async function loadDataSchools() {
+async function loadDataTeacher() {
   try {
     const data = await teacherService.listTeacherId(userid.value)
+
     return data.id || ''
   }
   catch (error) {
@@ -83,9 +97,9 @@ async function loadDataSchedule() {
   }
 }
 
-async function loadDataSeries() {
+async function loadDataSchoolClass() {
   try {
-    const data = await seriesService.listSeriesAndSchools(schools.value ?? [])
+    const data = await classroomService.listSchoolsAndClass(scheduleClass.value ?? [])
 
     return data || []
   }
@@ -94,11 +108,12 @@ async function loadDataSeries() {
   }
 }
 onMounted(async () => {
-  userid.value = loadDataTeacher()
-  teacherid.value = await loadDataSchools()
-  schools.value = await loadDataSchedule()
+  userid.value = loadDataUser()
+  teacherid.value = await loadDataTeacher()
+  scheduleClass.value = await loadDataSchedule()
 
-  ocupation.value = await loadDataSeries()
+  ocupation.value = await loadDataSchoolClass()
+  console.log('Ocupation', ocupation.value)
 })
 
 // Your component logic goes here
@@ -113,22 +128,22 @@ onMounted(async () => {
       </p>
     </ion-text>
     <IonItem style="--min-height: 57px;" color="primary" @click="setModalSchool(true)">
-      <IonLabel>{{ filteredOcupation.school || 'Selecione uma escola' }}</IonLabel>
+      <IonLabel>{{ filteredOcupation.schoolName || 'Selecione uma escola' }}</IonLabel>
       <IonIcon slot="start" :icon="businessOutline" />
     </IonItem>
     <IonItem style="--min-height: 57px;" color="tertiary" @click="setModalSerie(true)">
-      <IonLabel>{{ filteredOcupation.series ? filteredOcupation.series.join(', ') : 'Selecione uma série' }}</IonLabel>
+      <IonLabel>{{ filteredOcupation.classes ? filteredOcupation.classes.map(cls => cls.className).join(', ') : 'Selecione uma turma' }}</IonLabel>
       <IonIcon slot="start" :icon="peopleOutline" />
     </IonItem>
   </IonContent>
-  <!-- <pre>
+  <pre>
       filteredOcupation: {{ filteredOcupation }}
-    </pre> -->
+    </pre>
   <IonModal :is-open="isModalSchool" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]" @ion-modal-did-dismiss="setModalSchool(false)">
     <div class="block">
-      <ion-list v-for="(sch, i) in ocupation" :key="i" :value="sch.school">
+      <ion-list v-for="(sch, i) in ocupation" :key="i" :value="sch.schoolName">
         <IonItem @click="setSchool(sch)">
-          <IonLabel>{{ sch.school }}</IonLabel>
+          <IonLabel>{{ sch.schoolName }}</IonLabel>
         </IonItem>
       </ion-list>
     </div>
@@ -136,9 +151,9 @@ onMounted(async () => {
 
   <IonModal :is-open="isModalSerie" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]" @ion-modal-did-dismiss="setModalSerie(false)">
     <div class="block">
-      <ion-list v-for="(serie, i) in ocupation" :key="i" :value="serie.series ? serie.series[i] : ''">
-        <IonItem @click="setSerie(serie)">
-          <IonLabel>{{ serie.series ? serie.series[i] : '' }}</IonLabel>
+      <ion-list v-for="(classItem, i) in filteredClasses" :key="i" :value="classItem.className">
+        <IonItem @click="setClasses(classItem)">
+          <IonLabel>{{ classItem.className }}</IonLabel>
         </IonItem>
       </ion-list>
     </div>
@@ -148,7 +163,7 @@ onMounted(async () => {
     <ion-text v-show="!isFilterCollapse" color="secondary">
       <div class="ion-margin-horizontal">
         <span style="margin-right: 10px; color: var(--ion-color-accent)">{{ filteredOcupation.school }}</span>
-        <small style="color: var(--ion-color-accent)">{{ filteredOcupation.series ? filteredOcupation.series.join(', ') : '' }}</small>
+        <small style="color: var(--ion-color-accent)">{{ filteredOcupation.classes ? filteredOcupation.classes.join(', ') : '' }}</small>
       </div>
     </ion-text>
     <IonButton color="tertiary" :style="{ marginTop: isFilterCollapse ? '-20px' : '2px', marginLeft: isFilterCollapse ? '21.9em' : 'auto', marginRight: isFilterCollapse ? '10px' : '10px' }" @click="setFilterCollapse(!isFilterCollapse)">

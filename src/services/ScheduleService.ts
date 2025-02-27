@@ -43,8 +43,10 @@ export default class ScheduleService extends BaseService<Schedule> {
   async listClassrooms(teacherId: string) {
     const { data, error }: { data: { classroomId: string }[] | null, error: any } = await this.client
       .from('schedule')
-      .select('classroomId')
+      .select('*,classroomId')
       .eq('teacherId', teacherId)
+
+    console.log('Quadro de horário', data)
 
     if (error) {
       throw new Error(`Erro ao buscar turmas: ${error.message}`)
