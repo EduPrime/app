@@ -10,6 +10,7 @@ export const useAuthStore = defineStore('auth', () => {
     const organization = useLocalStorage<string | null>('auth/organization', null)
     const userLocal = useLocalStorage<string | null>('userLocal', null)
     const teacherId = useLocalStorage<string | null>('teacherId', null)
+    const courseName = useLocalStorage<string | null>('courseName', null)
 
     const isAuthenticated = computed(() => {
         if (!user.value)
@@ -79,6 +80,9 @@ export const useAuthStore = defineStore('auth', () => {
     function setTeacherId(teacherid: string) {
         teacherId.value = teacherid
     }
+    function setCourseName(coursename: string) {
+        courseName.value = coursename
+    }
 
     return {
         // Exposing parsed/computed values
@@ -92,6 +96,7 @@ export const useAuthStore = defineStore('auth', () => {
         getPostgrestToken,
         setOrganization,
         setTeacherId,
+        setCourseName,
         login,
         loginLocalUser,
         logout,
