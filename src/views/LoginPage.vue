@@ -6,7 +6,9 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store/AuthStore'
 import { AuthService } from '@/services/AuthService'
-import { updateRoutes } from '@/utils/updateRoutes'
+import { resetRouter } from '@/utils/updateRoutes'
+import { routes } from '@/router/index'
+import { getCurrentInstance } from 'vue'
 
 
 const email = ref<string>('')
@@ -15,6 +17,7 @@ const user = ref<any>(null)
 const router = useRouter()
 const userStore = useAuthStore()
 const authService = new AuthService()
+const appInstance = getCurrentInstance()?.appContext.app
 
 onMounted(async () => {
   try {
@@ -37,10 +40,20 @@ async function signIn() {
     await authService.setActiveOrganization(orgs[0].id)
     showToast('Login realizado com sucesso', 'top', 'success')
     userStore.login(data)
-    console.log('router antes do update', router.getRoutes())
-    updateRoutes(router)
-    console.log('router depois do update', router.getRoutes())
-    router.push(`/dashboard/${data?.id}`)
+    if (userStore.userLocal) {
+      const localUserRole = JSON.parse(userStore.userLocal).role
+      console.log('router antes do update', router.getRoutes())
+      resetRouter(router, routes)
+      console.log('router depois do update', router.getRoutes())
+      if (localUserRole === 'PROFESSOR') {
+        router.push('/home')
+        window.location.reload()
+      } else {
+        router.push('/dashboard/Home')
+        window.location.reload()
+      }
+    }
+    // router.push(`/dashboard/${data?.id}`)
   }
   catch (error) {
     showToast('Falha ao fazer login', 'top', 'warning')
