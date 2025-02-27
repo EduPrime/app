@@ -1,6 +1,12 @@
 import { useAuthStore } from '@/store/AuthStore'
 import { getPostgrestURL } from '@/utils/getPostgrestURL'
 import { PostgrestClient } from '@supabase/postgrest-js'
+import { setActivePinia, getActivePinia } from 'pinia'
+import pinia from '@/store/pinia'
+
+if (!getActivePinia) {
+  setActivePinia(pinia)
+}
 
 export default class BaseService<T> {
   public client: PostgrestClient
