@@ -257,6 +257,24 @@ export class AuthService {
         },
       })
       const data = await response.json()
+      if (data[0].role === "PROFESSOR") {
+        const url = `https://${postgresturl}/teacher?userId=eq.${data[0].id}`
+        try {
+          const responseTeacher = await fetch(url, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              mode: 'no-cors',
+            },
+          })
+          const savedId = await responseTeacher.json()
+          console.log('savedId', savedId)
+          useAuthStore().setTeacherId(savedId[0].id)
+        }
+        catch (error) {
+          throw new Error(`Failed to fetch user: ${(error as Error).message}`)
+        }
+      }
       return data[0] as UserLocal
     }
     catch (error) {

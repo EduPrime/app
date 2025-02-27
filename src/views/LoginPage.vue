@@ -6,7 +6,9 @@ import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store/AuthStore'
 import { AuthService } from '@/services/AuthService'
-import { updateRoutes } from '@/utils/updateRoutes'
+import { resetRouter } from '@/utils/updateRoutes'
+import { routes } from '@/router/index'
+import { getCurrentInstance } from 'vue'
 
 
 const email = ref<string>('')
@@ -15,6 +17,7 @@ const user = ref<any>(null)
 const router = useRouter()
 const userStore = useAuthStore()
 const authService = new AuthService()
+const appInstance = getCurrentInstance()?.appContext.app
 
 onMounted(async () => {
   try {
@@ -40,12 +43,14 @@ async function signIn() {
     if (userStore.userLocal) {
       const localUserRole = JSON.parse(userStore.userLocal).role
       console.log('router antes do update', router.getRoutes())
-      await updateRoutes(router, localUserRole)
+      resetRouter(router, routes)
       console.log('router depois do update', router.getRoutes())
       if (localUserRole === 'PROFESSOR') {
-        router.push('/teacherjourney')
+        router.push('/home')
+        window.location.reload()
       } else {
-        router.push(`/dashboard/Home`)
+        router.push('/dashboard/Home')
+        window.location.reload()
       }
     }
     // router.push(`/dashboard/${data?.id}`)

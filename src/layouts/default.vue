@@ -25,8 +25,14 @@ import {
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { AuthService } from '@/services/AuthService'
+import { useAuthStore } from '@/store/AuthStore'
 
 const authService = new AuthService()
+const authStore = useAuthStore()
+
+
+const userRole = JSON.parse(authStore.userLocal) ? JSON.parse(authStore.userLocal).role : "public"
+const homeRoute = userRole === "PROFESSOR" ? "/home" : "/dashboard/Home"
 
 const tabs = ref([
   {
@@ -279,7 +285,7 @@ async function logout() {
         <ion-content>
           <div class="vertical-tabs">
             <ion-list>
-              <ion-item lines="full" button class="vertical-tab-button" router-link="/" :detail="false">
+              <ion-item lines="full" button class="vertical-tab-button" :router-link=homeRoute :detail="false">
                 <ion-img src="/icons/icon-256.webp" alt="Gestão Pedagógica" />
               </ion-item>
               <ion-item
