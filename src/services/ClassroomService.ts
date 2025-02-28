@@ -37,23 +37,22 @@ export default class ClassroomService extends BaseService<Classroom> {
       throw new Error('Nenhuma nota encontrada')
     }
 
-    const schoolMap = new Map<string, { schoolId: string, schoolName: string, classes: { classId: string, className: string }[] }>()
-    console.log('Retorno listSeries', data)
+    const schoolMap = new Map<string, { schoolId: string, schoolName: string, classes: { classroomId: string, classroomName: string }[] }>()
 
     data.forEach((item) => {
       const schoolId = item.school?.id
       const schoolName = item.school?.name
-      const classId = item.id
-      const className = item.name
+      const classroomId = item.id
+      const classroomName = item.name
 
-      if (schoolId && schoolName && classId && className) {
+      if (schoolId && schoolName && classroomId && classroomName) {
         if (!schoolMap.has(schoolId)) {
           schoolMap.set(schoolId, { schoolId, schoolName, classes: [] })
         }
 
         const schoolEntry = schoolMap.get(schoolId)
-        if (schoolEntry && !schoolEntry.classes.some(cls => cls.classId === classId)) {
-          schoolEntry.classes.push({ classId, className })
+        if (schoolEntry && !schoolEntry.classes.some(cls => cls.classroomId === classroomId)) {
+          schoolEntry.classes.push({ classroomId, classroomName })
         }
       }
     })

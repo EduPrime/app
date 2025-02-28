@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import ClassroomService from '@/services/ClassroomService'
 import ScheduleService from '@/services/ScheduleService'
-// import SeriesService from '@/services/SeriesService'
 import TeacherService from '@/services/TeacherService'
 
 import { hexToRgb } from '@/utils/hex-to-rgb'
@@ -17,20 +16,21 @@ import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 interface Occupation {
   schoolId?: string
   schoolName?: string
-  classes?: { classId: string, className: string }[]
+  classroomId?: string
+  classroomName?: string
+  classes?: { classroomId: string, classroomName: string }[]
+
 }
 
+const emits = defineEmits(['update:filteredOcupation'])
 // const props = defineProps<Props>()
 
 const teacherService = new TeacherService()
-// const seriesService = new SeriesService()
 const scheduleService = new ScheduleService()
 const classroomService = new ClassroomService()
-// const emits = defineEmits(['update:modelValue'])
-
 const isFilterCollapse = ref(true)
 const filteredOcupation = ref<Occupation>({})
-const filteredClasses = ref<{ classId: string, className: string }[]>([])
+const filteredClasses = ref<{ classroomId: string, classroomName: string }[]>([])
 
 const isModalSchool = ref(false)
 const isModalSerie = ref(false)
@@ -54,18 +54,18 @@ function setSchool(school: Occupation): void {
   filteredOcupation.value.schoolId = school.schoolId
   filteredClasses.value = school.classes || []
   setModalSchool(false)
+  emitFilteredOcupation()
 }
 
-function setClasses(classItem: { classId: string, className: string }): void {
-  if (!filteredOcupation.value.classes) {
-    filteredOcupation.value.classes = []
-  }
-
-  if (!filteredOcupation.value.classes.some(cls => cls.classId === classItem.classId)) {
-    filteredOcupation.value.classes.push(classItem)
-  }
-
+function setClasses(classItem: { classroomId: string, classroomName: string }): void {
+  filteredOcupation.value.classroomId = classItem.classroomId
+  filteredOcupation.value.classroomName = classItem.classroomName
   setModalSerie(false)
+  emitFilteredOcupation()
+}
+
+function emitFilteredOcupation() {
+  emits('update:filteredOcupation', { ...filteredOcupation.value, teacherId: teacherid.value })
 }
 
 function loadDataUser() {
@@ -113,7 +113,6 @@ onMounted(async () => {
   scheduleClass.value = await loadDataSchedule()
 
   ocupation.value = await loadDataSchoolClass()
-  console.log('Ocupation', ocupation.value)
 })
 
 // Your component logic goes here
@@ -132,13 +131,11 @@ onMounted(async () => {
       <IonIcon slot="start" :icon="businessOutline" />
     </IonItem>
     <IonItem style="--min-height: 57px;" color="tertiary" @click="setModalSerie(true)">
-      <IonLabel>{{ filteredOcupation.classes ? filteredOcupation.classes.map(cls => cls.className).join(', ') : 'Selecione uma turma' }}</IonLabel>
+      <IonLabel>{{ filteredOcupation.classroomName || 'Selecione uma turma' }}</IonLabel>
       <IonIcon slot="start" :icon="peopleOutline" />
     </IonItem>
   </IonContent>
-  <pre>
-      filteredOcupation: {{ filteredOcupation }}
-    </pre>
+
   <IonModal :is-open="isModalSchool" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]" @ion-modal-did-dismiss="setModalSchool(false)">
     <div class="block">
       <ion-list v-for="(sch, i) in ocupation" :key="i" :value="sch.schoolName">
@@ -151,9 +148,9 @@ onMounted(async () => {
 
   <IonModal :is-open="isModalSerie" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]" @ion-modal-did-dismiss="setModalSerie(false)">
     <div class="block">
-      <ion-list v-for="(classItem, i) in filteredClasses" :key="i" :value="classItem.className">
+      <ion-list v-for="(classItem, i) in filteredClasses" :key="i" :value="classItem.classroomName">
         <IonItem @click="setClasses(classItem)">
-          <IonLabel>{{ classItem.className }}</IonLabel>
+          <IonLabel>{{ classItem.classroomName }}</IonLabel>
         </IonItem>
       </ion-list>
     </div>
@@ -162,8 +159,8 @@ onMounted(async () => {
   <div :style="{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isFilterCollapse ? '0' : '5px' }">
     <ion-text v-show="!isFilterCollapse" color="secondary">
       <div class="ion-margin-horizontal">
-        <span style="margin-right: 10px; color: var(--ion-color-accent)">{{ filteredOcupation.school }}</span>
-        <small style="color: var(--ion-color-accent)">{{ filteredOcupation.classes ? filteredOcupation.classes.join(', ') : '' }}</small>
+        <span style="margin-right: 10px; color: var(--ion-color-accent)">{{ filteredOcupation.schoolName }}</span>
+        <small style="color: var(--ion-color-accent)">{{ filteredOcupation.classroomName }}</small>
       </div>
     </ion-text>
     <IonButton color="tertiary" :style="{ marginTop: isFilterCollapse ? '-20px' : '2px', marginLeft: isFilterCollapse ? '21.9em' : 'auto', marginRight: isFilterCollapse ? '10px' : '10px' }" @click="setFilterCollapse(!isFilterCollapse)">

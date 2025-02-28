@@ -46,8 +46,6 @@ export default class ScheduleService extends BaseService<Schedule> {
       .select('*,classroomId')
       .eq('teacherId', teacherId)
 
-    console.log('Quadro de horário', data)
-
     if (error) {
       throw new Error(`Erro ao buscar turmas: ${error.message}`)
     }
