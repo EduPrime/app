@@ -22,7 +22,6 @@ export default class SeriesService extends BaseService<Series> {
     }
 
     const schoolMap = new Map<string, { school: string, series: string[] }>()
-    console.log('Retorno listSeries', data)
 
     data.forEach((item) => {
       const schoolName = item.school?.name

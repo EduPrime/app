@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import ClassroomService from '@/services/ClassroomService'
 import ScheduleService from '@/services/ScheduleService'
+
 import TeacherService from '@/services/TeacherService'
 
 import { hexToRgb } from '@/utils/hex-to-rgb'
-
 import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonModal } from '@ionic/vue'
 import { arrowDown, arrowUp, businessOutline, peopleOutline } from 'ionicons/icons'
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
@@ -18,7 +18,9 @@ interface Occupation {
   schoolName?: string
   classroomId?: string
   classroomName?: string
-  classes?: { classroomId: string, classroomName: string }[]
+  seriesId?: string
+  seriesName?: string
+  classes?: { classroomId: string, classroomName: string, serieId: string, serieName: string }[]
 
 }
 
@@ -30,7 +32,7 @@ const scheduleService = new ScheduleService()
 const classroomService = new ClassroomService()
 const isFilterCollapse = ref(true)
 const filteredOcupation = ref<Occupation>({})
-const filteredClasses = ref<{ classroomId: string, classroomName: string }[]>([])
+const filteredClasses = ref<{ classroomId: string, classroomName: string, serieId: string, serieName: string }[]>([])
 
 const isModalSchool = ref(false)
 const isModalSerie = ref(false)
@@ -57,9 +59,12 @@ function setSchool(school: Occupation): void {
   emitFilteredOcupation()
 }
 
-function setClasses(classItem: { classroomId: string, classroomName: string }): void {
+function setClasses(classItem: { classroomId: string, classroomName: string, serieId: string, serieName: string }): void {
   filteredOcupation.value.classroomId = classItem.classroomId
   filteredOcupation.value.classroomName = classItem.classroomName
+  filteredOcupation.value.seriesId = classItem.serieId
+  filteredOcupation.value.seriesName = classItem.serieName
+
   setModalSerie(false)
   emitFilteredOcupation()
 }
