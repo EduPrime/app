@@ -53,7 +53,7 @@ function handleClick() {
     <IonItem v-else button lines="none" :router-link="item.url" :disabled="isDisabled"
       :class="isActive ? 'menu-active' : ''" @click="handleClick">
       <IonIcon slot="start" :color="item.color" :icon="item.icon" />
-      <IonLabel>{{ item.name }}</IonLabel>
+      <IonLabel :style="{ fontSize: '12px' }">{{ item.name }}</IonLabel>
     </IonItem>
   </div>
 </template>
@@ -70,7 +70,7 @@ function handleClick() {
 }
 
 .tree-view ion-item ion-icon {
-  margin-inline-end: 15px;
+  margin-inline-end: 5px;
 }
 
 ion-accordion div[slot="content"] ion-item {
