@@ -5,6 +5,7 @@ import { setActivePinia, getActivePinia } from 'pinia'
 import { useAuthStore } from '@/store/AuthStore'
 import { AuthService } from '@/services/AuthService'
 import pinia from '@/store/pinia'
+import { updateRoutes } from '@/utils/updateRoutes'
 
 
 // Função para carregar dinamicamente todas as rotas dos módulos
@@ -14,18 +15,6 @@ const dynamicRoutes: CustomRouteRecordRaw[] = []
 if (!getActivePinia()) {
   setActivePinia(pinia)
 }
-
-// this was an attempt to type the routes to be easier to develop
-// for (const path in moduleRoutes) {
-//   const module: any = moduleRoutes[path]
-//   if (typeof module === 'function') {
-//     const mod = await module()
-//
-//     if (mod.default) {
-//       dynamicRoutes.push(...(mod.default as CustomRouteRecordRaw[]))
-//     }
-//   }
-// }
 
 for (const path in moduleRoutes) {
   const module: any = moduleRoutes[path]
@@ -42,7 +31,7 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     meta: {
       icon: home,
       name: 'Main Dashboard',
-      requiredRole: ['ADMIN', 'PROFESSOR'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -79,12 +68,12 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     },
   },
   {
-    path: '/dashboard/:id',
+    path: '/dashboard/Home',
     component: () => import('../views/HomePage.vue'),
     meta: {
       icon: home,
       name: 'Main Dashboard',
-      requiredRole: ['ADMIN', 'PROFESSOR'],
+      requiredRole: ['ADMIN'],
     },
   },
   {
@@ -152,67 +141,16 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
       requiredRole: ['ADMIN'],
     },
   },
+  // {
+  //   path: '/:pathMatch(.*)*',
+  //   redirect: '/dashboard/Home',
+  //   meta: {
+  //     requiredRole: ['ADMIN', 'PROFESSOR'],
+  //   },
+  // },
 ]
 
-const routes = [...staticRoutes, ...dynamicRoutes]
-const authStore = useAuthStore()
+export const routes = [...staticRoutes, ...dynamicRoutes]
 
-
-
-const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: routes.filter((route) => {
-
-    // Se a rota não exige um role, ela deve ser mantida
-    if (route.meta.requiredRole.length === 0) {
-      return true
-    }
-
-    if (route.meta.requiredRole.includes('public')) {
-      return true
-    }
-
-    // Sempre permitir a página de login
-    if (route.path === '/login') {
-      return true
-    }
-
-    // Se o usuário não estiver autenticado, bloquear
-    if (!authStore.userLocal) {
-      return false
-    }
-    console.log('user role', JSON.parse(authStore.userLocal).role)
-    // Verificar se o role do usuário está na lista de roles permitidas
-    return route.meta.requiredRole.includes(JSON.parse(authStore.userLocal).role)
-  }) as unknown as any,
-})
-
-router.beforeEach(async (to, from, next) => {
-  try {
-    const authService = new AuthService()
-    await authService.getSession()
-    if (!authStore.isAuthenticated) {
-      // Evitar redirecionamento infinito
-      if (to.path !== '/login') {
-        next('/login')
-      }
-      next()
-    } else {
-      // Usuário autenticado, permitir navegação
-
-      if (to.path === '/login') {
-        // Se já autenticado, redirecionar da rota de login para home ou outra página
-        next('')
-      }
-      next()
-    }
-  } catch {
-    console.log('Failed to get session')
-    if (to.path !== "/login") {
-      next("/login");
-    }
-    next();
-  }
-})
-
+const router = updateRoutes(routes)
 export default router

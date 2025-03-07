@@ -264,7 +264,7 @@ watch(selectedDate, (newValue: any) => {
       dayEvents: eventsForSelectedDate.value,
     })
   }
-}, { immediate: true })
+})
 
 watch(() => props.teacherId, async (newValue: any) => {
   if (newValue) {
@@ -329,7 +329,7 @@ watch(() => props.teacherId, async (newValue: any) => {
                     <IonChip
                       class="ion-no-padding"
                       style="padding: 10px;"
-                      :disabled="validDays && validDays.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0"
+                      :disabled="!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0"
                       :style="i === 0 ? 'margin-left: 10px;' : undefined"
                       :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
                     >

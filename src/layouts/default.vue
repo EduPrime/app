@@ -25,8 +25,15 @@ import {
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { AuthService } from '@/services/AuthService'
+import { useAuthStore } from '@/store/AuthStore'
 
 const authService = new AuthService()
+const authStore = useAuthStore()
+const userRole = ref('')
+if (authStore.userLocal) {
+  userRole.value = JSON.parse(authStore.userLocal) ? JSON.parse(authStore.userLocal).role : "public"
+}
+const homeRoute = userRole.value === "PROFESSOR" ? "/home" : "/dashboard/Home"
 
 const tabs = ref([
   {
@@ -237,7 +244,7 @@ dynamicTabs.forEach((tab) => {
   tab.children.sort((a: { order: number }, b: { order: number }) => a.order - b.order)
 })
 
-tabs.value.push(...dynamicTabs)
+tabs.value = dynamicTabs
 tabs.value.sort((a, b) => a.order - b.order)
 
 const isPublicPage = ref(route.path === '/login' || route.path === '/signup' || route.path === '/forgot-password' || route.path === '/change-password')
@@ -279,7 +286,7 @@ async function logout() {
         <ion-content>
           <div class="vertical-tabs">
             <ion-list>
-              <ion-item lines="full" button class="vertical-tab-button" router-link="/" :detail="false">
+              <ion-item lines="full" button class="vertical-tab-button" :router-link=homeRoute :detail="false">
                 <ion-img src="/icons/icon-256.webp" alt="Gestão Pedagógica" />
               </ion-item>
               <ion-item
@@ -294,21 +301,21 @@ async function logout() {
               <!-- Profile and Notifications button -->
             </ion-list>
             <div class="bottom-items">
-              <ion-item
+              <!-- <ion-item
                 lines="full" button class="vertical-tab-button" router-link="/notifications"
                 :detail="false"
               >
                 <ion-icon :icon="notificationsOutline" />
-              </ion-item>
+              </ion-item> -->
               <ion-item lines="full" button class="vertical-tab-button" :detail="false" @click="logout">
                 <ion-icon :icon="logOutOutline" />
               </ion-item>
-              <ion-item
+              <!-- <ion-item
                 lines="full" button class="vertical-tab-button" router-link="/profile"
                 :detail="false"
               >
                 <ion-icon :icon="personCircleOutline" />
-              </ion-item>
+              </ion-item> -->
             </div>
           </div>
           <div class="tree-view">

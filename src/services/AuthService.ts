@@ -257,6 +257,36 @@ export class AuthService {
         },
       })
       const data = await response.json()
+      if (data[0].role === "PROFESSOR") {
+        const url = `https://${postgresturl}/teacher?userId=eq.${data[0].id}`
+        try {
+          const responseTeacher = await fetch(url, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              mode: 'no-cors',
+            },
+          })
+          const savedId = await responseTeacher.json()
+          console.log('savedId', savedId)
+          useAuthStore().setTeacherId(savedId[0].id)
+
+          const url2 = `https://${postgresturl}/schedule?teacherId=eq.${savedId[0].id}&select=classroom(series(course(name)))`
+          const responseClassroom = await fetch(url2, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              mode: 'no-cors',
+            },
+          })
+          const jsonClassroom = await responseClassroom.json()
+          console.log('jsonClassroom', jsonClassroom[0].classroom.series.course.name)
+          useAuthStore().setCourseName(jsonClassroom[0].classroom.series.course.name)
+        }
+        catch (error) {
+          throw new Error(`Failed to fetch user: ${(error as Error).message}`)
+        }
+      }
       return data[0] as UserLocal
     }
     catch (error) {
