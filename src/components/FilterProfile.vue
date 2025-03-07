@@ -5,13 +5,13 @@ import ScheduleService from '@/services/ScheduleService'
 import TeacherService from '@/services/TeacherService'
 
 import { hexToRgb } from '@/utils/hex-to-rgb'
-import { IonButton, IonContent, IonIcon, IonItem, IonLabel, IonModal } from '@ionic/vue'
+import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonItem, IonLabel, IonModal, IonRow } from '@ionic/vue'
 import { arrowDown, arrowUp, businessOutline, peopleOutline } from 'ionicons/icons'
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 
-// interface Props {
-//   teacherId: string
-// }
+interface Props {
+  discipline?: boolean
+}
 
 interface Occupation {
   schoolId?: string
@@ -20,22 +20,25 @@ interface Occupation {
   classroomName?: string
   seriesId?: string
   seriesName?: string
+  disciplineId?: string
+  disciplineName?: string
   classes?: { classroomId: string, classroomName: string, serieId: string, serieName: string }[]
 
 }
 
+const props = defineProps<Props>()
 const emits = defineEmits(['update:filteredOcupation'])
-// const props = defineProps<Props>()
-
 const teacherService = new TeacherService()
 const scheduleService = new ScheduleService()
 const classroomService = new ClassroomService()
 const isFilterCollapse = ref(true)
 const filteredOcupation = ref<Occupation>({})
 const filteredClasses = ref<{ classroomId: string, classroomName: string, serieId: string, serieName: string }[]>([])
+const filteredDisciplines = ref<{ disciplineId: string, disciplineName: string }[]>([])
 
 const isModalSchool = ref(false)
 const isModalSerie = ref(false)
+const isModalDiscipline = ref(false)
 const ocupation = ref<Occupation[]>()
 const userid = ref(loadDataUser())
 const teacherid = ref('')
@@ -50,27 +53,74 @@ const colorStyle = ref({
 const setFilterCollapse = (open: boolean) => (isFilterCollapse.value = open)
 const setModalSchool = (open: boolean) => (isModalSchool.value = open)
 const setModalSerie = (open: boolean) => (isModalSerie.value = open)
+const setModalDiscipline = (open: boolean) => (isModalDiscipline.value = open)
 
 function setSchool(school: Occupation): void {
+  // Atualiza a escola
   filteredOcupation.value.schoolName = school.schoolName
   filteredOcupation.value.schoolId = school.schoolId
+
+  // Limpa turma e disciplina ao mudar de escola
+  filteredOcupation.value.classroomId = undefined
+  filteredOcupation.value.classroomName = undefined
+  filteredOcupation.value.seriesId = undefined
+  filteredOcupation.value.seriesName = undefined
+  filteredOcupation.value.disciplineId = undefined
+  filteredOcupation.value.disciplineName = undefined
+
+  // Atualiza as turmas disponíveis para a nova escola
   filteredClasses.value = school.classes || []
+
+  // Limpa a lista de disciplinas
+  filteredDisciplines.value = []
+
   setModalSchool(false)
   emitFilteredOcupation()
 }
 
-function setClasses(classItem: { classroomId: string, classroomName: string, serieId: string, serieName: string }): void {
+async function setClasses(classItem: { classroomId: string, classroomName: string, serieId: string, serieName: string }): void {
+  // Atualiza a turma
   filteredOcupation.value.classroomId = classItem.classroomId
   filteredOcupation.value.classroomName = classItem.classroomName
   filteredOcupation.value.seriesId = classItem.serieId
   filteredOcupation.value.seriesName = classItem.serieName
 
+  // Limpa disciplinas antes de carregar novas
+  filteredOcupation.value.disciplineId = undefined
+  filteredOcupation.value.disciplineName = undefined
+  filteredDisciplines.value = []
+
+  // Carrega disciplinas disponíveis para a turma selecionada
+  filteredDisciplines.value = await loadDisciplines(classItem.classroomId) || []
+
   setModalSerie(false)
   emitFilteredOcupation()
 }
 
+function setDiscipline(discipline: { disciplineId: string, disciplineName: string }): void {
+  filteredOcupation.value.disciplineId = discipline.disciplineId
+  filteredOcupation.value.disciplineName = abbreviate(discipline.disciplineName, 17)
+  setModalDiscipline(false)
+  emitFilteredOcupation()
+}
+
+async function loadDisciplines(classroomId: string) {
+  try {
+    const data = await scheduleService.listDiscipline(teacherid.value, classroomId)
+
+    return data || []
+  }
+  catch (error) {
+    console.error('Erro ao carregar as disciplinas:', error)
+  }
+}
+
 function emitFilteredOcupation() {
   emits('update:filteredOcupation', { ...filteredOcupation.value, teacherId: teacherid.value })
+}
+
+function abbreviate(text: string, maxLength: number): string {
+  return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text
 }
 
 function loadDataUser() {
@@ -112,11 +162,20 @@ async function loadDataSchoolClass() {
     console.error('Erro ao carregar os dados:', error)
   }
 }
+
+watch(() => filteredOcupation.value.classroomId, async (newClassroomId) => {
+  if (newClassroomId) {
+    filteredDisciplines.value = await loadDisciplines(newClassroomId) || []
+  }
+  else {
+    filteredDisciplines.value = []
+  }
+})
+
 onMounted(async () => {
   userid.value = loadDataUser()
   teacherid.value = await loadDataTeacher()
   scheduleClass.value = await loadDataSchedule()
-
   ocupation.value = await loadDataSchoolClass()
 })
 
@@ -131,14 +190,38 @@ onMounted(async () => {
         Preencha os filtros abaixo para uma mais acertiva
       </p>
     </ion-text>
-    <IonItem style="--min-height: 57px;" color="primary" @click="setModalSchool(true)">
-      <IonLabel>{{ filteredOcupation.schoolName || 'Selecione uma escola' }}</IonLabel>
-      <IonIcon slot="start" :icon="businessOutline" />
-    </IonItem>
-    <IonItem style="--min-height: 57px;" color="tertiary" @click="setModalSerie(true)">
-      <IonLabel>{{ filteredOcupation.classroomName || 'Selecione uma turma' }}</IonLabel>
-      <IonIcon slot="start" :icon="peopleOutline" />
-    </IonItem>
+    <IonGrid class="ion-no-padding">
+      <IonRow>
+        <IonCol size="12">
+          <IonItem style="--min-height: 57px;" color="secondary" @click="setModalSchool(true)">
+            <IonLabel>{{ filteredOcupation.schoolName || 'Selecione uma escola' }}</IonLabel>
+            <IonIcon slot="start" :icon="businessOutline" />
+          </IonItem>
+        </IonCol>
+      </IonRow>
+      <IonRow v-if="props.discipline">
+        <IonCol size="6">
+          <IonItem style="--min-height: 57px;" color="tertiary" @click="setModalSerie(true)">
+            <IonLabel>{{ filteredOcupation.classroomName || 'Turma' }}</IonLabel>
+            <IonIcon slot="start" :icon="peopleOutline" />
+          </IonItem>
+        </IonCol>
+        <IonCol size="6">
+          <IonItem style="--min-height: 57px;" color="primary" @click="setModalDiscipline(true)">
+            <IonLabel>{{ filteredOcupation.disciplineName || 'Disciplina' }}</IonLabel>
+            <IonIcon slot="start" :icon="peopleOutline" />
+          </IonItem>
+        </IonCol>
+      </IonRow>
+      <IonRow v-else>
+        <IonCol size="12">
+          <IonItem style="--min-height: 57px;" color="tertiary" @click="setModalSerie(true)">
+            <IonLabel>{{ filteredOcupation.classroomName || 'Selecione uma turma' }}</IonLabel>
+            <IonIcon slot="start" :icon="peopleOutline" />
+          </IonItem>
+        </IonCol>
+      </IonRow>
+    </IonGrid>
   </IonContent>
 
   <IonModal :is-open="isModalSchool" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]" @ion-modal-did-dismiss="setModalSchool(false)">
@@ -161,11 +244,22 @@ onMounted(async () => {
     </div>
   </IonModal>
 
+  <IonModal :is-open="isModalDiscipline" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]" @ion-modal-did-dismiss="setModalDiscipline(false)">
+    <div class="block">
+      <ion-list v-for="(discipline, i) in filteredDisciplines" :key="i" :value="discipline.disciplineName">
+        <IonItem @click="setDiscipline(discipline)">
+          <IonLabel>{{ discipline.disciplineName }}</IonLabel>
+        </IonItem>
+      </ion-list>
+    </div>
+  </IonModal>
+
   <div :style="{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isFilterCollapse ? '0' : '5px' }">
     <ion-text v-show="!isFilterCollapse" color="secondary">
       <div class="ion-margin-horizontal">
-        <span style="margin-right: 10px; color: var(--ion-color-accent)">{{ filteredOcupation.schoolName }}</span>
-        <small style="color: var(--ion-color-accent)">{{ filteredOcupation.classroomName }}</small>
+        <span style="margin-right: 10px; color: var(--ion-color-accent)">{{ filteredOcupation.schoolName }}</span><br>
+
+        <small style="color: var(--ion-color-accent)">{{ filteredOcupation.classroomName }} - {{ filteredOcupation.disciplineName }}</small>
       </div>
     </ion-text>
     <IonButton color="tertiary" :style="{ marginTop: isFilterCollapse ? '-20px' : '2px', marginLeft: isFilterCollapse ? '21.9em' : 'auto', marginRight: isFilterCollapse ? '10px' : '10px' }" @click="setFilterCollapse(!isFilterCollapse)">
