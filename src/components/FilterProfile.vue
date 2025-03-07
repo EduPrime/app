@@ -78,7 +78,7 @@ function setSchool(school: Occupation): void {
   emitFilteredOcupation()
 }
 
-async function setClasses(classItem: { classroomId: string, classroomName: string, serieId: string, serieName: string }): void {
+async function setClasses(classItem: { classroomId: string, classroomName: string, serieId: string, serieName: string }): Promise<void> {
   // Atualiza a turma
   filteredOcupation.value.classroomId = classItem.classroomId
   filteredOcupation.value.classroomName = classItem.classroomName
@@ -193,29 +193,29 @@ onMounted(async () => {
     <IonGrid class="ion-no-padding">
       <IonRow>
         <IonCol size="12">
-          <IonItem style="--min-height: 57px;" color="secondary" @click="setModalSchool(true)">
-            <IonLabel>{{ filteredOcupation.schoolName || 'Selecione uma escola' }}</IonLabel>
+          <IonItem class="ion-filter-item" color="secondary" @click="setModalSchool(true)">
+            <IonLabel class="custom-ion-item-label">{{ filteredOcupation.schoolName || 'Selecione uma escola' }}</IonLabel>
             <IonIcon slot="start" :icon="businessOutline" />
           </IonItem>
         </IonCol>
       </IonRow>
       <IonRow v-if="props.discipline">
         <IonCol size="6">
-          <IonItem style="--min-height: 57px;" color="tertiary" @click="setModalSerie(true)">
-            <IonLabel>{{ filteredOcupation.classroomName || 'Turma' }}</IonLabel>
-            <IonIcon slot="start" :icon="peopleOutline" />
+          <IonItem class="ion-filter-item" color="tertiary" @click="setModalSerie(true)">
+            <IonLabel class="custom-ion-label">{{ filteredOcupation.classroomName || 'Turma' }}</IonLabel>
+            <IonIcon slot="start" :icon="peopleOutline" class="custom-icon" />
           </IonItem>
         </IonCol>
         <IonCol size="6">
-          <IonItem style="--min-height: 57px;" color="primary" @click="setModalDiscipline(true)">
-            <IonLabel>{{ filteredOcupation.disciplineName || 'Disciplina' }}</IonLabel>
-            <IonIcon slot="start" :icon="peopleOutline" />
+          <IonItem class="ion-filter-item" color="primary" @click="setModalDiscipline(true)">
+            <IonLabel class="custom-ion-label">{{ filteredOcupation.disciplineName || 'Disciplina' }}</IonLabel>
+            <IonIcon slot="start" :icon="peopleOutline" class="custom-icon" />
           </IonItem>
         </IonCol>
       </IonRow>
       <IonRow v-else>
         <IonCol size="12">
-          <IonItem style="--min-height: 57px;" color="tertiary" @click="setModalSerie(true)">
+          <IonItem class="ion-filter-item" color="tertiary" @click="setModalSerie(true)">
             <IonLabel>{{ filteredOcupation.classroomName || 'Selecione uma turma' }}</IonLabel>
             <IonIcon slot="start" :icon="peopleOutline" />
           </IonItem>
@@ -351,5 +351,21 @@ ion-select {
   ion-select::part(label) {
     color: var(--ion-color-primary);
     opacity: 1;
+  }
+  .custom-ion-item-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ion-filter-item {
+    --min-height: 57px;
+  }
+  .custom-ion-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .custom-icon {
+    margin-right: 8px;
   }
 </style>
