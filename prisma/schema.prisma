@@ -89,6 +89,7 @@ model Classroom {
   enrollmenthistory_enrollmenthistory_currentClassroomIdToclassroom EnrollmentHistory[] @relation("enrollmenthistory_currentClassroomIdToclassroom")
   enrollmenthistory_enrollmenthistory_formerClassroomIdToclassroom  EnrollmentHistory[] @relation("enrollmenthistory_formerClassroomIdToclassroom")
   Schedule                                                          Schedule[]          @relation(map: "schedule_classroom_id_fkey")
+  Content                                                           Content[]
 
   @@map("classroom")
   @@schema("public")
@@ -143,6 +144,8 @@ model Discipline {
   DisciplineGrade         DisciplineGrade[]         @relation(map: "notadisciplina_discipline_id_fkey")
   DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "pareceretapadisciplina_discipline_id_fkey")
   Schedule                Schedule[]                @relation(map: "schedule_discipline_id_fkey")
+  ContentDiscipline       ContentDiscipline[]
+  Bncc                    Bncc[]
 
   @@map("discipline")
   @@schema("public")
@@ -540,6 +543,74 @@ model Schedule {
   @@schema("public")
 }
 
+model Content {
+  id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  date              DateTime            @db.Date
+  description       String              @db.VarChar(255)
+  classroomId       String?             @db.Uuid
+  teacherId         String?             @db.Uuid
+  createdAt         DateTime            @default(now()) @db.Timestamptz(6)
+  deletedAt         DateTime?           @db.Timestamptz(6)
+  updatedAt         DateTime?           @db.Timestamptz(6)
+  updatedBy         String?             @db.Uuid
+  tenantId          String?
+  userCreated       String?             @db.Uuid
+  classroom         Classroom?          @relation(fields: [classroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "content_classroom_id_fkey")
+  teacher           Teacher?            @relation(fields: [teacherId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "content_teacher_id_fkey")
+  ContentDiscipline ContentDiscipline[]
+  ContentBncc       ContentBncc[]
+
+  @@map("content")
+  @@schema("public")
+}
+
+model Bncc {
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code             String        @db.VarChar(30)
+  objective        String        @db.VarChar(350)
+  knowledgeArea    String?       @db.VarChar(100)
+  languagePractice String?       @db.VarChar(100)
+  fieldsOfAction   String?       @db.VarChar(100)
+  knowledgeObjects String?       @db.VarChar(100)
+  courseId         String        @db.Uuid
+  disciplineId     String        @db.Uuid
+  seriesId         String        @db.Uuid
+  createdAt        DateTime      @default(now()) @db.Timestamptz(6)
+  deletedAt        DateTime?     @db.Timestamptz(6)
+  updatedAt        DateTime?     @db.Timestamptz(6)
+  updatedBy        String?       @db.Uuid
+  tenantId         String?
+  userCreated      String?       @db.Uuid
+  themathicUnit    String        @db.VarChar(100)
+  discipline       Discipline    @relation(fields: [disciplineId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "bncc_discipline_id_fkey")
+  ContentBncc      ContentBncc[]
+
+  @@map("bncc")
+  @@schema("public")
+}
+
+model ContentDiscipline {
+  contentId    String     @db.Uuid
+  disciplineId String     @db.Uuid
+  content      Content    @relation(fields: [contentId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "contentdiscipline_content_id_fkey")
+  discipline   Discipline @relation(fields: [disciplineId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "contentdiscipline_discipline_id_fkey")
+
+  @@id([contentId, disciplineId])
+  @@map("contentdiscipline")
+  @@schema("public")
+}
+
+model ContentBncc {
+  contentId String  @db.Uuid
+  bnccId    String  @db.Uuid
+  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "contentbncc_content_id_fkey")
+  bncc      Bncc    @relation(fields: [bnccId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "contentbncc_bncc_id_fkey")
+
+  @@id([contentId, bnccId])
+  @@map("contentbncc")
+  @@schema("public")
+}
+
 model School {
   id                       String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   idpes                    Int?
@@ -799,6 +870,7 @@ model Teacher {
   user     User?      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_teacher_fkey")
   school   School     @relation(fields: [schoolId], references: [id], map: "teacher_school_id_fkey")
   Schedule Schedule[] @relation(map: "schedule_teacher_id_fkey")
+  Content  Content[]
 
   @@map("teacher")
   @@schema("public")
