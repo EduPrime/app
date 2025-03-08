@@ -39,7 +39,7 @@ export default class ClassroomService extends BaseService<Classroom> {
 
     const schoolMap = new Map<string, { schoolId: string, schoolName: string, seriesId: string, seriesName: string, classes: { classroomId: string, classroomName: string, serieId: string, serieName: string }[] }>()
 
-    data.forEach((item) => {
+    data.forEach((item: { id: string, name: string, school: { id: string, name: string } | any, series: { id: string, name: string } | any }) => {
       const schoolId = item.school?.id
       const schoolName = item.school?.name
       const classroomId = item.id

@@ -177,6 +177,7 @@ onMounted(async () => {
   teacherid.value = await loadDataTeacher()
   scheduleClass.value = await loadDataSchedule()
   ocupation.value = await loadDataSchoolClass()
+  console.log('Ocupation:', ocupation.value)
 })
 
 // Your component logic goes here
@@ -194,7 +195,9 @@ onMounted(async () => {
       <IonRow>
         <IonCol size="12">
           <IonItem class="ion-filter-item" color="secondary" @click="setModalSchool(true)">
-            <IonLabel class="custom-ion-item-label">{{ filteredOcupation.schoolName || 'Selecione uma escola' }}</IonLabel>
+            <IonLabel class="custom-ion-item-label">
+              {{ filteredOcupation.schoolName || 'Selecione uma escola' }}
+            </IonLabel>
             <IonIcon slot="start" :icon="businessOutline" />
           </IonItem>
         </IonCol>
@@ -202,13 +205,17 @@ onMounted(async () => {
       <IonRow v-if="props.discipline">
         <IonCol size="6">
           <IonItem class="ion-filter-item" color="tertiary" @click="setModalSerie(true)">
-            <IonLabel class="custom-ion-label">{{ filteredOcupation.classroomName || 'Turma' }}</IonLabel>
+            <IonLabel class="custom-ion-label">
+              {{ filteredOcupation.classroomName || 'Turma' }}
+            </IonLabel>
             <IonIcon slot="start" :icon="peopleOutline" class="custom-icon" />
           </IonItem>
         </IonCol>
         <IonCol size="6">
           <IonItem class="ion-filter-item" color="primary" @click="setModalDiscipline(true)">
-            <IonLabel class="custom-ion-label">{{ filteredOcupation.disciplineName || 'Disciplina' }}</IonLabel>
+            <IonLabel class="custom-ion-label">
+              {{ filteredOcupation.disciplineName || 'Disciplina' }}
+            </IonLabel>
             <IonIcon slot="start" :icon="peopleOutline" class="custom-icon" />
           </IonItem>
         </IonCol>

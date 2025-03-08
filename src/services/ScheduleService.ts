@@ -76,7 +76,7 @@ export default class ScheduleService extends BaseService<Schedule> {
   }
 
   async listDiscipline(teacherId: string, classroomId: string) {
-    const { data, error }: { data: { disciplineId: string, disciplineName: string }[] | null, error: any } = await this.client
+    const { data, error }: { data: { disciplineId: string }[] | null, error: any } = await this.client
       .from('schedule')
       .select('disciplineId')
       .eq('teacherId', teacherId)
