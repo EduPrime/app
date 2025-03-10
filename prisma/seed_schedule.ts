@@ -11,9 +11,9 @@ async function main() {
                     start: new Date("2010-01-17T08:00:00.000Z"),
                     end: new Date("2010-01-17T09:00:00.000Z"),
                     classroomId: '0c086508-d50b-49b6-afce-0c146643129d',
-                    teacherId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+                    teacherId: '45973489-ab5c-4d36-b5c0-842dff919a65', // Yohan teacher
                     schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab',
-                    disciplineId: '665c6577-9cc7-44ad-a654-6cd6b099cf47',
+                    disciplineId: '6862a800-92c3-4d46-8740-62a02a5e5cf9', // portugues
                     tenantId: self.crypto.randomUUID(),
                     createdAt: new Date('2010-01-17')
                 },
@@ -21,10 +21,10 @@ async function main() {
                     weekday: 'WEDNESDAY',
                     start: new Date("2010-01-17T09:00:00.000Z"),
                     end: new Date("2010-01-17T10:00:00.000Z"),
-                    classroomId: '0c086508-d50b-49b6-afce-0c146643129d',
-                    teacherId: 'a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+                    classroomId: '0c086508-d50b-49b6-afce-0c146643129d', // 1 ano A
+                    teacherId: '45973489-ab5c-4d36-b5c0-842dff919a65', // Yohan teacher
                     schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab',
-                    disciplineId: 'a01f22f6-d792-48e8-9324-8baee795476b',
+                    disciplineId: '4ca48f5c-2987-4cab-9420-614d64d4d489', // matematica
                     tenantId: self.crypto.randomUUID(),
                     createdAt: new Date('2010-01-18')
                 }
