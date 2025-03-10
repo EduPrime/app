@@ -270,6 +270,7 @@ async function logout() {
 <template>
   <ion-app>
     <template v-if="isPublicPage">
+      
       <!-- Router outlet com uma key para forçar re-renderização -->
       <ion-router-outlet :key="route.fullPath" />
     </template>
