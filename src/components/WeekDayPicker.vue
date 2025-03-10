@@ -1,31 +1,42 @@
 <script lang="ts" setup>
 import type { Moment } from 'moment'
+import { hexToRgb } from '@/utils/hex-to-rgb'
 import {
   IonButton,
   IonButtons,
   IonChip,
   IonDatetime,
-  IonDatetimeButton,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonListHeader,
   IonModal,
-  IonToolbar,
+  IonText,
 } from '@ionic/vue'
-import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
 
+import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
 import { DateTime } from 'luxon'
+
 import moment from 'moment'
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { computed, defineEmits, ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, onMounted, ref, type Ref, watch } from 'vue'
+import ScheduleService from '../services/ScheduleService'
 
 import 'swiper/css'
 
+// @TODO: Quando possível implementar a prop feriados para receber o valor de forma dinamica e aposentar a variável ref() events
+//
+interface Props {
+  // feriados: { date: string; type: string; title: string }[]
+  teacherId: string
+}
+
+const props = defineProps<Props>()
+
 const emits = defineEmits(['update:modelValue'])
 
-const getSwiper: any = ref(null)
+const scheduleService = new ScheduleService()
+const validDays = ref()
+const pulseAtEnd = ref('')
+
+const getSwiper: Ref<any> = ref(null)
 const currentDate = ref(moment())
 const monthYear = ref(new Date()
   .toISOString())
@@ -35,6 +46,7 @@ const selectedDate = ref(moment())
 const events = ref([
   { date: '2024-06-01', type: 'holiday', title: 'Holiday' },
   { date: '2024-06-05', type: 'event', title: 'Event' },
+  { date: '2025-02-04', type: 'holiday', title: 'Carnaval' },
   { date: '2024-06-08', type: 'disabled', title: 'Event' },
   { date: '2024-06-10', type: 'event', title: 'Event' },
   { date: '2024-06-25', type: 'disabled', title: 'Event' },
@@ -49,13 +61,36 @@ const slideOpts = {
 
 const modal = ref()
 
-// const dismiss = () => modal.value.$el.dismiss()
+//  Esta função serve para fechar o modal
+//  const dismiss = () => modal.value.$el.dismiss()
 
 // Variável para armazenar o valor de mês e ano selecionado
 const monthYearValue = ref(`${new Date().toISOString().slice(0, 8)}01`)
 
+const colorStyle = ref({
+  primary: getComputedStyle(document.documentElement).getPropertyValue('--ion-color-primary').trim(),
+  secondary: getComputedStyle(document.documentElement).getPropertyValue('--ion-color-secondary').trim(),
+  tertiary: getComputedStyle(document.documentElement).getPropertyValue('--ion-color-tertiary').trim(),
+})
+
+async function getValidDaysInScheduleService() {
+  try {
+    const data = await scheduleService.getSchedule(props.teacherId)
+
+    // Passa um map nas informações vindas de getSchedule e retorna apenas os dias da semana
+    // validDays.value = data.map((day: any) => {
+    //   return day.weekday
+    // })
+    return data
+    // console.log('Dados carregados loadDataSchedule:', data)
+  }
+  catch (error) {
+    console.error('Erro ao carregar os dados:', error)
+  }
+}
+
 // Função para atualizar o valor de mês e ano selecionado
-function updateDate(event: any) {
+function updateDate(event: Event | any) {
   monthYearValue.value = event.detail.value
 }
 
@@ -86,6 +121,7 @@ function prevMonth() {
   else {
     getSwiper.value.slidePrev()
   }
+  monthYearValue.value = monthYear.value
 }
 
 function nextMonth() {
@@ -97,6 +133,7 @@ function nextMonth() {
   else {
     getSwiper.value.slideNext()
   }
+  monthYearValue.value = monthYear.value
 }
 
 function selectDate(date: Moment) {
@@ -108,7 +145,7 @@ function selectDate(date: Moment) {
 function getColorForDate(date: Moment) {
   const formattedDate = date.format('YYYY-MM-DD')
   if (formattedDate === selectedDate.value.format('YYYY-MM-DD')) {
-    return 'primary'
+    return ''
   }
   else if (events.value.some(event => event.date === formattedDate)) {
     const event = events.value.find(event => event.date === formattedDate)
@@ -122,21 +159,25 @@ function getColorForDate(date: Moment) {
     }
   }
   else {
-    return ''
+    return 'primary'
   }
 }
 
-function isDateDisabled(date: Moment) {
-  const formattedDate = date.format('YYYY-MM-DD')
-  const event = events.value.find(event => event.date === formattedDate)
-  return event?.type === 'disabled'
-}
+// Metodo para lidar com datas desabilitadas
 
-function onMonthYearChange(event: any) {
-  const selectedDate = moment(event.detail.value)
-  currentDate.value = selectedDate.startOf('month')
-  loadVisibleMonth()
-}
+// function isDateDisabled(date: Moment) {
+//   const formattedDate = date.format('YYYY-MM-DD')
+//   const event = events.value.find(event => event.date === formattedDate)
+//   return event?.type === 'disabled'
+// }
+
+//  @TODO: Atenção, estudar melhor o uso desta função posteriormente
+
+// function onMonthYearChange(event: any) {
+//   const selectedDate = moment(event.detail.value)
+//   currentDate.value = selectedDate.startOf('month')
+//   loadVisibleMonth()
+// }
 
 function updateDatetimeButton() {
   monthYear.value = currentDate.value.format('YYYY-MM-DD')
@@ -158,31 +199,33 @@ function handleSlideChange(event: any) {
   }
 }
 function onSwiper(swiper: any) {
-  console.log(swiper)
+  // console.log(swiper)
   getSwiper.value = swiper
 }
-function checkNextSlide(swiper: any) {
-  if (swiper.isEnd) {
-    nextMonth()
-  }
-}
+
+// Era usado para mudar o mês quando chegava ao vim do slide ( clicando )
+// function checkNextSlide(swiper: any) {
+//   if (swiper.isEnd) {
+//     nextMonth()
+//   }
+// }
 
 function translateDay(day: string) {
   switch (day) {
     case 'SUN':
-      return 'Dom'
+      return 'DOM'
     case 'MON':
-      return 'Seg'
+      return 'SEG'
     case 'TUE':
-      return 'Ter'
+      return 'TER'
     case 'WED':
-      return 'Qua'
+      return 'QUA'
     case 'THU':
-      return 'Qui'
+      return 'QUI'
     case 'FRI':
-      return 'Sex'
+      return 'SEX'
     case 'SAT':
-      return 'Sab'
+      return 'SAB'
     default:
       return ''
   }
@@ -205,6 +248,15 @@ watch(monthYearValue, (newValue: any, oldValue: any) => {
   }
 })
 
+function pulse() {
+  pulseAtEnd.value = 'pulseButton'
+  setTimeout(() => {
+    pulseAtEnd.value = ''
+
+    // Nome da classe que você deseja adicionar
+  }, 2000) // 2000 milissegundos = 2 segundos de delay
+}
+
 watch(selectedDate, (newValue: any) => {
   if (newValue) {
     emits('update:modelValue', {
@@ -213,6 +265,12 @@ watch(selectedDate, (newValue: any) => {
     })
   }
 })
+
+watch(() => props.teacherId, async (newValue: any) => {
+  if (newValue) {
+    validDays.value = await getValidDaysInScheduleService()
+  }
+}, { immediate: true })
 </script>
 
 <template>
@@ -221,47 +279,60 @@ watch(selectedDate, (newValue: any) => {
       <!-- aqui vai o filtro ou algo assim <ion-col size="12" size-xl="6"></ion-col> -->
       <ion-col size="12" size-xl="6">
         <ion-row>
-          <ion-col style="display: flex;" class="ion-justify-content-start ion-align-items-center" size="7">
-            <IonButton id="open-custom-dialog" expand="block">
-              {{ luxonFormatDate(monthYearValue) }}
-            </IonButton>
+          <ion-col style="display: flex; padding-left: 10px;" class="ion-justify-content-start ion-align-items-center" size="7">
+            <IonChip id="open-custom-dialog" color="primary" class="ion-padding-horizontal ion-no-margin" shape="rounded">
+              <IonText style="height: 28px; display: flex; padding-bottom: 2px; font-size: medium; font-weight: medium;" class="ion-justify-content-center ion-align-items-center">
+                {{ luxonFormatDate(monthYearValue) }}
+              </IonText>
+            </IonChip>
 
             <IonModal id="month-year-modal" ref="modal" trigger="open-custom-dialog">
               <div class="wrapper">
                 <h1>Selecione o ano e mês</h1>
-                <IonDatetime v-model="monthYearValue" done-text="Confirmar" cancel-text="Cancelar"
-                  presentation="month-year" datetime="datetime" display-format="MMMM YYYY" :show-default-buttons="true"
-                  @ion-change="updateDate" />
+                <IonDatetime
+                  v-model="monthYearValue"
+                  done-text="Confirmar" cancel-text="Cancelar"
+                  presentation="month-year"
+                  datetime="datetime"
+                  display-format="MMMM YYYY"
+                  :show-default-buttons="true"
+                  @ion-change="updateDate"
+                />
                 <!-- dismiss() -->
               </div>
             </IonModal>
           </ion-col>
-          <ion-col style="display: flex;" class=" ion-align-items-center ion-justify-content-end" size="5">
+          <ion-col style="display: flex; padding-right: 5px;" class="ion-align-items-center ion-justify-content-end" size="5">
             <IonButtons style="scale: 0.9;" class="ion-justify-content-end">
-              <IonButton color="tertiary" class="navigation-btn" @click="prevMonth">
+              <IonButton color="primary" class="navigation-btn" :style="`background-color:  ${hexToRgb(colorStyle.primary, '0.1')};`" @click="prevMonth">
                 <IonIcon slot="icon-only" :icon="arrowBackOutline" />
               </IonButton>
-              <IonButton color="tertiary" class="navigation-btn" style="margin-left: 10px;" @click="nextMonth">
+              <IonButton color="primary" class="navigation-btn" :class="pulseAtEnd" style="margin-left: 10px;" :style="`background-color:  ${hexToRgb(colorStyle.primary, pulseAtEnd ? '0.5' : '0.1')};`" @click="nextMonth">
                 <IonIcon slot="icon-only" :icon="arrowForwardOutline" />
               </IonButton>
             </IonButtons>
           </ion-col>
           <ion-col size="12">
-            <Swiper :options="slideOpts" :slides-per-view="1" :space-between="8"
-              @ion-slide-will-change="handleSlideChange" @swiper="onSwiper"
-              @touch-end="(swiper: any) => checkNextSlide(swiper)">
+            <!-- isso fazia com que quando clicasse em páginas do slide com menos de 7 itens scrollar automático
+             porem não registrava o dia que clicou ( estudar maneira de trocar o array do mês ao tentar scrollar para o lado )
+              @touch-end="(swiper: any) => checkNextSlide(swiper)" -->
+            <Swiper
+              :options="slideOpts" :slides-per-view="1" :space-between="8" @ion-slide-will-change="handleSlideChange"
+              @swiper="onSwiper"
+              @reach-end="() => pulse()"
+            >
               <SwiperSlide v-for="(week, index) in weeksInMonth" :key="index">
                 <div class="date-selector">
-                  <div v-for="day in week" :key="day.date.format('YYYY-MM-DD')"
-                    :style="day.weekday !== 'SUN' ? '' : 'display: none;'" class="day-chip">
-                    <!-- <div class="ion-padding">
-                        {{ day.date.format('YYYY-MM-DD') }}
-                        <br>
-                        {{ monthYearValue }}
-                      </div> -->
-
-                    <IonChip :disabled="isDateDisabled(day.date)" shape="rounded" :color="getColorForDate(day.date)"
-                      @click="() => selectDate(day.date)">
+                  <div v-for="(day, i) in week" :key="day.date.format('YYYY-MM-DD')" class="day-chip">
+                    <!-- valor padrão de disabled :disabled="isDateDisabled(day.date)" shape="rounded" -->
+                    <!-- :style="day.weekday !== 'SUN' ? '' : 'display: none;'" -->
+                    <IonChip
+                      class="ion-no-padding"
+                      style="padding: 10px;"
+                      :disabled="!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0"
+                      :style="i === 0 ? 'margin-left: 10px;' : undefined"
+                      :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
+                    >
                       <div>
                         <div class="day-name">
                           {{ translateDay(day.weekday) }}
@@ -283,63 +354,83 @@ watch(selectedDate, (newValue: any) => {
 </template>
 
 <style scoped>
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.3);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulseButton {
+  animation: pulse 1s ease-in-out infinite; /* Tempo de 1 segundo e animação contínua */
+}
 .date-selector {
-  display: flex;
-  justify-content: flex-start;
-  padding: 4px;
+    display: flex;
+    justify-content: flex-start;
+    padding: 4px;
 }
 
 .day-chip {
-  text-align: center;
-  flex-basis: 13%;
+    text-align: center;
+    flex-basis: 13%;
 }
 
 ion-chip {
-  border-radius: 45px;
+    border-radius: 45px;
 }
 
 .day-name {
-  margin-top: 20px;
-  font-weight: normal;
-  font-size: 12px;
-  margin-bottom: 12px;
+  width: 24px;
+    margin-top: 20px;
+    font-size: 10px;
+    font-weight: lighter;
+    margin-bottom: 12px;
 }
 
 .day-number {
-  font-size: 16px;
-  font-weight: 800;
-  margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 800;
+    margin-bottom: 20px;
 }
 
 .navigation-btn {
-  background-color: var(--ion-color-lightaccent);
   border-radius: 100%
 }
 
+ion-chip {
+  --background: var(--ion-color-tertiary);
+  --color: var(--ion-color-lightaccent);
+}
+
 ion-modal#month-year-modal {
-  --width: fit-content;
-  --min-width: 250px;
-  --height: fit-content;
-  --border-radius: 6px;
-  --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
-}
+    --width: fit-content;
+    --min-width: 250px;
+    --height: fit-content;
+    --border-radius: 6px;
+    --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
+  }
 
-ion-modal#month-year-modal h1 {
-  margin: 20px 20px 10px 20px;
-}
+  ion-modal#month-year-modal h1 {
+    margin: 20px 20px 10px 20px;
+  }
 
-ion-modal#month-year-modal ion-icon {
-  margin-right: 6px;
+  ion-modal#month-year-modal ion-icon {
+    margin-right: 6px;
 
-  width: 48px;
-  height: 48px;
+    width: 48px;
+    height: 48px;
 
-  padding: 4px 0;
+    padding: 4px 0;
 
-  color: #aaaaaa;
-}
+    color: #aaaaaa;
+  }
 
-ion-modal#month-year-modal .wrapper {
-  margin-bottom: 10px;
-}
+  ion-modal#month-year-modal .wrapper {
+    margin-bottom: 10px;
+  }
 </style>
