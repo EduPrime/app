@@ -21,7 +21,7 @@ const routes = [
       icon: folder,
       name: 'Alunos',
       order: 1,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -33,7 +33,7 @@ const routes = [
       icon: folder,
       name: 'Cadastrar Aluno',
       order: 2,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -45,7 +45,7 @@ const routes = [
       icon: folder,
       name: 'Editar Aluno',
       order: 3,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -58,7 +58,7 @@ const routes = [
       icon: create,
       name: 'Matrículas',
       order: 2,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -70,7 +70,7 @@ const routes = [
       icon: create,
       name: 'Matricular Aluno',
       order: 3,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -82,7 +82,7 @@ const routes = [
       icon: create,
       name: 'Editar Matrícula',
       order: 4,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   /*   {
@@ -96,7 +96,7 @@ const routes = [
       order: 5,
       requiredRole: ['public', 'admin'],
     },
-  }, */
+  }, 
   {
     path: '/student/pre-enrollment',
     name: 'Pre_enrollmentList',
@@ -110,7 +110,7 @@ const routes = [
       requiredRole: ['ADMIN'],
     },
   },
-  /*   {
+  {
     path: '/student/pre-enrollment/register',
     name: 'Pre_enrollmentRegister',
     component: RegisterPre_enrollment,
@@ -121,7 +121,7 @@ const routes = [
       order: 6,
       requiredRole: ['public', 'admin'],
     },
-  }, */
+  }, 
   {
     path: '/student/pre-enrollment/edit/:id',
     name: 'Pre_enrollmentEdit',
@@ -133,7 +133,7 @@ const routes = [
       order: 6,
       requiredRole: ['ADMIN'],
     },
-  },
+  },*/
 ]
 
 export default routes

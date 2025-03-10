@@ -1,7 +1,8 @@
 import { flame, flameOutline } from 'ionicons/icons'
 import PreEnrollment from './views/PreEnrollment.vue'
 
-const routes = [
+const routes: never[] = [
+  /*
   {
     path: '/pre-enrollment',
     name: 'Pre Enrollment',
@@ -16,6 +17,7 @@ const routes = [
       requiredRole: ['ADMIN'],
     },
   },
+  */
 ]
 
 export default routes

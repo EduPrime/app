@@ -19,7 +19,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: list,
       name: 'Gerenciar Professores',
       order: 1,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -32,7 +32,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: create,
       name: 'Registrar Novo Professor',
       order: 2,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -45,7 +45,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: person,
       name: 'Editar Professor',
       order: 3,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -58,7 +58,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: calendar,
       name: 'Grade de Aula',
       order: 4,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -71,7 +71,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: document,
       name: 'Documentação',
       order: 5,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -84,7 +84,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: star,
       name: 'Avaliações e Feedback',
       order: 6,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -97,7 +97,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: school,
       name: 'Relatórios e Monitoramento',
       order: 8,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -110,7 +110,7 @@ const routes: Array<CustomRouteRecordRaw> = [
       icon: chatbubbles,
       name: 'Mensagens',
       order: 9,
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
 ]
