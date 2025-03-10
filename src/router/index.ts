@@ -31,7 +31,7 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     meta: {
       icon: home,
       name: 'Main Dashboard',
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -73,7 +73,7 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     meta: {
       icon: home,
       name: 'Main Dashboard',
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -82,63 +82,63 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     meta: {
       // icon: calendar,
       name: 'Book Appointment',
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
     path: '/files/:id',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
     path: '/files/:id/:page',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
     path: '/files/:id/:page/:reportType',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
     path: '/users/:id',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
     path: '/insights/:id',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
     path: '/settings/:id',
     component: () => import('../views/FolderPage.vue'),
     meta: {
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
     path: '/profile',
     component: () => import('../views/ProfilePage.vue'),
     meta: {
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   {
     path: '/notifications',
     component: () => import('../views/NotificationsPage.vue'),
     meta: {
-      requiredRole: ['ADMIN'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
     },
   },
   // {
