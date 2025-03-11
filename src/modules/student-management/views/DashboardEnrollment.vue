@@ -2,7 +2,7 @@
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import { IonButton, IonCol, IonIcon, IonItem, IonRow, IonSelect, IonSelectOption, IonText, toastController } from '@ionic/vue'
 import dayjs from 'dayjs'
-import { alertCircleOutline, arrowDownOutline, arrowUpOutline, businessOutline, menu } from 'ionicons/icons'
+import { alarm, alertCircleOutline, arrowDownOutline, arrowUpOutline, businessOutline, menu } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import Pre_enrollmentService from '../services/Pre_enrollmentService'
 import SchoolService from '../services/SchoolService'
@@ -34,8 +34,19 @@ interface Student {
   institutionId: string;
 }
 
+interface Classes {
+  id: string;
+  name: string;
+  maxStudents: number;
+  period: string;
+  totalStudents: number;
+  exceededStudents: number;
+  pcdStudents: number;
+}
+
 const enrollment = ref<Enrollment>()
 
+const prestudents = ref<Student[]>([])
 const students = ref<Student[]>([])
 const series = ref<any[]>([])
 const filter = ref({
@@ -48,26 +59,20 @@ const filter = ref({
 
 const schools = ref<{ name: any; id: any }[]>([])
 const finishEnrollmentOpened = ref(false)
-
-interface Classes {
-  id: string;
-  name: string;
-  maxStudents: number;
-  period: string;
-  totalStudents: number;
-  exceededStudents: number;
-  pcdStudents: number;
-}
-
 const classes = ref<Classes[]>([])
 const selectedClass = ref('')
 const selectClassOpened = ref(false)
 
+const turnos = {
+  'MORNING': 'manhã',
+  'AFTERNOON': 'tarde',
+  'EVENING': 'noite'
+}
 
 async function loadEnrollment() {
   try {
     const enrollments = await preEnrollmentService.getFilteredWithStudents(filter.value)
-    students.value = enrollments.map(enrollment => ({
+    prestudents.value = enrollments.map(enrollment => ({
       pcd: enrollment.student?.disability ?? false,
       name: enrollment.student?.name ?? '',
       age: dayjs().diff(dayjs(enrollment.student?.birthdate), 'year') ?? 0,
@@ -81,12 +86,17 @@ async function loadEnrollment() {
       institutionId: enrollment.institutionId,
     }
     ))
+    console.log('prestudents', prestudents.value)
   }
 
   catch (error) {
     console.error('Erro ao carregar as matrículas:', error)
-    students.value = []
+    prestudents.value = []
   }
+}
+
+function filterByShift(shift: string) {
+  students.value = prestudents.value.filter(student => student.shift === shift)
 }
 
 const selectedStudents = computed(() => students.value.filter(student => !!student.selected))
@@ -233,6 +243,15 @@ async function lastStepEnrollment() {
               @ion-change="($event) => { filter.serie = $event.detail.value; loadEnrollment() }">
               <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
                 {{ serie.name }}
+              </IonSelectOption>
+            </IonSelect>
+          </IonItem>
+          <IonItem color="secondary">
+            <IonIcon slot="start" class="cursor-pointer" :icon="alarm" />
+            <IonSelect class="hide-icon" :value="prestudents.shift" label-placement="floating"
+              @ion-change="($event) => { filterByShift($event.detail.value) }">
+              <IonSelectOption v-for="shift, i in turnos" :key="i" :value="i">
+                {{ shift }}
               </IonSelectOption>
             </IonSelect>
           </IonItem>
