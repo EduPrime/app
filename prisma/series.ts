@@ -80,6 +80,19 @@ async function main() {
                 teachingType: 'Regular',
                 courseModality: 'Manhã',
                 workload: 800,
+            },
+            {
+                id: 'b4c7da20-b25a-46e2-8759-c9347554b09c', // Ensino Fundamental II
+                name: 'Ensino Fundamental II',
+                status: 'ACTIVE',
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                institutionId: 'bd14f407-3758-4656-a299-e4cf3859dd29', // Prefeitura Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                courseStage: 1,
+                graduate: 'fundamental',
+                teachingType: 'Regular',
+                courseModality: 'Manhã',
+                workload: 800,
             }
         ],
         skipDuplicates: true
@@ -110,7 +123,92 @@ async function main() {
                 graduate: 'fundamental',
                 workload: 30,
                 schoolDays: '2,3,4,5'
-            }
+            },
+            {
+                id: 'c459fbfb-c33e-4d02-bb30-2875f1904e39',
+                name: '3º Ano',
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                courseId: '23ca0e75-5344-42c6-9640-97cc5bad6e94', // Ensino Fundamental I
+                institutionId: 'bd14f407-3758-4656-a299-e4cf3859dd29', // Prefeitura Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                courseStage: 'FUNDAMENTAL',
+                graduate: 'fundamental',
+                workload: 30,
+                schoolDays: '2,3,4,5'
+            },
+            {
+                id: 'd131b737-72ff-4c5c-9fd6-1dbd810b5cce',
+                name: '4º Ano',
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                courseId: '23ca0e75-5344-42c6-9640-97cc5bad6e94', // Ensino Fundamental I
+                institutionId: 'bd14f407-3758-4656-a299-e4cf3859dd29', // Prefeitura Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                courseStage: 'FUNDAMENTAL',
+                graduate: 'fundamental',
+                workload: 30,
+                schoolDays: '2,3,4,5'
+            },
+            {
+                id: '4a909dc9-f78f-41d9-9451-87a2708bbf99',
+                name: '5º Ano',
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                courseId: '23ca0e75-5344-42c6-9640-97cc5bad6e94', // Ensino Fundamental I
+                institutionId: 'bd14f407-3758-4656-a299-e4cf3859dd29', // Prefeitura Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                courseStage: 'FUNDAMENTAL',
+                graduate: 'fundamental',
+                workload: 30,
+                schoolDays: '2,3,4,5'
+            },
+            {
+                id: '19bcbcde-8016-4e7e-b0e4-bc3fcb73c53c',
+                name: '6º Ano',
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                courseId: 'b4c7da20-b25a-46e2-8759-c9347554b09c', // Ensino Fundamental II
+                institutionId: 'bd14f407-3758-4656-a299-e4cf3859dd29', // Prefeitura Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                courseStage: 'FUNDAMENTAL',
+                graduate: 'fundamental',
+                workload: 30,
+                schoolDays: '2,3,4,5'
+            },
+            {
+                id: 'b1ce4726-de53-47ed-8c6e-34eaa1e39747',
+                name: '7º Ano',
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                courseId: 'b4c7da20-b25a-46e2-8759-c9347554b09c', // Ensino Fundamental II
+                institutionId: 'bd14f407-3758-4656-a299-e4cf3859dd29', // Prefeitura Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                courseStage: 'FUNDAMENTAL',
+                graduate: 'fundamental',
+                workload: 30,
+                schoolDays: '2,3,4,5'
+            },
+            {
+                id: 'd6c891d2-f5c7-4088-8a90-1fd4ef9b9e95',
+                name: '8º Ano',
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                courseId: 'b4c7da20-b25a-46e2-8759-c9347554b09c', // Ensino Fundamental II
+                institutionId: 'bd14f407-3758-4656-a299-e4cf3859dd29', // Prefeitura Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                courseStage: 'FUNDAMENTAL',
+                graduate: 'fundamental',
+                workload: 30,
+                schoolDays: '2,3,4,5'
+            },
+            {
+                id: 'ea01d929-3479-4dc6-b162-6ed6a5c66a26',
+                name: '9º Ano',
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                courseId: 'b4c7da20-b25a-46e2-8759-c9347554b09c', // Ensino Fundamental II
+                institutionId: 'bd14f407-3758-4656-a299-e4cf3859dd29', // Prefeitura Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                courseStage: 'FUNDAMENTAL',
+                graduate: 'fundamental',
+                workload: 30,
+                schoolDays: '2,3,4,5'
+            },
+
         ],
         skipDuplicates: true
     })
