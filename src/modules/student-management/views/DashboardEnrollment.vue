@@ -45,10 +45,12 @@ interface Classes {
 }
 
 const enrollment = ref<Enrollment>()
-
 const prestudents = ref<Student[]>([])
 const students = ref<Student[]>([])
+
 const series = ref<any[]>([])
+const searchQuery = ref('')
+
 const filter = ref({
   direction: 'asc',
   by: 'name',
@@ -63,11 +65,22 @@ const classes = ref<Classes[]>([])
 const selectedClass = ref('')
 const selectClassOpened = ref(false)
 
-const turnos = {
-  'MORNING': 'manhã',
-  'AFTERNOON': 'tarde',
-  'EVENING': 'noite'
-}
+const turnos = ref({
+  'MORNING': 'Manhã',
+  'AFTERNOON': 'Tarde',
+  'EVENING': 'Noite'
+})
+
+let filteredStudents = computed(() => {
+
+  if (!searchQuery.value) {
+    return students.value
+  }
+
+  return students.value.filter((student) =>
+    student.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
+  )
+})
 
 async function loadEnrollment() {
   try {
@@ -99,23 +112,27 @@ function filterByShift(shift: string) {
   students.value = prestudents.value.filter(student => student.shift === shift)
 }
 
-const selectedStudents = computed(() => students.value.filter(student => !!student.selected))
+const selectedStudents = computed(() => filteredStudents.value.filter(student => !!student.selected))
 
 function handleSelectAll($event: any) {
-  students.value.forEach((element) => {
+  filteredStudents.value.forEach((element) => {
     element.selected = $event?.detail?.checked ?? false
   })
 }
 
 
-watch(filter, async () => {
+watch(filter, () => {
+  if (filter.value.by === 'name') {
+    students.value = students.value.sort((a, b) => filter.value.direction === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name))
+  }
+  else {
+    students.value = students.value.sort((a, b) => filter.value.direction === 'asc' ? a.age - b.age : b.age - a.age)
 
-}, { deep: true })
+  }
+}, { deep: true, immediate: true })
 
 onMounted(async () => {
   await getSchools()
-  // await getSeries()
-  // loadEnrollment()
 })
 
 async function getSchools() {
@@ -230,7 +247,7 @@ async function lastStepEnrollment() {
           <IonItem color="primary">
             <IonIcon slot="start" :icon="businessOutline" />
             <IonSelect class="hide-icon" :value="filter.school" label-placement="floating" @ion-change="($event) => {
-              filter.school = $event.detail.value; getSeries()
+              filter.school = $event.detail.value; getSeries(); students = []
             }">
               <IonSelectOption v-for="school, i in schools" :key="i" :value="school.id">
                 {{ school.name }}
@@ -240,7 +257,7 @@ async function lastStepEnrollment() {
           <IonItem color="tertiary">
             <IonIcon slot="start" class="cursor-pointer" :icon="menu" />
             <IonSelect class="hide-icon" :value="filter.serie" label-placement="floating"
-              @ion-change="($event) => { filter.serie = $event.detail.value; loadEnrollment() }">
+              @ion-change="($event) => { students = []; filter.serie = $event.detail.value; loadEnrollment() }">
               <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
                 {{ serie.name }}
               </IonSelectOption>
@@ -263,7 +280,7 @@ async function lastStepEnrollment() {
         </div>
         <IonRow>
           <IonCol class="p-0" size="8">
-            <ion-searchbar v-model="filter.value" class="custom-search" placeholder="Filtrar" />
+            <ion-searchbar v-model="searchQuery" class="custom-search" placeholder="Filtrar" />
           </IonCol>
           <IonCol class="p-0" size="4">
             <IonSelect :toggle-icon="arrowDownOutline" :expanded-icon="arrowUpOutline" class="custom-select"
@@ -279,7 +296,7 @@ async function lastStepEnrollment() {
         </IonRow>
         <IonRow class="checkbox-row">
           <IonCol size="10">
-            <ion-checkbox :checked="allSelected" @ion-change="handleSelectAll" />
+            <ion-checkbox v-if="filteredStudents.length > 0" :checked="allSelected" @ion-change="handleSelectAll" />
           </IonCol>
           <IonCol size="auto">
             <IonRow>
@@ -292,8 +309,8 @@ async function lastStepEnrollment() {
         </IonRow>
 
         <ion-list>
-          <IonItem v-for="(student, index) in students" :key="index" :color="student.selected ? 'lightaccent' : ''"
-            :class="{ selected: student.selected }">
+          <IonItem v-for="(student, index) in filteredStudents" :key="index"
+            :color="student.selected ? 'lightaccent' : ''" :class="{ selected: student.selected }">
             <ion-checkbox slot="start" v-model="student.selected" :checked="student.selected"
               @ion-change="($event: any) => student.selected = $event.detail.checked" />
             <ion-label>
