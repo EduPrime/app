@@ -7,7 +7,7 @@ async function main() {
         data: [
             // {
             //     id: '006d4da3-f7a5-4cab-b83e-e3b25002ea1a',
-            //     code: 'EF35LP22PE',
+            //     code: 'EF35LS22PE',
             //     objective: 'Perceber diálogos em textos narrativos, observando o efeito de sentido de verbos de enunciação, marcas linguísticas e, se for o caso, o uso de variedades linguísticas no discurso direto, e sua relevância para a construção de sentidos dos textos.',
             //     themathicUnit: 'Unidade temática 2',
             //     knowledgeArea: 'Area 1',
@@ -22,7 +22,7 @@ async function main() {
             // },
             // {
             //     id: '00857cf3-6d75-4891-bf8d-c8a78aa185b7',
-            //     code: 'EF05MA16PE',
+            //     code: 'EF05E16PE',
             //     objective: 'Associar figuras espaciais a suas planificações (prismas, pirâmides, cilindros e cones) e analisar, nomear e comparar seus atributos, utilizando e/ou recursos tecnológicos.',
             //     themathicUnit: 'GEOMETRIA',
             //     knowledgeArea: 'Area 2',
@@ -127,7 +127,7 @@ async function main() {
             },
             {
                 id: 'b5743aca-ba49-428e-8e2c-ee8f459fd686',
-                code: 'EF04GE13PE',
+                code: 'EF01MA13PE',
                 objective: 'Desenvolver habilidades de compreensão e aplicação de conceitos geométricos em diferentes contextos.',
                 themathicUnit: 'Geometria',
                 knowledgeArea: 'Matemática',

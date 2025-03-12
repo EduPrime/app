@@ -82,13 +82,17 @@ async function setupRoles() {
               WHERE schemaname = 'public'
                 AND tablename NOT LIKE '\\_%' ESCAPE '\\'
           LOOP
-              EXECUTE format('REVOKE DELETE ON TABLE public.%I FROM owner;', table_name);
+              IF table_name NOT IN ('contentdiscipline','contentbncc') THEN
+                  EXECUTE format('REVOKE DELETE ON TABLE public.%I FROM owner;', table_name);
+              ELSE
+                  EXECUTE format('GRANT DELETE ON TABLE public.%I TO owner;', table_name);
+              END IF;
           END LOOP;
       END
       $$;
     `;
         await prisma.$executeRawUnsafe(revokeDeletePermissionsQuery);
-        console.log("DELETE permissions explicitly revoked from role 'owner'.");
+        console.log("DELETE permissions explicitly revoked from role 'owner' for all tables except 'contentdiscipline' and 'contentbncc'.");
     } catch (error) {
         console.error('Error during role setup:', error);
     } finally {
