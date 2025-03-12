@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IonButtons, IonFooter, IonHeader, IonIcon, IonMenuButton, IonNote, IonTitle, IonToolbar } from '@ionic/vue'
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 const props = defineProps({
@@ -21,7 +21,7 @@ const props = defineProps({
     default: '',
   },
 })
-
+const screenWidth = computed(() => window.innerWidth)
 const route = useRoute()
 const metaName = ref((route.meta.name as string) || '')
 const metaIcon = ref((route.meta.icon as string) || '')
@@ -59,7 +59,8 @@ watch(
       </IonToolbar>
     </IonHeader>
 
-    <ion-content :fullscreen="true">
+    <ion-content :class="screenWidth > 768 ? '' : 'ion-no-padding'" :fullscreen="true">
+      <div style="height: 56px;" />
       <IonHeader collapse="condense">
         <IonToolbar>
           <slot name="header-buttons" />
@@ -69,12 +70,15 @@ watch(
         </IonToolbar>
       </IonHeader>
 
-      <div id="main-content-box" class="ion-no-padding ion-no-margin">
+      <div id="main-content-box">
         <ion-row v-if="props.showDescription" class="ion-no-padding ion-no-margin">
           <ion-col
-            style="background-color: #aa86ff; box-shadow: 5px 5px 0px 0px rgba(110, 68, 255, 0.4); border-radius: 3px;">
-            <IonNote class="ion-no-padding ion-no-margin"
-              style="color: #ffffff; display: flex; align-items: center; justify-content: center;">
+            style="background-color: #aa86ff; box-shadow: 5px 5px 0px 0px rgba(110, 68, 255, 0.4); border-radius: 3px;"
+          >
+            <IonNote
+              class="ion-no-padding ion-no-margin"
+              style="color: #ffffff; display: flex; align-items: center; justify-content: center;"
+            >
               <slot name="description" />
             </IonNote>
           </ion-col>
