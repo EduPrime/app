@@ -5,8 +5,8 @@ import ScheduleService from '@/services/ScheduleService'
 import TeacherService from '@/services/TeacherService'
 
 import { hexToRgb } from '@/utils/hex-to-rgb'
-import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonItem, IonLabel, IonModal, IonRow } from '@ionic/vue'
-import { arrowDown, arrowUp, businessOutline, peopleOutline } from 'ionicons/icons'
+import { IonButton, IonChip, IonCol, IonContent, IonGrid, IonIcon, IonItem, IonLabel, IonModal, IonRow } from '@ionic/vue'
+import { arrowDown, arrowUp, businessOutline, filterCircleOutline, peopleOutline } from 'ionicons/icons'
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 
 interface Props {
@@ -262,14 +262,30 @@ onMounted(async () => {
   </IonModal>
 
   <div :style="{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isFilterCollapse ? '0' : '5px' }">
-    <ion-text v-show="!isFilterCollapse" color="secondary">
-      <div class="ion-margin-horizontal">
-        <span style="margin-right: 10px; color: var(--ion-color-accent)">{{ filteredOcupation.schoolName }}</span><br>
+    <ion-text v-show="!isFilterCollapse" color="secondary" class="ion-padding-vertical">
+      <div v-if="filteredOcupation?.schoolName" class="ion-content">
+        <span style="margin-right: 10px; margin-left: 2px; color: var(--ion-color-tertiary); font-weight: 700;">{{ filteredOcupation.schoolName }}</span><br>
 
-        <small style="color: var(--ion-color-accent)">{{ filteredOcupation.classroomName }} - {{ filteredOcupation.disciplineName }}</small>
+        <IonChip color="tertiary" class="ion-no-margin">
+          Turma: {{ filteredOcupation.classroomName }}
+        </IonChip>
+        <IonChip v-if="filteredOcupation?.disciplineName" color="tertiary" class="ion-no-margin" style="margin-left: 5px;">
+          {{ filteredOcupation?.disciplineName?.slice(0, 15) }} <span v-if="filteredOcupation?.disciplineName?.length > 15">...</span>
+        </IonChip>
       </div>
+      <ion-text v-else color="secondary">
+        <h3 class="ion-content" style="margin-bottom: 0; display: flex;">
+          <IonIcon style="margin-top: auto; margin-bottom: auto;" :icon="filterCircleOutline" />
+          <span style="margin-top: auto; margin-bottom: auto; margin-left: 2px">
+            Filtros
+          </span>
+        </h3>
+        <p class="ion-content" style="margin-top: 0;">
+          Clique no botão para abrir os filtros
+        </p>
+      </ion-text>
     </ion-text>
-    <IonButton color="tertiary" :style="{ marginTop: isFilterCollapse ? '-20px' : '2px', marginLeft: isFilterCollapse ? '21.9em' : 'auto', marginRight: isFilterCollapse ? '10px' : '10px' }" @click="setFilterCollapse(!isFilterCollapse)">
+    <IonButton color="tertiary" :style="{ marginTop: isFilterCollapse ? '-20px' : '2px', marginLeft: 'auto', marginRight: isFilterCollapse ? '10px' : '10px' }" @click="setFilterCollapse(!isFilterCollapse)">
       <IonIcon slot="icon-only" :icon="isFilterCollapse ? arrowUp : arrowDown" />
     </IonButton>
   </div>
