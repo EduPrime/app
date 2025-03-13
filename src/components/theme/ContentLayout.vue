@@ -60,7 +60,7 @@ watch(
     </IonHeader>
 
     <ion-content :class="screenWidth > 768 ? '' : 'ion-no-padding'" :fullscreen="true">
-      <div style="height: 56px;" />
+      <div v-if="screenWidth < 768" style="height: 56px;" />
       <IonHeader collapse="condense">
         <IonToolbar>
           <slot name="header-buttons" />

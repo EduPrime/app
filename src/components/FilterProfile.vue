@@ -253,9 +253,9 @@ onMounted(async () => {
 
   <IonModal :is-open="isModalDiscipline" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]" @ion-modal-did-dismiss="setModalDiscipline(false)">
     <div class="block">
-      <ion-list v-for="(discipline, i) in filteredDisciplines" :key="i" :value="discipline.disciplineName">
-        <IonItem @click="setDiscipline(discipline)">
-          <IonLabel>{{ discipline.disciplineName }}</IonLabel>
+      <ion-list v-for="(d, i) in filteredDisciplines" :key="i" :value="d.disciplineName">
+        <IonItem @click="setDiscipline(d)">
+          <IonLabel>{{ d.disciplineName }}</IonLabel>
         </IonItem>
       </ion-list>
     </div>
