@@ -112,23 +112,4 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
 
     return data
   }
-
-  async getClasses(seriesId: string, schoolId: string) {
-    let query = this.client.from('classroom').select(`
-      *
-  `)
-
-    query = query.eq('seriesId', seriesId).eq('schoolId', schoolId)
-
-    const { data, error } = await query
-
-    if (error) {
-      throw new Error(`Erro ao buscar pré-matrículas com dados dos alunos: ${error.message}`)
-    }
-
-    if (!data || data.length === 0) {
-      throw new Error('Nenhuma pré-matrícula encontrada')
-    }
-    return data
-  }
 }
