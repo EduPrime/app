@@ -2,15 +2,15 @@
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import { IonButton, IonCol, IonIcon, IonItem, IonRow, IonSelect, IonSelectOption, IonText, toastController } from '@ionic/vue'
 import dayjs from 'dayjs'
-import { alarm, alertCircleOutline, arrowDownOutline, arrowUpOutline, businessOutline, menu } from 'ionicons/icons'
+import { arrowUp, arrowDown, alarm, alertCircleOutline, arrowDownOutline, arrowUpOutline, businessOutline, menu } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import Pre_enrollmentService from '../services/Pre_enrollmentService'
 import SchoolService from '../services/SchoolService'
-import { useRouter } from 'vue-router'
 import EnrollmentService from '../services/EnrollmentService'
-import type { Enrollment } from '@prisma/client'
 import StudentService from '../services/StudentService'
-
+import ClassroomService from '../services/ClassroomService'
+import type { Enrollment } from '@prisma/client'
 
 const router = useRouter()
 
@@ -18,6 +18,7 @@ const preEnrollmentService = new Pre_enrollmentService()
 const schoolService = new SchoolService()
 const enrollmentService = new EnrollmentService()
 const studentService = new StudentService()
+const classroomService = new ClassroomService()
 
 interface Student {
   pcd: boolean;
@@ -50,6 +51,7 @@ const students = ref<Student[]>([])
 
 const series = ref<any[]>([])
 const searchQuery = ref('')
+const isFilterCollapse = ref(false)
 
 const filter = ref({
   direction: 'asc',
@@ -108,6 +110,10 @@ async function loadEnrollment() {
   }
 }
 
+function setFilterCollapse(open: boolean) {
+  isFilterCollapse.value = open
+}
+
 function filterByShift(shift: string) {
   students.value = prestudents.value.filter(student => student.shift === shift)
 }
@@ -160,7 +166,7 @@ const allSelected = computed(() => students.value.length === selectedStudents.va
 async function handleSelectClass() {
   if (filter.value.serie && filter.value.school) {
     console.log('filter.serie and filter.school', filter.value.serie, filter.value.school)
-    classes.value = await preEnrollmentService.getClasses(filter.value.serie, filter.value.school)
+    classes.value = await classroomService.getClasses(filter.value.serie, filter.value.school)
   } else {
     console.error('Serie is undefined')
   }
@@ -201,32 +207,34 @@ function getTurno(turno: string) {
 }
 
 async function lastStepEnrollment() {
-  const enrollmentData = {
-    id: self.crypto.randomUUID(),
-    institutionId: selectedStudents.value[0].institutionId,
-    schoolId: selectedStudents.value[0].schoolId,
-    seriesId: selectedStudents.value[0].seriesId,
-    classroomId: selectedClass.value,
-    studentId: selectedStudents.value[0].studentId,
-    courseId: selectedStudents.value[0].courseId,
-    name: selectedStudents.value[0].name,
-    dateEnrollment: new Date(),
-    situation: "CURSANDO",
-    enrollmentCode: selectedStudents.value[0].code.replace('pre-', ''),
-    createdAt: new Date(),
-    deletedAt: null,
-    updatedAt: null,
-    updatedBy: null,
-    tenantId: null,
-    observations: null,
-    status: "ACTIVE",
-    preenrollmentId: selectedStudents.value[0].id,
-  }
-  await enrollmentService.createEnrollment(enrollmentData)
-  await preEnrollmentService.update(selectedStudents.value[0].id, { situation: "CURSANDO" })
-  await studentService.update(selectedStudents.value[0].studentId, { schoolId: selectedStudents.value[0].schoolId })
-  loadEnrollment()
-
+  selectedStudents.value.forEach(async (student) => {
+    const enrollmentData = {
+      id: self.crypto.randomUUID(),
+      institutionId: student.institutionId,
+      schoolId: student.schoolId,
+      seriesId: student.seriesId,
+      classroomId: selectedClass.value,
+      studentId: student.studentId,
+      courseId: student.courseId,
+      name: student.name,
+      dateEnrollment: new Date(),
+      situation: "CURSANDO",
+      enrollmentCode: student.code.replace('pre-', ''),
+      createdAt: new Date(),
+      deletedAt: null,
+      updatedAt: null,
+      updatedBy: null,
+      tenantId: null,
+      observations: null,
+      status: "ACTIVE",
+      preenrollmentId: student.id,
+    }
+    await enrollmentService.createEnrollment(enrollmentData)
+    await preEnrollmentService.update(student.id, { situation: "CURSANDO" })
+    await studentService.update(student.studentId, { schoolId: student.schoolId })
+    await classroomService.updateTotalStudents(selectedClass.value)
+  })
+  await loadEnrollment()
 }
 </script>
 
@@ -243,40 +251,48 @@ async function lastStepEnrollment() {
               Preencha os filtros abaixo para uma busca mais assertiva
             </div>
           </div>
-
-          <IonItem color="primary">
-            <IonIcon slot="start" :icon="businessOutline" />
-            <IonSelect class="hide-icon" :value="filter.school" label-placement="floating" @ion-change="($event) => {
-              filter.school = $event.detail.value; getSeries(); students = []
-            }">
-              <IonSelectOption v-for="school, i in schools" :key="i" :value="school.id">
-                {{ school.name }}
-              </IonSelectOption>
-            </IonSelect>
-          </IonItem>
-          <IonItem color="tertiary">
-            <IonIcon slot="start" class="cursor-pointer" :icon="menu" />
-            <IonSelect class="hide-icon" :value="filter.serie" label-placement="floating"
-              @ion-change="($event) => { students = []; filter.serie = $event.detail.value; loadEnrollment() }">
-              <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
-                {{ serie.name }}
-              </IonSelectOption>
-            </IonSelect>
-          </IonItem>
-          <IonItem color="secondary">
-            <IonIcon slot="start" class="cursor-pointer" :icon="alarm" />
-            <IonSelect class="hide-icon" :value="prestudents.shift" label-placement="floating"
-              @ion-change="($event) => { filterByShift($event.detail.value) }">
-              <IonSelectOption v-for="shift, i in turnos" :key="i" :value="i">
-                {{ shift }}
-              </IonSelectOption>
-            </IonSelect>
-          </IonItem>
+          <div v-show="!isFilterCollapse">
+            <IonItem color="primary">
+              <IonIcon slot="start" :icon="businessOutline" />
+              <IonSelect class="hide-icon" :value="filter.school" label-placement="floating" @ion-change="($event) => {
+                filter.school = $event.detail.value; getSeries(); students = []
+              }">
+                <IonSelectOption v-for="school, i in schools" :key="i" :value="school.id">
+                  {{ school.name }}
+                </IonSelectOption>
+              </IonSelect>
+            </IonItem>
+            <IonItem color="tertiary">
+              <IonIcon slot="start" class="cursor-pointer" :icon="menu" />
+              <IonSelect class="hide-icon" :value="filter.serie" label-placement="floating"
+                @ion-change="($event) => { students = []; filter.serie = $event.detail.value; loadEnrollment() }">
+                <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
+                  {{ serie.name }}
+                </IonSelectOption>
+              </IonSelect>
+            </IonItem>
+            <IonItem color="secondary">
+              <IonIcon slot="start" class="cursor-pointer" :icon="alarm" />
+              <IonSelect class="hide-icon" :value="prestudents.shift" label-placement="floating"
+                @ion-change="($event) => { filterByShift($event.detail.value) }">
+                <IonSelectOption v-for="shift, i in turnos" :key="i" :value="i">
+                  {{ shift }}
+                </IonSelectOption>
+              </IonSelect>
+            </IonItem>
+          </div>
+          <div display="flex" justify-content="flex-right">
+            <IonButton color="tertiary"
+              :style="{ marginTop: isFilterCollapse ? '-20px' : '2px', marginLeft: '73vw', marginRight: '10px' }"
+              @click="setFilterCollapse(!isFilterCollapse)">
+              <IonIcon slot="icon-only" :icon="!isFilterCollapse ? arrowUp : arrowDown" />
+            </IonButton>
+          </div>
         </div>
       </div>
       <ion-card class="requests m-0">
         <div class="text-md" style="padding-top: 0px; font-size: 20px;">
-          Solicitações de matrículas ({{ students.length }})
+          Solicitações de matrícula ({{ students.length }})
         </div>
         <IonRow>
           <IonCol class="p-0" size="8">
@@ -401,7 +417,7 @@ async function lastStepEnrollment() {
       <ion-content class="ion-padding">
         <p>Selecione uma turma:</p>
         <IonButton v-for="(classroom, i) in classes" :key="i" class="select-class-btn" @click="selectClass(classroom)">
-          {{ classroom.name }} ({{ classroom.maxStudents }})
+          {{ classroom.name }} ({{ classroom.maxStudents - classroom.totalStudents }})
         </IonButton>
       </ion-content>
     </ion-modal>
