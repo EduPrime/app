@@ -177,7 +177,7 @@ onMounted(async () => {
   teacherid.value = await loadDataTeacher()
   scheduleClass.value = await loadDataSchedule()
   ocupation.value = await loadDataSchoolClass()
-  console.log('Ocupation:', ocupation.value)
+  // console.log('Ocupation:', ocupation.value)
 })
 
 // Your component logic goes here

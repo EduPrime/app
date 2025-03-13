@@ -25,7 +25,7 @@ import 'swiper/css'
 //
 interface Props {
   // feriados: { date: string; type: string; title: string }[]
-  teacherId: string
+  teacherId: string | undefined
 }
 
 const props = defineProps<Props>()
@@ -75,13 +75,14 @@ const colorStyle = ref({
 
 async function getValidDaysInScheduleService() {
   try {
-    const data = await scheduleService.getSchedule(props.teacherId)
-
+    if (props.teacherId) {
+      const data = await scheduleService.getSchedule(props.teacherId)
+      return data
+    }
     // Passa um map nas informações vindas de getSchedule e retorna apenas os dias da semana
     // validDays.value = data.map((day: any) => {
     //   return day.weekday
     // })
-    return data
     // console.log('Dados carregados loadDataSchedule:', data)
   }
   catch (error) {
