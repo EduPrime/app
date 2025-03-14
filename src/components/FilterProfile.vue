@@ -10,7 +10,7 @@ import { arrowDown, arrowUp, businessOutline, filterCircleOutline, peopleOutline
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 
 interface Props {
-  discipline?: boolean
+  discipline?: string
 }
 
 interface Occupation {
@@ -117,6 +117,7 @@ async function loadDisciplines(classroomId: string) {
 
 function emitFilteredOcupation() {
   emits('update:filteredOcupation', { ...filteredOcupation.value, teacherId: teacherid.value })
+  console.log('FilteredOcupation:', filteredOcupation.value)
 }
 
 function abbreviate(text: string, maxLength: number): string {
@@ -177,7 +178,7 @@ onMounted(async () => {
   teacherid.value = await loadDataTeacher()
   scheduleClass.value = await loadDataSchedule()
   ocupation.value = await loadDataSchoolClass()
-  // console.log('Ocupation:', ocupation.value)
+  console.log('Ocupation:', ocupation.value)
 })
 
 // Your component logic goes here
@@ -202,7 +203,7 @@ onMounted(async () => {
           </IonItem>
         </IonCol>
       </IonRow>
-      <IonRow v-if="props.discipline">
+      <IonRow v-if="props.discipline === 'numerica'">
         <IonCol size="6">
           <IonItem class="ion-filter-item" color="tertiary" @click="setModalSerie(true)">
             <IonLabel class="custom-ion-label">

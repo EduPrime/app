@@ -57,14 +57,11 @@ export default class BaseService<T> {
     return data
   }
 
-
-
   async getAll(
     orderBy?: string,
     ascending = true,
     limit?: number,
   ) {
-
     let query = this.client.from(this.table).select('*')
 
     if (orderBy) {
