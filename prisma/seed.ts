@@ -100,6 +100,19 @@ async function main() {
                 teachingType: 'Regular',
                 courseModality: 'Manhã',
                 workload: 800,
+            },
+            {
+                id: '23ca0e75-5344-42c6-9640-97cc5bad6e97', // Maternal
+                name: 'Maternal',
+                status: 'ACTIVE',
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                institutionId: 'bd14f407-3758-4656-a299-e4cf3859dd29', // Prefeitura Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                courseStage: 1,
+                graduate: 'fundamental',
+                teachingType: 'Regular',
+                courseModality: 'Manhã',
+                workload: 800,
             }
         ],
         skipDuplicates: true
@@ -145,6 +158,15 @@ async function main() {
                 schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
                 tenantId: self.crypto.randomUUID(),
                 seriesId: '352a5857-193f-4672-9abf-c5302afd1c37', // 1º Ano
+            },
+            {
+                id: '0c086508-d50b-49b6-afce-0c146643131d',
+                maxStudents: 30,
+                name: '9º Ano A',
+                year: 2025,
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                seriesId: 'ea01d929-3479-4dc6-b162-6ed6a5c66a26', // 9º Ano
             }
         ],
         skipDuplicates: true
