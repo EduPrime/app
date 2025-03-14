@@ -10,10 +10,10 @@ export default class EnrollmentService extends BaseService<Classroom> {
     }
 
 
-    async updateTotalStudents(id: any) {
+    async updateTotalStudents(id: any, pcd: boolean) {
         try {
             const total = await this.client.from(table)
-                .select('totalStudents')
+                .select('totalStudents, pcdStudents')
                 .eq('id', id)
                 .single();
 
@@ -22,13 +22,16 @@ export default class EnrollmentService extends BaseService<Classroom> {
             }
 
             const novoTotal = (total.data?.totalStudents ?? 0) + 1;
-
-            const { error } = await this.client.from(table)
-                .update({ totalStudents: novoTotal })
-                .eq('id', id);
-
-            if (error) {
-                throw new Error(error.message);
+            const totalPcd = (total.data?.pcdStudents ?? 0) + 1;
+            if (pcd) {
+                await this.client.from(table)
+                    .update({ totalStudents: novoTotal, pcdStudents: totalPcd })
+                    .eq('id', id);
+            }
+            else {
+                await this.client.from(table)
+                    .update({ totalStudents: novoTotal })
+                    .eq('id', id);
             }
 
             console.log("Total de estudantes atualizado com sucesso!");

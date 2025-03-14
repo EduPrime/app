@@ -232,7 +232,7 @@ async function lastStepEnrollment() {
     await enrollmentService.createEnrollment(enrollmentData)
     await preEnrollmentService.update(student.id, { situation: "CURSANDO" })
     await studentService.update(student.studentId, { schoolId: student.schoolId })
-    await classroomService.updateTotalStudents(selectedClass.value)
+    await classroomService.updateTotalStudents(selectedClass.value, student.pcd)
   })
   await loadEnrollment()
 }
