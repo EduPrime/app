@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client'
 const prisma = new PrismaClient()
 
 async function main() {
-    const schedule = await prisma.examGrade.createMany(
+    const grades = await prisma.examGrade.createMany(
         {
             data: [
                 {
