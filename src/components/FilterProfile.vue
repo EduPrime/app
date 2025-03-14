@@ -10,7 +10,7 @@ import { arrowDown, arrowUp, businessOutline, peopleOutline } from 'ionicons/ico
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 
 interface Props {
-  discipline?: boolean
+  discipline?: string
 }
 
 interface Occupation {
@@ -117,6 +117,7 @@ async function loadDisciplines(classroomId: string) {
 
 function emitFilteredOcupation() {
   emits('update:filteredOcupation', { ...filteredOcupation.value, teacherId: teacherid.value })
+  console.log('FilteredOcupation:', filteredOcupation.value)
 }
 
 function abbreviate(text: string, maxLength: number): string {
@@ -177,7 +178,7 @@ onMounted(async () => {
   teacherid.value = await loadDataTeacher()
   scheduleClass.value = await loadDataSchedule()
   ocupation.value = await loadDataSchoolClass()
-  // console.log('Ocupation:', ocupation.value)
+  console.log('Ocupation:', ocupation.value)
 })
 
 // Your component logic goes here
@@ -202,7 +203,7 @@ onMounted(async () => {
           </IonItem>
         </IonCol>
       </IonRow>
-      <IonRow v-if="props.discipline">
+      <IonRow v-if="props.discipline === 'numerica'">
         <IonCol size="6">
           <IonItem class="ion-filter-item" color="tertiary" @click="setModalSerie(true)">
             <IonLabel class="custom-ion-label">
@@ -253,9 +254,9 @@ onMounted(async () => {
 
   <IonModal :is-open="isModalDiscipline" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]" @ion-modal-did-dismiss="setModalDiscipline(false)">
     <div class="block">
-      <ion-list v-for="(discipline, i) in filteredDisciplines" :key="i" :value="discipline.disciplineName">
-        <IonItem @click="setDiscipline(discipline)">
-          <IonLabel>{{ discipline.disciplineName }}</IonLabel>
+      <ion-list v-for="(disciplina, i) in filteredDisciplines" :key="i" :value="disciplina.disciplineName">
+        <IonItem @click="setDiscipline(disciplina)">
+          <IonLabel>{{ disciplina.disciplineName }}</IonLabel>
         </IonItem>
       </ion-list>
     </div>
