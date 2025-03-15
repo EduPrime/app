@@ -45,7 +45,6 @@ interface Classes {
   pcdStudents: number;
 }
 
-const prestudents = ref<Student[]>([])
 const students = ref<Student[]>([])
 
 const series = ref<any[]>([])
@@ -116,7 +115,7 @@ async function loadEnrollment() {
 
   catch (error) {
     console.error('Erro ao carregar as matrículas:', error)
-    prestudents.value = []
+    students.value = []
   }
 }
 
