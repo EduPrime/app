@@ -305,6 +305,7 @@ model DisciplineAttendance {
 model Attendance {
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   date            DateTime  @db.Date
+  presence        Boolean   @default(true)
   studentId       String    @db.Uuid
   classroomId     String    @db.Uuid
   enrollmentId    String    @db.Uuid
@@ -318,44 +319,33 @@ model Attendance {
   deletedAt       DateTime? @db.Timestamp(6)
   tenantId        String?
 
-  student       Student               @relation(fields: [studentId], references: [id], map: "faltacc_student_id_fkey")
-  classroom     Classroom             @relation(fields: [classroomId], references: [id], map: "faltacc_classroom_id_fkey")
-  enrollment    Enrollment            @relation(fields: [enrollmentId], references: [id], map: "faltacc_enrollment_id_fkey")
-  discipline    Discipline?           @relation(fields: [disciplineId], references: [id], map: "faltacc_discipline_id_fkey")
-  justification Justification         @relation(fields: [justificationId], references: [id], map: "faltacc_justification_id_fkey")
-  stage         Stage                 @relation(fields: [stageId], references: [id], map: "faltacc_stage_id_fkey")
-  school        School                @relation(fields: [schoolId], references: [id], map: "faltacc_school_id_fkey")
-  numMissed     AttendanceNumMissed[]
+  student       Student       @relation(fields: [studentId], references: [id], map: "faltacc_student_id_fkey")
+  classroom     Classroom     @relation(fields: [classroomId], references: [id], map: "faltacc_classroom_id_fkey")
+  enrollment    Enrollment    @relation(fields: [enrollmentId], references: [id], map: "faltacc_enrollment_id_fkey")
+  discipline    Discipline?   @relation(fields: [disciplineId], references: [id], map: "faltacc_discipline_id_fkey")
+  justification Justification @relation(fields: [justificationId], references: [id], map: "faltacc_justification_id_fkey")
+  stage         Stage         @relation(fields: [stageId], references: [id], map: "faltacc_stage_id_fkey")
+  school        School        @relation(fields: [schoolId], references: [id], map: "faltacc_school_id_fkey")
+  numMissed     NumMissed[]   @relation(map: "nummissed_attendance_id_fkey")
 
   @@map("attendance")
   @@schema("public")
 }
 
 model NumMissed {
-  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name      String    @db.VarChar(100)
-  absent    Boolean
-  createdAt DateTime  @default(now()) @db.Timestamp(6)
-  deletedAt DateTime? @db.Timestamp(6)
-  updatedAt DateTime? @updatedAt @db.Timestamp(6)
-  updatedBy String?   @db.Uuid
-  tenantId  String?
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String    @db.VarChar(100)
+  attendanceId String    @db.Uuid
+  absent       Boolean
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime? @db.Timestamp(6)
+  updatedAt    DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy    String?   @db.Uuid
+  tenantId     String?
 
-  Attendance AttendanceNumMissed[]
+  Attendance Attendance @relation(fields: [attendanceId], references: [id], map: "nummissed_attendance_id_fkey")
 
   @@map("nummissed")
-  @@schema("public")
-}
-
-model AttendanceNumMissed {
-  attendanceId String @db.Uuid
-  numMissedId  String @db.Uuid
-
-  attendance Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
-  numMissed  NumMissed  @relation(fields: [numMissedId], references: [id], onDelete: Cascade)
-
-  @@id([attendanceId, numMissedId])
-  @@map("attendance_numMissed")
   @@schema("public")
 }
 
