@@ -10,7 +10,7 @@ import SchoolService from '../services/SchoolService'
 import EnrollmentService from '../services/EnrollmentService'
 import StudentService from '../services/StudentService'
 import ClassroomService from '../services/ClassroomService'
-import type { Enrollment } from '@prisma/client'
+
 
 const router = useRouter()
 
@@ -45,13 +45,14 @@ interface Classes {
   pcdStudents: number;
 }
 
-const enrollment = ref<Enrollment>()
 const prestudents = ref<Student[]>([])
 const students = ref<Student[]>([])
 
 const series = ref<any[]>([])
 const searchQuery = ref('')
 const isFilterCollapse = ref(false)
+const isComplete = ref(false)
+
 
 const filter = ref({
   direction: 'asc',
@@ -59,6 +60,7 @@ const filter = ref({
   value: '',
   serie: undefined,
   school: undefined,
+  shift: undefined
 })
 
 const schools = ref<{ name: any; id: any }[]>([])
@@ -72,6 +74,14 @@ const turnos = ref({
   'AFTERNOON': 'Tarde',
   'EVENING': 'Noite'
 })
+
+watch(students, (novoValor, antigoValor) => {
+  if (JSON.stringify(novoValor) !== JSON.stringify(antigoValor)) {
+    students.value = [...novoValor]
+    console.log('alterou students')
+  }
+}, { deep: true })
+
 
 let filteredStudents = computed(() => {
 
@@ -87,7 +97,7 @@ let filteredStudents = computed(() => {
 async function loadEnrollment() {
   try {
     const enrollments = await preEnrollmentService.getFilteredWithStudents(filter.value)
-    prestudents.value = enrollments.map(enrollment => ({
+    students.value = enrollments.map(enrollment => ({
       pcd: enrollment.student?.disability ?? false,
       name: enrollment.student?.name ?? '',
       age: dayjs().diff(dayjs(enrollment.student?.birthdate), 'year') ?? 0,
@@ -100,8 +110,8 @@ async function loadEnrollment() {
       seriesId: enrollment.seriesId,
       institutionId: enrollment.institutionId,
     }
-    ))
-    console.log('prestudents', prestudents.value)
+    )).filter(student => student.shift === filter.value.shift)
+    console.log('load chamado!')
   }
 
   catch (error) {
@@ -112,10 +122,6 @@ async function loadEnrollment() {
 
 function setFilterCollapse(open: boolean) {
   isFilterCollapse.value = open
-}
-
-function filterByShift(shift: string) {
-  students.value = prestudents.value.filter(student => student.shift === shift)
 }
 
 const selectedStudents = computed(() => filteredStudents.value.filter(student => !!student.selected))
@@ -152,7 +158,7 @@ async function getSeries() {
     const data = await preEnrollmentService.getSeries(filter.value)
     series.value = data
     filter.value.serie = data[0].id
-    loadEnrollment()
+    await loadEnrollment()
   }
   catch {
     students.value = []
@@ -207,7 +213,7 @@ function getTurno(turno: string) {
 }
 
 async function lastStepEnrollment() {
-  selectedStudents.value.forEach(async (student) => {
+  for (const student of selectedStudents.value) {
     const enrollmentData = {
       id: self.crypto.randomUUID(),
       institutionId: student.institutionId,
@@ -229,13 +235,17 @@ async function lastStepEnrollment() {
       status: "ACTIVE",
       preenrollmentId: student.id,
     }
-    await enrollmentService.createEnrollment(enrollmentData)
-    await preEnrollmentService.update(student.id, { situation: "CURSANDO" })
-    await studentService.update(student.studentId, { schoolId: student.schoolId })
-    await classroomService.updateTotalStudents(selectedClass.value, student.pcd)
-  })
-  await loadEnrollment()
+
+    await enrollmentService.createEnrollment(enrollmentData);
+    await preEnrollmentService.update(student.id, { situation: "CURSANDO" });
+    await studentService.update(student.studentId, { schoolId: student.schoolId });
+    await classroomService.updateTotalStudents(selectedClass.value, student.pcd);
+  }
+
+  await loadEnrollment();
+  console.log('fim da matrícula');
 }
+
 </script>
 
 <template>
@@ -248,7 +258,7 @@ async function lastStepEnrollment() {
               Filtros
             </div>
             <div class="text-sm">
-              Preencha os filtros abaixo para uma busca mais assertiva
+              Preencha os filtros abaixo:
             </div>
           </div>
           <div v-show="!isFilterCollapse">
@@ -265,7 +275,7 @@ async function lastStepEnrollment() {
             <IonItem color="tertiary">
               <IonIcon slot="start" class="cursor-pointer" :icon="menu" />
               <IonSelect class="hide-icon" :value="filter.serie" label-placement="floating"
-                @ion-change="($event) => { students = []; filter.serie = $event.detail.value; loadEnrollment() }">
+                @ion-change="($event) => { students = []; filter.serie = $event.detail.value }">
                 <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
                   {{ serie.name }}
                 </IonSelectOption>
@@ -273,8 +283,8 @@ async function lastStepEnrollment() {
             </IonItem>
             <IonItem color="secondary">
               <IonIcon slot="start" class="cursor-pointer" :icon="alarm" />
-              <IonSelect class="hide-icon" :value="prestudents.shift" label-placement="floating"
-                @ion-change="($event) => { filterByShift($event.detail.value) }">
+              <IonSelect class="hide-icon" v-model="filter.shift" label-placement="floating"
+                @ion-change="($event) => { filter.shift = $event.detail.value; loadEnrollment() }">
                 <IonSelectOption v-for="shift, i in turnos" :key="i" :value="i">
                   {{ shift }}
                 </IonSelectOption>
@@ -389,7 +399,9 @@ async function lastStepEnrollment() {
           <ul style="padding-left: 25px;">
             <li>Turno {{ getTurno(classInfo?.period) }}</li>
             <li>{{ classInfo?.totalStudents }} alunos matriculados</li>
-            <li>{{ classInfo?.maxStudents - classInfo?.totalStudents }} vagas disponíveis</li>
+            <li>{{ classInfo?.maxStudents - classInfo?.totalStudents > 0 ? classInfo?.maxStudents -
+              classInfo?.totalStudents
+              : 0 }} vagas disponíveis</li>
             <li>Excedente ({{ classInfo?.exceededStudents }})</li>
             <li>{{ classInfo?.pcdStudents }} PCD</li>
           </ul>
@@ -401,10 +413,10 @@ async function lastStepEnrollment() {
             </IonButton>
           </IonCol>
           <IonCol>
-            <IonButton expand="block" color="primary" @click="() => {
+            <IonButton expand="block" color="primary" @click="async () => {
               finishEnrollmentOpened = false
-              lastStepEnrollment()
-              presentToast()
+              await lastStepEnrollment()
+              await presentToast()
             }">
               Matrícula
             </IonButton>
@@ -417,7 +429,8 @@ async function lastStepEnrollment() {
       <ion-content class="ion-padding">
         <p>Selecione uma turma:</p>
         <IonButton v-for="(classroom, i) in classes" :key="i" class="select-class-btn" @click="selectClass(classroom)">
-          {{ classroom.name }} ({{ classroom.maxStudents - classroom.totalStudents }})
+          {{ classroom.name }} ({{ classroom.maxStudents - classroom.totalStudents > 0 ? classroom.maxStudents -
+            classroom.totalStudents : 0 }})
         </IonButton>
       </ion-content>
     </ion-modal>

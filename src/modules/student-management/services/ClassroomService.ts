@@ -13,7 +13,7 @@ export default class EnrollmentService extends BaseService<Classroom> {
     async updateTotalStudents(id: any, pcd: boolean) {
         try {
             const total = await this.client.from(table)
-                .select('totalStudents, pcdStudents')
+                .select('totalStudents, pcdStudents, maxStudents, exceededStudents')
                 .eq('id', id)
                 .single();
 
@@ -23,15 +23,21 @@ export default class EnrollmentService extends BaseService<Classroom> {
 
             const novoTotal = (total.data?.totalStudents ?? 0) + 1;
             const totalPcd = (total.data?.pcdStudents ?? 0) + 1;
+            if (novoTotal > total.data?.maxStudents) {
+                const novoExceed = (total.data?.exceededStudents ?? 0) + 1
+                await this.client.from(table)
+                    .update({ exceededStudents: novoExceed })
+                    .eq('id', id)
+            }
             if (pcd) {
                 await this.client.from(table)
                     .update({ totalStudents: novoTotal, pcdStudents: totalPcd })
-                    .eq('id', id);
+                    .eq('id', id)
             }
             else {
                 await this.client.from(table)
                     .update({ totalStudents: novoTotal })
-                    .eq('id', id);
+                    .eq('id', id)
             }
 
             console.log("Total de estudantes atualizado com sucesso!");
