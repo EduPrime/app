@@ -144,6 +144,7 @@ model Discipline {
   DisciplineGrade         DisciplineGrade[]         @relation(map: "notadisciplina_discipline_id_fkey")
   DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "pareceretapadisciplina_discipline_id_fkey")
   Schedule                Schedule[]                @relation(map: "schedule_discipline_id_fkey")
+  Attendance              Attendance[]              @relation(map: "faltacc_discipline_id_fkey")
   ContentDiscipline       ContentDiscipline[]
   Bncc                    Bncc[]
 
@@ -172,6 +173,7 @@ model Stage {
   GeneralGrade            GeneralGrade[]            @relation(map: "notageral_stage_id_fkey")
   DisciplineAttendance    DisciplineAttendance[]    @relation(map: "faltacc_stage_id_fkey")
   GeneralAttendance       GeneralAttendance[]       @relation(map: "faltageral_stage_id_fkey")
+  Attendance              Attendance[]              @relation(map: "faltacc_stage_id_fkey")
 
   @@map("stage")
   @@schema("public")
@@ -212,6 +214,7 @@ model Enrollment {
   StudentFeedback         StudentFeedback[]         @relation(map: "feedbackaluno_enrollment_id_fkey")
   StudentStageFeedback    StudentStageFeedback[]    @relation(map: "feedbacketapaaluno_enrollment_id_fkey")
   DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "feedbacketapadisciplina_enrollment_id_fkey")
+  Attendance              Attendance[]              @relation(map: "faltacc_enrollment_id_fkey")
 
   @@map("enrollment")
   @@schema("public")
@@ -295,6 +298,76 @@ model DisciplineAttendance {
   school     School     @relation(fields: [schoolId], references: [id], map: "faltacc_school_id_fkey")
 
   @@map("disciplineAttendance")
+  @@schema("public")
+}
+
+model Attendance {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  date            DateTime  @db.Date
+  studentId       String    @db.Uuid
+  enrollmentId    String    @db.Uuid
+  disciplineId    String?   @db.Uuid
+  justificationId String    @db.Uuid
+  stageId         String    @db.Uuid
+  schoolId        String    @db.Uuid
+  updatedAt       DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy       String?   @db.Uuid
+  createdAt       DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt       DateTime? @db.Timestamp(6)
+  tenantId        String?
+
+  student       Student               @relation(fields: [studentId], references: [id], map: "faltacc_student_id_fkey")
+  enrollment    Enrollment            @relation(fields: [enrollmentId], references: [id], map: "faltacc_enrollment_id_fkey")
+  discipline    Discipline?           @relation(fields: [disciplineId], references: [id], map: "faltacc_discipline_id_fkey")
+  justification Justification         @relation(fields: [justificationId], references: [id], map: "faltacc_justification_id_fkey")
+  stage         Stage                 @relation(fields: [stageId], references: [id], map: "faltacc_stage_id_fkey")
+  school        School                @relation(fields: [schoolId], references: [id], map: "faltacc_school_id_fkey")
+  numMissed     AttendanceNumMissed[]
+
+  @@map("attendance")
+  @@schema("public")
+}
+
+model NumMissed {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String    @db.VarChar(100)
+  absent    Boolean
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt DateTime? @db.Timestamp(6)
+  updatedAt DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy String?   @db.Uuid
+  tenantId  String?
+
+  Attendance AttendanceNumMissed[]
+
+  @@map("nummissed")
+  @@schema("public")
+}
+
+model AttendanceNumMissed {
+  attendanceId String @db.Uuid
+  numMissedId  String @db.Uuid
+
+  attendance Attendance @relation(fields: [attendanceId], references: [id], onDelete: Cascade)
+  numMissed  NumMissed  @relation(fields: [numMissedId], references: [id], onDelete: Cascade)
+
+  @@id([attendanceId, numMissedId])
+  @@map("attendance_numMissed")
+  @@schema("public")
+}
+
+model Justification {
+  id        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String    @db.VarChar(100)
+  createdAt DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt DateTime? @db.Timestamp(6)
+  updatedAt DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy String?   @db.Uuid
+  tenantId  String?
+
+  Attendance Attendance[]
+
+  @@map("justification")
   @@schema("public")
 }
 
@@ -674,6 +747,7 @@ model School {
   StudentStageFeedback    StudentStageFeedback[]    @relation(map: "pareceretapaaluno_school_id_fkey")
   DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "pareceretapadisciplina_school_id_fkey")
   Schedule                Schedule[]                @relation(map: "schedule_school_id_fkey")
+  Attendance              Attendance[]              @relation(map: "faltacc_school_id_fkey")
 
   @@map("school")
   @@schema("public")
@@ -842,6 +916,7 @@ model Student {
   StudentFeedback         StudentFeedback[]         @relation(map: "pareceraluno_student_id_fkey")
   StudentStageFeedback    StudentStageFeedback[]    @relation(map: "pareceretapaaluno_student_id_fkey")
   DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "pareceretapadisciplina_student_id_fkey")
+  Attendance              Attendance[]              @relation(map: "student_attendance_fkey")
 
   @@map("student")
   @@schema("public")
