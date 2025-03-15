@@ -243,6 +243,15 @@ async function main() {
                 seriesId: 'a1eed49f-2832-467f-ae6f-7270244971ba', // 2º Ano
             },
             {
+                id: 'f19b7d1f-c398-41bf-a244-66fd905e14b8',
+                maxStudents: 30,
+                name: '4º Ano A',
+                year: 2025,
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                seriesId: 'd131b737-72ff-4c5c-9fd6-1dbd810b5cce', // 4º Ano
+            },
+            {
                 id: '48702fd4-5841-4d4d-bace-740cc915f39d',
                 maxStudents: 30,
                 name: '6º Ano A',
@@ -251,7 +260,24 @@ async function main() {
                 tenantId: self.crypto.randomUUID(),
                 seriesId: '19bcbcde-8016-4e7e-b0e4-bc3fcb73c53c', // 6º Ano
             },
-
+            {
+                id: 'b0c72f23-0378-4ad7-b8e5-3dd17f996920',
+                maxStudents: 30,
+                name: '6º Ano B',
+                year: 2025,
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                seriesId: '19bcbcde-8016-4e7e-b0e4-bc3fcb73c53c', // 6º Ano
+            },
+            {
+                id: '29cf9857-0fe4-45f4-8b00-fc10e626eba8',
+                maxStudents: 30,
+                name: '7º Ano A',
+                year: 2025,
+                schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab', // Escola Municipal de Araripina
+                tenantId: self.crypto.randomUUID(),
+                seriesId: 'b1ce4726-de53-47ed-8c6e-34eaa1e39747', // 7º Ano
+            },
         ],
         skipDuplicates: true
     })
