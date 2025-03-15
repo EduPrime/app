@@ -89,6 +89,7 @@ model Classroom {
   enrollmenthistory_enrollmenthistory_currentClassroomIdToclassroom EnrollmentHistory[] @relation("enrollmenthistory_currentClassroomIdToclassroom")
   enrollmenthistory_enrollmenthistory_formerClassroomIdToclassroom  EnrollmentHistory[] @relation("enrollmenthistory_formerClassroomIdToclassroom")
   Schedule                                                          Schedule[]          @relation(map: "schedule_classroom_id_fkey")
+  Attendance                                                        Attendance[]        @relation(map: "faltacc_classroom_id_fkey")
   Content                                                           Content[]
 
   @@map("classroom")
@@ -305,6 +306,7 @@ model Attendance {
   id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   date            DateTime  @db.Date
   studentId       String    @db.Uuid
+  classroomId     String    @db.Uuid
   enrollmentId    String    @db.Uuid
   disciplineId    String?   @db.Uuid
   justificationId String    @db.Uuid
@@ -317,6 +319,7 @@ model Attendance {
   tenantId        String?
 
   student       Student               @relation(fields: [studentId], references: [id], map: "faltacc_student_id_fkey")
+  classroom     Classroom             @relation(fields: [classroomId], references: [id], map: "faltacc_classroom_id_fkey")
   enrollment    Enrollment            @relation(fields: [enrollmentId], references: [id], map: "faltacc_enrollment_id_fkey")
   discipline    Discipline?           @relation(fields: [disciplineId], references: [id], map: "faltacc_discipline_id_fkey")
   justification Justification         @relation(fields: [justificationId], references: [id], map: "faltacc_justification_id_fkey")
