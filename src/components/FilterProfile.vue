@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import ClassroomService from '@/services/ClassroomService'
+import EvaluationRuleService from '@/services/EvaluationRuleService'
 import ScheduleService from '@/services/ScheduleService'
 
 import TeacherService from '@/services/TeacherService'
@@ -10,7 +11,7 @@ import { arrowDown, arrowUp, businessOutline, filterCircleOutline, peopleOutline
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 
 interface Props {
-  discipline?: string
+  discipline?: boolean
 }
 
 interface Occupation {
@@ -22,7 +23,10 @@ interface Occupation {
   seriesName?: string
   disciplineId?: string
   disciplineName?: string
-  classes?: { classroomId: string, classroomName: string, serieId: string, serieName: string }[]
+  courseIds?: string
+  frequency?: string
+  evaluation?: string
+  classes?: { classroomId: string, classroomName: string, serieId: string, serieName: string, courseId: string }[]
 
 }
 
@@ -30,11 +34,13 @@ const props = defineProps<Props>()
 const emits = defineEmits(['update:filteredOcupation'])
 const teacherService = new TeacherService()
 const scheduleService = new ScheduleService()
+const evaluationRuleService = new EvaluationRuleService()
 const classroomService = new ClassroomService()
 const isFilterCollapse = ref(true)
 const filteredOcupation = ref<Occupation>({})
-const filteredClasses = ref<{ classroomId: string, classroomName: string, serieId: string, serieName: string }[]>([])
+const filteredClasses = ref<{ classroomId: string, classroomName: string, serieId: string, serieName: string, courseId: string }[]>([])
 const filteredDisciplines = ref<{ disciplineId: string, disciplineName: string }[]>([])
+const filterEvaluationRule = ref<{ frequencyType?: string, gradeType?: string }[]>([])
 
 const isModalSchool = ref(false)
 const isModalSerie = ref(false)
@@ -67,6 +73,9 @@ function setSchool(school: Occupation): void {
   filteredOcupation.value.seriesName = undefined
   filteredOcupation.value.disciplineId = undefined
   filteredOcupation.value.disciplineName = undefined
+  filteredOcupation.value.courseIds = undefined
+  filteredOcupation.value.frequency = undefined
+  filteredOcupation.value.evaluation = undefined
 
   // Atualiza as turmas disponíveis para a nova escola
   filteredClasses.value = school.classes || []
@@ -78,12 +87,13 @@ function setSchool(school: Occupation): void {
   emitFilteredOcupation()
 }
 
-async function setClasses(classItem: { classroomId: string, classroomName: string, serieId: string, serieName: string }): Promise<void> {
+async function setClasses(classItem: { classroomId: string, classroomName: string, serieId: string, serieName: string, courseId: string }): Promise<void> {
   // Atualiza a turma
   filteredOcupation.value.classroomId = classItem.classroomId
   filteredOcupation.value.classroomName = classItem.classroomName
   filteredOcupation.value.seriesId = classItem.serieId
   filteredOcupation.value.seriesName = classItem.serieName
+  filteredOcupation.value.courseIds = classItem.courseId
 
   // Limpa disciplinas antes de carregar novas
   filteredOcupation.value.disciplineId = undefined
@@ -92,6 +102,19 @@ async function setClasses(classItem: { classroomId: string, classroomName: strin
 
   // Carrega disciplinas disponíveis para a turma selecionada
   filteredDisciplines.value = await loadDisciplines(classItem.classroomId) || []
+
+  // Carrega regras de avaliação disponíveis para a turma selecionada
+  filterEvaluationRule.value = await loadEvaluationRule(classItem.courseId) || []
+
+  // Adiciona o retorno de filterEvaluationRule às propriedades frequency e evaluation
+  if (filterEvaluationRule.value.length > 0) {
+    filteredOcupation.value.frequency = filterEvaluationRule.value[0].frequencyType
+    filteredOcupation.value.evaluation = filterEvaluationRule.value[0].gradeType
+  }
+  else {
+    filteredOcupation.value.frequency = undefined
+    filteredOcupation.value.evaluation = undefined
+  }
 
   setModalSerie(false)
   emitFilteredOcupation()
@@ -115,9 +138,19 @@ async function loadDisciplines(classroomId: string) {
   }
 }
 
+async function loadEvaluationRule(courseId: string) {
+  try {
+    const data = await evaluationRuleService.getRulesFromCourse(courseId)
+
+    return data || []
+  }
+  catch (error) {
+    console.error('Erro ao carregar as disciplinas:', error)
+  }
+}
+
 function emitFilteredOcupation() {
   emits('update:filteredOcupation', { ...filteredOcupation.value, teacherId: teacherid.value })
-  console.log('FilteredOcupation:', filteredOcupation.value)
 }
 
 function abbreviate(text: string, maxLength: number): string {
@@ -178,7 +211,6 @@ onMounted(async () => {
   teacherid.value = await loadDataTeacher()
   scheduleClass.value = await loadDataSchedule()
   ocupation.value = await loadDataSchoolClass()
-  console.log('Ocupation:', ocupation.value)
 })
 
 // Your component logic goes here
@@ -203,7 +235,7 @@ onMounted(async () => {
           </IonItem>
         </IonCol>
       </IonRow>
-      <IonRow v-if="props.discipline === 'numerica'">
+      <IonRow v-if="props.discipline || filteredOcupation.frequency === 'disciplina'">
         <IonCol size="6">
           <IonItem class="ion-filter-item" color="tertiary" @click="setModalSerie(true)">
             <IonLabel class="custom-ion-label">
