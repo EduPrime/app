@@ -92,10 +92,8 @@ watch(
       </div>
     </ion-content>
 
-    <IonFooter v-if="props.showFooter" :translucent="true">
-      <IonToolbar>
-        <slot name="footer" />
-      </IonToolbar>
+    <IonFooter :translucent="true">
+      <slot name="footer" />
     </IonFooter>
   </ion-page>
 </template>
