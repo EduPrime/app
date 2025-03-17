@@ -35,6 +35,7 @@ const emits = defineEmits(['update:modelValue'])
 const scheduleService = new ScheduleService()
 const validDays = ref()
 const pulseAtEnd = ref('')
+const currentWeekday = ref()
 
 const getSwiper: Ref<any> = ref(null)
 const currentDate = ref(moment())
@@ -137,10 +138,11 @@ function nextMonth() {
   monthYearValue.value = monthYear.value
 }
 
-function selectDate(date: Moment) {
+function selectDate(date: Moment, weekday: string) {
   selectedDate.value = date
   monthYearValue.value = `${date.format('YYYY-MM-DD')}`
   monthYear.value = date.format('YYYY-MM-DD')
+  currentWeekday.value = weekday
 }
 
 function getColorForDate(date: Moment) {
@@ -263,6 +265,7 @@ watch(selectedDate, (newValue: any) => {
     emits('update:modelValue', {
       selectedDate: newValue.format('YYYY-MM-DD'),
       dayEvents: eventsForSelectedDate.value,
+      weekday: currentWeekday.value,
     })
   }
 })
@@ -332,7 +335,7 @@ watch(() => props.teacherId, async (newValue: any) => {
                       style="padding: 10px;"
                       :disabled="!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0"
                       :style="i === 0 ? 'margin-left: 10px;' : undefined"
-                      :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
+                      :color="getColorForDate(day.date)" @click="() => selectDate(day.date, d.weekday)"
                     >
                       <div>
                         <div class="day-name">
