@@ -106,12 +106,21 @@ export default class ScheduleService extends BaseService<Schedule> {
     return uniqueDisciplines
   }
 
-  async getSchedule(teacherId: string) {
-    const { data, error } = await this.client
-      .from('schedule')
-      .select(`weekday`,
-      )
-      .eq('teacherId', teacherId)
+  async getSchedule(teacherId: string, classroomId: string, disciplineId?: any) {
+    const { data, error } = disciplineId
+      ? await this.client
+        .from('schedule')
+        .select(`weekday`,
+        )
+        .eq('teacherId', teacherId)
+        .eq('classroomId', classroomId)
+        .eq('disciplineId', disciplineId)
+      : await this.client
+        .from('schedule')
+        .select(`weekday`,
+        )
+        .eq('teacherId', teacherId)
+        .eq('classroomId', classroomId)
 
     if (error) {
       throw new Error(`Erro ao buscar dias válidos: ${error.message}`)
