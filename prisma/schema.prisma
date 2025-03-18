@@ -306,25 +306,25 @@ model DisciplineAttendance {
 }
 
 model TeacherAttendance {
-  id             String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  date           DateTime       @db.Date
-  totalClasses   Int
-  AttendanceType attendanceType
-  teacherId      String         @db.Uuid
-  classroomId    String         @db.Uuid
-  disciplineId   String?        @db.Uuid
-  stageId        String         @db.Uuid
-  schoolId       String         @db.Uuid
-  updatedAt      DateTime?      @updatedAt @db.Timestamp(6)
-  updatedBy      String?        @db.Uuid
-  createdAt      DateTime       @default(now()) @db.Timestamp(6)
-  deletedAt      DateTime?      @db.Timestamp(6)
-  tenantId       String?
-  teacher        Teacher        @relation(fields: [teacherId], references: [id], map: "faltaprof_teacher_id_fkey")
-  classroom      Classroom      @relation(fields: [classroomId], references: [id], map: "faltaprof_classroom_id_fkey")
-  discipline     Discipline?    @relation(fields: [disciplineId], references: [id], map: "faltaprof_discipline_id_fkey")
-  stage          Stage          @relation(fields: [stageId], references: [id], map: "faltaprof_stage_id_fkey")
-  school         School         @relation(fields: [schoolId], references: [id], map: "faltaprof_school_id_fkey")
+  id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  date         DateTime       @db.Date
+  totalClasses Int
+  type         attendanceType
+  teacherId    String         @db.Uuid
+  classroomId  String         @db.Uuid
+  disciplineId String?        @db.Uuid
+  stageId      String         @db.Uuid
+  schoolId     String         @db.Uuid
+  updatedAt    DateTime?      @updatedAt @db.Timestamp(6)
+  updatedBy    String?        @db.Uuid
+  createdAt    DateTime       @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime?      @db.Timestamp(6)
+  tenantId     String?
+  teacher      Teacher        @relation(fields: [teacherId], references: [id], map: "faltaprof_teacher_id_fkey")
+  classroom    Classroom      @relation(fields: [classroomId], references: [id], map: "faltaprof_classroom_id_fkey")
+  discipline   Discipline?    @relation(fields: [disciplineId], references: [id], map: "faltaprof_discipline_id_fkey")
+  stage        Stage          @relation(fields: [stageId], references: [id], map: "faltaprof_stage_id_fkey")
+  school       School         @relation(fields: [schoolId], references: [id], map: "faltaprof_school_id_fkey")
 
   @@map("teacherAttendance")
   @@schema("public")
