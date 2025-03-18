@@ -261,38 +261,47 @@ async function lastStepEnrollment() {
             </div>
           </div>
           <div v-show="!isFilterCollapse">
-            <IonItem color="primary">
-              <IonIcon slot="start" :icon="businessOutline" />
-              <IonSelect class="hide-icon" :value="filter.school" label-placement="floating" @ion-change="($event) => {
-                filter.school = $event.detail.value; getSeries(); students = []
-              }">
-                <IonSelectOption v-for="school, i in schools" :key="i" :value="school.id">
-                  {{ school.name }}
-                </IonSelectOption>
-              </IonSelect>
-            </IonItem>
-            <IonItem color="tertiary">
-              <IonIcon slot="start" class="cursor-pointer" :icon="menu" />
-              <IonSelect class="hide-icon" :value="filter.serie" label-placement="floating"
-                @ion-change="($event) => { students = []; filter.serie = $event.detail.value }">
-                <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
-                  {{ serie.name }}
-                </IonSelectOption>
-              </IonSelect>
-            </IonItem>
-            <IonItem color="secondary">
-              <IonIcon slot="start" class="cursor-pointer" :icon="alarm" />
-              <IonSelect class="hide-icon" v-model="filter.shift" label-placement="floating"
-                @ion-change="($event) => { filter.shift = $event.detail.value; loadEnrollment() }">
-                <IonSelectOption v-for="shift, i in turnos" :key="i" :value="i">
-                  {{ shift }}
-                </IonSelectOption>
-              </IonSelect>
-            </IonItem>
+            <IonGrid>
+              <IonRow style="margin: 0; border: 0; padding: 0;">
+                <IonCol size="12" style="margin: 0; border: 0; padding: 0;">
+                  <IonItem color="secondary">
+                    <IonIcon slot="start" :icon="businessOutline" />
+                    <IonSelect class="hide-icon" :value="filter.school" label-placement="floating" @ion-change="($event) => {
+                      filter.school = $event.detail.value; getSeries(); students = []
+                    }">
+                      <IonSelectOption v-for="school, i in schools" :key="i" :value="school.id">
+                        {{ school.name }}
+                      </IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+                </IonCol>
+                <IonCol size="6" style="margin: 0; border: 0; padding: 0;">
+                  <IonItem color="tertiary">
+                    <IonIcon slot="start" class="cursor-pointer" :icon="menu" />
+                    <IonSelect class="hide-icon" :value="filter.serie" label-placement="floating"
+                      @ion-change="($event) => { students = []; filter.serie = $event.detail.value }">
+                      <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
+                        {{ serie.name }}
+                      </IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+                </IonCol>
+                <IonCol size="6" style="margin: 0; border: 0; padding: 0;">
+                  <IonItem color="primary">
+                    <IonIcon slot="start" class="cursor-pointer" :icon="alarm" />
+                    <IonSelect class="hide-icon" v-model="filter.shift" label-placement="floating"
+                      @ion-change="($event) => { filter.shift = $event.detail.value; loadEnrollment() }">
+                      <IonSelectOption v-for="shift, i in turnos" :key="i" :value="i">
+                        {{ shift }}
+                      </IonSelectOption>
+                    </IonSelect>
+                  </IonItem>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
           </div>
-          <div display="flex" justify-content="flex-right">
-            <IonButton color="tertiary"
-              :style="{ marginTop: isFilterCollapse ? '-20px' : '2px', marginLeft: '73vw', marginRight: '10px' }"
+          <div class="left-end-button">
+            <IonButton color="tertiary" :style="{ marginTop: isFilterCollapse ? '-20px' : '2px' }"
               @click="setFilterCollapse(!isFilterCollapse)">
               <IonIcon slot="icon-only" :icon="!isFilterCollapse ? arrowUp : arrowDown" />
             </IonButton>
@@ -593,5 +602,11 @@ ion-searchbar.ios.custom-search {
 
 ion-searchbar.md.custom-search {
   --cancel-button-color: var(--ion-color-primary);
+}
+
+.left-end-button {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0%;
 }
 </style>
