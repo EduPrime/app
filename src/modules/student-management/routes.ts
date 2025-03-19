@@ -12,6 +12,13 @@ import RegisterStudent from './views/RegisterStudent.vue'
 
 const routes = [
   {
+    path: '',
+    redirect: '/student',
+    meta: {
+      requiredRole: ['GESTORESCOLAR'],
+    }
+  },
+  {
     path: '/student',
     name: 'StudentList',
     component: DashboardStudent,

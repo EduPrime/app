@@ -42,11 +42,12 @@ async function signIn() {
     userStore.login(data)
     if (userStore.userLocal) {
       const localUserRole = JSON.parse(userStore.userLocal).role
-      console.log('router antes do update', router.getRoutes())
       resetRouter(router, routes)
-      console.log('router depois do update', router.getRoutes())
       if (localUserRole === 'PROFESSOR') {
         router.push('/home')
+        window.location.reload()
+      } else if (localUserRole === 'GESTORESCOLAR') {
+        router.push('/student')
         window.location.reload()
       } else {
         router.push('/dashboard/Home')

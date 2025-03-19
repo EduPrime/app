@@ -33,7 +33,13 @@ const userRole = ref('')
 if (authStore.userLocal) {
   userRole.value = JSON.parse(authStore.userLocal) ? JSON.parse(authStore.userLocal).role : 'public'
 }
-const homeRoute = userRole.value === 'PROFESSOR' ? '/home' : '/dashboard/Home'
+const paths = {
+  'PROFESSOR': '/home',
+  'GESTORESCOLAR': '/student',
+  'ADMIN': '/dashboard/Home',
+  'GESTORMUNICIPAL': '/dashboard/Home',
+}
+const homeRoute = paths[userRole.value]
 
 const tabs = ref([
   {
@@ -289,12 +295,9 @@ async function logout() {
               <ion-item lines="full" button class="vertical-tab-button" :router-link="homeRoute" :detail="false">
                 <ion-img src="/icons/icon-256.webp" alt="Gestão Pedagógica" />
               </ion-item>
-              <ion-item
-                v-for="(tab, index) in tabs" :key="index" lines="full" button
-                class="vertical-tab-button" :detail="false"
-                :class="selectedTab === index ? 'selected' : ''" :router-link="tab.children[0].url"
-                @click="selectTab(index)"
-              >
+              <ion-item v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button"
+                :detail="false" :class="selectedTab === index ? 'selected' : ''" :router-link="tab.children[0].url"
+                @click="selectTab(index)">
                 <ion-icon :icon="tab.icon" />
               </ion-item>
 
@@ -334,10 +337,7 @@ async function logout() {
             <!--------------------------
               @TODO: Recursive method to implement nested components for nav-items
             ------------------------------>
-            <NavItem
-              v-for="(tab) in tabs[selectedTab].children" :key="`${tab.name}-${tab.icon}`"
-              :item="tab"
-            />
+            <NavItem v-for="(tab) in tabs[selectedTab].children" :key="`${tab.name}-${tab.icon}`" :item="tab" />
           </div>
         </ion-content>
       </ion-menu>
@@ -350,142 +350,142 @@ async function logout() {
 <style lang="scss">
 /* Global Styles */
 ion-split-pane {
-    --side-max-width: 350px;
+  --side-max-width: 350px;
 
-    &.split-pane-visible {
-        .tree-toggle-btn {
-            display: flex;
-            position: fixed;
-            top: 0;
-            left: 300px;
-        }
-
-        .tree-toggle-btn>ion-button {
-            --width: 25px;
-            --height: 25px;
-            --min-width: 25px;
-            --padding: 0;
-        }
-
-        &.tree-hidden {
-            --side-min-width: 61px;
-            --side-width: 61px;
-
-            .tree-toggle-btn {
-                top: 0;
-                left: 30px;
-            }
-
-            .tree-view {
-                display: none;
-            }
-        }
-    }
-
-    &:not(.split-pane-visible) .tree-toggle-btn {
-        display: none;
+  &.split-pane-visible {
+    .tree-toggle-btn {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 300px;
     }
 
     .tree-toggle-btn>ion-button {
-        --width: 25px;
-        --height: 25px;
-        --min-width: 25px;
-        --padding: 0;
+      --width: 25px;
+      --height: 25px;
+      --min-width: 25px;
+      --padding: 0;
     }
 
-    ion-menu {
-        --border: 1px solid #0000001f;
-        --width: 90%;
-        --max-width: 350px;
+    &.tree-hidden {
+      --side-min-width: 61px;
+      --side-width: 61px;
+
+      .tree-toggle-btn {
+        top: 0;
+        left: 30px;
+      }
+
+      .tree-view {
+        display: none;
+      }
+    }
+  }
+
+  &:not(.split-pane-visible) .tree-toggle-btn {
+    display: none;
+  }
+
+  .tree-toggle-btn>ion-button {
+    --width: 25px;
+    --height: 25px;
+    --min-width: 25px;
+    --padding: 0;
+  }
+
+  ion-menu {
+    --border: 1px solid #0000001f;
+    --width: 90%;
+    --max-width: 350px;
+  }
+
+  ion-item.vertical-tab-button {
+    width: 60px;
+    --background: #00000000;
+    --color: var(--ion-color-primary);
+
+    ion-icon {
+      color: var(--ion-color-primary);
     }
 
-    ion-item.vertical-tab-button {
-        width: 60px;
-        --background: #00000000;
-        --color: var(--ion-color-primary);
+    &::part(native) {
+      height: 60px;
+      width: 60px;
+    }
 
-        ion-icon {
-            color: var(--ion-color-primary);
-        }
+    &.selected {
+      --background: var(--ion-color-primary);
+      color: var(--ion-background-color);
+
+      ion-icon {
+        color: var(--ion-background-color);
+      }
+    }
+  }
+
+  .vertical-tabs ion-list {
+    width: 61px;
+    float: left;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--module-panel-background);
+    border-right: 1px solid #00000023;
+  }
+
+  .accordion-view {
+    margin-left: 60px;
+
+    ion-accordion::part(content) {
+      padding-left: 25px;
+    }
+  }
+
+  .tree-view {
+    margin-left: 60px;
+    padding: 15px;
+    background: var(--sidemenu-background);
+    height: 100%;
+    overflow-y: auto;
+
+    .tree-view-items ion-list {
+      --background: transparent;
+
+      ion-item {
+        --background: transparent;
+        --min-height: 32px;
+        --padding-top: 0;
+        --padding-bottom: 0;
+        --inner-padding-top: 0;
+        --inner-padding-bottom: 0;
+        margin-bottom: 5px;
 
         &::part(native) {
-            height: 60px;
-            width: 60px;
+          max-height: 16px;
+          font-size: 14px;
+          border-radius: 8px;
         }
-
-        &.selected {
-            --background: var(--ion-color-primary);
-            color: var(--ion-background-color);
-
-            ion-icon {
-                color: var(--ion-background-color);
-            }
-        }
+      }
     }
-
-    .vertical-tabs ion-list {
-        width: 61px;
-        float: left;
-        height: 100vh;
-        overflow-y: auto;
-        background: var(--module-panel-background);
-        border-right: 1px solid #00000023;
-    }
-
-    .accordion-view {
-        margin-left: 60px;
-
-        ion-accordion::part(content) {
-            padding-left: 25px;
-        }
-    }
-
-    .tree-view {
-        margin-left: 60px;
-        padding: 15px;
-        background: var(--sidemenu-background);
-        height: 100%;
-        overflow-y: auto;
-
-        .tree-view-items ion-list {
-            --background: transparent;
-
-            ion-item {
-                --background: transparent;
-                --min-height: 32px;
-                --padding-top: 0;
-                --padding-bottom: 0;
-                --inner-padding-top: 0;
-                --inner-padding-bottom: 0;
-                margin-bottom: 5px;
-
-                &::part(native) {
-                    max-height: 16px;
-                    font-size: 14px;
-                    border-radius: 8px;
-                }
-            }
-        }
-    }
+  }
 }
 
 ion-item.app-title-item {
-    height: 60px;
-    --background: transparent;
+  height: 60px;
+  --background: transparent;
 }
 
 .bottom-items {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: auto;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: auto;
 }
 
 .ion-accordion-toggle-icon {
-    color: var(--ion-color-primary)
+  color: var(--ion-color-primary)
 }
 
 .side-menu {
-    width: 350px;
+  width: 350px;
 }
 </style>

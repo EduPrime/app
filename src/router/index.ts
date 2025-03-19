@@ -31,7 +31,7 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     meta: {
       icon: home,
       name: 'Main Dashboard',
-      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
     },
   },
   {
@@ -73,7 +73,7 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
     meta: {
       icon: home,
       name: 'Main Dashboard',
-      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
     },
   },
   {
