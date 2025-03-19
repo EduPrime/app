@@ -92,9 +92,15 @@ async function main() {
       },
       {
         id: 'ed5a57b7-828f-4737-bc78-ca919f0f833c',
-        name: '	Ciclo de Leitura e Produção Textual',
+        name: 'Ciclo de Leitura e Produção Textual',
         tenantId: self.crypto.randomUUID(),
       },
+      {
+        id: '6b0cb88e-80a1-4185-a0b4-b625bb26b5fc',
+        name: 'Geral',
+        tenantId: self.crypto.randomUUID(),
+      },
+
     ],
     skipDuplicates: true,
   })

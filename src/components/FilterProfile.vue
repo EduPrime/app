@@ -144,7 +144,7 @@ async function loadEvaluationRule(courseId: string) {
   try {
     const data = await evaluationRuleService.getRulesFromCourse(courseId)
 
-    return data || []
+    return data || {}
   }
   catch (error) {
     console.error('Erro ao carregar as disciplinas:', error)
