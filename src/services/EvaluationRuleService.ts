@@ -13,6 +13,7 @@ export default class EvaluationRuleService extends BaseService<EvaluationRule> {
       .from(table)
       .select('*')
       .eq('courseId', courseId)
+      .single()
 
     if (error) {
       throw new Error(`Erro ao trazer as regras: ${error.message}`)

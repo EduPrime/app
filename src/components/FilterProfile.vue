@@ -40,7 +40,7 @@ const isFilterCollapse = ref(true)
 const filteredOcupation = ref<Occupation>({})
 const filteredClasses = ref<{ classroomId: string, classroomName: string, serieId: string, serieName: string, courseId: string }[]>([])
 const filteredDisciplines = ref<{ disciplineId: string, disciplineName: string }[]>([])
-const filterEvaluationRule = ref<{ frequencyType?: string, gradeType?: string }[]>([])
+const filterEvaluationRule = ref<{ frequencyType?: string, gradeType?: string }>()
 
 const isModalSchool = ref(false)
 const isModalSerie = ref(false)
@@ -99,17 +99,19 @@ async function setClasses(classItem: { classroomId: string, classroomName: strin
   filteredOcupation.value.disciplineId = undefined
   filteredOcupation.value.disciplineName = undefined
   filteredDisciplines.value = []
+  filteredOcupation.value.frequency = undefined
+  filteredOcupation.value.evaluation = undefined
 
   // Carrega disciplinas disponíveis para a turma selecionada
   filteredDisciplines.value = await loadDisciplines(classItem.classroomId) || []
 
   // Carrega regras de avaliação disponíveis para a turma selecionada
-  filterEvaluationRule.value = await loadEvaluationRule(classItem.courseId) || []
+  filterEvaluationRule.value = await loadEvaluationRule(classItem.courseId) || {}
 
   // Adiciona o retorno de filterEvaluationRule às propriedades frequency e evaluation
-  if (filterEvaluationRule.value.length > 0) {
-    filteredOcupation.value.frequency = filterEvaluationRule.value[0].frequencyType
-    filteredOcupation.value.evaluation = filterEvaluationRule.value[0].gradeType
+  if (filterEvaluationRule.value) {
+    filteredOcupation.value.frequency = filterEvaluationRule.value.frequencyType
+    filteredOcupation.value.evaluation = filterEvaluationRule.value.gradeType
   }
   else {
     filteredOcupation.value.frequency = undefined
