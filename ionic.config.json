@@ -1,7 +1,7 @@
 {
-  "name": "app.eduprime.chat",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "vue-vite"
+	"name": "app.eduprime.chat",
+	"integrations": {
+		"capacitor": {}
+	},
+	"type": "vue"
 }
