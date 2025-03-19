@@ -64,6 +64,9 @@ export const useAuthStore = defineStore('auth', () => {
         organization.value = null
         postgrestToken.value = null
         userLocal.value = null
+        teacherId.value = null
+        schoolId.value = null
+        courseName.value = null
     }
 
     async function setPostgrestToken(token: string) {
