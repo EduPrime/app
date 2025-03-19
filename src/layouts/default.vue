@@ -33,13 +33,17 @@ const userRole = ref('')
 if (authStore.userLocal) {
   userRole.value = JSON.parse(authStore.userLocal) ? JSON.parse(authStore.userLocal).role : 'public'
 }
-const paths = {
-  'PROFESSOR': '/home',
-  'GESTORESCOLAR': '/student',
-  'ADMIN': '/dashboard/Home',
-  'GESTORMUNICIPAL': '/dashboard/Home',
-}
-const homeRoute = paths[userRole.value]
+
+type UserRole = 'PROFESSOR' | 'GESTORESCOLAR' | 'ADMIN' | 'GESTORMUNICIPAL';
+
+const paths: Record<UserRole, string> = {
+  PROFESSOR: '/home',
+  GESTORESCOLAR: '/student',
+  ADMIN: '/dashboard/Home',
+  GESTORMUNICIPAL: '/dashboard/Home',
+};
+
+const homeRoute = paths[userRole.value as UserRole]
 
 const tabs = ref([
   {

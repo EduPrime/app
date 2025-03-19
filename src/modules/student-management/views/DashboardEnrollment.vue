@@ -64,7 +64,7 @@ const filter = ref({
   shift: undefined
 })
 
-const school = ref<{ name: any; id: any }>()
+const school = ref<{ name: any; id: any } | null>()
 const finishEnrollmentOpened = ref(false)
 const classes = ref<Classes[]>([])
 const selectedClass = ref('')
@@ -151,7 +151,7 @@ onMounted(async () => {
 
 async function getSchool() {
   const data = await schoolService.getSchool(schoolId)
-  school.value = data ?? {}
+  school.value = data
 }
 
 async function getSeries() {
@@ -282,7 +282,7 @@ async function lastStepEnrollment() {
                   <IonItem color="tertiary">
                     <IonIcon slot="start" class="cursor-pointer" :icon="menu" />
                     <IonSelect class="hide-icon" :value="filter.serie" label-placement="floating"
-                      @ion-change="($event) => { students = []; filter.shift = []; filter.serie = $event.detail.value }">
+                      @ion-change="($event) => { students = []; filter.shift = undefined; filter.serie = $event.detail.value }">
                       <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
                         {{ serie.name }}
                       </IonSelectOption>
