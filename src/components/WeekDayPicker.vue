@@ -27,7 +27,7 @@ interface Props {
   // feriados: { date: string; type: string; title: string }[]
   teacherId: string | undefined
   currentClassroom: string
-  currentDiscipline: string
+  currentDiscipline?: string
 }
 
 const props = defineProps<Props>()
