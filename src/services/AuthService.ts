@@ -287,6 +287,24 @@ export class AuthService {
           throw new Error(`Failed to fetch user: ${(error as Error).message}`)
         }
       }
+      if (data[0].role === "GESTORESCOLAR") {
+        const url = `https://${postgresturl}/servers?userId=eq.${data[0].id}`
+        try {
+          const responseServer = await fetch(url, {
+            method: 'GET',
+            headers: {
+              Authorization: `Bearer ${token}`,
+              mode: 'no-cors',
+            },
+          })
+          const savedId = await responseServer.json()
+          console.log('savedId', savedId)
+          useAuthStore().setSchoolId(savedId[0].schoolId)
+        }
+        catch (error) {
+          throw new Error(`Falha ao obter schoolId : ${(error as Error).message}`)
+        }
+      }
       return data[0] as UserLocal
     }
     catch (error) {

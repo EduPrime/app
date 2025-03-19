@@ -26,7 +26,7 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
   }
 
   async getFilteredWithStudents(filter: any) {
-    const { by, value, direction, serie } = filter || {}
+    const { by, value, direction, serie, school } = filter || {}
 
     if (by && !['name', 'age'].includes(by)) {
       throw new Error('Filtro inválido. Apenas "name" e "age" são permitidos.')
@@ -40,6 +40,7 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
       ,
       student:studentId (*)
   `).eq('situation', 'PENDENTE')
+      .eq('schoolId', school)
 
     query = query.not('student', 'is', null)
 

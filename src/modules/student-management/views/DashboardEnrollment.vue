@@ -20,6 +20,8 @@ const enrollmentService = new EnrollmentService()
 const studentService = new StudentService()
 const classroomService = new ClassroomService()
 
+const schoolId = localStorage.getItem('schoolId')
+
 interface Student {
   pcd: boolean;
   name: string;
@@ -58,11 +60,11 @@ const filter = ref({
   by: 'name',
   value: '',
   serie: undefined,
-  school: undefined,
+  school: schoolId,
   shift: undefined
 })
 
-const schools = ref<{ name: any; id: any }[]>([])
+const school = ref<{ name: any; id: any }>()
 const finishEnrollmentOpened = ref(false)
 const classes = ref<Classes[]>([])
 const selectedClass = ref('')
@@ -143,13 +145,13 @@ watch(filter, () => {
 }, { deep: true, immediate: true })
 
 onMounted(async () => {
-  await getSchools()
+  await getSchool()
+  await getSeries()
 })
 
-async function getSchools() {
-  console.log(filter.value)
-  const data = await schoolService.getSchools()
-  schools.value = data ?? []
+async function getSchool() {
+  const data = await schoolService.getSchool(schoolId)
+  school.value = data ?? {}
 }
 
 async function getSeries() {
@@ -266,20 +268,21 @@ async function lastStepEnrollment() {
                 <IonCol size="12" style="margin: 0; border: 0; padding: 0;">
                   <IonItem color="secondary">
                     <IonIcon slot="start" :icon="businessOutline" />
-                    <IonSelect class="hide-icon" :value="filter.school" label-placement="floating" @ion-change="($event) => {
+                    {{ school?.name ?? 'Escola' }}
+                    <!--IonSelect class="hide-icon" :value="filter.school" label-placement="floating" @ion-change="($event) => {
                       filter.school = $event.detail.value; getSeries(); students = []
                     }">
                       <IonSelectOption v-for="school, i in schools" :key="i" :value="school.id">
                         {{ school.name }}
                       </IonSelectOption>
-                    </IonSelect>
+                    </IonSelect -->
                   </IonItem>
                 </IonCol>
                 <IonCol size="6" style="margin: 0; border: 0; padding: 0;">
                   <IonItem color="tertiary">
                     <IonIcon slot="start" class="cursor-pointer" :icon="menu" />
                     <IonSelect class="hide-icon" :value="filter.serie" label-placement="floating"
-                      @ion-change="($event) => { students = []; filter.serie = $event.detail.value }">
+                      @ion-change="($event) => { students = []; filter.shift = []; filter.serie = $event.detail.value }">
                       <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
                         {{ serie.name }}
                       </IonSelectOption>
