@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "@ionic/vue-router"
 import { useAuthStore } from "@/store/AuthStore"
 import { AuthService } from "@/services/AuthService"
+import { jwtDecode } from "jwt-decode"
 
 export function updateRoutes(routes: any) {
     const authStore = useAuthStore()
@@ -31,43 +32,55 @@ export function updateRoutes(routes: any) {
         }) as unknown as any,
     })
 
+
+
     router.beforeEach(async (to, from, next) => {
         try {
             const authService = new AuthService()
             await authService.getSession()
-            if (!authStore.isAuthenticated) {
-                // Evitar redirecionamento infinito
-                if (to.path !== '/login') {
-                    next('/login')
-                }
-                next()
-            } else {
-                // Usuário autenticado, permitir navegação
 
-                if (to.path === '/login') {
-                    // Se já autenticado, redirecionar da rota de login para home ou outra página
-                    next('')
+            const token = authStore.getPostgrestToken()
+            if (token) {
+                const decoded: { exp: number } = jwtDecode(token)
+                const now = Math.floor(Date.now() / 1000) // Tempo atual em segundos
+
+                if (decoded.exp < now) {
+                    console.warn("Token expirado!")
+                    authStore.logout()
+                    return next("/login")
                 }
-                next()
+            }
+
+            if (!authStore.isAuthenticated) {
+                if (to.path !== "/login") {
+                    return next("/login")
+                }
+                return next()
+            } else {
+                if (to.path === "/login") {
+                    return next("/")
+                }
+                return next()
             }
         } catch {
-            console.log('Failed to get session')
+            console.log("Failed to get session")
             if (to.path !== "/login") {
-                next("/login");
+                return next("/login")
             }
-            next();
+            return next()
         }
     })
+
     return router
 }
 
 export function resetRouter(router: any, routes: any) {
-    const newRouter = updateRoutes(routes); // Criar uma nova instância do roteador
+    const newRouter = updateRoutes(routes) // Criar uma nova instância do roteador
 
     // Removendo todas as rotas antigas para evitar conflitos
     router.getRoutes().forEach((route: any) => {
-        router.removeRoute(route);
-    });
+        router.removeRoute(route)
+    })
 
-    router = newRouter; // Atualiza a variável global do router
+    router = newRouter // Atualiza a variável global do router
 }
