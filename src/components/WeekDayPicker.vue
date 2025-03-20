@@ -28,6 +28,7 @@ interface Props {
   teacherId: string | undefined
   currentClassroom: string
   currentDiscipline?: string
+  frequency?: string
 }
 
 const props = defineProps<Props>()
@@ -336,7 +337,7 @@ watch(() => [props.teacherId, props.currentClassroom, props.currentDiscipline], 
                     <IonChip
                       class="ion-no-padding"
                       style="padding: 10px;"
-                      :disabled="!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0"
+                      :disabled="(props?.frequency === 'disciplina' && !props.currentDiscipline) || (!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0)"
                       :style="i === 0 ? 'margin-left: 10px;' : undefined"
                       :color="getColorForDate(day.date)" @click="() => selectDate(day.date, day.weekday)"
                     >

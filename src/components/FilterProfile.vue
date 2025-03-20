@@ -42,6 +42,7 @@ const filteredClasses = ref<{ classroomId: string, classroomName: string, serieI
 const filteredDisciplines = ref<{ disciplineId: string, disciplineName: string }[]>([])
 const filterEvaluationRule = ref<{ frequencyType?: string, gradeType?: string }>()
 
+const pulseAtEnd = ref()
 const isModalSchool = ref(false)
 const isModalSerie = ref(false)
 const isModalDiscipline = ref(false)
@@ -199,6 +200,19 @@ async function loadDataSchoolClass() {
   }
 }
 
+function pulse() {
+  pulseAtEnd.value = 'pulseButton'
+  setTimeout(() => {
+    pulseAtEnd.value = ''
+  }, 1500)
+}
+
+watch(() => filteredOcupation.value.frequency, (newValue) => {
+  if (newValue === 'disciplina') {
+    pulse()
+  }
+}, { immediate: true, deep: true })
+
 watch(() => filteredOcupation.value.classroomId, async (newClassroomId) => {
   if (newClassroomId) {
     filteredDisciplines.value = await loadDisciplines(newClassroomId) || []
@@ -226,6 +240,7 @@ onMounted(async () => {
         Preencha os filtros abaixo para uma mais acertiva
       </p>
     </ion-text>
+
     <IonGrid class="ion-no-padding">
       <IonRow>
         <IonCol size="12">
@@ -247,7 +262,7 @@ onMounted(async () => {
           </IonItem>
         </IonCol>
         <IonCol size="6">
-          <IonItem class="ion-filter-item" color="primary" @click="setModalDiscipline(true)">
+          <IonItem class="ion-filter-item" :class="pulseAtEnd" color="primary" @click="setModalDiscipline(true)">
             <IonLabel class="custom-ion-label">
               {{ filteredOcupation.disciplineName || 'Disciplina' }}
             </IonLabel>
@@ -327,6 +342,23 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.pulseButton {
+  z-index: 1;
+  animation: pulse 0.8s ease-in-out infinite; /* Tempo de 1 segundo e animação contínua */
+}
+
 ion-content {
   --padding-start: 10px;
   --padding-end: 10px;
