@@ -222,6 +222,14 @@ watch(() => filteredOcupation.value.classroomId, async (newClassroomId) => {
   }
 })
 
+watch(ocupation, async (newValue) => {
+  if (Array.isArray(newValue) && newValue.length === 1) {
+    newValue.forEach((element: any) => {
+      setSchool(element)
+    })
+  }
+}, { immediate: true })
+
 onMounted(async () => {
   userid.value = loadDataUser()
   teacherid.value = await loadDataTeacher()
