@@ -245,7 +245,7 @@ onMounted(async () => {
     <ion-text color="secondary">
       <h4>Filtros</h4>
       <p style="font-size: 14px;">
-        Preencha os filtros abaixo para uma mais acertiva
+        Preencha os filtros abaixo para realizar a busca
       </p>
     </ion-text>
 
