@@ -895,7 +895,7 @@ model Student {
   guardianCpf      String?            @db.VarChar(100)
   guardianEmail    String?            @db.VarChar(100)
   status           status?            @default(ACTIVE)
-  disability       disabilityType?
+  disability       disabilityType[]
   photo            Bytes?
   metadata         Json?
   createdAt        DateTime?          @default(now()) @db.Timestamp(6)

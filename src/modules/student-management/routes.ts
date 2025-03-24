@@ -12,6 +12,13 @@ import RegisterStudent from './views/RegisterStudent.vue'
 
 const routes = [
   {
+    path: '',
+    redirect: '/student',
+    meta: {
+      requiredRole: ['GESTORESCOLAR'],
+    }
+  },
+  {
     path: '/student',
     name: 'StudentList',
     component: DashboardStudent,
@@ -21,7 +28,7 @@ const routes = [
       icon: folder,
       name: 'Alunos',
       order: 1,
-      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR'],
     },
   },
   {
@@ -33,7 +40,7 @@ const routes = [
       icon: folder,
       name: 'Cadastrar Aluno',
       order: 2,
-      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR'],
     },
   },
   {
@@ -45,7 +52,7 @@ const routes = [
       icon: folder,
       name: 'Editar Aluno',
       order: 3,
-      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR'],
     },
   },
   {
@@ -56,9 +63,9 @@ const routes = [
       moduleName: 'Student',
       moduleIcon: create,
       icon: create,
-      name: 'Matrículas',
+      name: 'Solicitações de matrícula',
       order: 2,
-      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR'],
     },
   },
   {
@@ -70,7 +77,7 @@ const routes = [
       icon: create,
       name: 'Matricular Aluno',
       order: 3,
-      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR'],
     },
   },
   {
@@ -82,7 +89,7 @@ const routes = [
       icon: create,
       name: 'Editar Matrícula',
       order: 4,
-      requiredRole: ['ADMIN', 'GESTORESCOLAR', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORESCOLAR'],
     },
   },
   /*   {
