@@ -59,6 +59,10 @@ import '@ionic/vue/css/flex-utils.css'
 import '@ionic/vue/css/display.css'
 /* Theme variables */
 import './theme/variables.css'
+
+import './utils/validationRules'
+import './utils/veeValidateErrorMessage'
+
 // Dynamically import modules
 const modules = import.meta.glob('./modules/*/index.ts', { eager: true })
 

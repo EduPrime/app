@@ -8,7 +8,7 @@ const teacherid = ref('')
 
 <template>
   <content-layout class="ion-no-padding" style="background-color: pink;">
-    <WeekDayPicker v-model="selectedDayInfo" :teacher-id="teacherid" />
+    <WeekDayPicker v-model="selectedDayInfo" current-classroom="undefinded" :teacher-id="teacherid" />
     <pre>
       selectedDayInfo: {{ selectedDayInfo }}
     </pre>

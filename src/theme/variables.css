@@ -83,10 +83,17 @@ http://ionicframework.com/docs/theming/ */
 
 	--ion-color-success: #2dd55b;
 	--ion-color-success-rgb: 45, 213, 91;
-	--ion-color-success-contrast: #000000;
-	--ion-color-success-contrast-rgb: 0, 0, 0;
+	--ion-color-success-contrast: #333333;
+	--ion-color-success-contrast-rgb: 51, 51, 51;
 	--ion-color-success-shade: #28bb50;
 	--ion-color-success-tint: #42d96b;
+
+	--ion-color-lightSuccess: #54da77;
+	--ion-color-lightSuccess-rgb: 45, 213, 91;
+	--ion-color-lightSuccess-contrast: #ffffff;
+	--ion-color-lightSuccess-contrast-rgb: 0, 0, 0;
+	--ion-color-lightSuccess-shade: #28bb50;
+	--ion-color-lightSuccess-tint: #42d96b;
 
 	--ion-color-warning: #ffc409;
 	--ion-color-warning-rgb: 255, 196, 9;

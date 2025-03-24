@@ -26,6 +26,9 @@ import 'swiper/css'
 interface Props {
   // feriados: { date: string; type: string; title: string }[]
   teacherId: string | undefined
+  currentClassroom: string
+  currentDiscipline?: string
+  frequency?: string
 }
 
 const props = defineProps<Props>()
@@ -35,6 +38,7 @@ const emits = defineEmits(['update:modelValue'])
 const scheduleService = new ScheduleService()
 const validDays = ref()
 const pulseAtEnd = ref('')
+const currentWeekday = ref()
 
 const getSwiper: Ref<any> = ref(null)
 const currentDate = ref(moment())
@@ -75,8 +79,9 @@ const colorStyle = ref({
 
 async function getValidDaysInScheduleService() {
   try {
-    if (props.teacherId) {
-      const data = await scheduleService.getSchedule(props.teacherId)
+    if (props.teacherId && props.currentClassroom) {
+      const data = await scheduleService.getSchedule(props.teacherId, props.currentClassroom, props.currentDiscipline ?? undefined)
+
       return data
     }
     // Passa um map nas informações vindas de getSchedule e retorna apenas os dias da semana
@@ -137,10 +142,11 @@ function nextMonth() {
   monthYearValue.value = monthYear.value
 }
 
-function selectDate(date: Moment) {
+function selectDate(date: Moment, weekday: string) {
   selectedDate.value = date
   monthYearValue.value = `${date.format('YYYY-MM-DD')}`
   monthYear.value = date.format('YYYY-MM-DD')
+  currentWeekday.value = weekday
 }
 
 function getColorForDate(date: Moment) {
@@ -263,12 +269,13 @@ watch(selectedDate, (newValue: any) => {
     emits('update:modelValue', {
       selectedDate: newValue.format('YYYY-MM-DD'),
       dayEvents: eventsForSelectedDate.value,
+      weekday: currentWeekday.value,
     })
   }
 })
 
-watch(() => props.teacherId, async (newValue: any) => {
-  if (newValue) {
+watch(() => [props.teacherId, props.currentClassroom, props.currentDiscipline], async (newValue: any) => {
+  if (newValue.at(0) && newValue.at(1)) {
     validDays.value = await getValidDaysInScheduleService()
   }
 }, { immediate: true })
@@ -330,9 +337,9 @@ watch(() => props.teacherId, async (newValue: any) => {
                     <IonChip
                       class="ion-no-padding"
                       style="padding: 10px;"
-                      :disabled="!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0"
+                      :disabled="(props?.frequency === 'disciplina' && !props.currentDiscipline) || (!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0)"
                       :style="i === 0 ? 'margin-left: 10px;' : undefined"
-                      :color="getColorForDate(day.date)" @click="() => selectDate(day.date)"
+                      :color="getColorForDate(day.date)" @click="() => selectDate(day.date, day.weekday)"
                     >
                       <div>
                         <div class="day-name">

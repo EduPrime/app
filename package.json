@@ -51,13 +51,14 @@
     "tus-js-client": "^4.2.3",
     "ulid": "^2.3.0",
     "vee-validate": "^4.15.0",
+    "@vee-validate/rules": "^4.15.0",
+    "validations-br": "^1.4.0",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
     "yup": "^1.6.1"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.2.0",
-    "@types/luxon": "^3.4.2",
     "@types/node": "^22.10.2",
     "@typescript-eslint/parser": "^8.18.2",
     "@vitejs/plugin-legacy": "^6.0.0",

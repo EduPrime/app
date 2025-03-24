@@ -1,6 +1,6 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 async function main() {
     const grades = await prisma.examGrade.createMany(
@@ -13,7 +13,7 @@ async function main() {
                     schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab',
                     grade: 4,
                     tenantId: self.crypto.randomUUID(),
-                    createdAt: new Date('2010-01-17')
+                    createdAt: new Date('2010-01-17'),
                 },
                 {
                     enrollmentId: '70a553d2-91b4-4fdd-9002-761878513b6f',
@@ -22,7 +22,7 @@ async function main() {
                     schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab',
                     grade: 7,
                     tenantId: self.crypto.randomUUID(),
-                    createdAt: new Date('2010-01-17')
+                    createdAt: new Date('2010-01-17'),
                 },
                 {
                     enrollmentId: '7bef062b-cf87-467e-96b3-cb7c31b89bf5',
@@ -31,18 +31,18 @@ async function main() {
                     schoolId: 'd488e90e-327b-4ca7-ad45-888c65d2a3ab',
                     grade: 5,
                     tenantId: self.crypto.randomUUID(),
-                    createdAt: new Date('2010-01-17')
-                }
-            ]
-        }
+                    createdAt: new Date('2010-01-17'),
+                },
+            ],
+        },
     )
 }
 
 main()
     .catch((e) => {
-        console.error(e);
-        process.exit(1);
+        console.error(e)
+        process.exit(1)
     })
     .finally(async () => {
-        await prisma.$disconnect();
-    });
+        await prisma.$disconnect()
+    })
