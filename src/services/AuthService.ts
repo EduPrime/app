@@ -1,10 +1,10 @@
-import type { User as UserLocal } from '@prisma/client'
-import type { ClientOptions } from 'better-auth/types'
 import router from '@/router'
 import { useAuthStore } from '@/store/AuthStore'
 import { getPostgrestURL } from '@/utils/getPostgrestURL'
+import type { User as UserLocal } from '@prisma/client'
 import { betterAuth } from 'better-auth'
 import { organizationClient } from 'better-auth/client/plugins'
+import type { ClientOptions } from 'better-auth/types'
 import { createAuthClient } from 'better-auth/vue'
 import { sendEmail } from '../utils/send-email'
 
@@ -16,6 +16,7 @@ const AUTH_API = import.meta.env.VITE_API_URL
 export class AuthService {
   public client: any
   public auth: any
+
 
   constructor() {
     this.auth = betterAuth({
