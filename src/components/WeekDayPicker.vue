@@ -1,22 +1,10 @@
 <script lang="ts" setup>
-import type { Moment } from 'moment'
-import { hexToRgb } from '@/utils/hex-to-rgb'
-import {
-  IonButton,
-  IonButtons,
-  IonChip,
-  IonDatetime,
-  IonIcon,
-  IonModal,
-  IonText,
-} from '@ionic/vue'
-
-import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
 import { DateTime } from 'luxon'
+import type { Moment } from 'moment'
+import type { Swiper as SwiperType } from 'swiper'
 
 import moment from 'moment'
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import { computed, defineEmits, defineProps, onMounted, ref, type Ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, ref, watch } from 'vue'
 import ScheduleService from '../services/ScheduleService'
 
 import 'swiper/css'
@@ -33,24 +21,23 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const emits = defineEmits(['update:modelValue'])
+const emits = defineEmits(['update:modelValue', 'update:invalidDay'])
 
 const scheduleService = new ScheduleService()
 const validDays = ref()
 const pulseAtEnd = ref('')
 const currentWeekday = ref()
 
-const getSwiper: Ref<any> = ref(null)
+const getSwiper = ref()
 const currentDate = ref(moment())
-const monthYear = ref(new Date()
-  .toISOString())
+const monthYear = ref(new Date().toISOString())
 const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
-const weeksInMonth = ref<any[]>([])
-const selectedDate = ref(moment())
+const weeksInMonth = ref<{ date: Moment; weekday: string }[][]>([])
+const selectedDate = ref<Moment | undefined>(moment())
 const events = ref([
   { date: '2024-06-01', type: 'holiday', title: 'Holiday' },
   { date: '2024-06-05', type: 'event', title: 'Event' },
-  { date: '2025-02-04', type: 'holiday', title: 'Carnaval' },
+  { date: '2025-04-01', type: 'holiday', title: 'Carnaval' },
   { date: '2024-06-08', type: 'disabled', title: 'Event' },
   { date: '2024-06-10', type: 'event', title: 'Event' },
   { date: '2024-06-25', type: 'disabled', title: 'Event' },
@@ -80,7 +67,11 @@ const colorStyle = ref({
 async function getValidDaysInScheduleService() {
   try {
     if (props.teacherId && props.currentClassroom) {
-      const data = await scheduleService.getSchedule(props.teacherId, props.currentClassroom, props.currentDiscipline ?? undefined)
+      const data = await scheduleService.getSchedule(
+        props.teacherId,
+        props.currentClassroom,
+        props.currentDiscipline ?? undefined,
+      )
 
       return data
     }
@@ -89,14 +80,13 @@ async function getValidDaysInScheduleService() {
     //   return day.weekday
     // })
     // console.log('Dados carregados loadDataSchedule:', data)
-  }
-  catch (error) {
+  } catch (error) {
     console.error('Erro ao carregar os dados:', error)
   }
 }
 
 // Função para atualizar o valor de mês e ano selecionado
-function updateDate(event: Event | any) {
+function updateDate(event: CustomEvent) {
   monthYearValue.value = event.detail.value
 }
 
@@ -123,8 +113,7 @@ function prevMonth() {
     currentDate.value = currentDate.value.clone().subtract(1, 'month').startOf('month')
     loadVisibleMonth()
     getSwiper.value.slideTo(getSwiper.value.slides.length - 1)
-  }
-  else {
+  } else {
     getSwiper.value.slidePrev()
   }
   monthYearValue.value = monthYear.value
@@ -135,8 +124,7 @@ function nextMonth() {
     currentDate.value = currentDate.value.clone().add(1, 'month').startOf('month')
     loadVisibleMonth()
     getSwiper.value.slideTo(0)
-  }
-  else {
+  } else {
     getSwiper.value.slideNext()
   }
   monthYearValue.value = monthYear.value
@@ -151,11 +139,12 @@ function selectDate(date: Moment, weekday: string) {
 
 function getColorForDate(date: Moment) {
   const formattedDate = date.format('YYYY-MM-DD')
-  if (formattedDate === selectedDate.value.format('YYYY-MM-DD')) {
+  if (formattedDate === selectedDate.value?.format('YYYY-MM-DD')) {
     return ''
   }
-  else if (events.value.some(event => event.date === formattedDate)) {
-    const event = events.value.find(event => event.date === formattedDate)
+
+  if (events.value.some((event) => event.date === formattedDate)) {
+    const event = events.value.find((event) => event.date === formattedDate)
     switch (event?.type) {
       case 'holiday':
         return 'danger'
@@ -165,9 +154,7 @@ function getColorForDate(date: Moment) {
         return ''
     }
   }
-  else {
-    return 'primary'
-  }
+  return 'primary'
 }
 
 // Metodo para lidar com datas desabilitadas
@@ -191,21 +178,20 @@ function updateDatetimeButton() {
 }
 
 const eventsForSelectedDate = computed(() => {
-  const formattedDate = selectedDate.value.format('YYYY-MM-DD')
-  return events.value.filter(event => event.date === formattedDate)
+  const formattedDate = selectedDate.value?.format('YYYY-MM-DD')
+  return events.value.filter((event) => event.date === formattedDate)
 })
 
-function handleSlideChange(event: any) {
-  const swiper: any = event.target.swiper
+function handleSlideChange(event: { target: { swiper: { activeIndex: number | string; slides: [] } } }) {
+  const swiper = event.target.swiper
   const activeIndex = swiper.activeIndex
   if (activeIndex === swiper.slides.length - 1) {
     nextMonth()
-  }
-  else if (activeIndex === 0) {
+  } else if (activeIndex === 0) {
     prevMonth()
   }
 }
-function onSwiper(swiper: any) {
+function onSwiper(swiper: SwiperType) {
   // console.log(swiper)
   getSwiper.value = swiper
 }
@@ -245,7 +231,7 @@ function luxonFormatDate(dateString: string) {
   return date.setLocale('pt-BR').toFormat('MMMM yyyy')
 }
 
-watch(monthYearValue, (newValue: any, oldValue: any) => {
+watch(monthYearValue, (newValue, oldValue) => {
   if (newValue.slice(0, 7) !== oldValue.slice(0, 7)) {
     const date = DateTime.fromISO(newValue)
     currentDate.value = moment(date.toISODate())
@@ -264,27 +250,44 @@ function pulse() {
   }, 2000) // 2000 milissegundos = 2 segundos de delay
 }
 
-watch(selectedDate, (newValue: any) => {
+function getDayName(sDate: Date | string | Moment | undefined) {
+  return new Date(`${sDate}`).getDay()
+}
+
+watch(selectedDate, (newValue) => {
   if (newValue) {
     emits('update:modelValue', {
       selectedDate: newValue.format('YYYY-MM-DD'),
       dayEvents: eventsForSelectedDate.value,
       weekday: currentWeekday.value,
     })
+    emits('update:invalidDay', false)
   }
 })
 
-watch(() => [props.teacherId, props.currentClassroom, props.currentDiscipline], async (newValue: any) => {
-  if (newValue.at(0) && newValue.at(1)) {
-    validDays.value = await getValidDaysInScheduleService()
-  }
-}, { immediate: true })
+watch(
+  () => [props.teacherId, props.currentClassroom, props.currentDiscipline],
+  async ([newTeacherId, newCurrentClassroom]) => {
+    selectedDate.value = undefined
+
+    if (newTeacherId && newCurrentClassroom) {
+      validDays.value = await getValidDaysInScheduleService()
+      if (
+        validDays.value.find((i: { weekday: string }) => i.weekday.slice(0, 3) === weekDays[getDayName(selectedDate.value)])
+      ) {
+        emits('update:invalidDay', false)
+      } else {
+        emits('update:invalidDay', true)
+      }
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
   <ion-grid class="ion-no-padding">
     <ion-row>
-      <!-- aqui vai o filtro ou algo assim <ion-col size="12" size-xl="6"></ion-col> -->
       <ion-col size="12" size-xl="6">
         <ion-row>
           <ion-col style="display: flex; padding-left: 10px;" class="ion-justify-content-start ion-align-items-center" size="7">
