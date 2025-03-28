@@ -94,6 +94,7 @@ model Classroom {
   TeacherAttendance                                                 TeacherAttendance[] @relation(map: "faltaprof_classroom_id_fkey")
   NumericGrade                                                      NumericGrade[]      @relation(map: "numericexame_classroom_id_fkey")
   RegisteredGrade                                                   RegisteredGrade[]   @relation(map: "notaregistrada_classroom_id_fkey")
+  ConceptualGrade                                                   ConceptualGrade[]   @relation(map: "notaconceitual_classroom_id_fkey")
   Content                                                           Content[]
 
   @@map("classroom")
@@ -154,7 +155,7 @@ model Discipline {
   Bncc                    Bncc[]
   TeacherAttendance       TeacherAttendance[]       @relation(map: "faltaprof_discipline_id_fkey")
   ConceptualGrade         ConceptualGrade[]         @relation(map: "notaconceitual_discipline_id_fkey")
-  ThemathicUnit           ThemathicUnit[]           @relation(map: "notaconceitualunidade_discipline_id_fkey")
+  thematicUnit            ThematicUnit[]            @relation(map: "notaconceitualunidade_discipline_id_fkey")
   RegisteredGrade         RegisteredGrade[]         @relation(map: "notaregistrada_discipline_id_fkey")
 
   @@map("discipline")
@@ -426,13 +427,13 @@ model GeneralGrade {
 
 model NumericGrade {
   id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  at1          Decimal   @db.Decimal
-  at2          Decimal   @db.Decimal
-  at3          Decimal   @db.Decimal
-  at4          Decimal   @db.Decimal
-  at5          Decimal   @db.Decimal
-  makeUp       Decimal   @db.Decimal
-  grade        Decimal   @db.Decimal
+  at1          Decimal?  @db.Decimal
+  at2          Decimal?  @db.Decimal
+  at3          Decimal?  @db.Decimal
+  at4          Decimal?  @db.Decimal
+  at5          Decimal?  @db.Decimal
+  makeUp       Decimal?  @db.Decimal
+  grade        Decimal?  @db.Decimal
   studentId    String    @db.Uuid
   enrollmentId String    @db.Uuid
   disciplineId String    @db.Uuid
@@ -460,6 +461,7 @@ model ConceptualGrade {
   id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   studentId    String    @db.Uuid
   enrollmentId String    @db.Uuid
+  classroomId  String    @db.Uuid
   disciplineId String    @db.Uuid
   schoolId     String    @db.Uuid
   stageId      String    @db.Uuid
@@ -474,13 +476,14 @@ model ConceptualGrade {
   discipline                    Discipline                      @relation(fields: [disciplineId], references: [id], map: "notaconceitual_discipline_id_fkey")
   school                        School                          @relation(fields: [schoolId], references: [id], map: "notaconceitual_school_id_fkey")
   enrollment                    Enrollment                      @relation(fields: [enrollmentId], references: [id], map: "notaconceitual_enrollment_id_fkey")
+  classroom                     Classroom                       @relation(fields: [classroomId], references: [id], map: "notaconceitual_classroom_id_fkey")
   conceptualGradeByThematicUnit ConceptualGradeByThematicUnit[]
 
   @@map("conceptualGrade")
   @@schema("public")
 }
 
-model ThemathicUnit {
+model ThematicUnit {
   id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name         String    @db.VarChar(100)
   seriesId     String    @db.Uuid
@@ -510,7 +513,7 @@ model ConceptualGradeByThematicUnit {
   deletedAt         DateTime? @db.Timestamp(6)
   tenantId          String?
 
-  themathicUnit   ThemathicUnit   @relation(fields: [thematicUnitId], references: [id], map: "notaconceitualunidade_thematicunit_id_fkey")
+  thematicUnit    ThematicUnit    @relation(fields: [thematicUnitId], references: [id], map: "notaconceitualunidade_thematicunit_id_fkey")
   conceptualGrade ConceptualGrade @relation(fields: [conceptualGradeId], references: [id], map: "notaconceitualunidade_conceptualgrade_id_fkey")
 
   @@map("conceptualGradeByThematicUnit")
@@ -927,7 +930,7 @@ model Series {
   institution   Institution?    @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_institution_fkey")
   School        School?         @relation(fields: [schoolId], references: [id])
   schoolId      String?         @db.Uuid
-  ThemathicUnit ThemathicUnit[] @relation(map: "notaconceitualunidade_series_id_fkey")
+  thematicUnit  ThematicUnit[]  @relation(map: "notaconceitualunidade_series_id_fkey")
 
   @@map("series")
   @@schema("public")
