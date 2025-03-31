@@ -367,6 +367,7 @@ model Attendance {
   teacher         Teacher        @relation(fields: [teacherId], references: [id], map: "faltacc_teacher_id_fkey")
   numMissed       NumMissed[]    @relation(map: "nummissed_attendance_id_fkey")
 
+  @@unique([studentId, classroomId, enrollmentId, date, disciplineId], map: "unique_attendance_on_conflict")
   @@map("attendance")
   @@schema("public")
 }
@@ -479,6 +480,7 @@ model ConceptualGrade {
   classroom                     Classroom                       @relation(fields: [classroomId], references: [id], map: "notaconceitual_classroom_id_fkey")
   conceptualGradeByThematicUnit ConceptualGradeByThematicUnit[]
 
+  @@unique([studentId, enrollmentId, classroomId, disciplineId, stageId], map: "unique_conceptual_grade_on_conflict")
   @@map("conceptualGrade")
   @@schema("public")
 }
