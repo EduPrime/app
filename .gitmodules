@@ -1,3 +1,6 @@
 [submodule "src/modules/teacher-journey"]
 	path = src/modules/teacher-journey
 	url = git@github.com:EduPrime/teacher_journey.git
+[submodule "src/modules/chatbot"]
+	path = src/modules/chatbot
+	url = https://github.com/EduPrime/app-module-chatbot.git
