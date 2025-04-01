@@ -10,7 +10,7 @@
     "ignore": ["node_modules/**", ".husky/**", ".vscode/**", "dist/**", ".parcel-cache/**", "src/services/**"]
   },
   "organizeImports": {
-    "enabled": true
+    "enabled": false
   },
   "files": {
     "maxSize": 50000000

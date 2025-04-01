@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { DateTime } from 'luxon'
 import type { Moment } from 'moment'
 import type { Swiper as SwiperType } from 'swiper'
+import { DateTime } from 'luxon'
 
 import moment from 'moment'
 import { computed, defineEmits, defineProps, ref, watch } from 'vue'
