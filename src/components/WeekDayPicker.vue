@@ -1,17 +1,15 @@
 <script lang="ts" setup>
-import type { Moment } from 'moment'
 import type { Swiper as SwiperType } from 'swiper'
-
 import { hexToRgb } from '@/utils/hex-to-rgb'
 
 import { IonButton, IonButtons, IonChip, IonDatetime, IonIcon, IonModal, IonText } from '@ionic/vue'
+
 import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
 import { DateTime } from 'luxon'
+import moment, { type Moment } from 'moment'
 
-
-import moment from 'moment'
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { computed, defineEmits, defineProps, onMounted, ref, type Ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, ref, watch } from 'vue'
 import ScheduleService from '../services/ScheduleService'
 
 import 'swiper/css'
@@ -151,7 +149,7 @@ function getColorForDate(date: Moment) {
   }
 
   if (events.value.some(event => event.date === formattedDate)) {
-    const event = events.value.find(event => event.date === formattedDate)
+    const event = events.value.find(event2 => event2.date === formattedDate)
     switch (event?.type) {
       case 'holiday':
         return 'danger'
