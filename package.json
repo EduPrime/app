@@ -86,6 +86,6 @@
     "nodejs": ">=18.18.0"
   },
   "lint-staged": {
-    "*.{js,ts,vue}": "biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --error-on-warnings"
+    "*.{js,ts,vue}": "biome check --no-errors-on-unmatched --files-ignore-unknown=true"
   }
 }

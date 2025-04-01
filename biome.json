@@ -99,7 +99,7 @@
         "useValidTypeof": "error"
       }
     },
-    "ignore": ["node_modules/**", ".husky/**", ".vscode/**", "dist/**", ".parcel-cache/**", "src/services/**"]
+    "ignore": ["node_modules/**", ".husky/**", ".vscode/**", "dist/**", ".parcel-cache/**"]
   },
   "javascript": {
     "formatter": {
