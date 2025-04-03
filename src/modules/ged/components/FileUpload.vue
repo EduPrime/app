@@ -36,7 +36,6 @@ const uppy = new Uppy({
   },
   autoProceed: false,
   debug: false,
-  // @ts-expect-error @TODO: "Tus" have a type incompatibility when used inside of Uppy({}).use(Tus, {})
 }).use(Tus, {
   endpoint: `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/upload/resumable`,
   headers: {
