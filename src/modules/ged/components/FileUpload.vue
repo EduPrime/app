@@ -1,4 +1,119 @@
 <script setup lang="ts">
+import Uppy, { type Meta, type UppyFile } from '@uppy/core'
+import Tus from '@uppy/tus'
+
+import { onMounted, ref } from 'vue'
+import '@uppy/core/dist/style.css'
+import '@uppy/dashboard/dist/style.css'
+
+const props = defineProps<{
+  bucketName: string
+  maxFileSize?: number
+}>()
+
+const emit = defineEmits<{
+  (event: 'uploadSuccess', data: Record<string, unknown>): void
+  (event: 'uploadError', error: Error): void
+}>()
+
+interface FileItem {
+  file: UppyFile<Meta, Record<string, unknown>>
+  preview: string
+  name: string
+  size: number
+  type: string
+  progress: number
+  error: boolean
+  errorMessage: string
+}
+
+const fileItems = ref<FileItem[]>([])
+const uppy = new Uppy({
+  restrictions: {
+    maxNumberOfFiles: 10,
+    allowedFileTypes: ['image/*', 'application/pdf'],
+    maxFileSize: (props.maxFileSize ?? 500) * (1024 * 1024),
+  },
+  autoProceed: false,
+  debug: false,
+  // @ts-expect-error @TODO: "Tus" have a type incompatibility when used inside of Uppy({}).use(Tus, {})
+}).use(Tus, {
+  endpoint: `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/upload/resumable`,
+  headers: {
+    Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_KEY}`,
+  },
+  uploadDataDuringCreation: true,
+  chunkSize: 6 * 1024 * 1024,
+  allowedMetaFields: ['bucketName', 'objectName', 'contentType', 'cacheControl'],
+  onError: (error: Error) => {
+    console.error(`Failed because: ${error}`)
+  },
+})
+
+onMounted(() => {
+  uppy.on('file-added', (file) => {
+    const supabaseMetadata: Meta = {
+      bucketName: props.bucketName,
+      objectName: `uploads/${file.name}`,
+      contentType: file.type,
+    }
+    file.meta = {
+      ...file.meta,
+      ...supabaseMetadata,
+    }
+    console.info('file added', file)
+  })
+    .on('upload-progress', (file, progress) => {
+      const item = fileItems.value.find(i => i.file.id === file?.id)
+      if (item) {
+        item.progress = (progress.bytesUploaded / (progress.bytesTotal ?? 1)) * 100
+      }
+    })
+    .on('upload-error', (file, error) => {
+      const item = file ? fileItems.value.find(i => i.file.id === file.id) : null
+      if (item) {
+        item.error = true
+        item.errorMessage = 'Upload failed. Please try again.'
+      }
+      console.error('File upload error:', error)
+      emit('uploadError', error)
+    })
+    .on('upload-success', async (file, response) => {
+      if (file) {
+        const fileItem: FileItem = {
+          file,
+          preview: URL.createObjectURL(file.data),
+          name: file.name ?? '',
+          size: file.size ?? 0,
+          type: file.type,
+          progress: 100,
+          error: false,
+          errorMessage: '',
+        }
+        fileItems.value.push(fileItem)
+        const storage_path = `${import.meta.env.VITE_SUPABASE_URL}/storage/v1/object/public/${props.bucketName}/uploads/${file.name}`
+        const newDocumentRecord = {
+          compression_applied: false,
+          file_hash: null,
+          file_name: file.name,
+          is_current_version: true,
+          is_deleted: false,
+          metadata: null,
+          mime_type: file.type,
+          size: file.size,
+          storage_path,
+          upload_date: new Date().toISOString(),
+          version: 1,
+        }
+        console.log('Upload Response: ', response)
+        emit('uploadSuccess', newDocumentRecord)
+      }
+    })
+})
+</script>
+
+<!--
+<script setup lang="ts">
 import type { Meta, UppyFile } from '@uppy/core'
 import { IonChip, IonListHeader, IonThumbnail } from '@ionic/vue'
 import Uppy from '@uppy/core'
@@ -130,4 +245,4 @@ onMounted(() => {
       </div>
     </div>
   </div>
-</template>
+</template> -->
