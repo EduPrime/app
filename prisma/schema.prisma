@@ -524,6 +524,7 @@ model ConceptualGradeByThematicUnit {
 
 model RegisteredGrade {
   id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  isCompleted  Boolean   @default(false)
   teacherId    String    @db.Uuid
   classroomId  String    @db.Uuid
   disciplineId String    @db.Uuid
