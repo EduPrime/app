@@ -1,6 +1,7 @@
 import type { PreEnrollment } from '@prisma/client'
 import BaseService from '@/services/BaseService'
-import dayjs from 'dayjs'
+// import dayjs from 'dayjs' // estava estourando o erro TS2307
+import moment from 'moment'
 
 export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
   constructor() {
@@ -71,8 +72,8 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
     // Ordenação manual
     if (by && direction) {
       data.sort((a, b) => {
-        const valueA = by === 'name' ? a.student.name : dayjs(a.student.birthdate).unix()
-        const valueB = by === 'name' ? b.student.name : dayjs(b.student.birthdate).unix()
+        const valueA = by === 'name' ? a.student.name : moment(a.student.birthdate).unix()
+        const valueB = by === 'name' ? b.student.name : moment(b.student.birthdate).unix()
         if (by === 'name') {
           if (direction === 'asc') {
             return valueA.localeCompare(valueB)
