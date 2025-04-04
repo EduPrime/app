@@ -480,7 +480,6 @@ model ConceptualGrade {
   classroom                     Classroom                       @relation(fields: [classroomId], references: [id], map: "notaconceitual_classroom_id_fkey")
   conceptualGradeByThematicUnit ConceptualGradeByThematicUnit[]
 
-  @@unique([studentId, enrollmentId, classroomId, disciplineId, stageId], map: "unique_conceptual_grade_on_conflict")
   @@map("conceptualGrade")
   @@schema("public")
 }
@@ -540,6 +539,7 @@ model RegisteredGrade {
   discipline Discipline @relation(fields: [disciplineId], references: [id], map: "notaregistrada_discipline_id_fkey")
   stage      Stage      @relation(fields: [stageId], references: [id], map: "notaregistrada_stage_id_fkey")
 
+  @@unique([teacherId, classroomId, disciplineId, stageId], map: "unique_registered_grade_on_conflict")
   @@map("registeredGrade")
   @@schema("public")
 }
