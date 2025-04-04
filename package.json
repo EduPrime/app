@@ -4,6 +4,9 @@
   "version": "0.0.4",
   "private": true,
   "description": "Gestão Pedagógica",
+  "engines": {
+    "nodejs": ">=18.18.0"
+  },
   "scripts": {
     "vite": "vite",
     "dev": "ionic serve --browser firefox",
@@ -86,9 +89,6 @@
     "vitest": "^2.1.8",
     "vue-eslint-parser": "^10.1.1",
     "vue-tsc": "^2.2.0"
-  },
-  "engines": {
-    "nodejs": ">=18.18.0"
   },
   "lint-staged": {
     "*.{js,ts,vue}": "eslint --fix"
