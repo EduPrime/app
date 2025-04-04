@@ -10,7 +10,7 @@
       "@/*": ["./src/*"]
     },
     "resolveJsonModule": true,
-    "types": ["vite/client", "dayjs"], // Adicionei o dayjs aqui (estava disparando o erro TS2307: Cannot find module 'dayjs' or its corresponding type declarations.)
+    "types": ["vite/client"],
     "maxNodeModuleJsDepth": 7,
     "strict": true,
     "strictNullChecks": true,
