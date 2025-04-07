@@ -16,7 +16,8 @@
     "lint:fix": "eslint . --ext .ts,.vue --fix",
     "prepare": "husky install",
     "type-check": "vue-tsc --noEmit",
-    "prisma-dataload": "bun prisma/roles.ts && bun prisma/seed.ts"
+    "prisma-dataload": "bun prisma/roles.ts && bun prisma/seed.ts",
+    "seed:script": "./prisma/seed_script.sh"
   },
   "dependencies": {
     "@antfu/eslint-config": "^3.12.1",

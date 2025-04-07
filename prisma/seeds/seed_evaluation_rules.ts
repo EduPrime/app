@@ -34,14 +34,19 @@ async function main() {
                     conceptualLabel:
                         [
                             {
+                                "rotulo": "PC",
+                                "descricao": "Processo Construído",
+                                "valor": 10
+                            },
+                            {
                                 "rotulo": "PEC",
                                 "descricao": "Processo em Construção",
                                 "valor": 7.9
                             },
                             {
-                                "rotulo": "PC",
-                                "descricao": "Processo Construído",
-                                "valor": 10
+                                "rotulo": "PNC",
+                                "descricao": "Processo Não Construído",
+                                "valor": 0
                             },
                             {
                                 "rotulo": "NT",
