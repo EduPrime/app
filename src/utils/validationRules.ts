@@ -77,7 +77,7 @@ defineRule('notaValida', (value: string) => {
   if (!value)
     return true
 
-  const num = Number(value)
+  const num = Number(value.replace(',', '.'))
 
   if (Number.isNaN(num))
     return 'Deve ser um número válido'
