@@ -7,7 +7,7 @@ import TeacherService from '@/services/TeacherService'
 
 import { hexToRgb } from '@/utils/hex-to-rgb'
 import { IonButton, IonChip, IonCol, IonContent, IonGrid, IonIcon, IonItem, IonLabel, IonModal, IonRow } from '@ionic/vue'
-import { arrowDown, arrowUp, businessOutline, filterCircleOutline, peopleOutline } from 'ionicons/icons'
+import { apps, arrowDown, arrowUp, businessOutline, filterCircleOutline, peopleOutline } from 'ionicons/icons'
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 
 interface Props {
@@ -274,7 +274,7 @@ onMounted(async () => {
             <IonLabel class="custom-ion-label">
               {{ filteredOcupation.disciplineName || 'Disciplina' }}
             </IonLabel>
-            <IonIcon slot="start" :icon="peopleOutline" class="custom-icon" />
+            <IonIcon slot="start" :icon="apps" class="custom-icon" />
           </IonItem>
         </IonCol>
       </IonRow>
