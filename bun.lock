@@ -28,6 +28,7 @@
         "@uppy/tus": "^4.2.2",
         "@uppy/vue": "^2.1.1",
         "@vee-validate/rules": "^4.15.0",
+        "@vue/runtime-core": "^3.5.13",
         "@vueuse/core": "^12.2.0",
         "better-auth": "^1.1.7",
         "cors": "^2.8.5",
