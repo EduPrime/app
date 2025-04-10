@@ -58,9 +58,26 @@ const colorStyle = ref({
 })
 
 const setFilterCollapse = (open: boolean) => (isFilterCollapse.value = open)
-const setModalSchool = (open: boolean) => (isModalSchool.value = open)
-const setModalSerie = (open: boolean) => (isModalSerie.value = open)
-const setModalDiscipline = (open: boolean) => (isModalDiscipline.value = open)
+function setModalSchool(open: boolean) {
+  isModalSchool.value = open
+  if (open) {
+    isModalSchool.value = false
+    setTimeout(() => (isModalSchool.value = true), 10)
+  }
+}
+function setModalSerie(open: boolean) {
+  isModalSerie.value = open
+  if (open) {
+    setTimeout(() => (isModalSerie.value = true), 10)
+  }
+}
+function setModalDiscipline(open: boolean) {
+  isModalDiscipline.value = open
+  if (open) {
+    isModalDiscipline.value = false
+    setTimeout(() => (isModalDiscipline.value = true), 10)
+  }
+}
 
 function setSchool(school: Occupation): void {
   // Atualiza a escola
