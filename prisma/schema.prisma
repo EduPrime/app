@@ -454,6 +454,7 @@ model NumericGrade {
   classroom  Classroom  @relation(fields: [classroomId], references: [id], map: "notaexame_classroom_id_fkey")
   student    Student    @relation(fields: [studentId], references: [id], map: "notaexame_student_id_fkey")
 
+  @@unique([studentId, classroomId, enrollmentId, stageId, disciplineId], map: "unique_numeric_grade_on_conflict")
   @@map("numericGrade")
   @@schema("public")
 }

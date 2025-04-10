@@ -1,8 +1,8 @@
-import { configure } from "vee-validate";
+import { configure } from 'vee-validate'
 
 configure({
   generateMessage: (ctx) => {
-    const params = Array.isArray(ctx.rule?.params) ? ctx.rule.params : [];
+    const params = Array.isArray(ctx.rule?.params) ? ctx.rule.params : []
     const messages: Record<string, string> = {
       required: `O campo "${ctx.field}" é obrigatório.`,
       min: `O campo "${ctx.field}" precisa ter ao menos ${params[0]} caracteres.`,
@@ -11,15 +11,16 @@ configure({
       cpf: `${ctx.field} inválido.`,
       phone: `${ctx.field} inválido.`,
       cep: `${ctx.field} inválido.`,
-    };
-
-    if (!ctx.rule?.name) {
-      return `O campo "${ctx.field}" é inválido.`;
+      notaValida: `A nota na ${ctx.field} está inválida.`,
     }
 
-    return messages[ctx.rule?.name] || `O campo "${ctx.field}" é inválido.`;
+    if (!ctx.rule?.name) {
+      return `O campo "${ctx.field}" é inválido.`
+    }
+
+    return messages[ctx.rule?.name] || `O campo "${ctx.field}" é inválido.`
   },
   validateOnBlur: true,
   validateOnChange: true,
   validateOnInput: false,
-});
+})
