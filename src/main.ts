@@ -38,9 +38,10 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import ContentLayout from './components/theme/ContentLayout.vue'
 
-import pinia from './store/pinia'
 import router from './router'
+import pinia from './store/pinia'
 
+import imaskDirective from './utils/imasks'
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css'
@@ -66,13 +67,11 @@ import './utils/veeValidateErrorMessage'
 // Dynamically import modules
 const modules = import.meta.glob('./modules/*/index.ts', { eager: true })
 
-
-
 const app = createApp(App)
+  .directive('imask', imaskDirective)
   .use(IonicVue)
   .use(pinia)
   .use(router)
-
 
 app.component('ion-app', IonApp)
 app.component('ion-content', IonContent)

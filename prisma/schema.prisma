@@ -454,6 +454,7 @@ model NumericGrade {
   classroom  Classroom  @relation(fields: [classroomId], references: [id], map: "notaexame_classroom_id_fkey")
   student    Student    @relation(fields: [studentId], references: [id], map: "notaexame_student_id_fkey")
 
+  @@unique([studentId, classroomId, enrollmentId, stageId, disciplineId], map: "unique_numeric_grade_on_conflict")
   @@map("numericGrade")
   @@schema("public")
 }
@@ -480,7 +481,6 @@ model ConceptualGrade {
   classroom                     Classroom                       @relation(fields: [classroomId], references: [id], map: "notaconceitual_classroom_id_fkey")
   conceptualGradeByThematicUnit ConceptualGradeByThematicUnit[]
 
-  @@unique([studentId, enrollmentId, classroomId, disciplineId, stageId], map: "unique_conceptual_grade_on_conflict")
   @@map("conceptualGrade")
   @@schema("public")
 }
@@ -524,6 +524,7 @@ model ConceptualGradeByThematicUnit {
 
 model RegisteredGrade {
   id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  isCompleted  Boolean   @default(false)
   teacherId    String    @db.Uuid
   classroomId  String    @db.Uuid
   disciplineId String    @db.Uuid
@@ -539,6 +540,7 @@ model RegisteredGrade {
   discipline Discipline @relation(fields: [disciplineId], references: [id], map: "notaregistrada_discipline_id_fkey")
   stage      Stage      @relation(fields: [stageId], references: [id], map: "notaregistrada_stage_id_fkey")
 
+  @@unique([teacherId, classroomId, disciplineId, stageId], map: "unique_registered_grade_on_conflict")
   @@map("registeredGrade")
   @@schema("public")
 }

@@ -7,7 +7,7 @@ import TeacherService from '@/services/TeacherService'
 
 import { hexToRgb } from '@/utils/hex-to-rgb'
 import { IonButton, IonChip, IonCol, IonContent, IonGrid, IonIcon, IonItem, IonLabel, IonModal, IonRow } from '@ionic/vue'
-import { arrowDown, arrowUp, businessOutline, filterCircleOutline, peopleOutline } from 'ionicons/icons'
+import { apps, arrowDown, arrowUp, businessOutline, filterCircleOutline, peopleOutline } from 'ionicons/icons'
 import { defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 
 interface Props {
@@ -58,9 +58,27 @@ const colorStyle = ref({
 })
 
 const setFilterCollapse = (open: boolean) => (isFilterCollapse.value = open)
-const setModalSchool = (open: boolean) => (isModalSchool.value = open)
-const setModalSerie = (open: boolean) => (isModalSerie.value = open)
-const setModalDiscipline = (open: boolean) => (isModalDiscipline.value = open)
+function setModalSchool(open: boolean) {
+  isModalSchool.value = open
+  if (open) {
+    isModalSchool.value = false
+    setTimeout(() => (isModalSchool.value = true), 10)
+  }
+}
+function setModalSerie(open: boolean) {
+  isModalSerie.value = open
+  if (open) {
+    isModalSerie.value = false
+    setTimeout(() => (isModalSerie.value = true), 10)
+  }
+}
+function setModalDiscipline(open: boolean) {
+  isModalDiscipline.value = open
+  if (open) {
+    isModalDiscipline.value = false
+    setTimeout(() => (isModalDiscipline.value = true), 10)
+  }
+}
 
 function setSchool(school: Occupation): void {
   // Atualiza a escola
@@ -241,11 +259,12 @@ onMounted(async () => {
 </script>
 
 <template>
-  <IonContent v-show="isFilterCollapse" class="" style="--background: rgba(249, 211, 227, 0.3); height: 235px;" :style="`box-shadow: inset 0 0 10px ${hexToRgb(colorStyle.primary, '0.2')}`">
+  <IonContent v-show="isFilterCollapse" class="" style="--background: rgba(249, 211, 227, 0.3); height: 235px;"
+    :style="`box-shadow: inset 0 0 10px ${hexToRgb(colorStyle.primary, '0.2')}`">
     <ion-text color="secondary">
       <h4>Filtros</h4>
       <p style="font-size: 14px;">
-        Preencha os filtros abaixo para realizar a busca
+        Preencha os filtros abaixo para realizar a busca.
       </p>
     </ion-text>
 
@@ -274,7 +293,7 @@ onMounted(async () => {
             <IonLabel class="custom-ion-label">
               {{ filteredOcupation.disciplineName || 'Disciplina' }}
             </IonLabel>
-            <IonIcon slot="start" :icon="peopleOutline" class="custom-icon" />
+            <IonIcon slot="start" :icon="apps" class="custom-icon" />
           </IonItem>
         </IonCol>
       </IonRow>
@@ -289,7 +308,8 @@ onMounted(async () => {
     </IonGrid>
   </IonContent>
 
-  <IonModal :is-open="isModalSchool" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]" @ion-modal-did-dismiss="setModalSchool(false)">
+  <IonModal :is-open="isModalSchool" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
+    @ion-modal-did-dismiss="setModalSchool(false)">
     <div class="block">
       <ion-list v-for="(sch, i) in ocupation" :key="i" :value="sch.schoolName">
         <IonItem @click="setSchool(sch)">
@@ -299,7 +319,8 @@ onMounted(async () => {
     </div>
   </IonModal>
 
-  <IonModal :is-open="isModalSerie" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]" @ion-modal-did-dismiss="setModalSerie(false)">
+  <IonModal :is-open="isModalSerie" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
+    @ion-modal-did-dismiss="setModalSerie(false)">
     <div class="block">
       <ion-list v-for="(classItem, i) in filteredClasses" :key="i" :value="classItem.classroomName">
         <IonItem @click="setClasses(classItem)">
@@ -309,7 +330,8 @@ onMounted(async () => {
     </div>
   </IonModal>
 
-  <IonModal :is-open="isModalDiscipline" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]" @ion-modal-did-dismiss="setModalDiscipline(false)">
+  <IonModal :is-open="isModalDiscipline" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
+    @ion-modal-did-dismiss="setModalDiscipline(false)">
     <div class="block">
       <ion-list v-for="(d, i) in filteredDisciplines" :key="i" :value="d.disciplineName">
         <IonItem @click="setDiscipline(d)">
@@ -319,16 +341,20 @@ onMounted(async () => {
     </div>
   </IonModal>
 
-  <div :style="{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isFilterCollapse ? '0' : '5px' }">
+  <div
+    :style="{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isFilterCollapse ? '0' : '5px' }">
     <ion-text v-show="!isFilterCollapse" color="secondary" class="ion-padding-vertical">
       <div v-if="filteredOcupation?.schoolName" class="ion-content">
-        <span style="margin-right: 10px; margin-left: 2px; color: var(--ion-color-tertiary); font-weight: 700;">{{ filteredOcupation.schoolName }}</span><br>
+        <span style="margin-right: 10px; margin-left: 2px; color: var(--ion-color-tertiary); font-weight: 700;">{{
+          filteredOcupation.schoolName }}</span><br>
 
         <IonChip color="tertiary" class="ion-no-margin">
           Turma: {{ filteredOcupation.classroomName }}
         </IonChip>
-        <IonChip v-if="filteredOcupation?.disciplineName" color="tertiary" class="ion-no-margin" style="margin-left: 5px;">
-          {{ filteredOcupation?.disciplineName?.slice(0, 15) }} <span v-if="filteredOcupation?.disciplineName?.length > 15">...</span>
+        <IonChip v-if="filteredOcupation?.disciplineName" color="tertiary" class="ion-no-margin"
+          style="margin-left: 5px;">
+          {{ filteredOcupation?.disciplineName?.slice(0, 15) }} <span
+            v-if="filteredOcupation?.disciplineName?.length > 15">...</span>
         </IonChip>
       </div>
       <ion-text v-else color="secondary">
@@ -343,7 +369,9 @@ onMounted(async () => {
         </p>
       </ion-text>
     </ion-text>
-    <IonButton color="tertiary" :style="{ marginTop: isFilterCollapse ? '-20px' : '2px', marginLeft: 'auto', marginRight: isFilterCollapse ? '10px' : '10px' }" @click="setFilterCollapse(!isFilterCollapse)">
+    <IonButton color="tertiary"
+      :style="{ marginTop: isFilterCollapse ? '-20px' : '2px', marginLeft: 'auto', marginRight: isFilterCollapse ? '10px' : '10px' }"
+      @click="setFilterCollapse(!isFilterCollapse)">
       <IonIcon slot="icon-only" :icon="isFilterCollapse ? arrowUp : arrowDown" />
     </IonButton>
   </div>
@@ -354,9 +382,11 @@ onMounted(async () => {
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.05);
   }
+
   100% {
     transform: scale(1);
   }
@@ -364,17 +394,20 @@ onMounted(async () => {
 
 .pulseButton {
   z-index: 1;
-  animation: pulse 0.8s ease-in-out infinite; /* Tempo de 1 segundo e animação contínua */
+  animation: pulse 0.8s ease-in-out infinite;
+  /* Tempo de 1 segundo e animação contínua */
 }
 
 ion-content {
   --padding-start: 10px;
   --padding-end: 10px;
 }
+
 .ion-content {
   padding-left: 10px;
   padding-right: 10px;
 }
+
 ion-accordion-group {
   margin-inline: 0 !important;
   margin-top: 16px;
@@ -438,32 +471,39 @@ ion-select {
   --placeholder-color: var(--ion-color-primary);
   --placeholder-opacity: 1;
   --border-color: var(--ion-color-primary)
- }
- ion-select::part(text) {
-    color: var(--ion-color-primary);
-  }
-  ion-select::part(icon) {
-    color: var(--ion-color-primary);
-    opacity: 1;
-  }
-  ion-select::part(label) {
-    color: var(--ion-color-primary);
-    opacity: 1;
-  }
-  .custom-ion-item-label {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .ion-filter-item {
-    --min-height: 57px;
-  }
-  .custom-ion-label {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .custom-icon {
-    margin-right: 8px;
-  }
+}
+
+ion-select::part(text) {
+  color: var(--ion-color-primary);
+}
+
+ion-select::part(icon) {
+  color: var(--ion-color-primary);
+  opacity: 1;
+}
+
+ion-select::part(label) {
+  color: var(--ion-color-primary);
+  opacity: 1;
+}
+
+.custom-ion-item-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ion-filter-item {
+  --min-height: 57px;
+}
+
+.custom-ion-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.custom-icon {
+  margin-right: 8px;
+}
 </style>

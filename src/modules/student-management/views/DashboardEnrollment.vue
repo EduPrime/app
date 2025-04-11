@@ -1,18 +1,18 @@
 <script setup lang="ts">
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import { IonButton, IonCol, IonIcon, IonItem, IonRow, IonSelect, IonSelectOption, IonText, toastController } from '@ionic/vue'
-import dayjs from 'dayjs'
-import { arrowUp, arrowDown, alarm, alertCircleOutline, arrowDownOutline, arrowUpOutline, businessOutline, menu } from 'ionicons/icons'
+// import dayjs from 'dayjs'
+import { alarm, alertCircleOutline, arrowDown, arrowDownOutline, arrowUp, arrowUpOutline, businessOutline, menu } from 'ionicons/icons'
+import moment from 'moment'
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
+import ClassroomService from '../services/ClassroomService'
+import EnrollmentService from '../services/EnrollmentService'
 import Pre_enrollmentService from '../services/Pre_enrollmentService'
 import SchoolService from '../services/SchoolService'
-import EnrollmentService from '../services/EnrollmentService'
 import StudentService from '../services/StudentService'
-import ClassroomService from '../services/ClassroomService'
 
-
-const router = useRouter()
+// const router = useRouter()
 
 const preEnrollmentService = new Pre_enrollmentService()
 const schoolService = new SchoolService()
@@ -23,28 +23,28 @@ const classroomService = new ClassroomService()
 const schoolId = localStorage.getItem('schoolId')
 
 interface Student {
-  pcd: boolean;
-  name: string;
-  age: number;
-  shift: string;
-  selected?: boolean;
-  code: string;
-  id: string;
-  studentId: string;
-  schoolId: string;
-  courseId: string;
-  seriesId: string;
-  institutionId: string;
+  pcd: boolean
+  name: string
+  age: number
+  shift: string
+  selected?: boolean
+  code: string
+  id: string
+  studentId: string
+  schoolId: string
+  courseId: string
+  seriesId: string
+  institutionId: string
 }
 
 interface Classes {
-  id: string;
-  name: string;
-  maxStudents: number;
-  period: string;
-  totalStudents: number;
-  exceededStudents: number;
-  pcdStudents: number;
+  id: string
+  name: string
+  maxStudents: number
+  period: string
+  totalStudents: number
+  exceededStudents: number
+  pcdStudents: number
 }
 
 const students = ref<Student[]>([])
@@ -52,8 +52,7 @@ const students = ref<Student[]>([])
 const series = ref<any[]>([])
 const searchQuery = ref('')
 const isFilterCollapse = ref(false)
-const isComplete = ref(false)
-
+// const isComplete = ref(false)
 
 const filter = ref({
   direction: 'asc',
@@ -61,19 +60,19 @@ const filter = ref({
   value: '',
   serie: undefined,
   school: schoolId,
-  shift: undefined
+  shift: undefined,
 })
 
-const school = ref<{ name: any; id: any } | null>()
+const school = ref<{ name: any, id: any } | null>()
 const finishEnrollmentOpened = ref(false)
 const classes = ref<Classes[]>([])
 const selectedClass = ref('')
 const selectClassOpened = ref(false)
 
 const turnos = ref({
-  'MORNING': 'Manhã',
-  'AFTERNOON': 'Tarde',
-  'EVENING': 'Noite'
+  MORNING: 'Manhã',
+  AFTERNOON: 'Tarde',
+  EVENING: 'Noite',
 })
 
 watch(students, (novoValor, antigoValor) => {
@@ -83,14 +82,12 @@ watch(students, (novoValor, antigoValor) => {
   }
 }, { deep: true })
 
-
-let filteredStudents = computed(() => {
-
+const filteredStudents = computed(() => {
   if (!searchQuery.value) {
     return students.value
   }
 
-  return students.value.filter((student) =>
+  return students.value.filter(student =>
     student.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
@@ -101,7 +98,8 @@ async function loadEnrollment() {
     students.value = enrollments.map(enrollment => ({
       pcd: enrollment.student?.disability ?? false,
       name: enrollment.student?.name ?? '',
-      age: dayjs().diff(dayjs(enrollment.student?.birthdate), 'year') ?? 0,
+      age: moment().diff(moment(enrollment.student?.birthdate), 'years') ?? 0,
+      // age: dayjs().diff(dayjs(enrollment.student?.birthdate), 'year') ?? 0,
       shift: enrollment.preferShift,
       code: enrollment.preenrollmentcode,
       id: enrollment.id,
@@ -133,14 +131,12 @@ function handleSelectAll($event: any) {
   })
 }
 
-
 watch(filter, () => {
   if (filter.value.by === 'name') {
     students.value = students.value.sort((a, b) => filter.value.direction === 'asc' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name))
   }
   else {
     students.value = students.value.sort((a, b) => filter.value.direction === 'asc' ? a.age - b.age : b.age - a.age)
-
   }
 }, { deep: true, immediate: true })
 
@@ -174,7 +170,8 @@ async function handleSelectClass() {
   if (filter.value.serie && filter.value.school) {
     console.log('filter.serie and filter.school', filter.value.serie, filter.value.school)
     classes.value = await classroomService.getClasses(filter.value.serie, filter.value.school)
-  } else {
+  }
+  else {
     console.error('Serie is undefined')
   }
   selectClassOpened.value = true
@@ -216,7 +213,7 @@ function getTurno(turno: string) {
 async function lastStepEnrollment() {
   for (const student of selectedStudents.value) {
     const enrollmentData = {
-      id: self.crypto.randomUUID(),
+      id: globalThis.crypto.randomUUID(), // estava self.crypto.randomUUID()
       institutionId: student.institutionId,
       schoolId: student.schoolId,
       seriesId: student.seriesId,
@@ -225,7 +222,7 @@ async function lastStepEnrollment() {
       courseId: student.courseId,
       name: student.name,
       dateEnrollment: new Date(),
-      situation: "CURSANDO",
+      situation: 'CURSANDO',
       enrollmentCode: student.code.replace('pre-', ''),
       createdAt: new Date(),
       deletedAt: null,
@@ -233,20 +230,19 @@ async function lastStepEnrollment() {
       updatedBy: null,
       tenantId: null,
       observations: null,
-      status: "ACTIVE",
+      status: 'ACTIVE',
       preenrollmentId: student.id,
     }
 
-    await enrollmentService.createEnrollment(enrollmentData);
-    await preEnrollmentService.update(student.id, { situation: "CURSANDO" });
-    await studentService.update(student.studentId, { schoolId: student.schoolId });
-    await classroomService.updateTotalStudents(selectedClass.value, student.pcd);
+    await enrollmentService.createEnrollment(enrollmentData)
+    await preEnrollmentService.update(student.id, { situation: 'CURSANDO' })
+    await studentService.update(student.studentId, { schoolId: student.schoolId })
+    await classroomService.updateTotalStudents(selectedClass.value, student.pcd)
   }
 
-  await loadEnrollment();
-  console.log('fim da matrícula');
+  await loadEnrollment()
+  console.log('fim da matrícula')
 }
-
 </script>
 
 <template>
@@ -269,7 +265,7 @@ async function lastStepEnrollment() {
                   <IonItem color="secondary">
                     <IonIcon slot="start" :icon="businessOutline" />
                     {{ school?.name ?? 'Escola' }}
-                    <!--IonSelect class="hide-icon" :value="filter.school" label-placement="floating" @ion-change="($event) => {
+                    <!-- IonSelect class="hide-icon" :value="filter.school" label-placement="floating" @ion-change="($event) => {
                       filter.school = $event.detail.value; getSeries(); students = []
                     }">
                       <IonSelectOption v-for="school, i in schools" :key="i" :value="school.id">
@@ -281,8 +277,10 @@ async function lastStepEnrollment() {
                 <IonCol size="6" style="margin: 0; border: 0; padding: 0;">
                   <IonItem color="tertiary">
                     <IonIcon slot="start" class="cursor-pointer" :icon="menu" />
-                    <IonSelect class="hide-icon" :value="filter.serie" label-placement="floating"
-                      @ion-change="($event) => { students = []; filter.shift = undefined; filter.serie = $event.detail.value }">
+                    <IonSelect
+                      class="hide-icon" :value="filter.serie" label-placement="floating"
+                      @ion-change="($event) => { students = []; filter.shift = undefined; filter.serie = $event.detail.value }"
+                    >
                       <IonSelectOption v-for="serie, i in series" :key="i" :value="serie.id">
                         {{ serie.name }}
                       </IonSelectOption>
@@ -292,8 +290,10 @@ async function lastStepEnrollment() {
                 <IonCol size="6" style="margin: 0; border: 0; padding: 0;">
                   <IonItem color="primary">
                     <IonIcon slot="start" class="cursor-pointer" :icon="alarm" />
-                    <IonSelect class="hide-icon" v-model="filter.shift" label-placement="floating"
-                      @ion-change="($event) => { filter.shift = $event.detail.value; loadEnrollment() }">
+                    <IonSelect
+                      v-model="filter.shift" class="hide-icon" label-placement="floating"
+                      @ion-change="($event) => { filter.shift = $event.detail.value; loadEnrollment() }"
+                    >
                       <IonSelectOption v-for="shift, i in turnos" :key="i" :value="i">
                         {{ shift }}
                       </IonSelectOption>
@@ -304,8 +304,10 @@ async function lastStepEnrollment() {
             </IonGrid>
           </div>
           <div class="left-end-button">
-            <IonButton color="tertiary" :style="{ marginTop: isFilterCollapse ? '-20px' : '2px' }"
-              @click="setFilterCollapse(!isFilterCollapse)">
+            <IonButton
+              color="tertiary" :style="{ marginTop: isFilterCollapse ? '-20px' : '2px' }"
+              @click="setFilterCollapse(!isFilterCollapse)"
+            >
               <IonIcon slot="icon-only" :icon="!isFilterCollapse ? arrowUp : arrowDown" />
             </IonButton>
           </div>
@@ -320,8 +322,10 @@ async function lastStepEnrollment() {
             <ion-searchbar v-model="searchQuery" class="custom-search" placeholder="Filtrar" />
           </IonCol>
           <IonCol class="p-0" size="4">
-            <IonSelect :toggle-icon="arrowDownOutline" :expanded-icon="arrowUpOutline" class="custom-select"
-              :value="filter.by" @ion-change="($event) => filter.by = $event.detail.value">
+            <IonSelect
+              :toggle-icon="arrowDownOutline" :expanded-icon="arrowUpOutline" class="custom-select"
+              :value="filter.by" @ion-change="($event) => filter.by = $event.detail.value"
+            >
               <IonSelectOption value="name">
                 Nome
               </IonSelectOption>
@@ -337,19 +341,27 @@ async function lastStepEnrollment() {
           </IonCol>
           <IonCol size="auto">
             <IonRow>
-              <IonIcon class="cursor-pointer" :color="filter.direction === 'asc' ? 'accent' : ''" :icon="arrowUpOutline"
-                @click="filter.direction = 'asc'" />
-              <IonIcon class="cursor-pointer" :color="filter.direction === 'desc' ? 'accent' : ''"
-                :icon="arrowDownOutline" @click="filter.direction = 'desc'" />
+              <IonIcon
+                class="cursor-pointer" :color="filter.direction === 'asc' ? 'accent' : ''" :icon="arrowUpOutline"
+                @click="filter.direction = 'asc'"
+              />
+              <IonIcon
+                class="cursor-pointer" :color="filter.direction === 'desc' ? 'accent' : ''"
+                :icon="arrowDownOutline" @click="filter.direction = 'desc'"
+              />
             </IonRow>
           </IonCol>
         </IonRow>
 
         <ion-list>
-          <IonItem v-for="(student, index) in filteredStudents" :key="index"
-            :color="student.selected ? 'lightaccent' : ''" :class="{ selected: student.selected }">
-            <ion-checkbox slot="start" v-model="student.selected" :checked="student.selected"
-              @ion-change="($event: any) => student.selected = $event.detail.checked" />
+          <IonItem
+            v-for="(student, index) in filteredStudents" :key="index"
+            :color="student.selected ? 'lightaccent' : ''" :class="{ selected: student.selected }"
+          >
+            <ion-checkbox
+              slot="start" v-model="student.selected" :checked="student.selected"
+              @ion-change="($event: any) => student.selected = $event.detail.checked"
+            />
             <ion-label>
               <div class="title">
                 {{ student.name }}
@@ -368,8 +380,10 @@ async function lastStepEnrollment() {
       <template #footer>
         <IonRow class="" style="padding-top: 0px; padding-bottom: 0px;">
           <IonCol>
-            <IonButton :disabled="!selectedStudents.length" expand="block" color="accent"
-              @click="handleSelectAll(false)">
+            <IonButton
+              :disabled="!selectedStudents.length" expand="block" color="accent"
+              @click="handleSelectAll(false)"
+            >
               Cancelar
             </IonButton>
           </IonCol>
@@ -381,13 +395,17 @@ async function lastStepEnrollment() {
         </IonRow>
       </template>
     </ContentLayout>
-    <ion-modal :is-open="finishEnrollmentOpened" :initial-breakpoint="0.9" :breakpoints="[0.9]" handle-behavior="cycle"
-      @did-dismiss="finishEnrollmentOpened = false">
+    <ion-modal
+      :is-open="finishEnrollmentOpened" :initial-breakpoint="0.9" :breakpoints="[0.9]" handle-behavior="cycle"
+      @did-dismiss="finishEnrollmentOpened = false"
+    >
       <ion-content style="position: relative;" class="ion-padding">
         <IonRow style="margin-bottom: 12px;">
           <IonCol class="p-0" size="8">
-            <IonSelect fill="outline" v-model="selectedClass" :toggle-icon="undefined" label-placement="floating"
-              @ion-change="($event) => selectedClass = $event.detail.value">
+            <IonSelect
+              v-model="selectedClass" fill="outline" :toggle-icon="undefined" label-placement="floating"
+              @ion-change="($event) => selectedClass = $event.detail.value"
+            >
               <IonSelectOption v-for="classroom, i in classes" :key="i" :value="classroom.id">
                 {{ classroom.name }}
               </IonSelectOption>
@@ -410,9 +428,11 @@ async function lastStepEnrollment() {
           <ul style="padding-left: 25px;">
             <li>Turno {{ getTurno(classInfo?.period) }}</li>
             <li>{{ classInfo?.totalStudents }} alunos matriculados</li>
-            <li>{{ classInfo?.maxStudents - classInfo?.totalStudents > 0 ? classInfo?.maxStudents -
-              classInfo?.totalStudents
-              : 0 }} vagas disponíveis</li>
+            <li>
+              {{ classInfo?.maxStudents - classInfo?.totalStudents > 0 ? classInfo?.maxStudents
+                - classInfo?.totalStudents
+                : 0 }} vagas disponíveis
+            </li>
             <li>Excedente ({{ classInfo?.exceededStudents }})</li>
             <li>{{ classInfo?.pcdStudents }} PCD</li>
           </ul>
@@ -424,24 +444,28 @@ async function lastStepEnrollment() {
             </IonButton>
           </IonCol>
           <IonCol>
-            <IonButton expand="block" color="primary" @click="async () => {
-              finishEnrollmentOpened = false
-              await lastStepEnrollment()
-              await presentToast()
-            }">
+            <IonButton
+              expand="block" color="primary" @click="async () => {
+                finishEnrollmentOpened = false
+                await lastStepEnrollment()
+                await presentToast()
+              }"
+            >
               Matrícula
             </IonButton>
           </IonCol>
         </IonRow>
       </ion-content>
     </ion-modal>
-    <ion-modal :is-open="selectClassOpened" :initial-breakpoint="0.50" :breakpoints="[0, 0.25, 0.5, 0.75]"
-      handle-behavior="cycle" @did-dismiss="selectClassOpened = false">
+    <ion-modal
+      :is-open="selectClassOpened" :initial-breakpoint="0.50" :breakpoints="[0, 0.25, 0.5, 0.75]"
+      handle-behavior="cycle" @did-dismiss="selectClassOpened = false"
+    >
       <ion-content class="ion-padding">
         <p>Selecione uma turma:</p>
         <IonButton v-for="(classroom, i) in classes" :key="i" class="select-class-btn" @click="selectClass(classroom)">
-          {{ classroom.name }} ({{ classroom.maxStudents - classroom.totalStudents > 0 ? classroom.maxStudents -
-            classroom.totalStudents : 0 }})
+          {{ classroom.name }} ({{ classroom.maxStudents - classroom.totalStudents > 0 ? classroom.maxStudents
+            - classroom.totalStudents : 0 }})
         </IonButton>
       </ion-content>
     </ion-modal>

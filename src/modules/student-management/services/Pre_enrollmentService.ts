@@ -1,6 +1,7 @@
 import type { PreEnrollment } from '@prisma/client'
 import BaseService from '@/services/BaseService'
-import dayjs from 'dayjs'
+// import dayjs from 'dayjs' // estava estourando o erro TS2307
+import moment from 'moment'
 
 export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
   constructor() {
@@ -13,7 +14,8 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
       .select(`
         *,
         student:studentId (name, address)
-      `).eq('situation', 'PENDENTE') // Fazendo a seleção e o join com a tabela 'student'
+      `)
+      .eq('situation', 'PENDENTE') // Fazendo a seleção e o join com a tabela 'student'
 
     if (error) {
       throw new Error(`Erro ao buscar pré-matrículas com dados dos alunos: ${error.message}`)
@@ -39,8 +41,7 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
       *
       ,
       student:studentId (*)
-  `).eq('situation', 'PENDENTE')
-      .eq('schoolId', school)
+  `).eq('situation', 'PENDENTE').eq('schoolId', school)
 
     query = query.not('student', 'is', null)
 
@@ -71,8 +72,8 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
     // Ordenação manual
     if (by && direction) {
       data.sort((a, b) => {
-        const valueA = by === 'name' ? a.student.name : dayjs(a.student.birthdate).unix()
-        const valueB = by === 'name' ? b.student.name : dayjs(b.student.birthdate).unix()
+        const valueA = by === 'name' ? a.student.name : moment(a.student.birthdate).unix()
+        const valueB = by === 'name' ? b.student.name : moment(b.student.birthdate).unix()
         if (by === 'name') {
           if (direction === 'asc') {
             return valueA.localeCompare(valueB)
@@ -96,7 +97,7 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
   }
 
   async getSeries(filter: any) {
-    const { by, value, direction, school } = filter || {}
+    const { school } = filter || {}
     console.log(filter, school)
     const query = this.client.from('series').select(`
       *

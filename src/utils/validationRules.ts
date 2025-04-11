@@ -1,74 +1,106 @@
-import { defineRule } from "vee-validate";
-import { required, min, max, email } from "@vee-validate/rules";
+import { email, max, min, required } from '@vee-validate/rules'
 import {
-  validateCPF,
   validateCep,
-  validatePhone,
-  validateEmail,
   validateCNPJ,
-} from "validations-br";
+  validateCPF,
+  validateEmail,
+  validatePhone,
+} from 'validations-br'
+import { defineRule } from 'vee-validate'
 
-defineRule("required", required);
-defineRule("min", min);
-defineRule("max", max);
-defineRule("email", email);
+defineRule('required', required)
+defineRule('min', min)
+defineRule('max', max)
+defineRule('email', email)
 
-defineRule("cpf", (value: string) => {
+defineRule('cpf', (value: string) => {
   if (!value || !validateCPF(value)) {
-    return "CPF inválido";
+    return 'CPF inválido'
   }
-  return true;
-});
+  return true
+})
 
-defineRule("cep", (value: string) => {
+defineRule('cep', (value: string) => {
   if (!value) {
-    return true;
+    return true
   }
 
   if (!validateCep(value)) {
-    return "CEP inválido";
+    return 'CEP inválido'
   }
-  return true;
-});
+  return true
+})
 
-defineRule("phone", (value: string) => {
+defineRule('phone', (value: string) => {
   if (!value || !validatePhone(value)) {
-    return "Telefone inválido";
+    return 'Telefone inválido'
   }
-  return true;
-});
+  return true
+})
 
-defineRule("email", (value: string) => {
+defineRule('email', (value: string) => {
   if (!value) {
-    return true;
+    return true
   }
 
   if (!validateEmail(value)) {
-    return "Email inválido";
+    return 'Email inválido'
   }
-  return true;
-});
+  return true
+})
 
-defineRule("cnpj", (value: string) => {
+defineRule('cnpj', (value: string) => {
   if (!value || !validateCNPJ(value)) {
-    return "CNPJ inválido";
+    return 'CNPJ inválido'
   }
-  return true;
-});
+  return true
+})
 
-defineRule("notFuture", (value: string) => {
+defineRule('notFuture', (value: string) => {
   if (!value) {
-    return true;
+    return true
   }
 
-  const inputDate = new Date(value);
-  const today = new Date();
+  const inputDate = new Date(value)
+  const today = new Date()
 
-  inputDate.setHours(0, 0, 0, 0);
-  today.setHours(0, 0, 0, 0);
+  inputDate.setHours(0, 0, 0, 0)
+  today.setHours(0, 0, 0, 0)
 
   if (inputDate > today) {
-    return "A data está invcorreta.";
+    return 'A data está invcorreta.'
   }
-  return true;
-});
+  return true
+})
+
+defineRule('notaValida', (value: string) => {
+  if (!value)
+    return true
+
+  const num = Number(value.replace(',', '.'))
+
+  if (Number.isNaN(num))
+    return 'Deve ser um número válido'
+
+  if (num < 0 || num > 10)
+    return 'A nota deve ser de 0 a 10'
+  return true
+})
+
+defineRule('somaAtividades', (_value: string, _, context) => {
+  const form = context.form
+
+  const atividades = [
+    Number.parseFloat(form['1ª Atividade'] as string) || 0,
+    Number.parseFloat(form['2ª Atividade'] as string) || 0,
+    Number.parseFloat(form['3ª Atividade'] as string) || 0,
+    Number.parseFloat(form['4ª Atividade'] as string) || 0,
+    Number.parseFloat(form['5ª Atividade'] as string) || 0,
+  ]
+
+  const soma = atividades.reduce((total, nota) => total + nota, 0)
+
+  if (soma > 10)
+    return 'A soma das atividades não pode ultrapassar 10'
+  return true
+})
