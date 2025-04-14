@@ -1,5 +1,6 @@
 import type { Classroom } from '@prisma/client'
 import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 const table = 'classroom' as const // Modifique para sua tabela
 
@@ -15,7 +16,7 @@ export default class ClassroomService extends BaseService<Classroom> {
     // .eq('classroomId',classroomId)
 
     if (error) {
-      throw new Error(`Erro ao trazer as turmas: ${error.message}`)
+      errorHandler(error, 'Erro ao buscar turmas')
     }
     if (!data) {
       throw new Error('Nenhuma turma encontrada')
@@ -31,7 +32,7 @@ export default class ClassroomService extends BaseService<Classroom> {
       .in('id', classes)
 
     if (error) {
-      throw new Error(`Erro ao buscar notas com dados dos alunos: ${error.message}`)
+      errorHandler(error, 'Erro ao buscar turmas e escolas')
     }
     if (!data) {
       throw new Error('Nenhuma nota encontrada')

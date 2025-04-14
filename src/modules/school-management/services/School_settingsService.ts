@@ -1,6 +1,6 @@
-import BaseService from '@/services/BaseService'
 import type { SchoolSettings } from '@prisma/client'
-
+import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 export default class School_settingsService extends BaseService<SchoolSettings> {
   constructor() {
@@ -15,7 +15,7 @@ export default class School_settingsService extends BaseService<SchoolSettings> 
       .select() // Certifique-se de que esse select existe para obter a linha atualizada
 
     if (error)
-      throw new Error(`Failed to update record in school_settings: ${error.message}`)
+      errorHandler(error, 'Error updating school settings')
     if (!updated || updated.length === 0)
       throw new Error('No rows returned from the update operation')
 

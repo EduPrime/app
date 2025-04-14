@@ -1,5 +1,5 @@
 import BaseService from '@/services/BaseService'
-import { status } from '@prisma/client'
+import errorHandler from '@/utils/error-handler'
 import { ref } from 'vue'
 
 const table = 'student' as const
@@ -18,33 +18,30 @@ export default class StudentService extends BaseService<TabelaType> {
         .select('*')
 
       if (error) {
-        console.error(error)
-        return void 0
+        errorHandler(error, 'Error fetching students')
       }
       else {
         return data
       }
     }
     catch (error: unknown | any) {
-      throw new Error(error)
+      errorHandler(error, 'Error fetching students')
     }
   }
 
   async insertStudent(student: { [key: string]: any, tenantId?: string, createdAt?: string }) {
     try {
-      student['tenantId'] = self.crypto.randomUUID();
-      student['createdAt'] = new Date().toISOString();
+      student.tenantId = globalThis.crypto.randomUUID()
+      student.createdAt = new Date().toISOString()
       const data = await this.client
         .from('student')
         .insert([student])
         .select('id') // Seleciona o ID do novo registro
 
-      console.log(data, 'Insert Student')
-
       return data
     }
     catch (error: unknown | any) {
-      console.error(error)
+      errorHandler(error, 'Error inserting student')
       return error.status
     }
   }
@@ -71,7 +68,7 @@ export default class StudentService extends BaseService<TabelaType> {
       const { data, error } = await query
 
       if (error) {
-        console.error(error)
+        errorHandler(error, 'Error fetching student ID')
         return (error as unknown | any).status
       }
 
@@ -82,7 +79,7 @@ export default class StudentService extends BaseService<TabelaType> {
       return null
     }
     catch (error: unknown | any) {
-      console.error(error)
+      errorHandler(error, 'Error fetching student ID')
       return error.status
     }
   }
@@ -93,10 +90,10 @@ export default class StudentService extends BaseService<TabelaType> {
       return data.data?.at(0)
     }
     catch (error) {
-      console.error('Erro ao buscar:', error)
-      throw error
+      errorHandler(error, 'Error fetching data')
     }
   }
+
   async getStudentByResponsible(cpf: string) {
     try {
       const information = ref({
@@ -120,7 +117,7 @@ export default class StudentService extends BaseService<TabelaType> {
             seriesId
           )
         `)
-        .or(`fatherCpf.eq.${cpf},motherCpf.eq.${cpf},guardianCpf.eq.${cpf}`);
+        .or(`fatherCpf.eq.${cpf},motherCpf.eq.${cpf},guardianCpf.eq.${cpf}`)
 
       if (data && data.length > 0) {
         information.value.preenrollmentcode = data[0].preenrollment[0].preenrollmentcode
@@ -131,13 +128,10 @@ export default class StudentService extends BaseService<TabelaType> {
         information.value.situation = data[0].preenrollment[0].situation
       }
 
-      return information.value;
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new Error(`Erro inesperado: ${error.message}`);
-      } else {
-        throw new Error('Erro inesperado');
-      }
+      return information.value
+    }
+    catch (error) {
+      errorHandler(error, 'Error fetching student by responsible')
     }
   }
 }

@@ -1,5 +1,6 @@
-import BaseService from '@/services/BaseService'
 import type { Enrollment } from '@prisma/client'
+import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 const table = 'enrollment'
 
@@ -22,17 +23,17 @@ export default class EnrollmentService extends BaseService<Enrollment> {
       )
     }
     catch (error) {
-      console.error('Erro ao verificar unicidade do código de matrícula:', error)
+      errorHandler(error, 'Erro ao verificar código de matrícula')
       return false // Retorna false em caso de erro
     }
   }
 
   async createEnrollment(enrollmentData: any) {
     try {
-      const data = await this.client.from(table).insert(enrollmentData)
+      await this.client.from(table).insert(enrollmentData)
     }
     catch (error: any) {
-      console.log("Não foi possível criar a matrícula", error.message)
+      errorHandler(error, 'Erro ao criar matrícula')
     }
   }
 }

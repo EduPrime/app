@@ -1,5 +1,6 @@
 import type { EvaluationRule } from '@prisma/client'
 import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 const table = 'evaluationRule' as const // Modifique para sua tabela
 
@@ -16,7 +17,7 @@ export default class EvaluationRuleService extends BaseService<EvaluationRule> {
       .single()
 
     if (error) {
-      throw new Error(`Erro ao trazer as regras: ${error.message}`)
+      errorHandler(error, 'Erro ao buscar regras de avaliação')
     }
     if (!data) {
       throw new Error('Nenhuma regra encontrada')

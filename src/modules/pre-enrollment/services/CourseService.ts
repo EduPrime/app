@@ -1,5 +1,5 @@
 import BaseService from '@/services/BaseService'
-import { ref } from 'vue'
+import errorHandler from '@/utils/error-handler'
 
 const table = 'course' as const
 
@@ -18,7 +18,7 @@ export default class CourseService extends BaseService<TabelaType> {
         .eq('schoolId', schoolId)
 
       if (error) {
-        console.error(error)
+        errorHandler(error, 'Error fetching courses by school ID')
         return void 0
       }
       else {

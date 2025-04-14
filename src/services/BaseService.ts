@@ -1,4 +1,5 @@
 import { useAuthStore } from '@/store/AuthStore'
+import errorHandler from '@/utils/error-handler'
 import { getPostgrestURL } from '@/utils/getPostgrestURL'
 import { PostgrestClient } from '@supabase/postgrest-js'
 
@@ -23,7 +24,7 @@ export default class BaseService<T> {
     }
     catch (error: any) {
       authStore.logout()
-      throw new Error(`Failed to initialize PostgrestClient: ${error.message}`)
+      errorHandler(error, 'Failed to create PostgREST client')
     }
   }
 
@@ -38,7 +39,7 @@ export default class BaseService<T> {
       .single()
 
     if (error)
-      throw new Error(error.message)
+      errorHandler(error, 'Failed to get record by ID')
     return data
   }
 
@@ -53,7 +54,7 @@ export default class BaseService<T> {
       .single()
 
     if (error)
-      throw new Error(error.message)
+      errorHandler(error, 'Failed to get record by school ID')
     return data
   }
 
@@ -75,7 +76,7 @@ export default class BaseService<T> {
     const { data, error } = await query
 
     if (error)
-      throw new Error(error.message)
+      errorHandler(error, 'Failed to get all records')
     return data || []
   }
 
@@ -93,10 +94,7 @@ export default class BaseService<T> {
       .single()
 
     if (error) {
-      if (error.message.includes('JWT ')) {
-        //  new AuthService().logout()
-      }
-      throw new Error(error.message)
+      errorHandler(error, 'Failed to create record')
     }
     return data
   }
@@ -116,7 +114,7 @@ export default class BaseService<T> {
       .single()
 
     if (error)
-      throw new Error(error.message)
+      errorHandler(error, 'Failed to update record')
     return data
   }
 
@@ -132,14 +130,14 @@ export default class BaseService<T> {
       .single()
 
     if (error)
-      throw new Error(error.message)
+      errorHandler(error, 'Failed to soft delete record')
     return data
   }
 
   async callRpc(functionName: string, params: Record<string, unknown>): Promise<unknown> {
     const { data, error } = await this.client.rpc(functionName, params)
     if (error)
-      throw new Error(error.message)
+      errorHandler(error, `Failed to call RPC function ${functionName}`)
     return data
   }
 
@@ -149,7 +147,7 @@ export default class BaseService<T> {
       .select('*', { count: 'exact', head: true })
 
     if (error)
-      throw new Error(error.message)
+      errorHandler(error, 'Failed to count entries')
     return count || 0
   }
 
@@ -168,7 +166,7 @@ export default class BaseService<T> {
     const { data, error } = await query
 
     if (error)
-      throw new Error(error.message)
+      errorHandler(error, 'Failed to filter records')
     return data || []
   }
 }
