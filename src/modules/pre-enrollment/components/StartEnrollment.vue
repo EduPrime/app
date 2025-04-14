@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { catchPageWidth } from '@/utils/useUtils'
 
-import { IonButton, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonGrid, IonHeader, IonIcon, IonRow, IonSpinner } from '@ionic/vue'
+import { IonButton, IonCardContent, IonCardHeader, IonCardTitle, IonCol, IonGrid, IonIcon, IonRow, IonSpinner } from '@ionic/vue'
 
 import { arrowBackOutline, checkmarkCircleOutline } from 'ionicons/icons'
 import { onMounted, ref, watch } from 'vue'
@@ -13,9 +13,8 @@ import selectCourseSlider from '../components/SelectCourseSlider.vue'
 import selectSchoolSlider from '../components/SelectSchoolSlider.vue'
 
 import selectSeriesSlider from '../components/SelectSeriesSlider.vue'
-import PreEnrollmentService from '../services/PreEnrollmentService'
 import InstitutionService from '../services/InstitutionService'
-
+import PreEnrollmentService from '../services/PreEnrollmentService'
 
 interface Props {
   searchbox: string
@@ -55,8 +54,8 @@ const preEnrollment = ref({
   tenantId: null,
   deletedAt: null,
   updatedBy: null,
-  status: "ACTIVE",
-  situation: "PENDENTE",
+  status: 'ACTIVE',
+  situation: 'PENDENTE',
 })
 watch(selectedSchool, (value) => {
   if (value) {
@@ -153,8 +152,7 @@ watch(postStatus, async (value) => {
     setTimeout(() => {
       finished.value = true
     }, 500) // 1 segundo antes de loading se tornar false
-    console.log('preEnrollment:', preEnrollment.value)
-    preEnrollment.value.preenrollmentcode = await postgrest.generateUnicPreEnrollmentCode()
+    preEnrollment.value.preenrollmentcode = await postgrest.generateUnicPreEnrollmentCode() ?? ''
 
     if (
       preEnrollment.value.preenrollmentcode
@@ -164,7 +162,6 @@ watch(postStatus, async (value) => {
       && preEnrollment.value.studentId
     ) {
       const data = await postgrest.insertPreEnrollment(preEnrollment.value)
-      console.log('data:', data)
       insertedPreEnrollment.value = data
     }
 
@@ -190,17 +187,23 @@ onMounted(async () => {
 </script>
 
 <template>
-  <IonButton v-if="postStatus?.loading" :class="pageWidth?.pageWidth < 992 ? 'ion-margin-start' : ''" color="light"
-    @click="postStatus = undefined">
+  <IonButton
+    v-if="postStatus?.loading" :class="pageWidth?.pageWidth < 992 ? 'ion-margin-start' : ''" color="light"
+    @click="postStatus = undefined"
+  >
     <IonIcon :icon="arrowBackOutline" />
   </IonButton>
 
   <div class="ion-padding-bottom">
     <div style="min-height: 250px; " class="flex wrap">
-      <container v-if="loading"
-        style="height: 120px; width: 120px; background-color: white; margin: auto; border-radius: 100%;" class="flex">
-        <IonIcon v-if="finished" :icon="checkmarkCircleOutline" class="my-auto mx-auto"
-          style="font-size: 80px; color:lawngreen;" />
+      <container
+        v-if="loading"
+        style="height: 120px; width: 120px; background-color: white; margin: auto; border-radius: 100%;" class="flex"
+      >
+        <IonIcon
+          v-if="finished" :icon="checkmarkCircleOutline" class="my-auto mx-auto"
+          style="font-size: 80px; color:lawngreen;"
+        />
         <IonSpinner v-else class="my-auto mx-auto" name="crescent" />
       </container>
       <!-- Etapa 1 -->
@@ -209,8 +212,10 @@ onMounted(async () => {
       </div>
       <!-- Etapa 2 -->
       <div v-else-if="etapa === 2">
-        <IonButton color="light" :class="pageWidth?.pageWidth < 992 ? 'ion-margin-start' : 'ion-margin-bottom'"
-          @click="etapa = (etapa - 1)">
+        <IonButton
+          color="light" :class="pageWidth?.pageWidth < 992 ? 'ion-margin-start' : 'ion-margin-bottom'"
+          @click="etapa = (etapa - 1)"
+        >
           <IonIcon :icon="arrowBackOutline" />
         </IonButton>
         <div>
@@ -218,8 +223,10 @@ onMounted(async () => {
         </div>
       </div>
       <div v-else-if="etapa === 3">
-        <IonButton color="light" :class="pageWidth?.pageWidth < 992 ? 'ion-margin-start' : 'ion-margin-bottom'"
-          @click="etapa = (etapa - 1)">
+        <IonButton
+          color="light" :class="pageWidth?.pageWidth < 992 ? 'ion-margin-start' : 'ion-margin-bottom'"
+          @click="etapa = (etapa - 1)"
+        >
           <IonIcon :icon="arrowBackOutline" />
         </IonButton>
         <div class="ion-padding-top">
@@ -227,8 +234,10 @@ onMounted(async () => {
         </div>
       </div>
       <div v-else-if="etapa === 4" style="width: 100%;">
-        <IonButton color="light" :class="pageWidth?.pageWidth < 992 ? 'ion-margin-start' : 'ion-margin-bottom'"
-          @click="etapa = (etapa - 1)">
+        <IonButton
+          color="light" :class="pageWidth?.pageWidth < 992 ? 'ion-margin-start' : 'ion-margin-bottom'"
+          @click="etapa = (etapa - 1)"
+        >
           <IonIcon :icon="arrowBackOutline" />
         </IonButton>
 
@@ -236,9 +245,11 @@ onMounted(async () => {
           <IonGrid style="padding: 0;">
             <IonRow>
               <IonCol style="padding: 0;" size="12">
-                <formPreEnrrolment v-model="studentId" :page-width="pageWidth?.pageWidth"
+                <formPreEnrrolment
+                  v-model="studentId" :page-width="pageWidth?.pageWidth"
                   @preference="($event) => shiftPreference = $event" @post-status="($event) => postStatus = $event"
-                  @studentId="($event) => studentId = $event" />
+                  @student-id="($event) => studentId = $event"
+                />
               </IonCol>
             </IonRow>
           </IonGrid>
@@ -255,12 +266,16 @@ onMounted(async () => {
                   </IonCardTitle>
                 </IonCardHeader>
                 <IonCardContent>
-                  <p>Os dados do aluno foram salvos com sucesso! Digite o CPF do responsável caso deseje acompanhar a
-                    situação.</p>
+                  <p>
+                    Os dados do aluno foram salvos com sucesso! Digite o CPF do responsável caso deseje acompanhar a
+                    situação.
+                  </p>
 
                   <div class="flex" style="min-height: 150px;">
-                    <IonIcon :icon="checkmarkCircleOutline" class="my-auto mx-auto"
-                      style="font-size: 130px; color:lawngreen;" />
+                    <IonIcon
+                      :icon="checkmarkCircleOutline" class="my-auto mx-auto"
+                      style="font-size: 130px; color:lawngreen;"
+                    />
                   </div>
                 </IonCardContent>
               </ion-card>
