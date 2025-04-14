@@ -1,5 +1,6 @@
 import type { PreEnrollment } from '@prisma/client'
 import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 // import dayjs from 'dayjs' // estava estourando o erro TS2307
 import moment from 'moment'
 
@@ -18,7 +19,7 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
       .eq('situation', 'PENDENTE') // Fazendo a seleção e o join com a tabela 'student'
 
     if (error) {
-      throw new Error(`Erro ao buscar pré-matrículas com dados dos alunos: ${error.message}`)
+      errorHandler(error, 'Erro ao buscar pré-matrículas com dados dos alunos')
     }
     if (!data) {
       throw new Error('Nenhuma pré-matrícula encontrada')
@@ -59,10 +60,9 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
     }
 
     const { data, error } = await query as { data: any[], error: any }
-    console.log('data do get', data)
 
     if (error) {
-      throw new Error(`Erro ao buscar pré-matrículas com dados dos alunos: ${error.message}`)
+      errorHandler(error, 'Erro ao buscar pré-matrículas com dados dos alunos')
     }
 
     if (!data || data.length === 0) {
@@ -98,7 +98,6 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
 
   async getSeries(filter: any) {
     const { school } = filter || {}
-    console.log(filter, school)
     const query = this.client.from('series').select(`
       *
   `).eq('schoolId', school)
@@ -106,7 +105,7 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
     const { data, error } = await query as { data: any[], error: any }
 
     if (error) {
-      throw new Error(`Erro ao buscar pré-matrículas com dados dos alunos: ${error.message}`)
+      errorHandler(error, 'Erro ao buscar séries')
     }
 
     if (!data || data.length === 0) {

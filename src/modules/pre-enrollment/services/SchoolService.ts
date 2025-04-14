@@ -1,5 +1,5 @@
-import type { Tables } from '@/types/database.types'
 import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 const table = 'school' as const
 
@@ -10,22 +10,21 @@ export default class SchoolService extends BaseService<TabelaType> {
     super(table)
   }
 
-  async getSchools(): Promise< any | null> {
+  async getSchools(): Promise<any | null> {
     try {
       const { data, error } = await this.client
         .from('school')
         .select('*')
 
       if (error) {
-        console.error(error)
-        return null
+        errorHandler(error, 'Error fetching schools')
       }
       else {
         return data
       }
     }
     catch (error: unknown | any) {
-      throw new Error(error)
+      errorHandler(error, 'Error fetching schools')
     }
   }
 
@@ -41,15 +40,14 @@ export default class SchoolService extends BaseService<TabelaType> {
 
       const { data, error } = await query
       if (error) {
-        console.error(error)
-        return void 0
+        errorHandler(error, 'Error fetching schools')
       }
       else {
         return data
       }
     }
     catch (error: unknown | any) {
-      throw new Error(error)
+      errorHandler(error, 'Error fetching schools')
     }
   }
 }

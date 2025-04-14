@@ -1,5 +1,6 @@
 import type { Tables } from '@/types/database.types'
 import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 const table = 'school' as const
 
@@ -15,16 +16,13 @@ export default class SchoolService extends BaseService<SchoolTable> {
    * @param schoolId - The ID of the school to fetch related courses and series
    * @returns An object containing arrays of courses and series or null if not found
    */
-  async getCoursesAndSeriesBySchoolId(schoolId: string): Promise<{
-    courses: Tables<'course'>[] | null
-    series: Tables<'series'>[] | null
-  } | null> {
+  async getCoursesAndSeriesBySchoolId(schoolId: string) {
     try {
       // Fetch courses related to the school
       const { data: courses, error: coursesError } = await this.client.from('course').select('*').eq('school_id', schoolId).is('deletedAt', null)
 
       if (coursesError) {
-        throw coursesError
+        errorHandler(coursesError, 'Erro ao buscar cursos')
       }
 
       if (!courses || courses.length === 0) {
@@ -38,7 +36,7 @@ export default class SchoolService extends BaseService<SchoolTable> {
       const { data: series, error: seriesError } = await this.client.from('series').select('*').in('course_id', courseIds).is('deletedAt', null)
 
       if (seriesError) {
-        throw seriesError
+        errorHandler(seriesError, 'Erro ao buscar séries')
       }
 
       return {
@@ -47,8 +45,7 @@ export default class SchoolService extends BaseService<SchoolTable> {
       }
     }
     catch (error) {
-      console.error(`Erro ao buscar cursos e séries para a escola ${schoolId}:`, error)
-      throw new Error(`Failed to fetch courses and series for school ID ${schoolId}`)
+      errorHandler(error, 'Erro ao buscar cursos e séries')
     }
   }
 }

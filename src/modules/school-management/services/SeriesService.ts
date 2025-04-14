@@ -1,4 +1,5 @@
 import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 const table = 'series' as const
 
@@ -18,15 +19,14 @@ export default class SeriesService extends BaseService<TabelaType> {
         .eq('schoolId', schoolId)
 
       if (seriesError) {
-        throw seriesError
+        errorHandler(seriesError, 'Erro ao buscar séries')
       }
 
       // Retorna os dados das séries
       return series
     }
     catch (error) {
-      console.error('Erro ao buscar séries', error)
-      throw new Error('Failed to fetch series.')
+      errorHandler(error, 'Erro ao buscar séries')
     }
   }
 }

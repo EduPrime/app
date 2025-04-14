@@ -1,9 +1,9 @@
-import BaseService from '@/services/BaseService'
-import { ref } from 'vue'
 import type { PreEnrollment } from '@prisma/client'
+import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
+import { ref } from 'vue'
 
 const table = 'preenrollment' as const
-
 
 export default class PreEnrollmentService extends BaseService<PreEnrollment> {
   constructor() {
@@ -16,8 +16,7 @@ export default class PreEnrollmentService extends BaseService<PreEnrollment> {
       return data
     }
     catch (error) {
-      console.error('Erro ao listar as pré-matrículas:', error)
-      throw error
+      errorHandler(error, 'Erro ao listar as pré-matrículas')
     }
   }
 
@@ -30,7 +29,7 @@ export default class PreEnrollmentService extends BaseService<PreEnrollment> {
       return data.data?.at(0)
     }
     catch (error) {
-      console.error(`Erro ao listar dados da collection: ${collection} filtrando pelo id: ${id}`, error)
+      errorHandler(error, 'Erro ao listar o nome')
     }
   }
 
@@ -58,8 +57,7 @@ export default class PreEnrollmentService extends BaseService<PreEnrollment> {
       return information.value
     }
     catch (error) {
-      console.error('Erro ao listar a pré-matrícula:', error)
-      throw error
+      errorHandler(error, 'Erro ao listar as pré-matrículas')
     }
   }
 
@@ -68,19 +66,18 @@ export default class PreEnrollmentService extends BaseService<PreEnrollment> {
   ) {
     try {
       if (preEnrollmentData.id === '') {
-        preEnrollmentData.id = self.crypto.randomUUID()
+        preEnrollmentData.id = globalThis.crypto.randomUUID()
       }
       const data = await this.client.from(table).insert(preEnrollmentData).select('*')
 
       return data
     }
     catch (error) {
-      console.error('Erro ao inserir a pré-matrícula:', error)
-      throw error
+      errorHandler(error, 'Erro ao inserir pré-matrícula')
     }
   }
 
-  async generateUnicPreEnrollmentCode(preEnrollmentCode = this.generateRandomPreEnrollmentCode()): Promise<string> {
+  async generateUnicPreEnrollmentCode(preEnrollmentCode = this.generateRandomPreEnrollmentCode()) {
     const data = ref()
     const uCode = ref(preEnrollmentCode)
     try {
@@ -97,8 +94,7 @@ export default class PreEnrollmentService extends BaseService<PreEnrollment> {
       return uCode.value
     }
     catch (error) {
-      console.error('Erro ao pegar o código de pré-matrícula:', error)
-      throw error
+      errorHandler(error, 'Erro ao gerar código de pré-matrícula')
     }
   }
 
@@ -108,19 +104,3 @@ export default class PreEnrollmentService extends BaseService<PreEnrollment> {
     return `pre-${randomDigits}`
   }
 }
-
-// async getPreEnrollmentCode(preEnrollmentCode = this.generateRandomPreEnrollmentCode()) {
-//   try {
-//     const data = await this.client.from(table)
-//       .select('pre_enrollment_code')
-//       .eq('pre_enrollment_code', preEnrollmentCode)
-
-//     console.log('Resultado', data.data)
-
-//     return data
-//   }
-//   catch (error) {
-//     console.error('Erro ao pegar o código de pré-matrícula:', error)
-//     throw error
-//   }
-// }
