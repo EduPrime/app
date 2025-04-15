@@ -152,6 +152,8 @@ http://ionicframework.com/docs/theming/ */
 	--ion-color-lightSuccess-contrast-rgb: 0, 0, 0;
 	--ion-color-lightSuccess-shade: #28bb50;
 	--ion-color-lightSuccess-tint: #42d96b;
+	--ion-color-success-light: #a8e6a3;
+	--ion-color-success-light-rgb: 168, 230, 163;
 
 	--ion-color-warning: #ffc409;
 	--ion-color-warning-rgb: 255, 196, 9;
@@ -377,3 +379,8 @@ body.dark {
 	--ion-color-shade: var(--ion-color-lightaccent-shade);
 	--ion-color-tint: var(--ion-color-lightaccent-tint);
 }
+
+.success-card {
+	--background: var(--ion-color-success-light);
+	--color: var(--ion-color-success-contrast);
+  }
