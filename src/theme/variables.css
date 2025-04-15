@@ -101,15 +101,14 @@ button.alert-button.alert-button-confirm {
 	border-top-right-radius: 13px;
 }
 
-/* 1) Dropdown do vue‑multiselect */
+/* Dropdown do vue‑multiselect */
 .multiselect__content-wrapper {
-	/* Firefox */
 	scrollbar-width: thin;
 	scrollbar-color: var(--ion-color-primary) var(--ion-color-light);
   }
   .multiselect__content-wrapper::-webkit-scrollbar {
-	width: 6px;   /* vertical */
-	height: 6px;  /* horizontal */
+	width: 6px;   
+	height: 6px;  
   }
   .multiselect__content-wrapper::-webkit-scrollbar-track {
 	background: var(--ion-color-light);
@@ -124,10 +123,8 @@ button.alert-button.alert-button-confirm {
 	background-color: var(--ion-color-primary-shade);
   }
   
-  /* 2) Scroll da modal (ion-content / sua .update-modal-content) */
   .update-modal-content,
   ion-content {
-	/* Firefox */
 	scrollbar-width: thin;
 	scrollbar-color: var(--ion-color-primary) var(--ion-color-light);
   }
