@@ -1,4 +1,5 @@
 import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 const table = 'course_series_discipline' as const
 
@@ -19,7 +20,7 @@ export default class Course_series_disciplineService extends BaseService<TabelaT
         .eq('course_id', courseId) // Filtra pelo course_id selecionado
 
       if (error) {
-        throw error
+        errorHandler(error, 'Erro ao buscar séries para o curso')
       }
 
       // Se não encontrar nenhuma série relacionada, retornar vazio
@@ -37,15 +38,14 @@ export default class Course_series_disciplineService extends BaseService<TabelaT
         .in('id', seriesIds) // Filtra pelos series_ids
 
       if (seriesError) {
-        throw seriesError
+        errorHandler(seriesError, 'Erro ao buscar detalhes das séries')
       }
 
       // Retorna os dados das séries
       return series
     }
     catch (error) {
-      console.error('Erro ao buscar séries para o curso:', error)
-      throw new Error('Failed to fetch series for the selected course.')
+      errorHandler(error, 'Erro ao buscar séries por curso')
     }
   }
 }

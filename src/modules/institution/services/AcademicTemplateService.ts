@@ -1,5 +1,6 @@
-import BaseService from '@/services/BaseService'
 import type { AcademicYearTemplate } from '@prisma/client'
+import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 export default class AcademicTemplateService extends BaseService<AcademicYearTemplate> {
   constructor() {
@@ -18,7 +19,7 @@ export default class AcademicTemplateService extends BaseService<AcademicYearTem
       return result as number | null
     }
     catch (error) {
-      console.error('Erro ao calcular dias úteis:', error)
+      errorHandler(error, 'Error calculating business days')
       return null
     }
   }

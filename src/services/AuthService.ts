@@ -1,11 +1,12 @@
+import type { User as UserLocal } from '@prisma/client'
+import type { ClientOptions } from 'better-auth/types'
 import router from '@/router'
 import { useAuthStore } from '@/store/AuthStore'
 import { getPostgrestURL } from '@/utils/getPostgrestURL'
-import type { User as UserLocal } from '@prisma/client'
 import { betterAuth } from 'better-auth'
 import { organizationClient } from 'better-auth/client/plugins'
-import type { ClientOptions } from 'better-auth/types'
 import { createAuthClient } from 'better-auth/vue'
+import errorHandler from '../utils/error-handler'
 import { sendEmail } from '../utils/send-email'
 
 const AUTH_API = import.meta.env.VITE_API_URL
@@ -17,13 +18,12 @@ export class AuthService {
   public client: any
   public auth: any
 
-
   constructor() {
     this.auth = betterAuth({
       emailAndPassword: {
         enabled: true,
       },
-      sendResetPassword: async ({ user, url, token }: { user: UserLocal, url: string, token: string }, request: any) => {
+      sendResetPassword: async ({ user, url }: { user: UserLocal, url: string }) => {
         await sendEmail({
           to: user.email || '',
           subject: 'Reset your password',
@@ -46,7 +46,7 @@ export class AuthService {
    * @param password User's password
    * @returns A promise resolving to the user's session.
    */
-  async login(email: string, password: string): Promise<UserLocal> {
+  async login(email: string, password: string) {
     try {
       const { data } = await this.client.signIn.email({
         email,
@@ -61,7 +61,7 @@ export class AuthService {
       return data.user as UserLocal
     }
     catch (error) {
-      throw new Error(`Login failed: ${(error as Error).message}`)
+      errorHandler(error, 'Login failed')
     }
   }
 
@@ -76,7 +76,7 @@ export class AuthService {
       router.push({ path: '/' })
     }
     catch (error) {
-      throw new Error(`Logout failed: ${(error as Error).message}`)
+      errorHandler(error, 'Logout failed')
     }
   }
 
@@ -107,7 +107,7 @@ export class AuthService {
       return response.data as UserLocal
     }
     else {
-      console.error(`Registration failed: ${response.error.message}`)
+      errorHandler(response.error, 'Registration failed')
       return response.error
     }
   }
@@ -122,7 +122,7 @@ export class AuthService {
       return session
     }
     catch (error) {
-      throw new Error(`Failed to fetch user: ${(error as Error).message}`)
+      errorHandler(error, 'Failed to fetch user')
     }
   }
 
@@ -136,22 +136,17 @@ export class AuthService {
       return session
     }
     catch (error) {
-      throw new Error(`Failed to retrieve session: ${(error as Error).message}`)
+      errorHandler(error, 'Failed to retrieve session')
     }
   }
 
-  /**
-   * Sends a password reset email to the user.
-   * @param email User's email
-   * @returns A promise resolving when the email is sent.
-   */
   async useSession() {
     try {
       const response = await this.client.useSession()
       return response
     }
     catch (error) {
-      throw new Error(`Failed to use session: ${(error as Error).message}`)
+      errorHandler(error, 'Failed to use session')
     }
   }
 
@@ -160,7 +155,7 @@ export class AuthService {
       await this.client.forgetPassword({ email })
     }
     catch (error) {
-      throw new Error(`Password reset failed: ${(error as Error).message}`)
+      errorHandler(error, 'Password reset failed')
     }
   }
 
@@ -169,7 +164,7 @@ export class AuthService {
       await this.client.resetPassword({ newPassword })
     }
     catch (error) {
-      throw new Error(`Password reset failed: ${(error as Error).message}`)
+      errorHandler(error, 'Password reset failed')
     }
   }
 
@@ -177,7 +172,7 @@ export class AuthService {
    * Retrieves a list of organizations and their IDs.
    * @returns A promise resolving to an array of organizations with their details.
    */
-  async listOrganizations(): Promise<{ id: string, name: string, logo: string, metadata: string, createdAt: Date, slug: string }[]> {
+  async listOrganizations() {
     try {
       const { data } = await this.client.organization.list()
       return data.map((org: any) => ({
@@ -190,7 +185,7 @@ export class AuthService {
       }))
     }
     catch (error) {
-      throw new Error(`Failed to list organizations: ${(error as Error).message}`)
+      errorHandler(error, 'Failed to list organizations')
     }
   }
 
@@ -213,7 +208,7 @@ export class AuthService {
       return data
     }
     catch (error) {
-      throw new Error(`Failed to set active organization: ${(error as Error).message}`)
+      errorHandler(error, 'Failed to set active organization')
     }
   }
 
@@ -221,27 +216,22 @@ export class AuthService {
    * Requests a remote token.
    * @returns A promise resolving to the token.
    */
-  async postgrestToken(): Promise<string> {
+  async postgrestToken() {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL_TOKEN}/postgrest/token`, {
         method: 'POST',
         credentials: 'include',
       })
-
-      if (!response.ok) {
-        throw new Error(`Token request failed: ${response.statusText}`)
-      }
-
       const data = await response.json()
       useAuthStore().setPostgrestToken(data.token)
       return data.token
     }
     catch (error) {
-      throw new Error(`Token request failed: ${(error as Error).message}`)
+      errorHandler(error, 'Token request failed')
     }
   }
 
-  async getLocalUser(): Promise<UserLocal> {
+  async getLocalUser() {
     const token = useAuthStore().getPostgrestToken()
     if (!token) {
       throw new Error('No PostgREST token found')
@@ -258,10 +248,10 @@ export class AuthService {
         },
       })
       const data = await response.json()
-      if (data[0].role === "PROFESSOR") {
-        const url = `https://${postgresturl}/teacher?userId=eq.${data[0].id}`
+      if (data[0].role === 'PROFESSOR') {
+        const urlTeacher = `https://${postgresturl}/teacher?userId=eq.${data[0].id}`
         try {
-          const responseTeacher = await fetch(url, {
+          const responseTeacher = await fetch(urlTeacher, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -269,11 +259,10 @@ export class AuthService {
             },
           })
           const savedId = await responseTeacher.json()
-          console.log('savedId', savedId)
           useAuthStore().setTeacherId(savedId[0].id)
 
-          const url2 = `https://${postgresturl}/schedule?teacherId=eq.${savedId[0].id}&select=classroom(series(course(name)))`
-          const responseClassroom = await fetch(url2, {
+          const urlClass = `https://${postgresturl}/schedule?teacherId=eq.${savedId[0].id}&select=classroom(series(course(name)))`
+          const responseClassroom = await fetch(urlClass, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -281,17 +270,16 @@ export class AuthService {
             },
           })
           const jsonClassroom = await responseClassroom.json()
-          console.log('jsonClassroom', jsonClassroom[0].classroom.series.course.name)
           useAuthStore().setCourseName(jsonClassroom[0].classroom.series.course.name)
         }
         catch (error) {
-          throw new Error(`Failed to fetch user: ${(error as Error).message}`)
+          errorHandler(error, 'Failed to fetch user')
         }
       }
-      if (data[0].role === "GESTORESCOLAR") {
-        const url = `https://${postgresturl}/servers?userId=eq.${data[0].id}`
+      if (data[0].role === 'GESTORESCOLAR') {
+        const urlManager = `https://${postgresturl}/servers?userId=eq.${data[0].id}`
         try {
-          const responseServer = await fetch(url, {
+          const responseServer = await fetch(urlManager, {
             method: 'GET',
             headers: {
               Authorization: `Bearer ${token}`,
@@ -299,33 +287,37 @@ export class AuthService {
             },
           })
           const savedId = await responseServer.json()
-          console.log('savedId', savedId)
           useAuthStore().setSchoolId(savedId[0].schoolId)
         }
         catch (error) {
-          throw new Error(`Falha ao obter schoolId : ${(error as Error).message}`)
+          errorHandler(error, 'Falha ao obter schoolId')
         }
       }
       return data[0] as UserLocal
     }
     catch (error) {
-      throw new Error(`Failed to fetch user: ${(error as Error).message}`)
+      errorHandler(error, 'Failed to fetch user')
     }
   }
 
   async addMemberToOrg(userId: string, organizationId: string, role: string) {
-    const response = await fetch(`${import.meta.env.VITE_BACK3ND_URL}/organization/add-member`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        userId,
-        organizationId,
-        role,
-      }),
-    })
-    return response
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACK3ND_URL}/organization/add-member`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          organizationId,
+          role,
+        }),
+      })
+      return response
+    }
+    catch (error) {
+      errorHandler(error, 'Failed to add member to organization')
+    }
   }
 }

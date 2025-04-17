@@ -1,5 +1,6 @@
 import type { Schedule } from '@prisma/client'
 import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 const table = 'schedule' as const
 
@@ -15,7 +16,7 @@ export default class ScheduleService extends BaseService<Schedule> {
       .eq('teacherId', teacherId)
 
     if (error) {
-      throw new Error(`Erro ao contar o número de escolas: ${error.message}`)
+      errorHandler(error, 'Erro ao contar o número de escolas')
     }
     if (!count) {
       throw new Error('Nenhuma escola encontrada')
@@ -31,7 +32,7 @@ export default class ScheduleService extends BaseService<Schedule> {
       .eq('teacherId', teacherId)
 
     if (error) {
-      throw new Error(`Erro ao contar o número de turmas: ${error.message}`)
+      errorHandler(error, 'Erro ao contar o número de turmas')
     }
     if (!count) {
       throw new Error('Nenhuma turma encontrada')
@@ -47,7 +48,7 @@ export default class ScheduleService extends BaseService<Schedule> {
       .eq('teacherId', teacherId)
 
     if (error) {
-      throw new Error(`Erro ao buscar turmas: ${error.message}`)
+      errorHandler(error, 'Erro ao buscar turmas')
     }
     if (!data || data.length === 0) {
       throw new Error('Nenhuma turma encontrada')
@@ -66,7 +67,7 @@ export default class ScheduleService extends BaseService<Schedule> {
       .eq('id', disciplineId)
 
     if (error) {
-      throw new Error(`Erro ao buscar nome da disciplina: ${error.message}`)
+      errorHandler(error, 'Erro ao buscar disciplina')
     }
     if (!data) {
       throw new Error('Nenhuma disciplina encontrada')
@@ -83,7 +84,7 @@ export default class ScheduleService extends BaseService<Schedule> {
       .eq('classroomId', classroomId)
 
     if (error) {
-      throw new Error(`Erro ao buscar disciplinas: ${error.message}`)
+      errorHandler(error, 'Erro ao buscar disciplinas')
     }
     if (!data || data.length === 0) {
       throw new Error('Nenhuma disciplina encontrada')
@@ -123,7 +124,7 @@ export default class ScheduleService extends BaseService<Schedule> {
         .eq('classroomId', classroomId)
 
     if (error) {
-      throw new Error(`Erro ao buscar dias válidos: ${error.message}`)
+      errorHandler(error, 'Erro ao buscar horários')
     }
     if (!data) {
       throw new Error('Nenhum dia válido encontrado')

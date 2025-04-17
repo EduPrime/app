@@ -1,13 +1,13 @@
-import BaseService from '@/services/BaseService'
 import type { School } from '@prisma/client'
-
+import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 export default class SchoolService extends BaseService<School> {
   constructor() {
     super('school') // Passando o nome da tabela para a classe base
   }
 
-  async getSchoolCount(): Promise<number> {
+  async getSchoolCount() {
     try {
       const { count, error } = await this.client
         .from('school') // Tabela de escolas
@@ -15,12 +15,11 @@ export default class SchoolService extends BaseService<School> {
         .is('deletedAt', null) // Ignora as escolas delet
 
       if (error)
-        throw error
+        errorHandler(error, 'Erro ao contar escolas')
       return count ?? 0
     }
     catch (error) {
-      console.error('Error ao contar escolas:', error)
-      return 0
+      errorHandler(error, 'Erro ao contar escolas')
     }
   }
 
@@ -32,11 +31,11 @@ export default class SchoolService extends BaseService<School> {
         .is('deletedAt', null) // Ignora as turmas deletadas
 
       if (error)
-        throw error
+        errorHandler(error, 'Erro ao contar turmas')
       return count ?? 0
     }
     catch (error) {
-      console.error('Error ao contar turmas:', error)
+      errorHandler(error, 'Erro ao contar turmas')
       return 0
     }
   }
@@ -49,11 +48,11 @@ export default class SchoolService extends BaseService<School> {
         .is('deletedAt', null) // Ignora os professores deletados
 
       if (error)
-        throw error
+        errorHandler(error, 'Erro ao contar professores')
       return count ?? 0
     }
     catch (error) {
-      console.error('Error ao contar professores:', error)
+      errorHandler(error, 'Erro ao contar professores')
       return 0
     }
   }
@@ -65,7 +64,7 @@ export default class SchoolService extends BaseService<School> {
         .select('*', { count: 'exact', head: true }) // Conta o número de estudantes ignorando os soft-deleted
 
       if (totalError)
-        throw totalError
+        errorHandler(totalError, 'Erro ao contar estudantes')
 
       const { count: approvedStudents, error: approvedError } = await this.client
         .from('student') // Tabela de estudantes
@@ -74,14 +73,14 @@ export default class SchoolService extends BaseService<School> {
       /*   .filter({ approved: true }) // Filtra os estudantes aprovados ou .eq({ approved: true }) */
 
       if (approvedError)
-        throw approvedError
+        errorHandler(approvedError, 'Erro ao contar estudantes aprovados')
 
       const total = totalStudents ?? 0
       const approved = approvedStudents ?? 0
       return total > 0 ? Math.round((approved / total) * 100) : 0
     }
     catch (error) {
-      console.error('Error ao calcular taxa de aprovação:', error)
+      errorHandler(error, 'Erro ao calcular taxa de aprovação')
       return 0
     }
   }
@@ -94,11 +93,11 @@ export default class SchoolService extends BaseService<School> {
         .is('deletedAt', null) // Ignora os estudantes deletados
 
       if (error)
-        throw error
+        errorHandler(error, 'Erro ao contar estudantes')
       return count ?? 0
     }
     catch (error) {
-      console.error('Error ao contar estudantes:', error)
+      errorHandler(error, 'Erro ao contar estudantes')
       return 0
     }
   }

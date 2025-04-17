@@ -1,15 +1,13 @@
 <script setup lang="ts">
+import { routes } from '@/router/index'
+import { AuthService } from '@/services/AuthService'
 import showToast from '@/utils/toast-alert'
-import { IonButton, IonIcon, IonInput, IonItem, IonList } from '@ionic/vue'
-import { eye, lockClosed, mail } from 'ionicons/icons'
+import { resetRouter } from '@/utils/updateRoutes'
+import { IonButton, IonIcon, IonInput, IonItem } from '@ionic/vue'
+import { lockClosed, mail } from 'ionicons/icons'
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../store/AuthStore'
-import { AuthService } from '@/services/AuthService'
-import { resetRouter } from '@/utils/updateRoutes'
-import { routes } from '@/router/index'
-import { getCurrentInstance } from 'vue'
-
 
 const email = ref<string>('')
 const password = ref<string>('')
@@ -17,7 +15,6 @@ const user = ref<any>(null)
 const router = useRouter()
 const userStore = useAuthStore()
 const authService = new AuthService()
-const appInstance = getCurrentInstance()?.appContext.app
 
 onMounted(async () => {
   try {
@@ -25,9 +22,8 @@ onMounted(async () => {
     user.value = data?.user || null
   }
   catch (err) {
-    console.log('Erro ao buscar sessão', (err as Error).message)
+    console.error('Erro ao buscar sessão', (err as Error).message)
   }
-
 })
 
 const loading = ref<boolean>(false)
@@ -39,17 +35,21 @@ async function signIn() {
     const orgs = await authService.listOrganizations()
     await authService.setActiveOrganization(orgs[0].id)
     showToast('Login realizado com sucesso', 'top', 'success')
-    userStore.login(data)
+    if (data) {
+      userStore.login(data)
+    }
     if (userStore.userLocal) {
       const localUserRole = JSON.parse(userStore.userLocal).role
       resetRouter(router, routes)
       if (localUserRole === 'PROFESSOR') {
         router.push('/home')
         window.location.reload()
-      } else if (localUserRole === 'GESTORESCOLAR') {
+      }
+      else if (localUserRole === 'GESTORESCOLAR') {
         router.push('/student')
         window.location.reload()
-      } else {
+      }
+      else {
         router.push('/dashboard/Home')
         window.location.reload()
       }
@@ -91,8 +91,10 @@ onMounted(() => {
             </IonInput>
           </IonItem>
           <IonItem>
-            <IonInput v-model="password" type="password" label-placement="stacked" label="Senha"
-              placeholder="Digite sua senha">
+            <IonInput
+              v-model="password" type="password" label-placement="stacked" label="Senha"
+              placeholder="Digite sua senha"
+            >
               <IonIcon slot="start" :icon="lockClosed" aria-hidden="true" />
               <ion-input-password-toggle slot="end" />
             </IonInput>

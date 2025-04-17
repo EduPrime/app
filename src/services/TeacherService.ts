@@ -1,5 +1,6 @@
 import type { Teacher } from '@prisma/client'
 import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 const table = 'teacher' as const
 
@@ -15,7 +16,7 @@ export default class TeacherService extends BaseService<Teacher> {
       .eq('userId', userId)
 
     if (error) {
-      throw new Error(`Erro ao encontrar professor: ${error.message}`)
+      errorHandler(error, 'Erro ao buscar professor')
     }
     if (!data) {
       throw new Error('Nenhuma professor encontrado')

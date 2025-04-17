@@ -1,4 +1,5 @@
 import BaseService from '@/services/BaseService'
+import errorHandler from '@/utils/error-handler'
 
 const table = 'school_course' as const
 
@@ -19,7 +20,7 @@ export default class School_courseService extends BaseService<TabelaType> {
         .eq('school_id', schoolId) // Filtra pelo school_id selecionado
 
       if (error) {
-        throw error
+        errorHandler(error, 'Erro ao buscar cursos para a escola')
       }
 
       // Se não encontrar nenhum curso relacionado, retornar vazio
@@ -37,15 +38,14 @@ export default class School_courseService extends BaseService<TabelaType> {
         .in('id', courseIds) // Filtra pelos course_ids
 
       if (courseError) {
-        throw courseError
+        errorHandler(courseError, 'Erro ao buscar detalhes dos cursos')
       }
 
       // Retorna os dados dos cursos
       return courses
     }
     catch (error) {
-      console.error('Erro ao buscar cursos para a escola:', error)
-      throw new Error('Failed to fetch courses for the selected school.')
+      errorHandler(error, 'Erro ao buscar cursos por escola')
     }
   }
 }
