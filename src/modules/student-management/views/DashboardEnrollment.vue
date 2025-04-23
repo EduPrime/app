@@ -52,7 +52,7 @@ const students = ref<Student[]>([])
 const series = ref<any[]>([])
 const searchQuery = ref('')
 const isFilterCollapse = ref(false)
-// const isComplete = ref(false)
+const isComplete = ref(false)
 
 const filter = ref({
   direction: 'asc',
@@ -96,7 +96,6 @@ const filteredStudents = computed(() => {
 //   ...filteredStudents, selected: !student.selected
 // }
 
-
 async function loadEnrollment() {
   try {
     const enrollments = await preEnrollmentService.getFilteredWithStudents(filter.value)
@@ -133,12 +132,13 @@ function setFilterCollapse(open: boolean) {
 
 // Computed para obter os estudantes selecionados
 const selectedStudents = computed(() => {
-  return filteredStudents.value.filter(student => !!student.selected);
+  return filteredStudents.value.filter(student => !!student.selected)
 })
 
-function handleSelectAll($event: any) {
+function handleSelectAll(isTrue: boolean) {
+  isComplete.value = isTrue
   filteredStudents.value.forEach((element) => {
-    element.selected = $event?.detail?.checked ?? false
+    element.selected = isTrue
   })
 }
 
@@ -162,20 +162,13 @@ async function getSchool() {
 }
 
 async function getSeries() {
-  try {
-    const data = await preEnrollmentService.getSeries(filter.value)
-    series.value = data
-    filter.value.serie = data[0].id
-    await loadEnrollment()
-  }
-  catch {
-    students.value = []
-    series.value = []
-    filter.value.serie = undefined
-  }
+  const data = await preEnrollmentService.getSeries(filter.value)
+  series.value = data
+  filter.value.serie = data[0].id
+  await loadEnrollment()
 }
 
-const allSelected = computed(() => { return selectedStudents.value.length === filteredStudents.value.length })
+const allSelected = computed(() => selectedStudents.value.length === filteredStudents.value.length)
 
 async function handleSelectClass() {
   if (filter.value.serie && filter.value.school) {
@@ -348,7 +341,24 @@ async function lastStepEnrollment() {
         </IonRow>
         <IonRow class="checkbox-row">
           <IonCol size="10">
-            <ion-checkbox v-if="filteredStudents.length > 0" :checked="allSelected" @ion-change="handleSelectAll" />
+            <IonButton
+              v-if="filteredStudents.length > 0" fill="clear" class="checkbox-button"
+              @click="handleSelectAll(!isComplete)"
+            >
+              <svg v-if="!allSelected" width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                <rect
+                  x="0.5" y="0.5" width="9" height="9" rx="0.5" fill="none" stroke="var(--ion-color-primary)"
+                  stroke-width="1"
+                />
+              </svg>
+              <!-- SVG de checkbox (marcado) -->
+              <svg v-if="allSelected" width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                <rect
+                  x="0.5" y="0.5" width="9" height="9" rx="0.5" fill="var(--ion-color-tertiary)"
+                  stroke="var(--ion-color-primary)" stroke-width="1"
+                />
+              </svg>
+            </IonButton>
           </IonCol>
           <IonCol size="auto">
             <IonRow>
@@ -369,11 +379,29 @@ async function lastStepEnrollment() {
             v-for="(student, index) in filteredStudents" :key="index"
             :color="student.selected ? 'lightaccent' : ''" :class="{ selected: student.selected }"
           >
-            <ion-checkbox
-              slot="start" :checked="student.selected"
-              @click="student.selected = !student.selected"
-            />
-            <ion-label>
+            <IonButton
+              slot="start" fill="clear" class="checkbox-button"
+              @click.stop="student.selected = !student.selected"
+            >
+              <!-- Checkbox não marcado -->
+              <svg
+                v-if="!student.selected" width="10" height="10" viewBox="0 0 10 10"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="0.5" y="0.5" width="9" height="9" rx="0.5" fill="none" stroke="var(--ion-color-primary)"
+                  stroke-width="1"
+                />
+              </svg>
+
+              <!-- Checkbox marcado -->
+              <svg v-else width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                <rect
+                  x="0.5" y="0.5" width="9" height="9" rx="0.5" fill="var(--ion-color-tertiary)"
+                  stroke="var(--ion-color-primary)" stroke-width="1"
+                />
+              </svg>
+            </IonButton> <ion-label>
               <div class="title">
                 {{ student.name }}
               </div>
@@ -387,22 +415,6 @@ async function lastStepEnrollment() {
           </IonItem>
         </ion-list>
       </ion-card>
-      <pre>
-        <small>
-        selectedStudents {{ selectedStudents }}
-        filteredStudents {{ filteredStudents }}
-        <!-- allSelected {{ allSelected }}
-        filter {{ filter }}
-        students {{ students }}
-        series {{ series }}
-        searchQuery {{ searchQuery }}
-        isFilterCollapse {{ isFilterCollapse }}
-        selectedClass {{ selectedClass }}
-        classes {{ classes }}
-        classInfo {{ classInfo }}
-        finishEnrollmentOpened {{ finishEnrollmentOpened }} -->
-      </small>
-      </pre>
       <template #footer>
         <IonRow class="" style="padding-top: 0px; padding-bottom: 0px;">
           <IonCol>
@@ -661,5 +673,30 @@ ion-searchbar.md.custom-search {
   display: flex;
   justify-content: flex-end;
   margin: 0%;
+}
+
+.checkbox-button {
+  --padding-start: 0;
+  --padding-end: 0;
+  --border-radius: 0;
+  --margin-top: 0px !important;
+  --margin-bottom: 0px !important;
+  /* Remove o arredondamento para deixar quadrado */
+  --background: transparent;
+  --box-shadow: none;
+  border: 0px solid var(--ion-color-primary);
+  /* Borda de 1px com a cor primária do Ionic */
+  width: 10px;
+  height: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkbox-button ion-icon,
+.checkbox-button svg {
+  display: block;
+  width: 10px;
+  height: 10px;
 }
 </style>
