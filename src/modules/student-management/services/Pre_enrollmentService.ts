@@ -98,9 +98,17 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
 
   async getSeries(filter: any) {
     const { school } = filter || {}
-    const query = this.client.from('series').select(`
-      *
-  `).eq('schoolId', school)
+
+    const { data: courseData } = await this.client
+      .from('courseSchool')
+      .select('courseId')
+      .eq('schoolId', school)
+
+    const courses = courseData?.map((course) => course.courseId)
+    // console.log('courses', courses)
+    const query = this.client.from('series')
+      .select('*')
+      .in('courseId', courses || [])
 
     const { data, error } = await query as { data: any[], error: any }
 

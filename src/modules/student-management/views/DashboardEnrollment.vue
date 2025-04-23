@@ -27,7 +27,7 @@ interface Student {
   name: string
   age: number
   shift: string
-  selected?: boolean
+  selected: boolean
   code: string
   id: string
   studentId: string
@@ -78,7 +78,7 @@ const turnos = ref({
 watch(students, (novoValor, antigoValor) => {
   if (JSON.stringify(novoValor) !== JSON.stringify(antigoValor)) {
     students.value = [...novoValor]
-    console.log('alterou students')
+    // console.log('alterou students')
   }
 }, { deep: true })
 
@@ -92,12 +92,18 @@ const filteredStudents = computed(() => {
   )
 })
 
+// function changeSelected(student: Student) {
+//   ...filteredStudents, selected: !student.selected
+// }
+
+
 async function loadEnrollment() {
   try {
     const enrollments = await preEnrollmentService.getFilteredWithStudents(filter.value)
     students.value = enrollments.map(enrollment => ({
       pcd: enrollment.student?.disability ?? false,
       name: enrollment.student?.name ?? '',
+      selected: false,
       age: moment().diff(moment(enrollment.student?.birthdate), 'years') ?? 0,
       // age: dayjs().diff(dayjs(enrollment.student?.birthdate), 'year') ?? 0,
       shift: enrollment.preferShift,
@@ -110,7 +116,7 @@ async function loadEnrollment() {
       institutionId: enrollment.institutionId,
     }
     )).filter(student => student.shift === filter.value.shift)
-    console.log('load chamado!')
+    // console.log('load chamado!')
   }
 
   catch (error) {
@@ -123,7 +129,12 @@ function setFilterCollapse(open: boolean) {
   isFilterCollapse.value = open
 }
 
-const selectedStudents = computed(() => filteredStudents.value.filter(student => !!student.selected))
+// const selectedStudents = computed(() => { return filteredStudents.value.filter(student => !!student.selected) })
+
+// Computed para obter os estudantes selecionados
+const selectedStudents = computed(() => {
+  return filteredStudents.value.filter(student => !!student.selected);
+})
 
 function handleSelectAll($event: any) {
   filteredStudents.value.forEach((element) => {
@@ -164,11 +175,11 @@ async function getSeries() {
   }
 }
 
-const allSelected = computed(() => students.value.length === selectedStudents.value.length)
+const allSelected = computed(() => { return selectedStudents.value.length === filteredStudents.value.length })
 
 async function handleSelectClass() {
   if (filter.value.serie && filter.value.school) {
-    console.log('filter.serie and filter.school', filter.value.serie, filter.value.school)
+    // console.log('filter.serie and filter.school', filter.value.serie, filter.value.school)
     classes.value = await classroomService.getClasses(filter.value.serie, filter.value.school)
   }
   else {
@@ -185,7 +196,7 @@ function selectClass(classroom: any) {
 
 const classInfo = computed(() => {
   const [classroom] = classes.value.filter(room => room.id === selectedClass.value)
-  console.log(classroom)
+  // console.log(classroom)
   return classroom
 })
 
@@ -241,7 +252,7 @@ async function lastStepEnrollment() {
   }
 
   await loadEnrollment()
-  console.log('fim da matrícula')
+  // console.log('fim da matrícula')
 }
 </script>
 
@@ -359,8 +370,8 @@ async function lastStepEnrollment() {
             :color="student.selected ? 'lightaccent' : ''" :class="{ selected: student.selected }"
           >
             <ion-checkbox
-              slot="start" v-model="student.selected" :checked="student.selected"
-              @ion-change="($event: any) => student.selected = $event.detail.checked"
+              slot="start" :checked="student.selected"
+              @click="student.selected = !student.selected"
             />
             <ion-label>
               <div class="title">
@@ -376,7 +387,22 @@ async function lastStepEnrollment() {
           </IonItem>
         </ion-list>
       </ion-card>
-
+      <pre>
+        <small>
+        selectedStudents {{ selectedStudents }}
+        filteredStudents {{ filteredStudents }}
+        <!-- allSelected {{ allSelected }}
+        filter {{ filter }}
+        students {{ students }}
+        series {{ series }}
+        searchQuery {{ searchQuery }}
+        isFilterCollapse {{ isFilterCollapse }}
+        selectedClass {{ selectedClass }}
+        classes {{ classes }}
+        classInfo {{ classInfo }}
+        finishEnrollmentOpened {{ finishEnrollmentOpened }} -->
+      </small>
+      </pre>
       <template #footer>
         <IonRow class="" style="padding-top: 0px; padding-bottom: 0px;">
           <IonCol>
