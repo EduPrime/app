@@ -126,6 +126,7 @@ model Course {
   series         Series[]
   School         School?          @relation(fields: [schoolId], references: [id])
   EvaluationRule EvaluationRule[] @relation(map: "rule_course_fkey")
+  CourseSchool   CourseSchool[]
 
   @@map("course")
   @@schema("public")
@@ -145,18 +146,18 @@ model Discipline {
   tenantId      String?
   codDisciplina Int?
 
-  DisciplineAttendance    DisciplineAttendance[]    @relation(map: "faltacc_discipline_id_fkey")
-  NumericGrade            NumericGrade[]            @relation(map: "numericexame_discipline_id_fkey")
-  DisciplineGrade         DisciplineGrade[]         @relation(map: "notadisciplina_discipline_id_fkey")
-  DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "pareceretapadisciplina_discipline_id_fkey")
-  Schedule                Schedule[]                @relation(map: "schedule_discipline_id_fkey")
-  Attendance              Attendance[]              @relation(map: "faltacc_discipline_id_fkey")
-  ContentDiscipline       ContentDiscipline[]
-  Bncc                    Bncc[]
-  TeacherAttendance       TeacherAttendance[]       @relation(map: "faltaprof_discipline_id_fkey")
-  ConceptualGrade         ConceptualGrade[]         @relation(map: "notaconceitual_discipline_id_fkey")
-  thematicUnit            ThematicUnit[]            @relation(map: "notaconceitualunidade_discipline_id_fkey")
-  RegisteredGrade         RegisteredGrade[]         @relation(map: "notaregistrada_discipline_id_fkey")
+  DisciplineAttendance DisciplineAttendance[] @relation(map: "faltacc_discipline_id_fkey")
+  NumericGrade         NumericGrade[]         @relation(map: "numericexame_discipline_id_fkey")
+  DisciplineGrade      DisciplineGrade[]      @relation(map: "notadisciplina_discipline_id_fkey")
+  Schedule             Schedule[]             @relation(map: "schedule_discipline_id_fkey")
+  Attendance           Attendance[]           @relation(map: "faltacc_discipline_id_fkey")
+  ContentDiscipline    ContentDiscipline[]
+  Bncc                 Bncc[]
+  TeacherAttendance    TeacherAttendance[]    @relation(map: "faltaprof_discipline_id_fkey")
+  ConceptualGrade      ConceptualGrade[]      @relation(map: "notaconceitual_discipline_id_fkey")
+  thematicUnit         ThematicUnit[]         @relation(map: "notaconceitualunidade_discipline_id_fkey")
+  RegisteredGrade      RegisteredGrade[]      @relation(map: "notaregistrada_discipline_id_fkey")
+  StudentFeedback      StudentFeedback[]      @relation(map: "pareceraluno_discipline_id_fkey")
 
   @@map("discipline")
   @@schema("public")
@@ -175,18 +176,16 @@ model Stage {
   tenantId      String?
   userCreated   String?   @db.VarChar(255)
 
-  institution             Institution               @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stage_institutionid_fkey")
-  DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "pareceretapadisciplina_stage_id_fkey")
-  StudentStageFeedback    StudentStageFeedback[]    @relation(map: "pareceretapaaluno_stage_id_fkey")
-  DisciplineGrade         DisciplineGrade[]         @relation(map: "notadisciplina_stage_id_fkey")
-  NumericGrade            NumericGrade[]            @relation(map: "numericexame_stage_id_fkey")
-  GeneralGrade            GeneralGrade[]            @relation(map: "notageral_stage_id_fkey")
-  DisciplineAttendance    DisciplineAttendance[]    @relation(map: "faltacc_stage_id_fkey")
-  GeneralAttendance       GeneralAttendance[]       @relation(map: "faltageral_stage_id_fkey")
-  Attendance              Attendance[]              @relation(map: "faltacc_stage_id_fkey")
-  TeacherAttendance       TeacherAttendance[]       @relation(map: "faltaprof_stage_id_fkey")
-  ConceptualGrade         ConceptualGrade[]         @relation(map: "notaconceitual_stage_id_fkey")
-  RegisteredGrade         RegisteredGrade[]         @relation(map: "notaregistrada_stage_id_fkey")
+  institution          Institution            @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "stage_institutionid_fkey")
+  DisciplineGrade      DisciplineGrade[]      @relation(map: "notadisciplina_stage_id_fkey")
+  NumericGrade         NumericGrade[]         @relation(map: "numericexame_stage_id_fkey")
+  GeneralGrade         GeneralGrade[]         @relation(map: "notageral_stage_id_fkey")
+  DisciplineAttendance DisciplineAttendance[] @relation(map: "faltacc_stage_id_fkey")
+  GeneralAttendance    GeneralAttendance[]    @relation(map: "faltageral_stage_id_fkey")
+  Attendance           Attendance[]           @relation(map: "faltacc_stage_id_fkey")
+  TeacherAttendance    TeacherAttendance[]    @relation(map: "faltaprof_stage_id_fkey")
+  ConceptualGrade      ConceptualGrade[]      @relation(map: "notaconceitual_stage_id_fkey")
+  RegisteredGrade      RegisteredGrade[]      @relation(map: "notaregistrada_stage_id_fkey")
 
   @@map("stage")
   @@schema("public")
@@ -213,22 +212,20 @@ model Enrollment {
   institutionId   String?       @db.Uuid
   preenrollmentId String?       @unique(map: "enrollment_preenrollmentid_key") @db.Uuid
 
-  classroom               Classroom                 @relation(fields: [classroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_classroomid_fkey")
-  course                  Course                    @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_courseid_fkey")
-  institution             Institution?              @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_institutionid_fkey")
-  preenrollment           PreEnrollment?            @relation(fields: [preenrollmentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_preenrollmentid_fkey")
-  school                  School                    @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_schoolid_fkey")
-  series                  Series                    @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_seriesid_fkey")
-  student                 Student                   @relation(fields: [studentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_studentid_fkey")
-  enrollmenthistory       EnrollmentHistory[]
-  StudentAttendance       StudentAttendance[]       @relation(map: "faltaaluno_enrollment_id_fkey")
-  NumericGrade            NumericGrade[]            @relation(map: "numericexame_enrollment_id_fkey")
-  DisciplineGrade         DisciplineGrade[]         @relation(map: "notadisciplina_enrollment_id_fkey")
-  StudentFeedback         StudentFeedback[]         @relation(map: "feedbackaluno_enrollment_id_fkey")
-  StudentStageFeedback    StudentStageFeedback[]    @relation(map: "feedbacketapaaluno_enrollment_id_fkey")
-  DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "feedbacketapadisciplina_enrollment_id_fkey")
-  Attendance              Attendance[]              @relation(map: "faltacc_enrollment_id_fkey")
-  ConceptualGrade         ConceptualGrade[]         @relation(map: "notaconceitual_enrollment_id_fkey")
+  classroom         Classroom           @relation(fields: [classroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_classroomid_fkey")
+  course            Course              @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_courseid_fkey")
+  institution       Institution?        @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_institutionid_fkey")
+  preenrollment     PreEnrollment?      @relation(fields: [preenrollmentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_preenrollmentid_fkey")
+  school            School              @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_schoolid_fkey")
+  series            Series              @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_seriesid_fkey")
+  student           Student             @relation(fields: [studentId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "enrollment_studentid_fkey")
+  enrollmenthistory EnrollmentHistory[]
+  StudentAttendance StudentAttendance[] @relation(map: "faltaaluno_enrollment_id_fkey")
+  NumericGrade      NumericGrade[]      @relation(map: "numericexame_enrollment_id_fkey")
+  DisciplineGrade   DisciplineGrade[]   @relation(map: "notadisciplina_enrollment_id_fkey")
+  StudentFeedback   StudentFeedback[]   @relation(map: "feedbackaluno_enrollment_id_fkey")
+  Attendance        Attendance[]        @relation(map: "faltacc_enrollment_id_fkey")
+  ConceptualGrade   ConceptualGrade[]   @relation(map: "notaconceitual_enrollment_id_fkey")
 
   @@map("enrollment")
   @@schema("public")
@@ -575,68 +572,29 @@ model DisciplineGrade {
 }
 
 model StudentFeedback {
-  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  studentId    String    @db.Uuid
-  enrollmentId String    @db.Uuid
-  schoolId     String    @db.Uuid
-  parecer      String    @db.VarChar(255)
-  updatedAt    DateTime? @updatedAt @db.Timestamp(6)
-  updatedBy    String?   @db.Uuid
-  createdAt    DateTime  @default(now()) @db.Timestamp(6)
-  deletedAt    DateTime? @db.Timestamp(6)
-  tenantId     String?
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId       String    @db.Uuid
+  enrollmentId    String    @db.Uuid
+  schoolId        String    @db.Uuid
+  disciplineId    String?   @db.Uuid
+  teacherId       String    @db.Uuid
+  initialFeedback String    @db.VarChar(800)
+  partialFeedback String?   @db.VarChar(800)
+  finalFeedback   String?   @db.VarChar(800)
+  updatedAt       DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy       String?   @db.Uuid
+  createdAt       DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt       DateTime? @db.Timestamp(6)
+  tenantId        String?
 
-  student    Student    @relation(fields: [studentId], references: [id], map: "pareceraluno_student_id_fkey")
-  school     School     @relation(fields: [schoolId], references: [id], map: "pareceraluno_school_id_fkey")
-  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], map: "pareceraluno_enrollment_id_fkey")
+  student    Student     @relation(fields: [studentId], references: [id], map: "pareceraluno_student_id_fkey")
+  school     School      @relation(fields: [schoolId], references: [id], map: "pareceraluno_school_id_fkey")
+  enrollment Enrollment  @relation(fields: [enrollmentId], references: [id], map: "pareceraluno_enrollment_id_fkey")
+  discipline Discipline? @relation(fields: [disciplineId], references: [id], map: "pareceraluno_discipline_id_fkey")
+  teacher    Teacher     @relation(fields: [teacherId], references: [id], map: "pareceraluno_teacher_id_fkey")
 
+  @@unique([enrollmentId], map: "unique_student_feedback_on_conflict")
   @@map("studentFeedback")
-  @@schema("public")
-}
-
-model StudentStageFeedback {
-  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  studentId    String    @db.Uuid
-  enrollmentId String    @db.Uuid
-  schoolId     String    @db.Uuid
-  stageId      String    @db.Uuid
-  feedback     String    @db.VarChar(255)
-  updatedAt    DateTime? @updatedAt @db.Timestamp(6)
-  updatedBy    String?   @db.Uuid
-  createdAt    DateTime  @default(now()) @db.Timestamp(6)
-  deletedAt    DateTime? @db.Timestamp(6)
-  tenantId     String?
-
-  stage      Stage      @relation(fields: [stageId], references: [id], map: "pareceretapaaluno_stage_id_fkey")
-  student    Student    @relation(fields: [studentId], references: [id], map: "pareceretapaaluno_student_id_fkey")
-  school     School     @relation(fields: [schoolId], references: [id], map: "pareceretapaaluno_school_id_fkey")
-  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], map: "pareceretapaaluno_enrollment_id_fkey")
-
-  @@map("studentStageFeedback")
-  @@schema("public")
-}
-
-model DisciplineStageFeedback {
-  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  studentId    String    @db.Uuid
-  enrollmentId String    @db.Uuid
-  disciplineId String    @db.Uuid
-  schoolId     String    @db.Uuid
-  stageId      String    @db.Uuid
-  feedback     String    @db.VarChar(255)
-  updatedAt    DateTime? @updatedAt @db.Timestamp(6)
-  updatedBy    String?   @db.Uuid
-  createdAt    DateTime  @default(now()) @db.Timestamp(6)
-  deletedAt    DateTime? @db.Timestamp(6)
-  tenantId     String?
-
-  stage      Stage      @relation(fields: [stageId], references: [id], map: "pareceretapadisciplina_stage_id_fkey")
-  student    Student    @relation(fields: [studentId], references: [id], map: "pareceretapadisciplina_student_id_fkey")
-  school     School     @relation(fields: [schoolId], references: [id], map: "pareceretapadisciplina_school_id_fkey")
-  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], map: "pareceretapadisciplina_enrollment_id_fkey")
-  discipline Discipline @relation(fields: [disciplineId], references: [id], map: "pareceretapadisciplina_discipline_id_fkey")
-
-  @@map("disciplineStageFeedback")
   @@schema("public")
 }
 
@@ -775,7 +733,7 @@ model Bncc {
   knowledgeArea    String?       @db.VarChar(100)
   languagePractice String?       @db.VarChar(100)
   fieldsOfAction   String?       @db.VarChar(100)
-  knowledgeObjects String?       @db.VarChar(100)
+  knowledgeObjects String?       @db.VarChar(300)
   courseId         String        @db.Uuid
   disciplineId     String        @db.Uuid
   seriesId         String        @db.Uuid
@@ -790,6 +748,24 @@ model Bncc {
   ContentBncc      ContentBncc[]
 
   @@map("bncc")
+  @@schema("public")
+}
+
+model CourseSchool {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  courseId    String    @db.Uuid
+  schoolId    String    @db.Uuid
+  createdAt   DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt   DateTime? @db.Timestamp(6)
+  updatedAt   DateTime? @db.Timestamp(6)
+  updatedBy   String?   @db.Uuid
+  tenantId    String?
+  userCreated String?   @db.Uuid
+
+  course Course @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cursocurso_course_id_fkey")
+  school School @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "cursocurso_school_id_fkey")
+
+  @@map("courseSchool")
   @@schema("public")
 }
 
@@ -858,29 +834,28 @@ model School {
   tenantId                 String?
   userCreated              String?   @db.VarChar(255)
 
-  classroom               Classroom[]
-  course                  Course[]
-  enrollment              Enrollment[]
-  preenrollment           PreEnrollment[]
-  institution             Institution               @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_institutionid_fkey")
-  schoolSettings          SchoolSettings[]
-  series                  Series[]
-  serverAllocations       ServerAllocations[]
-  student                 Student[]
-  teacher                 Teacher[]
-  GeneralAttendance       GeneralAttendance[]       @relation(map: "faltageral_school_id_fkey")
-  DisciplineAttendance    DisciplineAttendance[]    @relation(map: "faltacc_school_id_fkey")
-  StudentAttendance       StudentAttendance[]       @relation(map: "faltaaluno_school_id_fkey")
-  GeneralGrade            GeneralGrade[]            @relation(map: "notageral_school_id_fkey")
-  NumericGrade            NumericGrade[]            @relation(map: "NumericGrade_school_id_fkey")
-  DisciplineGrade         DisciplineGrade[]         @relation(map: "notadisciplina_school_id_fkey")
-  StudentFeedback         StudentFeedback[]         @relation(map: "pareceraluno_school_id_fkey")
-  StudentStageFeedback    StudentStageFeedback[]    @relation(map: "pareceretapaaluno_school_id_fkey")
-  DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "pareceretapadisciplina_school_id_fkey")
-  Schedule                Schedule[]                @relation(map: "schedule_school_id_fkey")
-  Attendance              Attendance[]              @relation(map: "faltacc_school_id_fkey")
-  TeacherAttendance       TeacherAttendance[]       @relation(map: "faltaprof_school_id_fkey")
-  ConceptualGrade         ConceptualGrade[]         @relation(map: "notaconceitual_school_id_fkey")
+  classroom            Classroom[]
+  course               Course[]
+  enrollment           Enrollment[]
+  preenrollment        PreEnrollment[]
+  institution          Institution            @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_institutionid_fkey")
+  schoolSettings       SchoolSettings[]
+  series               Series[]
+  serverAllocations    ServerAllocations[]
+  student              Student[]
+  teacher              Teacher[]
+  GeneralAttendance    GeneralAttendance[]    @relation(map: "faltageral_school_id_fkey")
+  DisciplineAttendance DisciplineAttendance[] @relation(map: "faltacc_school_id_fkey")
+  StudentAttendance    StudentAttendance[]    @relation(map: "faltaaluno_school_id_fkey")
+  GeneralGrade         GeneralGrade[]         @relation(map: "notageral_school_id_fkey")
+  NumericGrade         NumericGrade[]         @relation(map: "NumericGrade_school_id_fkey")
+  DisciplineGrade      DisciplineGrade[]      @relation(map: "notadisciplina_school_id_fkey")
+  StudentFeedback      StudentFeedback[]      @relation(map: "pareceraluno_school_id_fkey")
+  Schedule             Schedule[]             @relation(map: "schedule_school_id_fkey")
+  Attendance           Attendance[]           @relation(map: "faltacc_school_id_fkey")
+  TeacherAttendance    TeacherAttendance[]    @relation(map: "faltaprof_school_id_fkey")
+  ConceptualGrade      ConceptualGrade[]      @relation(map: "notaconceitual_school_id_fkey")
+  CourseSchool         CourseSchool[]
 
   @@map("school")
   @@schema("public")
@@ -1040,19 +1015,17 @@ model Student {
   responsibleType  responsibleType?   @default(PAI)
   citystate        String?            @db.VarChar
 
-  enrollment              Enrollment?
-  preenrollment           PreEnrollment?
-  school                  School?                   @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "student_school")
-  GeneralAttendance       GeneralAttendance[]       @relation(map: "faltageral_student_id_fkey")
-  DisciplineAttendance    DisciplineAttendance[]    @relation(map: "faltacc_student_id_fkey")
-  GeneralGrade            GeneralGrade[]            @relation(map: "notageral_student_id_fkey")
-  DisciplineGrade         DisciplineGrade[]         @relation(map: "notadisciplina_student_id_fkey")
-  StudentFeedback         StudentFeedback[]         @relation(map: "pareceraluno_student_id_fkey")
-  StudentStageFeedback    StudentStageFeedback[]    @relation(map: "pareceretapaaluno_student_id_fkey")
-  DisciplineStageFeedback DisciplineStageFeedback[] @relation(map: "pareceretapadisciplina_student_id_fkey")
-  Attendance              Attendance[]              @relation(map: "student_attendance_fkey")
-  NumericGrade            NumericGrade[]            @relation(map: "NumericGrade_student_id_fkey")
-  ConceptualGrade         ConceptualGrade[]         @relation(map: "notaconceitual_student_id_fkey")
+  enrollment           Enrollment?
+  preenrollment        PreEnrollment?
+  school               School?                @relation(fields: [schoolId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "student_school")
+  GeneralAttendance    GeneralAttendance[]    @relation(map: "faltageral_student_id_fkey")
+  DisciplineAttendance DisciplineAttendance[] @relation(map: "faltacc_student_id_fkey")
+  GeneralGrade         GeneralGrade[]         @relation(map: "notageral_student_id_fkey")
+  DisciplineGrade      DisciplineGrade[]      @relation(map: "notadisciplina_student_id_fkey")
+  StudentFeedback      StudentFeedback[]      @relation(map: "pareceraluno_student_id_fkey")
+  Attendance           Attendance[]           @relation(map: "student_attendance_fkey")
+  NumericGrade         NumericGrade[]         @relation(map: "NumericGrade_student_id_fkey")
+  ConceptualGrade      ConceptualGrade[]      @relation(map: "notaconceitual_student_id_fkey")
 
   @@map("student")
   @@schema("public")
@@ -1085,6 +1058,7 @@ model Teacher {
   TeacherAttendance TeacherAttendance[] @relation(map: "teacher_teacher_attendance_fkey")
   RegisteredGrade   RegisteredGrade[]   @relation(map: "notaregistrada_teacher_id_fkey")
   Content           Content[]
+  StudentFeedback   StudentFeedback[]   @relation(map: "pareceraluno_teacher_id_fkey")
 
   @@map("teacher")
   @@schema("public")
