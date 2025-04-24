@@ -576,7 +576,7 @@ model StudentFeedback {
   studentId       String    @db.Uuid
   enrollmentId    String    @db.Uuid
   schoolId        String    @db.Uuid
-  disciplineId    String    @db.Uuid
+  disciplineId    String?   @db.Uuid
   teacherId       String    @db.Uuid
   initialFeedback String    @db.VarChar(800)
   partialFeedback String?   @db.VarChar(800)
@@ -587,13 +587,13 @@ model StudentFeedback {
   deletedAt       DateTime? @db.Timestamp(6)
   tenantId        String?
 
-  student    Student    @relation(fields: [studentId], references: [id], map: "pareceraluno_student_id_fkey")
-  school     School     @relation(fields: [schoolId], references: [id], map: "pareceraluno_school_id_fkey")
-  enrollment Enrollment @relation(fields: [enrollmentId], references: [id], map: "pareceraluno_enrollment_id_fkey")
-  discipline Discipline @relation(fields: [disciplineId], references: [id], map: "pareceraluno_discipline_id_fkey")
-  teacher    Teacher    @relation(fields: [teacherId], references: [id], map: "pareceraluno_teacher_id_fkey")
+  student    Student     @relation(fields: [studentId], references: [id], map: "pareceraluno_student_id_fkey")
+  school     School      @relation(fields: [schoolId], references: [id], map: "pareceraluno_school_id_fkey")
+  enrollment Enrollment  @relation(fields: [enrollmentId], references: [id], map: "pareceraluno_enrollment_id_fkey")
+  discipline Discipline? @relation(fields: [disciplineId], references: [id], map: "pareceraluno_discipline_id_fkey")
+  teacher    Teacher     @relation(fields: [teacherId], references: [id], map: "pareceraluno_teacher_id_fkey")
 
-  @@unique([studentId, enrollmentId, disciplineId], map: "unique_student_feedback_on_conflict")
+  @@unique([enrollmentId], map: "unique_student_feedback_on_conflict")
   @@map("studentFeedback")
   @@schema("public")
 }
