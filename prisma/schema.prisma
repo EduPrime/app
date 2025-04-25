@@ -520,18 +520,18 @@ model ConceptualGradeByThematicUnit {
 }
 
 model RegisteredGrade {
-  id                  String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  areGradesRegistered Boolean   @default(true)
-  isCompleted         Boolean   @default(false)
-  teacherId           String    @db.Uuid
-  classroomId         String    @db.Uuid
-  disciplineId        String    @db.Uuid
-  stageId             String    @db.Uuid
-  updatedAt           DateTime? @updatedAt @db.Timestamp(6)
-  updatedBy           String?   @db.Uuid
-  createdAt           DateTime  @default(now()) @db.Timestamp(6)
-  deletedAt           DateTime? @db.Timestamp(6)
-  tenantId            String?
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  areGradesReleased Boolean   @default(true)
+  isCompleted       Boolean   @default(false)
+  teacherId         String    @db.Uuid
+  classroomId       String    @db.Uuid
+  disciplineId      String    @db.Uuid
+  stageId           String    @db.Uuid
+  updatedAt         DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy         String?   @db.Uuid
+  createdAt         DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt         DateTime? @db.Timestamp(6)
+  tenantId          String?
 
   teacher    Teacher    @relation(fields: [teacherId], references: [id], map: "notaregistrada_teacher_id_fkey")
   classroom  Classroom  @relation(fields: [classroomId], references: [id], map: "notaregistrada_classroom_id_fkey")
