@@ -103,7 +103,22 @@ export default class ScheduleService extends BaseService<Schedule> {
 
     // Remove undefined values from the array
     const uniqueDisciplines = disciplines.filter(discipline => discipline !== undefined)
+    if (uniqueDisciplines[0]?.disciplineName === 'Geral') {
+      const { data: disciplineData, error: disciplineError } = await this.client
+        .from('discipline')
+        .select(`
+          disciplineId:id,
+          disciplineName:name
+        `)
+        .neq('name', 'Geral')
+        .neq('name', 'Campos de Experiência')
 
+      if (disciplineError) {
+        errorHandler(disciplineError, 'Erro ao buscar disciplinas')
+      }
+
+      return disciplineData
+    }
     return uniqueDisciplines
   }
 
