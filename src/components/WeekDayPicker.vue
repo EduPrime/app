@@ -2,7 +2,7 @@
 import type { Swiper as SwiperType } from 'swiper'
 import { hexToRgb } from '@/utils/hex-to-rgb'
 
-import { IonButton, IonButtons, IonChip, IonDatetime, IonIcon, IonModal, IonText } from '@ionic/vue'
+import { IonAlert, IonButton, IonButtons, IonChip, IonDatetime, IonIcon, IonModal, IonText } from '@ionic/vue'
 
 import { arrowBackOutline, arrowForwardOutline, time } from 'ionicons/icons'
 import { DateTime } from 'luxon'
@@ -23,6 +23,7 @@ interface Props {
   currentDiscipline?: string
   frequency?: string
   originPage?: string
+  hasUnsavedChangesToAlert?: boolean | false
 }
 
 const props = defineProps<Props>()
@@ -34,10 +35,14 @@ const validDays = ref()
 const pulseAtEnd = ref('')
 const currentWeekday = ref()
 
+// variáveis de controle para IonAlert de mudança não salvas
+const isAlertOpen = ref(false)
+const dateToAlert = ref< Moment | undefined>(moment())
+const weekToAlert = ref('')
+
 const getSwiper = ref()
 const currentDate = ref(moment())
-const monthYear = ref(new Date()
-  .toISOString())
+const monthYear = ref(new Date().toISOString())
 const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const weeksInMonth = ref<{ date: Moment, weekday: string }[][]>([])
 const selectedDate = ref<Moment | undefined>(moment())
@@ -97,6 +102,7 @@ async function getValidDaysInScheduleService() {
 // Função para atualizar o valor de mês e ano selecionado
 function updateDate(event: CustomEvent) {
   monthYearValue.value = event.detail.value
+  selectedDate.value = undefined
 }
 
 function loadVisibleMonth() {
@@ -243,6 +249,40 @@ function luxonFormatDate(dateString: string) {
   return date.setLocale('pt-BR').toFormat('MMMM yyyy')
 }
 
+// function preSelectDateUsingUpdateDate() {
+//   switch (props.hasUnsavedChangesToAlert) {
+//     case true:
+//       setAlertOpen(true)
+//       break
+//     case false:
+//       // Call updateDate with the appropriate event or data
+//       const event = { detail: { value: monthYearValue.value } } // Create a mock event
+//       updateDate(event as CustomEvent)
+//       break
+//   }
+// }
+
+function preSelectDate(d: Moment, w: string) {
+  switch (props.hasUnsavedChangesToAlert) {
+    case true:
+      setAlertOpen(true)
+      dateToAlert.value = d
+      weekToAlert.value = w
+      break
+    case false:
+      selectDate(d, w)
+      break
+  }
+}
+
+function setAlertOpen(open: boolean) {
+  isAlertOpen.value = open
+  if (open) {
+    isAlertOpen.value = false
+    setTimeout(() => (isAlertOpen.value = true), 10)
+  }
+}
+
 watch(monthYearValue, (newValue, oldValue) => {
   if (newValue.slice(0, 7) !== oldValue.slice(0, 7)) {
     const date = DateTime.fromISO(newValue)
@@ -367,12 +407,12 @@ watch(
                       style="padding: 10px; margin: 0px"
                       :disabled="(props?.frequency === 'disciplina' && !props.currentDiscipline) || (!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0)" :style="i === 0 ? 'margin-left: 10px;' : undefined"
                       :color="getColorForDate(day.date)"
-                      @click="() => selectDate(day.date, day.weekday)"
+                      @click="() => preSelectDate(day.date, day.weekday)"
                     >
                       <div>
                         <IonIcon
                           :style="{
-                            visibility: day.date.date() === Number(currentDate.format('DD')) ? 'visible' : 'hidden',
+                            visibility: day.date.format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') ? 'visible' : 'hidden',
                           }" :icon="time"
                         />
                         <div class="day-name">
@@ -392,6 +432,40 @@ watch(
       </ion-col>
     </ion-row>
   </ion-grid>
+
+  <IonAlert
+    id="alertChangeDateWithoutSave"
+    class="custom-alert"
+    :is-open="isAlertOpen"
+    :on-did-dismiss="() => { setAlertOpen(false) }"
+    header="Alterações não salvas!"
+    sub-header="Ao trocar de dia no calendário, todas as alterações realizadas serão perdidas!"
+    message="Deseja continuar sem salvar?"
+    :buttons="[
+      {
+        text: 'Cancelar',
+        role: 'cancel',
+        cssClass: 'alert-button-cancel',
+        handler: () => {
+          console.log('Confirm Cancel');
+          setAlertOpen(false)
+        },
+      },
+      {
+        text: 'Confirmar',
+        cssClass: 'alert-button-confirm',
+        handler: () => {
+          console.log('Confirm Ok');
+          if (dateToAlert && weekToAlert) {
+            selectDate(dateToAlert, weekToAlert)
+          }
+          else {
+            console.error('dateToAlert or weekToAlert is undefined')
+          }
+        },
+      },
+    ]"
+  />
 </template>
 
 <style scoped>
