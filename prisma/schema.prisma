@@ -520,17 +520,18 @@ model ConceptualGradeByThematicUnit {
 }
 
 model RegisteredGrade {
-  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  isCompleted  Boolean   @default(false)
-  teacherId    String    @db.Uuid
-  classroomId  String    @db.Uuid
-  disciplineId String    @db.Uuid
-  stageId      String    @db.Uuid
-  updatedAt    DateTime? @updatedAt @db.Timestamp(6)
-  updatedBy    String?   @db.Uuid
-  createdAt    DateTime  @default(now()) @db.Timestamp(6)
-  deletedAt    DateTime? @db.Timestamp(6)
-  tenantId     String?
+  id                String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  areGradesReleased Boolean   @default(true)
+  isCompleted       Boolean   @default(false)
+  teacherId         String    @db.Uuid
+  classroomId       String    @db.Uuid
+  disciplineId      String    @db.Uuid
+  stageId           String    @db.Uuid
+  updatedAt         DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy         String?   @db.Uuid
+  createdAt         DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt         DateTime? @db.Timestamp(6)
+  tenantId          String?
 
   teacher    Teacher    @relation(fields: [teacherId], references: [id], map: "notaregistrada_teacher_id_fkey")
   classroom  Classroom  @relation(fields: [classroomId], references: [id], map: "notaregistrada_classroom_id_fkey")
@@ -572,20 +573,26 @@ model DisciplineGrade {
 }
 
 model StudentFeedback {
-  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  studentId       String    @db.Uuid
-  enrollmentId    String    @db.Uuid
-  schoolId        String    @db.Uuid
-  disciplineId    String?   @db.Uuid
-  teacherId       String    @db.Uuid
-  initialFeedback String    @db.VarChar(800)
-  partialFeedback String?   @db.VarChar(800)
-  finalFeedback   String?   @db.VarChar(800)
-  updatedAt       DateTime? @updatedAt @db.Timestamp(6)
-  updatedBy       String?   @db.Uuid
-  createdAt       DateTime  @default(now()) @db.Timestamp(6)
-  deletedAt       DateTime? @db.Timestamp(6)
-  tenantId        String?
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId        String    @db.Uuid
+  enrollmentId     String    @db.Uuid
+  schoolId         String    @db.Uuid
+  disciplineId     String?   @db.Uuid
+  teacherId        String    @db.Uuid
+  initialFeedback  String    @db.VarChar(800)
+  partialFeedback  String?   @db.VarChar(800)
+  finalFeedback    String?   @db.VarChar(800)
+  initialCreatedAt DateTime  @default(now()) @db.Timestamp(6)
+  initialUpdatedAt DateTime? @db.Timestamp(6)
+  partialCreatedAt DateTime? @default(now()) @db.Timestamp(6)
+  partialUpdatedAt DateTime? @db.Timestamp(6)
+  finalCreatedAt   DateTime? @default(now()) @db.Timestamp(6)
+  finalUpdatedAt   DateTime? @db.Timestamp(6)
+  updatedAt        DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy        String?   @db.Uuid
+  createdAt        DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt        DateTime? @db.Timestamp(6)
+  tenantId         String?
 
   student    Student     @relation(fields: [studentId], references: [id], map: "pareceraluno_student_id_fkey")
   school     School      @relation(fields: [schoolId], references: [id], map: "pareceraluno_school_id_fkey")

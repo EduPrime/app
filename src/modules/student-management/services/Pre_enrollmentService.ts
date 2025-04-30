@@ -104,7 +104,7 @@ export default class Pre_enrollmentService extends BaseService<PreEnrollment> {
       .select('courseId')
       .eq('schoolId', school)
 
-    const courses = courseData?.map((course) => course.courseId)
+    const courses = courseData?.map(course => course.courseId)
     // console.log('courses', courses)
     const query = this.client.from('series')
       .select('*')
