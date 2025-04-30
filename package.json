@@ -8,6 +8,7 @@
     "nodejs": ">=18.18.0"
   },
   "scripts": {
+    "ionic:serve": "vite",
     "vite": "vite",
     "dev": "ionic serve --browser firefox",
     "build": "vue-tsc && vite build",
@@ -64,6 +65,7 @@
     "validations-br": "^1.4.0",
     "vee-validate": "^4.15.0",
     "vue": "^3.5.13",
+    "vue-multiselect": "^3.2.0",
     "vue-router": "^4.5.0",
     "yup": "^1.6.1"
   },
