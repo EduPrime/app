@@ -101,6 +101,54 @@ button.alert-button.alert-button-confirm {
 	border-top-right-radius: 13px;
 }
 
+/* Dropdown do vue‑multiselect */
+.multiselect__content-wrapper {
+	scrollbar-width: thin;
+	scrollbar-color: var(--ion-color-primary) var(--ion-color-light);
+  }
+  .multiselect__content-wrapper::-webkit-scrollbar {
+	width: 6px;   
+	height: 6px;  
+  }
+  .multiselect__content-wrapper::-webkit-scrollbar-track {
+	background: var(--ion-color-light);
+	border-radius: 3px;
+  }
+  .multiselect__content-wrapper::-webkit-scrollbar-thumb {
+	background-color: var(--ion-color-primary);
+	border-radius: 3px;
+	border: 2px solid var(--ion-color-light);
+  }
+  .multiselect__content-wrapper::-webkit-scrollbar-thumb:hover {
+	background-color: var(--ion-color-primary-shade);
+  }
+  
+  .update-modal-content,
+  ion-content {
+	scrollbar-width: thin;
+	scrollbar-color: var(--ion-color-primary) var(--ion-color-light);
+  }
+  .update-modal-content::-webkit-scrollbar,
+  ion-content::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+  }
+  .update-modal-content::-webkit-scrollbar-track,
+  ion-content::-webkit-scrollbar-track {
+	background: var(--ion-color-light);
+	border-radius: 3px;
+  }
+  .update-modal-content::-webkit-scrollbar-thumb,
+  ion-content::-webkit-scrollbar-thumb {
+	background-color: var(--ion-color-primary);
+	border-radius: 3px;
+	border: 2px solid var(--ion-color-light);
+  }
+  .update-modal-content::-webkit-scrollbar-thumb:hover,
+  ion-content::-webkit-scrollbar-thumb:hover {
+	background-color: var(--ion-color-primary-shade);
+  }
+
 /* For information on how to create your own theme, please see:
 http://ionicframework.com/docs/theming/ */
 :root {
@@ -152,6 +200,8 @@ http://ionicframework.com/docs/theming/ */
 	--ion-color-lightSuccess-contrast-rgb: 0, 0, 0;
 	--ion-color-lightSuccess-shade: #28bb50;
 	--ion-color-lightSuccess-tint: #42d96b;
+	--ion-color-success-light: #a8e6a3;
+	--ion-color-success-light-rgb: 168, 230, 163;
 
 	--ion-color-warning: #ffc409;
 	--ion-color-warning-rgb: 255, 196, 9;
@@ -377,3 +427,8 @@ body.dark {
 	--ion-color-shade: var(--ion-color-lightaccent-shade);
 	--ion-color-tint: var(--ion-color-lightaccent-tint);
 }
+
+.success-card {
+	--background: var(--ion-color-success-light);
+	--color: var(--ion-color-success-contrast);
+  }
