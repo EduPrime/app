@@ -555,25 +555,31 @@ model DisciplineGrade {
 }
 
 model StudentFeedback {
-  id              String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  studentId       String      @db.Uuid
-  enrollmentId    String      @unique(map: "unique_student_feedback_on_conflict") @db.Uuid
-  schoolId        String      @db.Uuid
-  updatedAt       DateTime?   @updatedAt @db.Timestamp(6)
-  updatedBy       String?     @db.Uuid
-  createdAt       DateTime    @default(now()) @db.Timestamp(6)
-  deletedAt       DateTime?   @db.Timestamp(6)
-  tenantId        String?
-  disciplineId    String?     @db.Uuid
-  finalFeedback   String?     @db.VarChar(800)
-  initialFeedback String      @db.VarChar(800)
-  partialFeedback String?     @db.VarChar(800)
-  teacherId       String      @db.Uuid
-  discipline      Discipline? @relation(fields: [disciplineId], references: [id], map: "pareceraluno_discipline_id_fkey")
-  enrollment      Enrollment  @relation(fields: [enrollmentId], references: [id], map: "pareceraluno_enrollment_id_fkey")
-  school          School      @relation(fields: [schoolId], references: [id], map: "pareceraluno_school_id_fkey")
-  student         Student     @relation(fields: [studentId], references: [id], map: "pareceraluno_student_id_fkey")
-  teacher         Teacher     @relation(fields: [teacherId], references: [id], map: "pareceraluno_teacher_id_fkey")
+  id               String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  studentId        String      @db.Uuid
+  enrollmentId     String      @unique(map: "unique_student_feedback_on_conflict") @db.Uuid
+  schoolId         String      @db.Uuid
+  updatedAt        DateTime?   @updatedAt @db.Timestamp(6)
+  updatedBy        String?     @db.Uuid
+  createdAt        DateTime    @default(now()) @db.Timestamp(6)
+  deletedAt        DateTime?   @db.Timestamp(6)
+  tenantId         String?
+  disciplineId     String?     @db.Uuid
+  finalFeedback    String?     @db.VarChar(800)
+  initialFeedback  String      @db.VarChar(800)
+  partialFeedback  String?     @db.VarChar(800)
+  teacherId        String      @db.Uuid
+  finalCreatedAt   DateTime?   @default(now()) @db.Timestamp(6)
+  finalUpdatedAt   DateTime?   @db.Timestamp(6)
+  initialCreatedAt DateTime    @default(now()) @db.Timestamp(6)
+  initialUpdatedAt DateTime?   @db.Timestamp(6)
+  partialCreatedAt DateTime?   @default(now()) @db.Timestamp(6)
+  partialUpdatedAt DateTime?   @db.Timestamp(6)
+  discipline       Discipline? @relation(fields: [disciplineId], references: [id], map: "pareceraluno_discipline_id_fkey")
+  enrollment       Enrollment  @relation(fields: [enrollmentId], references: [id], map: "pareceraluno_enrollment_id_fkey")
+  school           School      @relation(fields: [schoolId], references: [id], map: "pareceraluno_school_id_fkey")
+  student          Student     @relation(fields: [studentId], references: [id], map: "pareceraluno_student_id_fkey")
+  teacher          Teacher     @relation(fields: [teacherId], references: [id], map: "pareceraluno_teacher_id_fkey")
 
   @@map("studentFeedback")
   @@schema("public")
