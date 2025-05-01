@@ -8,6 +8,7 @@
     "nodejs": ">=18.18.0"
   },
   "scripts": {
+    "ionic:serve": "vite",
     "vite": "vite",
     "dev": "ionic serve --browser firefox",
     "build": "vue-tsc && vite build",
