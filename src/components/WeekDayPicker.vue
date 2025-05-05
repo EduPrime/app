@@ -2,14 +2,14 @@
 import type { Swiper as SwiperType } from 'swiper'
 import { hexToRgb } from '@/utils/hex-to-rgb'
 
-import { IonButton, IonButtons, IonChip, IonDatetime, IonIcon, IonModal, IonText } from '@ionic/vue'
+import { IonAlert, IonButton, IonButtons, IonChip, IonDatetime, IonIcon, IonModal, IonText } from '@ionic/vue'
 
-import { arrowBackOutline, arrowForwardOutline } from 'ionicons/icons'
+import { arrowBackOutline, arrowForwardOutline, time } from 'ionicons/icons'
 import { DateTime } from 'luxon'
 import moment, { type Moment } from 'moment'
 
 import { Swiper, SwiperSlide } from 'swiper/vue'
-import { computed, defineEmits, defineProps, ref, watch } from 'vue'
+import { computed, defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 import ScheduleService from '../services/ScheduleService'
 
 import 'swiper/css'
@@ -22,6 +22,8 @@ interface Props {
   currentClassroom: string
   currentDiscipline?: string
   frequency?: string
+  originPage?: string
+  hasUnsavedChangesToAlert?: boolean | false
 }
 
 const props = defineProps<Props>()
@@ -33,13 +35,17 @@ const validDays = ref()
 const pulseAtEnd = ref('')
 const currentWeekday = ref()
 
+// variáveis de controle para IonAlert de mudança não salvas
+const isAlertOpen = ref(false)
+const dateToAlert = ref< Moment | undefined>(moment())
+const weekToAlert = ref('')
+
 const getSwiper = ref()
 const currentDate = ref(moment())
-const monthYear = ref(new Date()
-  .toISOString())
+const monthYear = ref(new Date().toISOString())
 const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const weeksInMonth = ref<{ date: Moment, weekday: string }[][]>([])
-const selectedDate = ref< Moment | undefined>(moment())
+const selectedDate = ref<Moment | undefined>(moment())
 const events = ref([
   { date: '2024-06-01', type: 'holiday', title: 'Holiday' },
   { date: '2024-06-05', type: 'event', title: 'Event' },
@@ -70,6 +76,11 @@ const colorStyle = ref({
   tertiary: getComputedStyle(document.documentElement).getPropertyValue('--ion-color-tertiary').trim(),
 })
 
+onMounted(() => {
+  const parsed = Number.parseInt(currentDate.value.format('DD').toString())
+  getSwiper.value.slideTo(Math.ceil(parsed / 7) - 1)
+})
+
 async function getValidDaysInScheduleService() {
   try {
     if (props.teacherId && props.currentClassroom) {
@@ -91,6 +102,7 @@ async function getValidDaysInScheduleService() {
 // Função para atualizar o valor de mês e ano selecionado
 function updateDate(event: CustomEvent) {
   monthYearValue.value = event.detail.value
+  selectedDate.value = undefined
 }
 
 function loadVisibleMonth() {
@@ -237,6 +249,40 @@ function luxonFormatDate(dateString: string) {
   return date.setLocale('pt-BR').toFormat('MMMM yyyy')
 }
 
+// function preSelectDateUsingUpdateDate() {
+//   switch (props.hasUnsavedChangesToAlert) {
+//     case true:
+//       setAlertOpen(true)
+//       break
+//     case false:
+//       // Call updateDate with the appropriate event or data
+//       const event = { detail: { value: monthYearValue.value } } // Create a mock event
+//       updateDate(event as CustomEvent)
+//       break
+//   }
+// }
+
+function preSelectDate(d: Moment, w: string) {
+  switch (props.hasUnsavedChangesToAlert) {
+    case true:
+      setAlertOpen(true)
+      dateToAlert.value = d
+      weekToAlert.value = w
+      break
+    case false:
+      selectDate(d, w)
+      break
+  }
+}
+
+function setAlertOpen(open: boolean) {
+  isAlertOpen.value = open
+  if (open) {
+    isAlertOpen.value = false
+    setTimeout(() => (isAlertOpen.value = true), 10)
+  }
+}
+
 watch(monthYearValue, (newValue, oldValue) => {
   if (newValue.slice(0, 7) !== oldValue.slice(0, 7)) {
     const date = DateTime.fromISO(newValue)
@@ -295,9 +341,18 @@ watch(
     <ion-row>
       <ion-col size="12" size-xl="6">
         <ion-row>
-          <ion-col style="display: flex; padding-left: 10px;" class="ion-justify-content-start ion-align-items-center" size="7">
-            <IonChip id="open-custom-dialog" color="primary" class="ion-padding-horizontal ion-no-margin" shape="rounded">
-              <IonText style="height: 28px; display: flex; padding-bottom: 2px; font-size: medium; font-weight: medium;" class="ion-justify-content-center ion-align-items-center">
+          <ion-col
+            style="display: flex; padding-left: 10px;" class="ion-justify-content-start ion-align-items-center"
+            size="7"
+          >
+            <IonChip
+              id="open-custom-dialog" color="primary" class="ion-padding-horizontal ion-no-margin"
+              shape="rounded"
+            >
+              <IonText
+                style="height: 28px; display: flex; padding-bottom: 2px; font-size: medium; font-weight: medium;"
+                class="ion-justify-content-center ion-align-items-center"
+              >
                 {{ luxonFormatDate(monthYearValue) }}
               </IonText>
             </IonChip>
@@ -306,24 +361,30 @@ watch(
               <div class="wrapper">
                 <h1>Selecione o ano e mês</h1>
                 <IonDatetime
-                  v-model="monthYearValue"
-                  done-text="Confirmar" cancel-text="Cancelar"
-                  presentation="month-year"
-                  datetime="datetime"
-                  display-format="MMMM YYYY"
-                  :show-default-buttons="true"
+                  v-model="monthYearValue" done-text="Confirmar" cancel-text="Cancelar"
+                  presentation="month-year" datetime="datetime" display-format="MMMM YYYY" :show-default-buttons="true"
                   @ion-change="updateDate"
                 />
                 <!-- dismiss() -->
               </div>
             </IonModal>
           </ion-col>
-          <ion-col style="display: flex; padding-right: 5px;" class="ion-align-items-center ion-justify-content-end" size="5">
+          <ion-col
+            style="display: flex; padding-right: 5px;" class="ion-align-items-center ion-justify-content-end"
+            size="5"
+          >
             <IonButtons style="scale: 0.9;" class="ion-justify-content-end">
-              <IonButton color="primary" class="navigation-btn" :style="`background-color:  ${hexToRgb(colorStyle.primary, '0.1')};`" @click="prevMonth">
+              <IonButton
+                color="primary" class="navigation-btn"
+                :style="`background-color:  ${hexToRgb(colorStyle.primary, '0.1')};`" @click="prevMonth"
+              >
                 <IonIcon slot="icon-only" :icon="arrowBackOutline" />
               </IonButton>
-              <IonButton color="primary" class="navigation-btn" :class="pulseAtEnd" style="margin-left: 10px;" :style="`background-color:  ${hexToRgb(colorStyle.primary, pulseAtEnd ? '0.5' : '0.1')};`" @click="nextMonth">
+              <IonButton
+                color="primary" class="navigation-btn" :class="pulseAtEnd" style="margin-left: 10px;"
+                :style="`background-color:  ${hexToRgb(colorStyle.primary, pulseAtEnd ? '0.5' : '0.1')};`"
+                @click="nextMonth"
+              >
                 <IonIcon slot="icon-only" :icon="arrowForwardOutline" />
               </IonButton>
             </IonButtons>
@@ -333,9 +394,8 @@ watch(
              porem não registrava o dia que clicou ( estudar maneira de trocar o array do mês ao tentar scrollar para o lado )
               @touch-end="(swiper: any) => checkNextSlide(swiper)" -->
             <Swiper
-              :options="slideOpts" :slides-per-view="1" :space-between="8" @ion-slide-will-change="handleSlideChange"
-              @swiper="onSwiper"
-              @reach-end="() => pulse()"
+              :options="slideOpts" :slides-per-view="1" :space-between="8"
+              @ion-slide-will-change="handleSlideChange" @swiper="onSwiper" @reach-end="() => pulse()"
             >
               <SwiperSlide v-for="(week, index) in weeksInMonth" :key="index">
                 <div class="date-selector">
@@ -343,13 +403,18 @@ watch(
                     <!-- valor padrão de disabled :disabled="isDateDisabled(day.date)" shape="rounded" -->
                     <!-- :style="day.weekday !== 'SUN' ? '' : 'display: none;'" -->
                     <IonChip
-                      class="ion-no-padding"
-                      style="padding: 10px;"
-                      :disabled="(props?.frequency === 'disciplina' && !props.currentDiscipline) || (!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0)"
-                      :style="i === 0 ? 'margin-left: 10px;' : undefined"
-                      :color="getColorForDate(day.date)" @click="() => selectDate(day.date, day.weekday)"
+                      :id="`${props.originPage}-${day.date.format('MM-DD')}`" class="ion-no-padding"
+                      style="padding: 10px; margin: 0px"
+                      :disabled="(props?.frequency === 'disciplina' && !props.currentDiscipline) || (!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0)" :style="i === 0 ? 'margin-left: 10px;' : undefined"
+                      :color="getColorForDate(day.date)"
+                      @click="() => preSelectDate(day.date, day.weekday)"
                     >
                       <div>
+                        <IonIcon
+                          :style="{
+                            visibility: day.date.format('YYYY-MM-DD') === moment().format('YYYY-MM-DD') ? 'visible' : 'hidden',
+                          }" :icon="time"
+                        />
                         <div class="day-name">
                           {{ translateDay(day.weekday) }}
                         </div>
@@ -367,6 +432,40 @@ watch(
       </ion-col>
     </ion-row>
   </ion-grid>
+
+  <IonAlert
+    id="alertChangeDateWithoutSave"
+    class="custom-alert"
+    :is-open="isAlertOpen"
+    :on-did-dismiss="() => { setAlertOpen(false) }"
+    header="Alterações não salvas!"
+    sub-header="Ao trocar de dia no calendário, todas as alterações realizadas serão perdidas!"
+    message="Deseja continuar sem salvar?"
+    :buttons="[
+      {
+        text: 'Cancelar',
+        role: 'cancel',
+        cssClass: 'alert-button-cancel',
+        handler: () => {
+          console.log('Confirm Cancel');
+          setAlertOpen(false)
+        },
+      },
+      {
+        text: 'Confirmar',
+        cssClass: 'alert-button-confirm',
+        handler: () => {
+          console.log('Confirm Ok');
+          if (dateToAlert && weekToAlert) {
+            selectDate(dateToAlert, weekToAlert)
+          }
+          else {
+            console.error('dateToAlert or weekToAlert is undefined')
+          }
+        },
+      },
+    ]"
+  />
 </template>
 
 <style scoped>
@@ -374,44 +473,48 @@ watch(
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.3);
   }
+
   100% {
     transform: scale(1);
   }
 }
 
 .pulseButton {
-  animation: pulse 1s ease-in-out infinite; /* Tempo de 1 segundo e animação contínua */
+  animation: pulse 1s ease-in-out infinite;
+  /* Tempo de 1 segundo e animação contínua */
 }
+
 .date-selector {
-    display: flex;
-    justify-content: flex-start;
-    padding: 4px;
+  display: flex;
+  justify-content: flex-start;
+  padding: 4px;
 }
 
 .day-chip {
-    text-align: center;
-    flex-basis: 13%;
+  text-align: center;
+  flex-basis: 13%;
 }
 
 ion-chip {
-    border-radius: 45px;
+  border-radius: 45px;
 }
 
 .day-name {
   width: 24px;
-    margin-top: 20px;
-    font-size: 10px;
-    font-weight: lighter;
-    margin-bottom: 12px;
+  margin-top: 5px;
+  font-size: 10px;
+  font-weight: lighter;
+  margin-bottom: 12px;
 }
 
 .day-number {
-    font-size: 16px;
-    font-weight: 800;
-    margin-bottom: 20px;
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 20px;
 }
 
 .navigation-btn {
@@ -424,29 +527,29 @@ ion-chip {
 }
 
 ion-modal#month-year-modal {
-    --width: fit-content;
-    --min-width: 250px;
-    --height: fit-content;
-    --border-radius: 6px;
-    --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
-  }
+  --width: fit-content;
+  --min-width: 250px;
+  --height: fit-content;
+  --border-radius: 6px;
+  --box-shadow: 0 28px 48px rgba(0, 0, 0, 0.4);
+}
 
-  ion-modal#month-year-modal h1 {
-    margin: 20px 20px 10px 20px;
-  }
+ion-modal#month-year-modal h1 {
+  margin: 20px 20px 10px 20px;
+}
 
-  ion-modal#month-year-modal ion-icon {
-    margin-right: 6px;
+ion-modal#month-year-modal ion-icon {
+  margin-right: 6px;
 
-    width: 48px;
-    height: 48px;
+  width: 48px;
+  height: 48px;
 
-    padding: 4px 0;
+  padding: 4px 0;
 
-    color: #aaaaaa;
-  }
+  color: #aaaaaa;
+}
 
-  ion-modal#month-year-modal .wrapper {
-    margin-bottom: 10px;
-  }
+ion-modal#month-year-modal .wrapper {
+  margin-bottom: 10px;
+}
 </style>
