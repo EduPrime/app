@@ -27,7 +27,7 @@ interface Student {
   name: string
   age: number
   shift: string
-  selected?: boolean
+  selected: boolean
   code: string
   id: string
   studentId: string
@@ -52,7 +52,7 @@ const students = ref<Student[]>([])
 const series = ref<any[]>([])
 const searchQuery = ref('')
 const isFilterCollapse = ref(false)
-// const isComplete = ref(false)
+const isComplete = ref(false)
 
 const filter = ref({
   direction: 'asc',
@@ -78,7 +78,7 @@ const turnos = ref({
 watch(students, (novoValor, antigoValor) => {
   if (JSON.stringify(novoValor) !== JSON.stringify(antigoValor)) {
     students.value = [...novoValor]
-    console.log('alterou students')
+    // console.log('alterou students')
   }
 }, { deep: true })
 
@@ -92,12 +92,17 @@ const filteredStudents = computed(() => {
   )
 })
 
+// function changeSelected(student: Student) {
+//   ...filteredStudents, selected: !student.selected
+// }
+
 async function loadEnrollment() {
   try {
     const enrollments = await preEnrollmentService.getFilteredWithStudents(filter.value)
     students.value = enrollments.map(enrollment => ({
       pcd: enrollment.student?.disability ?? false,
       name: enrollment.student?.name ?? '',
+      selected: false,
       age: moment().diff(moment(enrollment.student?.birthdate), 'years') ?? 0,
       // age: dayjs().diff(dayjs(enrollment.student?.birthdate), 'year') ?? 0,
       shift: enrollment.preferShift,
@@ -110,7 +115,7 @@ async function loadEnrollment() {
       institutionId: enrollment.institutionId,
     }
     )).filter(student => student.shift === filter.value.shift)
-    console.log('load chamado!')
+    // console.log('load chamado!')
   }
 
   catch (error) {
@@ -123,11 +128,17 @@ function setFilterCollapse(open: boolean) {
   isFilterCollapse.value = open
 }
 
-const selectedStudents = computed(() => filteredStudents.value.filter(student => !!student.selected))
+// const selectedStudents = computed(() => { return filteredStudents.value.filter(student => !!student.selected) })
 
-function handleSelectAll($event: any) {
+// Computed para obter os estudantes selecionados
+const selectedStudents = computed(() => {
+  return filteredStudents.value.filter(student => !!student.selected)
+})
+
+function handleSelectAll(isTrue: boolean) {
+  isComplete.value = isTrue
   filteredStudents.value.forEach((element) => {
-    element.selected = $event?.detail?.checked ?? false
+    element.selected = isTrue
   })
 }
 
@@ -151,24 +162,17 @@ async function getSchool() {
 }
 
 async function getSeries() {
-  try {
-    const data = await preEnrollmentService.getSeries(filter.value)
-    series.value = data
-    filter.value.serie = data[0].id
-    await loadEnrollment()
-  }
-  catch {
-    students.value = []
-    series.value = []
-    filter.value.serie = undefined
-  }
+  const data = await preEnrollmentService.getSeries(filter.value)
+  series.value = data
+  filter.value.serie = data[0].id
+  await loadEnrollment()
 }
 
-const allSelected = computed(() => students.value.length === selectedStudents.value.length)
+const allSelected = computed(() => selectedStudents.value.length === filteredStudents.value.length)
 
 async function handleSelectClass() {
   if (filter.value.serie && filter.value.school) {
-    console.log('filter.serie and filter.school', filter.value.serie, filter.value.school)
+    // console.log('filter.serie and filter.school', filter.value.serie, filter.value.school)
     classes.value = await classroomService.getClasses(filter.value.serie, filter.value.school)
   }
   else {
@@ -185,7 +189,7 @@ function selectClass(classroom: any) {
 
 const classInfo = computed(() => {
   const [classroom] = classes.value.filter(room => room.id === selectedClass.value)
-  console.log(classroom)
+  // console.log(classroom)
   return classroom
 })
 
@@ -241,7 +245,7 @@ async function lastStepEnrollment() {
   }
 
   await loadEnrollment()
-  console.log('fim da matrícula')
+  // console.log('fim da matrícula')
 }
 </script>
 
@@ -337,7 +341,24 @@ async function lastStepEnrollment() {
         </IonRow>
         <IonRow class="checkbox-row">
           <IonCol size="10">
-            <ion-checkbox v-if="filteredStudents.length > 0" :checked="allSelected" @ion-change="handleSelectAll" />
+            <IonButton
+              v-if="filteredStudents.length > 0" fill="clear" class="checkbox-button"
+              @click="handleSelectAll(!isComplete)"
+            >
+              <svg v-if="!allSelected" width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                <rect
+                  x="0.5" y="0.5" width="9" height="9" rx="0.5" fill="none" stroke="var(--ion-color-primary)"
+                  stroke-width="1"
+                />
+              </svg>
+              <!-- SVG de checkbox (marcado) -->
+              <svg v-if="allSelected" width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                <rect
+                  x="0.5" y="0.5" width="9" height="9" rx="0.5" fill="var(--ion-color-tertiary)"
+                  stroke="var(--ion-color-primary)" stroke-width="1"
+                />
+              </svg>
+            </IonButton>
           </IonCol>
           <IonCol size="auto">
             <IonRow>
@@ -358,11 +379,29 @@ async function lastStepEnrollment() {
             v-for="(student, index) in filteredStudents" :key="index"
             :color="student.selected ? 'lightaccent' : ''" :class="{ selected: student.selected }"
           >
-            <ion-checkbox
-              slot="start" v-model="student.selected" :checked="student.selected"
-              @ion-change="($event: any) => student.selected = $event.detail.checked"
-            />
-            <ion-label>
+            <IonButton
+              slot="start" fill="clear" class="checkbox-button"
+              @click.stop="student.selected = !student.selected"
+            >
+              <!-- Checkbox não marcado -->
+              <svg
+                v-if="!student.selected" width="10" height="10" viewBox="0 0 10 10"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  x="0.5" y="0.5" width="9" height="9" rx="0.5" fill="none" stroke="var(--ion-color-primary)"
+                  stroke-width="1"
+                />
+              </svg>
+
+              <!-- Checkbox marcado -->
+              <svg v-else width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">
+                <rect
+                  x="0.5" y="0.5" width="9" height="9" rx="0.5" fill="var(--ion-color-tertiary)"
+                  stroke="var(--ion-color-primary)" stroke-width="1"
+                />
+              </svg>
+            </IonButton> <ion-label>
               <div class="title">
                 {{ student.name }}
               </div>
@@ -376,7 +415,6 @@ async function lastStepEnrollment() {
           </IonItem>
         </ion-list>
       </ion-card>
-
       <template #footer>
         <IonRow class="" style="padding-top: 0px; padding-bottom: 0px;">
           <IonCol>
@@ -635,5 +673,30 @@ ion-searchbar.md.custom-search {
   display: flex;
   justify-content: flex-end;
   margin: 0%;
+}
+
+.checkbox-button {
+  --padding-start: 0;
+  --padding-end: 0;
+  --border-radius: 0;
+  --margin-top: 0px !important;
+  --margin-bottom: 0px !important;
+  /* Remove o arredondamento para deixar quadrado */
+  --background: transparent;
+  --box-shadow: none;
+  border: 0px solid var(--ion-color-primary);
+  /* Borda de 1px com a cor primária do Ionic */
+  width: 10px;
+  height: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkbox-button ion-icon,
+.checkbox-button svg {
+  display: block;
+  width: 10px;
+  height: 10px;
 }
 </style>
