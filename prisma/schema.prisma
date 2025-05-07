@@ -990,6 +990,7 @@ model Servers {
   tenantId           String?
   userCreated        String?             @db.VarChar(255)
   userId             String?             @db.Uuid
+  functionId         String?             @db.Uuid
   institutionId      String              @db.Uuid
   codServidor        Int
   contract           contractType?       @default(INDETERMINADO)
@@ -997,6 +998,7 @@ model Servers {
   server_allocations ServerAllocations[]
   institution        Institution         @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "server_institution_fkey")
   User               User?               @relation(fields: [userId], references: [id])
+  ServerFunction     ServerFunction?     @relation(fields: [functionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_server_function")
 
   @@map("servers")
   @@schema("public")
@@ -1122,6 +1124,23 @@ model EvaluationRule {
   course               Course    @relation(fields: [courseId], references: [id], map: "rule_course_fkey")
 
   @@map("evaluationRule")
+  @@schema("public")
+}
+
+model ServerFunction {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name         String    @db.VarChar(100)
+  abbreviation String    @db.VarChar(10)
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime? @db.Timestamp(6)
+  updatedAt    DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy    String?   @db.Uuid
+  tenantId     String?
+  userCreated  String?   @db.VarChar(255)
+
+  Servers Servers[] @relation(map: "fk_server_function")
+
+  @@map("serverFunction")
   @@schema("public")
 }
 
