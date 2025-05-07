@@ -3,23 +3,27 @@ import type { Tables } from '@/types/database.types'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import SchoolList from '@/modules/school-management/components/SchoolList.vue'
-import { add } from 'ionicons/icons'
+
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import SearchBox from '../components/SearchBox.vue'
 import SchoolService from '../services/SchoolService'
 
-const router = useRouter()
+// const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
 const schoolService = new SchoolService()
 const dataList = ref<Tables<'school'>[]>([])
-const schoolData = ref<Array<{ school: Tables<'school'>, courses: Tables<'course'>[], series: Tables<'series'>[] }> | []>([])
+// const schoolData = ref<Array<{ school: Tables<'school'>, courses: Tables<'course'>[], series: Tables<'series'>[] }> | []>([])
 const schoolCount = ref(0)
 const classCount = ref(0)
 const approvalRate = ref(0)
 const teacherCount = ref(0)
 const searchQuery = ref('')
 
+//
+const newItem = ref()
+const searchResult = ref()
+//
 const filteredDataList = computed(() => {
   if (!searchQuery.value) {
     return dataList.value
@@ -40,9 +44,9 @@ async function loadSchools() {
   }
 }
 
-function navigateToRegister() {
-  router.push({ name: 'RegisterSchool' })
-}
+// function navigateToRegister() {
+//   router.push({ name: 'RegisterSchool' })
+// }
 
 onMounted(() => {
   loadSchools()
@@ -57,22 +61,15 @@ onMounted(() => {
       :class-count="classCount"
       :approval-rate="approvalRate"
     />
+    <!--  -->
+    <!--  -->
+
     <ion-toolbar>
       <ion-title>Escolas ativas ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
-    <ion-row class="ion-align-items-center ion-justify-content-between">
-      <ion-col size="10">
-        <ion-searchbar v-model="searchQuery" placeholder="Buscar escola" />
-      </ion-col>
-      <ion-col size="2" class="ion-text-end">
-        <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
-          <ion-icon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
-          <ion-icon slot="start" :icon="add" class="ion-hide-sm-down" />
-          <span class="ion-hide-sm-down">Novo</span>
-        </ion-button>
-      </ion-col>
-    </ion-row>
-    <SchoolList :data-list="filteredDataList" />
+    <SearchBox table="school" placeholder="Nome da escola" @update:search-result="searchResult = $event" @update:new-item="newItem = $event" />
+
+    <SchoolList :data-list="searchResult" />
   </ContentLayout>
 </template>
 
