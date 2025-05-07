@@ -23,7 +23,7 @@ const routes = [
       icon: school,
       name: 'Escolas',
       order: 1,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
   {
@@ -37,7 +37,7 @@ const routes = [
       icon: create,
       name: 'Editar escola',
       order: 2,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
   {
@@ -49,7 +49,7 @@ const routes = [
       icon: create,
       name: 'Registrar escola',
       order: 3,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
   {
@@ -62,7 +62,7 @@ const routes = [
       icon: people,
       name: 'Turmas',
       order: 4,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
   {
@@ -74,7 +74,7 @@ const routes = [
       icon: create,
       name: 'Registrar turma',
       order: 5,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
   {
@@ -86,7 +86,7 @@ const routes = [
       icon: create,
       name: 'Editar turma',
       order: 6,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
   {
@@ -99,7 +99,7 @@ const routes = [
       icon: list,
       name: 'Séries',
       order: 7,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
   {
@@ -111,7 +111,7 @@ const routes = [
       icon: create,
       name: 'Editar série',
       order: 8,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
   {
@@ -123,7 +123,7 @@ const routes = [
       icon: create,
       name: 'Registrar série',
       order: 9,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
   {
@@ -136,7 +136,7 @@ const routes = [
       icon: book,
       name: 'Cursos',
       order: 10,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
   {
@@ -148,7 +148,7 @@ const routes = [
       icon: create,
       name: 'Editar curso',
       order: 11,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
   {
@@ -160,7 +160,7 @@ const routes = [
       icon: create,
       name: 'Registrar curso',
       order: 12,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
 ]
