@@ -8,10 +8,7 @@ import SchoolService from '../services/SchoolService'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import SchoolList from '@/modules/school-management/components/SchoolList.vue'
-
-import { computed, onMounted, ref } from 'vue'
-import SearchBox from '../components/SearchBox.vue'
-import SchoolService from '../services/SchoolService'
+import RegisterSchool from './RegisterSchool.vue'
 
 // const router = useRouter()
 
@@ -87,7 +84,7 @@ onMounted(() => {
         <ion-searchbar v-model="searchQuery" placeholder="Buscar escola" />
       </ion-col>
       <ion-col size="2" class="ion-text-end">
-        <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
+        <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="setModalAddSchool(true)">
           <ion-icon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
           <ion-icon slot="start" :icon="add" class="ion-hide-sm-down" />
           <span class="ion-hide-sm-down">Novo</span>
@@ -95,6 +92,18 @@ onMounted(() => {
       </ion-col>
     </ion-row>
     <SchoolList :data-list="filteredDataList" />
+
+    <IonModal
+      :is-open="isModalAddSchool"
+      :expand-to-scroll="false"
+      :initial-breakpoint="0.95"
+      :breakpoints="[0, 0.7, 0.95, 1]"
+      @ion-modal-did-dismiss="setModalAddSchool(false)"
+    >
+      <IonContent>
+        <RegisterSchool />
+      </IonContent>
+  </IonModal>
   </ContentLayout>
 </template>
 
