@@ -99,32 +99,76 @@ model Classroom {
   @@schema("public")
 }
 
+enum timeSerial {
+  Anual
+  Creche
+
+  @@schema("public")
+}
+
+enum graduate {
+  Fundamental
+  Medio       @map("Médio")
+  Superior
+  Infantil
+
+  @@schema("public")
+}
+
+enum teachingType {
+  Regular
+  Creche
+
+  @@schema("public")
+}
+
+enum regimeType {
+  Presencial
+  Semipresencial
+  EAD
+
+  @@schema("public")
+}
+
+enum courseModality {
+  ensino_regular     @map("Ensino Regular")
+  especial           @map("Ensino Especial")
+  EJA
+  profissionalizante @map("Ensino Profissionalizante")
+
+  @@schema("public")
+}
+
 model Course {
-  id             String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name           String           @db.VarChar(100)
-  status         status?          @default(ACTIVE)
-  metadata       Json?
-  createdAt      DateTime?        @default(now()) @db.Timestamp(6)
-  deletedAt      DateTime?        @db.Timestamp(6)
-  updatedAt      DateTime?        @updatedAt @db.Timestamp(6)
-  userCreated    String?          @db.VarChar(255)
-  updatedBy      String?          @db.Uuid
-  tenantId       String?
-  courseStage    Int
-  graduate       String?
-  workload       Decimal?         @db.Decimal
-  teachingType   String
-  regimeType     String?
-  courseModality String
-  institutionId  String           @db.Uuid
-  schoolId       String?          @db.Uuid
-  institution    Institution      @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_institutionId_fkey")
-  School         School?          @relation(fields: [schoolId], references: [id])
-  CourseSchool   CourseSchool[]
-  enrollment     Enrollment[]
-  EvaluationRule EvaluationRule[]
-  preenrollment  PreEnrollment[]
-  series         Series[]
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String           @db.VarChar(100)
+  abbreviation      String?          @db.VarChar(10)
+  description       String?          @db.VarChar(255)
+  numberOfStages    Int?
+  status            status?          @default(ACTIVE)
+  metadata          Json?
+  createdAt         DateTime?        @default(now()) @db.Timestamp(6)
+  deletedAt         DateTime?        @db.Timestamp(6)
+  updatedAt         DateTime?        @updatedAt @db.Timestamp(6)
+  userCreated       String?          @db.VarChar(255)
+  updatedBy         String?          @db.Uuid
+  tenantId          String?
+  timeSerialization timeSerial?
+  courseStage       Int?
+  graduate          graduate?
+  workload          Decimal?         @db.Decimal
+  teachingType      teachingType?
+  regimeType        regimeType?
+  courseModality    courseModality?
+  institutionId     String           @db.Uuid
+  schoolId          String?          @db.Uuid
+  institution       Institution      @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_institutionId_fkey")
+  School            School?          @relation(fields: [schoolId], references: [id])
+  CourseSchool      CourseSchool[]
+  enrollment        Enrollment[]
+  EvaluationRule    EvaluationRule[]
+  preenrollment     PreEnrollment[]
+  series            Series[]
 
   @@map("course")
   @@schema("public")
