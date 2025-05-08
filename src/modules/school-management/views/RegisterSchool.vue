@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { apps, schoolSharp } from 'ionicons/icons'
-import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonInput, IonSelect, IonSelectOption, IonSegment, IonSegmentView ,IonSegmentContent, IonSegmentButton, IonIcon } from '@ionic/vue'
+import { IonButton, IonAccordionGroup, IonInput, IonSelect, IonSelectOption, IonSegment, IonSegmentView ,IonSegmentContent, IonSegmentButton, IonIcon, IonAccordion, IonItem, IonLabel, IonContent } from '@ionic/vue'
 import SchoolForm from '../../school-management/components/SchoolForm.vue'
 import type { SchoolSettings, School } from '@prisma/client'
 import { Form, Field, ErrorMessage } from "vee-validate";
@@ -138,9 +138,11 @@ const formValues = ref({
   // Add other fields as needed...
 });
 
-function handleSubmit(values: typeof formValues.value) {
+import type { SubmissionHandler } from "vee-validate";
+
+const handleSubmit: SubmissionHandler<typeof formValues.value> = (values) => {
   console.log("Form submitted:", values);
-}
+};
 
 function handleCancel() {
   router.push({ name: 'InstitutionListInstitutions' })
@@ -152,7 +154,7 @@ function handleSave() {
 </script>
 
 <template>
-  <Form @submit="handleSubmit">
+  <Form @submit="handleSubmit as SubmissionHandler">
     <ion-segment mode="ios" :scrollable="false"
       style="margin: 20px 0 0 0; padding: 3px 0 3px 0; font-size: 10px;" :style="{}" >
       <ion-segment-button value="general" content-id="general">
@@ -170,17 +172,6 @@ function handleSave() {
 
     <ion-segment-view>
       <ion-segment-content id="general">
-    <!-- <IonCard> -->
-      <!-- <IonCardHeader
-        id="accordionContentHeader" class="ion-no-padding" style="padding: 8px;"
-        :translucent="true"
-      >
-        <div style="display: flex; align-items: center; height: 15px;">
-          <IonIcon :icon="schoolSharp" style="margin-right: 10px;" />
-          Unidades Temáticas
-        </div>
-      </IonCardHeader> -->
-      <!-- <IonCardContent> -->
         <Field name="inepCode" rules="required" v-slot="{ field, errors }">
           <IonInput v-bind="field" label="Código INEP" label-placement="stacked" fill="outline" placeholder="Digite o código INEP" />
           <span class="error-message">{{ errors[0] }}</span>
@@ -245,62 +236,199 @@ function handleSave() {
 
       <ion-segment-content id="complementary">
 
-        <Field name="inepCode" rules="required" v-slot="{ field, errors }">
-          <IonInput v-bind="field" label="Código INEP" label-placement="stacked" fill="outline" placeholder="Digite o código INEP" />
-          <span class="error-message">{{ errors[0] }}</span>
-        </Field>
+        <IonAccordionGroup>
 
-        <Field name="schoolName" rules="required" v-slot="{ field, errors }">
-          <IonInput v-bind="field" label="Nome da Escola" label-placement="stacked" fill="outline" placeholder="Digite o nome da escola" />
-          <span class="error-message">{{ errors[0] }}</span>
-        </Field>
+          <IonAccordion value="infrastructure">
+            <IonItem slot="header" color="light">
+              <IonLabel>Infraestrutura</IonLabel>
+            </IonItem>
+            <div class="ion-padding" slot="content">
+              <Field name="operatingLocation" rules="required" v-slot="{ field, errors }">
+                <IonSelect v-bind="field" label="Local de Funcionamento" label-placement="stacked" fill="outline" placeholder="Selecione o local de funcionamento">
+                  <IonSelectOption value="Próprio">Próprio</IonSelectOption>
+                  <IonSelectOption value="Alugado">Alugado</IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
 
-        <Field name="corporateName" rules="required" v-slot="{ field, errors }">
-          <IonInput v-bind="field" label="Razão Social" label-placement="stacked" fill="outline" placeholder="Digite a razão social" />
-          <span class="error-message">{{ errors[0] }}</span>
-        </Field>
+              <Field name="buildingUsage" rules="required" v-slot="{ field, errors }">
+                <IonSelect v-bind="field" label="Forma de Ocupação do Prédio" label-placement="stacked" fill="outline" placeholder="Selecione a forma de ocupação">
+                  <IonSelectOption value="Exclusivo">Exclusivo</IonSelectOption>
+                  <IonSelectOption value="Compartilhado">Compartilhado</IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
 
-        <Field name="cnpj" rules="required|cnpj" v-slot="{ field, errors }">
-          <IonInput v-bind="field" label="CNPJ" label-placement="stacked" fill="outline" placeholder="Digite o CNPJ" />
-          <span class="error-message">{{ errors[0] }}</span>
-        </Field>
+              <Field name="sharedSchool" rules="required" v-slot="{ field, errors }">
+                <IonSelect v-bind="field" label="Escola Compartilhada?" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
+                  <IonSelectOption value="Sim">Sim</IonSelectOption>
+                  <IonSelectOption value="Não">Não</IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
 
-        <Field name="educationNetwork" rules="required" v-slot="{ field, errors }">
-          <IonSelect v-bind="field" label="Rede de Ensino" label-placement="stacked" fill="outline" placeholder="Selecione a rede de ensino">
-            <IonSelectOption value="Pública">Pública</IonSelectOption>
-            <IonSelectOption value="Privada">Privada</IonSelectOption>
-          </IonSelect>
-          <span class="error-message">{{ errors[0] }}</span>
-        </Field>
+              <Field name="sharedSchoolINEPCode" v-slot="{ field, errors }">
+                <IonInput v-bind="field" label="Código INEP da escola compartilhada" label-placement="stacked" fill="outline" placeholder="Digite o código INEP" />
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
 
-        <Field name="phone1" rules="required" v-slot="{ field, errors }">
-          <IonInput v-bind="field" label="Telefone 1" label-placement="stacked" fill="outline" placeholder="Digite o telefone 1" />
-          <span class="error-message">{{ errors[0] }}</span>
-        </Field>
+              <Field name="potableWaterAvailable" rules="required" v-slot="{ field, errors }">
+                <IonSelect v-bind="field" label="Água potável disponível" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
+                  <IonSelectOption value="Sim">Sim</IonSelectOption>
+                  <IonSelectOption value="Não">Não</IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
 
-        <Field name="email" rules="email" v-slot="{ field, errors }">
-          <IonInput v-bind="field" label="E-mail" label-placement="stacked" fill="outline" placeholder="Digite o e-mail" />
-          <span class="error-message">{{ errors[0] }}</span>
-        </Field>
+              <Field name="electricityAvailable" rules="required" v-slot="{ field, errors }">
+                <IonSelect v-bind="field" label="Fonte de energia elétrica" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
+                  <IonSelectOption value="Sim">Sim</IonSelectOption>
+                  <IonSelectOption value="Não">Não</IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
 
-        <Field name="postalCode" rules="required|postalCode" v-slot="{ field, errors }">
-          <IonInput v-bind="field" label="CEP" label-placement="stacked" fill="outline" placeholder="Digite o CEP" />
-          <span class="error-message">{{ errors[0] }}</span>
-        </Field>
+              <Field name="sewageAvailable" rules="required" v-slot="{ field, errors }">
+                <IonSelect v-bind="field" label="Esgotamento sanitário adequado" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
+                  <IonSelectOption value="Sim">Sim</IonSelectOption>
+                  <IonSelectOption value="Não">Não</IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
 
-        <Field name="address" rules="required" v-slot="{ field, errors }">
-          <IonInput v-bind="field" label="Endereço" label-placement="stacked" fill="outline" placeholder="Digite o endereço" />
-          <span class="error-message">{{ errors[0] }}</span>
-        </Field>
+              <Field name="wasteDisposal" rules="required" v-slot="{ field, errors }">
+                <IonSelect v-bind="field" label="Destinação do lixo" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
+                  <IonSelectOption value="Coleta Regular">Coleta Regular</IonSelectOption>
+                  <IonSelectOption value="Reciclagem">Reciclagem</IonSelectOption>
+                  <IonSelectOption value="Outro">Outro</IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
 
-        <Field name="operatingLocation" rules="required" v-slot="{ field, errors }">
-          <IonSelect v-bind="field" label="Local de Funcionamento" label-placement="stacked" fill="outline" placeholder="Selecione o local de funcionamento">
-            <IonSelectOption value="Própria">Própria</IonSelectOption>
-            <IonSelectOption value="Alugada">Alugada</IonSelectOption>
-          </IonSelect>
-          <span class="error-message">{{ errors[0] }}</span>
-        </Field>
+              <Field name="wasteTreatmentBySchool" rules="required" v-slot="{ field, errors }">
+                <IonSelect v-bind="field" label="Tratamento de resíduos realizado pela escola" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
+                  <IonSelectOption value="Sim">Sim</IonSelectOption>
+                  <IonSelectOption value="Não">Não</IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
+
+              <Field name="foodServiceAvailable" rules="required" v-slot="{ field, errors }">
+                <IonSelect v-bind="field" label="Oferece alimentação escolar aos alunos?" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
+                  <IonSelectOption value="Sim">Sim</IonSelectOption>
+                  <IonSelectOption value="Não">Não</IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
+
+              <Field name="communitySharedSpaces" rules="required" v-slot="{ field, errors }">
+                <IonSelect v-bind="field" label="Compartilha espaços com a comunidade?" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
+                  <IonSelectOption value="Sim">Sim</IonSelectOption>
+                  <IonSelectOption value="Não">Não</IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
+
+              <Field name="usesSurroundingSpaces" rules="required" v-slot="{ field, errors }">
+                <IonSelect v-bind="field" label="Utiliza equipamentos do entorno escolar para atividades educacionais?" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
+                  <IonSelectOption value="Sim">Sim</IonSelectOption>
+                  <IonSelectOption value="Não">Não</IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
+            </div>
+            </IonAccordion>
+
+            <IonAccordion value="facilities">
+              <IonItem slot="header" color="light">
+                <IonLabel>Dependências</IonLabel>
+              </IonItem>
+              <div class="ion-padding" slot="content">
+                <Field name="inepCode" rules="required" v-slot="{ field, errors }">
+                  <IonInput v-bind="field" label="Código INEP" label-placement="stacked" fill="outline" placeholder="Digite o código INEP" />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+
+                <Field name="schoolName" rules="required" v-slot="{ field, errors }">
+                  <IonInput v-bind="field" label="Nome da Escola" label-placement="stacked" fill="outline" placeholder="Digite o nome da escola" />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+
+                <Field name="corporateName" rules="required" v-slot="{ field, errors }">
+                  <IonInput v-bind="field" label="Razão Social" label-placement="stacked" fill="outline" placeholder="Digite a razão social" />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+
+                <Field name="cnpj" rules="required|cnpj" v-slot="{ field, errors }">
+                  <IonInput v-bind="field" label="CNPJ" label-placement="stacked" fill="outline" placeholder="Digite o CNPJ" />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+
+                <Field name="educationNetwork" rules="required" v-slot="{ field, errors }">
+                  <IonSelect v-bind="field" label="Rede de Ensino" label-placement="stacked" fill="outline" placeholder="Selecione a rede de ensino">
+                    <IonSelectOption value="Pública">Pública</IonSelectOption>
+                    <IonSelectOption value="Privada">Privada</IonSelectOption>
+                  </IonSelect>
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+
+                <Field name="phone1" rules="required" v-slot="{ field, errors }">
+                  <IonInput v-bind="field" label="Telefone 1" label-placement="stacked" fill="outline" placeholder="Digite o telefone 1" />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+
+                <Field name="email" rules="email" v-slot="{ field, errors }">
+                  <IonInput v-bind="field" label="E-mail" label-placement="stacked" fill="outline" placeholder="Digite o e-mail" />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+
+                <Field name="postalCode" rules="required|postalCode" v-slot="{ field, errors }">
+                  <IonInput v-bind="field" label="CEP" label-placement="stacked" fill="outline" placeholder="Digite o CEP" />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+
+                <Field name="address" rules="required" v-slot="{ field, errors }">
+                  <IonInput v-bind="field" label="Endereço" label-placement="stacked" fill="outline" placeholder="Digite o endereço" />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+
+                <Field name="operatingLocation" rules="required" v-slot="{ field, errors }">
+                  <IonSelect v-bind="field" label="Local de Funcionamento" label-placement="stacked" fill="outline" placeholder="Selecione o local de funcionamento">
+                    <IonSelectOption value="Própria">Própria</IonSelectOption>
+                    <IonSelectOption value="Alugada">Alugada</IonSelectOption>
+                  </IonSelect>
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+              </div>
+            </IonAccordion>
+
+            <IonAccordion value="equipments">
+              <IonItem slot="header" color="light">
+                <IonLabel>Equipamentos</IonLabel>
+              </IonItem>
+            </IonAccordion>
+            <div class="ion-padding" slot="content">
+            </div>
+
+            <IonAccordion value="humanResources">
+              <IonItem slot="header" color="light">
+                <IonLabel>Recursos Humanos</IonLabel>
+              </IonItem>
+            </IonAccordion>
+            <div class="ion-padding" slot="content">
+            </div>
+
+            <IonAccordion value="teachingAndPedagogicalPractices">
+              <IonItem slot="header" color="light">
+                <IonLabel>Ensino e Práticas Pedagógicas</IonLabel>
+              </IonItem>
+            </IonAccordion>
+            <div class="ion-padding" slot="content">
+            </div>
+
+          </IonAccordionGroup>
         
+
       </ion-segment-content>
     </ion-segment-view>
 
@@ -326,7 +454,9 @@ ion-segment-content#general ion-input, ion-select {
   color: var(--ion-color-secondary);
 }
 
-ion-segment-content#complementary ion-input {
+ion-segment-content#complementary ion-input, ion-select {
   margin: 10px 0px 12px 0px;
+  color: var(--ion-color-secondary);
 }
+
 </style>
