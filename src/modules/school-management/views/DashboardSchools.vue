@@ -68,15 +68,25 @@ onMounted(() => {
       <ion-title>Escolas ativas ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
 
-    <IonRow class="ion-align-items-center ion-justify-content-between">
+    <IonRow class="ion-align-items-center ion-justify-content-between ">
       <IonCol size="11" size-md="10">
-        <SearchBox table="school" placeholder="Nome da escola" :filter-area="['name', 'city', 'address']" filter-type="text" @update:search-result="searchResult = $event" @update:new-item="newItem = $event" />
+        <SearchBox
+          table="school"
+          placeholder="Nome da escola"
+          :search-areas="['name', 'city', 'address']"
+          :filter-areas="[{ table: 'student', placeholder: 'Selecione o estudante' }]"
+          filter-type="list"
+          @update:search-result="searchResult = $event"
+          @update:new-item="newItem = $event"
+        />
       </IonCol>
       <IonCol size="1" size-md="2" class="ion-text-end">
         <!-- @TODO: Posicionar o botão de adicionar aqui -->
       </IonCol>
     </IonRow>
-
+    <!-- <pre>
+      {{ searchResult?.at(0) }}
+    </pre> -->
     <SchoolList :data-list="searchResult" />
   </ContentLayout>
 </template>
