@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import { IonButton, IonContent, IonIcon, IonModal } from '@ionic/vue'
 import type { Tables } from '@/types/database.types'
+import { add } from 'ionicons/icons'
+import { useRouter } from 'vue-router'
+import { computed, onMounted, ref } from 'vue'
+import SchoolService from '../services/SchoolService'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import SchoolList from '@/modules/school-management/components/SchoolList.vue'
@@ -19,11 +24,19 @@ const classCount = ref(0)
 const approvalRate = ref(0)
 const teacherCount = ref(0)
 const searchQuery = ref('')
+const isModalAddSchool = ref(false)
 
-//
+function setModalAddSchool(open: boolean) {
+  isModalAddSchool.value = open
+  if (open) {
+    isModalAddSchool.value = false
+    setTimeout(() => (isModalAddSchool.value = true), 10)
+  }
+}
+
 const newItem = ref()
 const searchResult = ref()
-//
+
 const filteredDataList = computed(() => {
   if (!searchQuery.value) {
     return dataList.value
@@ -68,8 +81,20 @@ onMounted(() => {
       <ion-title>Escolas ativas ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
     <SearchBox table="school" placeholder="Nome da escola" @update:search-result="searchResult = $event" @update:new-item="newItem = $event" />
-
-    <SchoolList :data-list="searchResult" />
+    
+    <ion-row class="ion-align-items-center ion-justify-content-between">
+      <ion-col size="10">
+        <ion-searchbar v-model="searchQuery" placeholder="Buscar escola" />
+      </ion-col>
+      <ion-col size="2" class="ion-text-end">
+        <ion-button id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
+          <ion-icon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
+          <ion-icon slot="start" :icon="add" class="ion-hide-sm-down" />
+          <span class="ion-hide-sm-down">Novo</span>
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <SchoolList :data-list="filteredDataList" />
   </ContentLayout>
 </template>
 
@@ -81,5 +106,14 @@ ion-label h2 {
 
 ion-searchbar {
   --background: var(--ion-color-light);
+}
+
+ion-segment {
+  --background: rgba(var(--ion-color-tertiary-rgb), 0.15);
+  --color: var(--ion-color-secondary);
+}
+
+.custom-button {
+  max-width: 120px;
 }
 </style>

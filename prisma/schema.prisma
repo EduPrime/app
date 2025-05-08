@@ -565,9 +565,9 @@ model StudentFeedback {
   deletedAt        DateTime?   @db.Timestamp(6)
   tenantId         String?
   disciplineId     String?     @db.Uuid
-  finalFeedback    String?     @db.VarChar(800)
-  initialFeedback  String      @db.VarChar(800)
-  partialFeedback  String?     @db.VarChar(800)
+  finalFeedback    String?     @db.VarChar(1000)
+  initialFeedback  String      @db.VarChar(1000)
+  partialFeedback  String?     @db.VarChar(1000)
   teacherId        String      @db.Uuid
   finalCreatedAt   DateTime?   @default(now()) @db.Timestamp(6)
   finalUpdatedAt   DateTime?   @db.Timestamp(6)
@@ -774,69 +774,127 @@ model ContentBncc {
 }
 
 model School {
-  id                       String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  idpes                    Int?
-  name                     String                 @db.VarChar(100)
-  cnpj                     Decimal?               @db.Decimal(14, 0)
-  address                  String?                @db.VarChar(255)
-  city                     String?                @db.VarChar(100)
-  state                    String?                @db.Char(2)
-  postalCode               String?                @db.Char(10)
-  phone                    String?                @db.VarChar(15)
-  institutionId            String                 @db.Uuid
-  active                   Boolean?               @default(true)
-  abbreviation             String?                @db.VarChar(255)
-  longitude                String?                @db.VarChar(255)
-  latitude                 String?                @db.VarChar(255)
-  totalArea                String?                @db.VarChar(255)
-  builtArea                String?                @db.VarChar(255)
-  availableArea            String?                @db.VarChar(255)
-  acronym                  String?                @db.VarChar(255)
-  blockDiaryEntries        Boolean?
-  operationalStatus        Int?
-  administrativeDependency Int?
-  regulation               Int?
-  logoUrl                  String?                @db.VarChar(255)
-  access                   Int?
-  managerid                String?                @db.Uuid
-  managerPosition          String?                @db.VarChar(255)
-  operationLocation        String?                @db.VarChar(255)
-  condition                Int?
-  sharedSchooLinePCode     Int?
-  creationDecree           String?                @db.VarChar(255)
-  numberOfFloors           Int?
-  floorType                Int?
-  energyMeter              Int?
-  hasExternalArea          Boolean?
-  metadata                 Json?
-  createdAt                DateTime?              @default(now()) @db.Timestamp(6)
-  deletedAt                DateTime?              @db.Timestamp(6)
-  updatedAt                DateTime?              @updatedAt @db.Timestamp(6)
-  updatedBy                String?                @db.Uuid
-  tenantId                 String?
-  userCreated              String?                @db.VarChar(255)
-  Attendance               Attendance[]
-  classroom                Classroom[]
-  ConceptualGrade          ConceptualGrade[]
-  course                   Course[]
-  CourseSchool             CourseSchool[]
-  DisciplineAttendance     DisciplineAttendance[]
-  DisciplineGrade          DisciplineGrade[]
-  enrollment               Enrollment[]
-  GeneralAttendance        GeneralAttendance[]
-  GeneralGrade             GeneralGrade[]
-  NumericGrade             NumericGrade[]
-  preenrollment            PreEnrollment[]
-  Schedule                 Schedule[]
-  institution              Institution            @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_institutionid_fkey")
-  schoolSettings           SchoolSettings[]
-  series                   Series[]
-  serverAllocations        ServerAllocations[]
-  student                  Student[]
-  StudentAttendance        StudentAttendance[]
-  StudentFeedback          StudentFeedback[]
-  teacher                  Teacher[]
-  TeacherAttendance        TeacherAttendance[]
+  id                           String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  idpes                        Int?
+  INEPCode                     String?                @db.VarChar(100)
+  corporateName                String?                @db.VarChar(100)
+  acronym                      String?                @db.VarChar(100)
+  blockJournalEntries          Boolean?
+  operationalStatus            Boolean?
+  usesAlternativeRules         Boolean?
+  educationNetwork             Boolean?
+  administrativeDependency     Organ?
+  name                         String                 @db.VarChar(100)
+  cnpj                         Decimal?               @db.Decimal(14, 0)
+  address                      String?                @db.VarChar(255)
+  addressNumber                String?                @db.VarChar(10)
+  additionalInfo               String?                @db.VarChar(255)
+  neighborhood                 String?                @db.VarChar(100)
+  city                         String?                @db.VarChar(100)
+  state                        String?                @db.Char(2)
+  postalCode                   String?                @db.Char(10)
+  unusualLocation              Boolean?
+  phone                        String?                @db.VarChar(15)
+  phone2                       String?                @db.VarChar(15)
+  email                        String?                @db.VarChar(255)
+  website                      String?                @db.VarChar(255)
+  operatingLocation            Location?
+  buildingUsage                Usage?
+  sharedSchool                 Boolean?
+  sharedSchoolINEPCode         String?                @db.VarChar(100)
+  potableWaterAvailable        Boolean?
+  sewageAvailable              Boolean?
+  electricityAvailable         Boolean?
+  wasteDisposal                Disposal?
+  wasteTreatmentBySchool       Boolean?
+  foodServiceAvailable         Boolean?
+  communitySharedSpaces        Boolean?
+  usesSurroundingSpaces        Boolean?
+  specificFacilities           Boolean?
+  generalUseRooms              Room[]
+  labsAndFunctionalAreas       Lab[]
+  supportFacilities            Facility[]
+  insideClassroooms            Int?
+  outsideClassrooms            Int?
+  refrigeratedClassrooms       Int?
+  accessibleClassrooms         Int?
+  internetAvailable            Boolean?
+  localNetworkAvailable        Boolean?
+  connectionTypes              ConnectionType?
+  devicesUsedByStudents        Device[]
+  availabeDesktops             Int?
+  availableLaptops             Int?
+  availableTablets             Int?
+  teachingEquipments           TeachingEquipment[]
+  administrativeStaffNumber    Int?
+  teachingStaffNumber          Int?
+  generalServicesStaffNumber   Int?
+  securityStaffNumber          Int?
+  schoolManagementStaffNumber  Int?
+  healthcareStaffNumber        Int?
+  socialAssistanceStaffNumber  Int?
+  specializedAssistance        Boolean?
+  elementaryEducationModel     CycleType?
+  pedagogicalMaterials         Material[]
+  collegiateBodies             CollegiateBody[]
+  studentSelectionCriteria     Criteria[]
+  wasPedagogicalProjectUpdated Boolean?
+  indigenousEducationAvailable Boolean?
+  indigenousEducationLanguages Language[]
+  linkedWithSuperiorEducation  Boolean?
+  headSchoolCode               String?                @db.VarChar(100)
+  IESCode                      String?                @db.VarChar(100)
+  institutionId                String                 @db.Uuid
+  active                       Boolean?               @default(true)
+  abbreviation                 String?                @db.VarChar(255)
+  longitude                    String?                @db.VarChar(255)
+  latitude                     String?                @db.VarChar(255)
+  totalArea                    String?                @db.VarChar(255)
+  builtArea                    String?                @db.VarChar(255)
+  availableArea                String?                @db.VarChar(255)
+  blockDiaryEntries            Boolean?
+  regulation                   Int?
+  logoUrl                      String?                @db.VarChar(255)
+  access                       Int?
+  managerid                    String?                @db.Uuid
+  managerPosition              String?                @db.VarChar(255)
+  operationLocation            String?                @db.VarChar(255)
+  condition                    Int?
+  sharedSchooLinePCode         Int?
+  creationDecree               String?                @db.VarChar(255)
+  numberOfFloors               Int?
+  floorType                    Int?
+  energyMeter                  Int?
+  hasExternalArea              Boolean?
+  metadata                     Json?
+  createdAt                    DateTime?              @default(now()) @db.Timestamp(6)
+  deletedAt                    DateTime?              @db.Timestamp(6)
+  updatedAt                    DateTime?              @updatedAt @db.Timestamp(6)
+  updatedBy                    String?                @db.Uuid
+  tenantId                     String?
+  userCreated                  String?                @db.VarChar(255)
+  Attendance                   Attendance[]
+  classroom                    Classroom[]
+  ConceptualGrade              ConceptualGrade[]
+  course                       Course[]
+  CourseSchool                 CourseSchool[]
+  DisciplineAttendance         DisciplineAttendance[]
+  DisciplineGrade              DisciplineGrade[]
+  enrollment                   Enrollment[]
+  GeneralAttendance            GeneralAttendance[]
+  GeneralGrade                 GeneralGrade[]
+  NumericGrade                 NumericGrade[]
+  preenrollment                PreEnrollment[]
+  Schedule                     Schedule[]
+  institution                  Institution            @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "school_institutionid_fkey")
+  schoolSettings               SchoolSettings[]
+  series                       Series[]
+  serverAllocations            ServerAllocations[]
+  student                      Student[]
+  StudentAttendance            StudentAttendance[]
+  StudentFeedback              StudentFeedback[]
+  teacher                      Teacher[]
+  TeacherAttendance            TeacherAttendance[]
 
   @@map("school")
   @@schema("public")
@@ -1174,22 +1232,22 @@ enum contractType {
 }
 
 enum disabilityType {
-  TRANSTORNO_DO_ESPECTRO_AUTISTA
-  TRANSTORNO_DESINTEGRATIVO_DA_INFANCIA_PSICOSE_INFANTIL
-  TDAH
-  SINDROME_DE_RETT
-  SINDROME_DE_ASPERGER
-  SURDOCEGUEIRA
-  SURDEZ
-  DEFICIENCIA_MULTIPLA
-  DEFICIENCIA_MENTAL
-  DEFICIENCIA_INTELECTUAL
-  DEFICIENCIA_FISICA
-  DEFICIENCIA_AUDITIVA
-  CEGUEIRA
-  BAIXA_VISAO
-  AUTISMO_CLASSICO
-  ALTAS_HABILIDADES_SUPERDOTACAO
+  TRANSTORNO_DO_ESPECTRO_AUTISTA                         @map("Transtorno do Espectro Autista")
+  TRANSTORNO_DESINTEGRATIVO_DA_INFANCIA_PSICOSE_INFANTIL @map("Transtorno desintegrativo da infância - psicose infantil")
+  TDAH                                                   @map("TDAH")
+  SINDROME_DE_RETT                                       @map("Síndrome de Rett")
+  SINDROME_DE_ASPERGER                                   @map("Síndrome de Asperger")
+  SURDOCEGUEIRA                                          @map("Surdocegueira")
+  SURDEZ                                                 @map("Surdez")
+  DEFICIENCIA_MULTIPLA                                   @map("Deficiência múltipla")
+  DEFICIENCIA_MENTAL                                     @map("Deficiência mental")
+  DEFICIENCIA_INTELECTUAL                                @map("Deficiência intelectual")
+  DEFICIENCIA_FISICA                                     @map("Deficiência física")
+  DEFICIENCIA_AUDITIVA                                   @map("Deficiência auditiva")
+  CEGUEIRA                                               @map("Cegueira")
+  BAIXA_VISAO                                            @map("Baixa visão")
+  AUTISMO_CLASSICO                                       @map("Autismo clássico")
+  ALTAS_HABILIDADES_SUPERDOTACAO                         @map("Altas habilidades/superdotação")
 
   @@schema("public")
 }
@@ -1197,6 +1255,145 @@ enum disabilityType {
 enum attendanceType {
   DISCIPLINA
   DIARIA
+
+  @@schema("public")
+}
+
+enum Organ {
+  MUNICIPAL @map("Municipal")
+  STATE     @map("Estadual")
+  FEDERAL   @map("Federal")
+  PRIVATE   @map("Privada")
+
+  @@schema("public")
+}
+
+enum Location {
+  OWNED  @map("Própria")
+  RENTED @map("Alugada")
+
+  @@schema("public")
+}
+
+enum Usage {
+  EXCLUSIVE @map("Exclusiva")
+  SHARED    @map("Compartilhada")
+
+  @@schema("public")
+}
+
+enum Disposal {
+  INCINERATION @map("Incineração")
+  LANDFILL     @map("Aterro")
+  COMPOSTING   @map("Compostagem")
+  RECYCLING    @map("Reciclagem")
+  OTHER        @map("Outro")
+
+  @@schema("public")
+}
+
+enum Lab {
+  COMPUTER_SCIENCE @map("Informática")
+  SCIENCE          @map("Ciências")
+  MULTIMEDIA       @map("Multimídia")
+
+  @@schema("public")
+}
+
+enum Room {
+  CLASSROOM     @map("Sala de aula")
+  AUDITORIUM    @map("Auditório")
+  COMMON_PLACES @map("Espaços comuns")
+
+  @@schema("public")
+}
+
+enum Facility {
+  RESTROOMS      @map("Banheiros")
+  ACCESSIBILITY  @map("Acessibilidade")
+  EXTERNAL_AREAS @map("Áreas externas")
+
+  @@schema("public")
+}
+
+enum Device {
+  COMPUTER   @map("Computador")
+  TABLET     @map("Tablet")
+  SMARTPHONE @map("Smartphone")
+
+  @@schema("public")
+}
+
+enum ConnectionType {
+  OPTIC_FIBER @map("Fibra ótica")
+  BROAD_BAND  @map("Banda larga")
+  SATELLITE   @map("Satélite")
+  OTHER       @map("Outro")
+
+  @@schema("public")
+}
+
+enum TeachingEquipment {
+  PROJECTOR          @map("Projetor")
+  DVD_BLU_RAY        @map("DVD/Blu-ray")
+  MULTIMEDIA_TV      @map("TV multimídia")
+  DIGITAL_WHITEBOARD @map("Lousa digital")
+  SOUND_SYSTEM       @map("Sistema de som")
+
+  @@schema("public")
+}
+
+enum CycleType {
+  CYCLE @map("Ciclo")
+  GRADE @map("Série")
+
+  @@schema("public")
+}
+
+enum Material {
+  MULTIMEDIA_ARCHIVE               @map("Arquivo multimídia")
+  TOYS                             @map("Brinquedos")
+  EDUCATIONAL_GAMES                @map("Jogos educativos")
+  SCIENTIFICAL_MATERIALS           @map("Materiais científicos")
+  AUDIO_EQUIPMENT                  @map("Equipamentos de áudio")
+  MUSICAL_INSTRUMENTS              @map("Instrumentos musicais")
+  ARTISTIC_MATERIALS               @map("Materiais culturais/artísticos")
+  PROFESSIONAL_EDUCATION_MATERIALS @map("Materiais de educação profissional")
+  SPORT_MATERIALS                  @map("Materiais esportivos")
+  INDIGENOUS_MATERIALS             @map("Materiais educacionais indígenas")
+  ETHNIC_MATERIALS                 @map("Materiais étnicos")
+  RURAL_MATERIALS                  @map("Materiais educacionais do campo")
+  NONE_OF_THE_ABOVE                @map("Nenhum dos anteriores")
+
+  @@schema("public")
+}
+
+enum CollegiateBody {
+  ASSOCIACAO_DE_PAIS           @map("Associação de Pais")
+  ASSOCIACAO_DE_PAIS_E_MESTRES @map("Associação de Pais e Mestres")
+  GREMIO_ESTUDANTIL            @map("Grêmio Estudantil")
+  CONSELHO_ESCOLAR             @map("Conselho Escolar")
+  NAO_HA_ORGAOS_COLEGIADOS     @map("Não há órgãos colegiados")
+
+  @@schema("public")
+}
+
+enum Criteria {
+  ANALISE_CURRICULAR @map("Análise curricular")
+  EXAME_DE_SELECAO   @map("Exame de seleção")
+  COTAS              @map("Cotas")
+
+  @@schema("public")
+}
+
+enum Language {
+  PORTUGUES      @map("Português")
+  TIKUNA         @map("Ticuna")
+  GUARANI_KAIOWA @map("Guarani Kaiowá")
+  KAINGANG       @map("Kaingang")
+  XAVANTE        @map("Xavante")
+  YANOMAMI       @map("Yanomami")
+  OUTRO          @map("Outro")
 
   @@schema("public")
 }
