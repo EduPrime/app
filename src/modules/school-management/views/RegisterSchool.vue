@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { MaskitoElement } from '@maskito/core'
 import type { School, SchoolSettings } from '@prisma/client'
-import type { defineRule, ErrorMessage, Field, Form, SubmissionHandler } from 'vee-validate'
+import type { SubmissionHandler } from 'vee-validate'
 import type SchoolForm from '../../school-management/components/SchoolForm.vue'
 import { IonAccordion, IonAccordionGroup, IonButton, IonContent, IonIcon, IonInput, IonItem, IonLabel, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonSelect, IonSelectOption } from '@ionic/vue'
 import { maskito as vMaskito } from '@maskito/vue'
 import { apps, schoolSharp } from 'ionicons/icons'
+// eslint-disable-next-line no-duplicate-imports
+import { defineRule, Field, Form } from 'vee-validate'
 
 import { ref } from 'vue'
 
