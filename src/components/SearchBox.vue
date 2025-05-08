@@ -7,6 +7,8 @@ import { onMounted, ref, watch } from 'vue'
 interface Props {
   table: string
   placeholder: string
+  filterArea?: string[]
+  filterType: string
 }
 
 const props = defineProps<Props>()
@@ -18,7 +20,7 @@ const baseService = new BaseService(props.table)
 const searchQuery = ref('')
 
 async function searchByQuery(query: string) {
-  const result = await baseService.searchByQuery(props.table, query)
+  const result = await baseService.searchByQuery(props.table, query, props.filterArea)
 
   emits('update:searchResult', result)
   return result

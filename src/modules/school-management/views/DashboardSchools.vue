@@ -70,7 +70,7 @@ onMounted(() => {
 
     <IonRow class="ion-align-items-center ion-justify-content-between">
       <IonCol size="11" size-md="10">
-        <SearchBox table="school" placeholder="Nome da escola" @update:search-result="searchResult = $event" @update:new-item="newItem = $event" />
+        <SearchBox table="school" placeholder="Nome da escola" :filter-area="['name', 'city', 'address']" filter-type="text" @update:search-result="searchResult = $event" @update:new-item="newItem = $event" />
       </IonCol>
       <IonCol size="1" size-md="2" class="ion-text-end">
         <!-- @TODO: Posicionar o botão de adicionar aqui -->

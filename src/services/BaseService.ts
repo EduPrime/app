@@ -58,14 +58,15 @@ export default class BaseService<T> {
     return data
   }
 
-  async searchByQuery(table: string, query: string) {
-    if (!query)
+  async searchByQuery(table: string, query: string, filterAreas: string[] = ['name']) {
+    if (!query || !filterAreas.length)
       return []
 
+    const filterString = filterAreas.map(area => `${area}.ilike.%${query}%`).join(',')
     const { data, error } = await this.client
       .from(table)
       .select('*')
-      .ilike('name', `%${query}%`)
+      .or(filterString)
 
     if (error)
       errorHandler(error, `Failed to find ${query} from ${table}`)
