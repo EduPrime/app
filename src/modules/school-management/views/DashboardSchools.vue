@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { Tables } from '@/types/database.types'
+import SearchBox from '@/components/SearchBox.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import SchoolList from '@/modules/school-management/components/SchoolList.vue'
-
+import { IonCol, IonRow } from '@ionic/vue'
 import { computed, onMounted, ref } from 'vue'
-import SearchBox from '../components/SearchBox.vue'
 import SchoolService from '../services/SchoolService'
 
 // const router = useRouter()
@@ -67,11 +67,15 @@ onMounted(() => {
     <ion-toolbar>
       <ion-title>Escolas ativas ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
-    <SearchBox table="school" placeholder="Nome da escola" @update:search-result="searchResult = $event" @update:new-item="newItem = $event">
-      <template #buttons>
+
+    <IonRow class="ion-align-items-center ion-justify-content-between">
+      <IonCol size="11" size-md="10">
+        <SearchBox table="school" placeholder="Nome da escola" @update:search-result="searchResult = $event" @update:new-item="newItem = $event" />
+      </IonCol>
+      <IonCol size="1" size-md="2" class="ion-text-end">
         <!-- @TODO: Posicionar o botão de adicionar aqui -->
-      </template>
-    </SearchBox>
+      </IonCol>
+    </IonRow>
 
     <SchoolList :data-list="searchResult" />
   </ContentLayout>

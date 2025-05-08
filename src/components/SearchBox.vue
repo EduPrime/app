@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import BaseService from '@/services/BaseService'
-import { IonCol, IonRow, IonSearchbar } from '@ionic/vue'
+import { IonSearchbar } from '@ionic/vue'
 
 import { onMounted, ref, watch } from 'vue'
 
@@ -39,19 +39,17 @@ onMounted(async () => {
 </script>
 
 <template>
-  <IonRow class="ion-align-items-center ion-justify-content-between">
-    <IonCol size="11" size-md="10">
-      <IonSearchbar v-model="searchQuery" :placeholder="`${props.placeholder}`" />
-    </IonCol>
-    <IonCol size="1" size-md="2" class="ion-text-end">
-      <slot name="buttons" />
-    </IonCol>
-  </IonRow>
+  <IonSearchbar id="eduprime-search-bar" v-model="searchQuery" :placeholder="`${props.placeholder}`" />
 </template>
 
 <style scoped>
-.search-bar {
-  --background: var(--ion-color-primary);
-  --color: var(--ion-color-primary-contrast);
+ #eduprime-search-bar {
+  --background: white;
+  --color: var(--ion-color-primary);
+  --icon-color: var(--ion-color-primary);
+  --placeholder-color: var(--ion-color-primary);
+  --clear-button-color: var(--ion-color-primary);
+  --border-radius: 4px;
+  padding: 0 16px;
 }
 </style>
