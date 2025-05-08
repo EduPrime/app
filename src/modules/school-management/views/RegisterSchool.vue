@@ -154,7 +154,7 @@ function handleSave() {
 <template>
   <Form @submit="handleSubmit">
     <ion-segment mode="ios" :scrollable="false"
-    style="margin: 20px 0 0 0; padding: 3px 0 3px 0; font-size: 10px;" :style="{}" >
+      style="margin: 20px 0 0 0; padding: 3px 0 3px 0; font-size: 10px;" :style="{}" >
       <ion-segment-button value="general" content-id="general">
         <ion-label>Dados Gerais</ion-label>
       </ion-segment-button>
@@ -163,14 +163,14 @@ function handleSave() {
       </ion-segment-button>
     </ion-segment>
 
-    <div class="ion-margin style-purple-lane" style="display: flex; align-items: center; height: 15px;">
+    <div class="ion-margin style-purple-lane" style="display: flex; align-items: center;">
       <IonIcon :icon="schoolSharp" style="margin-right: 10px;" />
       Nova escola
     </div>
 
     <ion-segment-view>
       <ion-segment-content id="general">
-    <IonCard>
+    <!-- <IonCard> -->
       <!-- <IonCardHeader
         id="accordionContentHeader" class="ion-no-padding" style="padding: 8px;"
         :translucent="true"
@@ -180,7 +180,7 @@ function handleSave() {
           Unidades Temáticas
         </div>
       </IonCardHeader> -->
-      <IonCardContent>
+      <!-- <IonCardContent> -->
         <Field name="inepCode" rules="required" v-slot="{ field, errors }">
           <IonInput v-bind="field" label="Código INEP" label-placement="stacked" fill="outline" placeholder="Digite o código INEP" />
           <span class="error-message">{{ errors[0] }}</span>
@@ -238,18 +238,13 @@ function handleSave() {
         </Field>
 
         <!-- Add other fields similarly -->
-      </IonCardContent>
-    </IonCard>
+      <!-- </IonCardContent>
+    </IonCard> -->
 
       </ion-segment-content>
 
       <ion-segment-content id="complementary">
-        
-    <IonCard>
-      <!-- <IonCardHeader>
-        <IonCardTitle>Dados Complementares</IonCardTitle>
-      </IonCardHeader> -->
-      <IonCardContent>
+
         <Field name="inepCode" rules="required" v-slot="{ field, errors }">
           <IonInput v-bind="field" label="Código INEP" label-placement="stacked" fill="outline" placeholder="Digite o código INEP" />
           <span class="error-message">{{ errors[0] }}</span>
@@ -305,10 +300,7 @@ function handleSave() {
           </IonSelect>
           <span class="error-message">{{ errors[0] }}</span>
         </Field>
-
-        <!-- Add other fields similarly -->
-      </IonCardContent>
-    </IonCard>
+        
       </ion-segment-content>
     </ion-segment-view>
 
@@ -325,7 +317,16 @@ function handleSave() {
 .style-purple-lane {
   background: rgba(var(--ion-color-secondary-rgb), 0.15);
   color: var(--ion-color-secondary);
-  padding: 10px 2px 10px 2px;
-  margin: 10px 10px 10px 10px;
+  padding: 2px 2px 2px 2px;
+  margin: 8px 2px 8px 2px;
+}
+
+ion-segment-content#general ion-input, ion-select {
+  margin: 10px 0px 12px 0px;
+  color: var(--ion-color-secondary);
+}
+
+ion-segment-content#complementary ion-input {
+  margin: 10px 0px 12px 0px;
 }
 </style>
