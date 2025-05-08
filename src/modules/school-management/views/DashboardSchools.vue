@@ -67,7 +67,11 @@ onMounted(() => {
     <ion-toolbar>
       <ion-title>Escolas ativas ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
-    <SearchBox table="school" placeholder="Nome da escola" @update:search-result="searchResult = $event" @update:new-item="newItem = $event" />
+    <SearchBox table="school" placeholder="Nome da escola" @update:search-result="searchResult = $event" @update:new-item="newItem = $event">
+      <template #buttons>
+        <!-- @TODO: Posicionar o botão de adicionar aqui -->
+      </template>
+    </SearchBox>
 
     <SchoolList :data-list="searchResult" />
   </ContentLayout>
