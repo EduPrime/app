@@ -68,13 +68,15 @@ model Classroom {
   startTimeInterval                                                 DateTime?           @db.Timestamp(6)
   endTimeInterval                                                   DateTime?           @db.Timestamp(6)
   endTime                                                           DateTime?           @db.Timestamp(6)
-  dayofweek                                                         dayofweek?
+  dayofweek                                                         dayofweek[]
+  room                                                              String?             @db.VarChar(100)
+  regimeType                                                        regimeType?         @default(Presencial)
   name                                                              String              @db.VarChar(100)
   period                                                            period?             @default(MORNING)
   status                                                            status?             @default(ACTIVE)
   abbreviation                                                      String?             @db.VarChar(100)
   year                                                              Int
-  metadata                                                          Json?
+  isMultiSerialized                                                 Boolean?            @default(false)
   userCreated                                                       String?             @db.VarChar(255)
   createdAt                                                         DateTime?           @default(now()) @db.Timestamp(6)
   deletedAt                                                         DateTime?           @db.Timestamp(6)
@@ -1201,6 +1203,7 @@ enum period {
   MORNING
   AFTERNOON
   EVENING
+  INTEGRAL
 
   @@schema("public")
 }
