@@ -69,24 +69,18 @@ onMounted(() => {
     </ion-toolbar>
 
     <IonRow class="ion-align-items-center ion-justify-content-between ">
-      <IonCol size="11" size-md="10">
+      <IonCol size="12">
         <SearchBox
           table="school"
           placeholder="Nome da escola"
           :search-areas="['name', 'city', 'address']"
-          :filter-areas="[{ table: 'student', placeholder: 'Selecione o estudante' }]"
+          :filter-areas="[{ table: 'institution', relationship: 'institutionId', placeholder: 'Instituição' }]"
           filter-type="list"
           @update:search-result="searchResult = $event"
           @update:new-item="newItem = $event"
         />
       </IonCol>
-      <IonCol size="1" size-md="2" class="ion-text-end">
-        <!-- @TODO: Posicionar o botão de adicionar aqui -->
-      </IonCol>
     </IonRow>
-    <!-- <pre>
-      {{ searchResult?.at(0) }}
-    </pre> -->
     <SchoolList :data-list="searchResult" />
   </ContentLayout>
 </template>
