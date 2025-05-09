@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { Tables } from '@/types/database.types'
-import SearchBox from '@/components/SearchBox.vue'
+import SearchBox from '@/components/SearchBox.vue' // componente de busca personalidado
 import ContentLayout from '@/components/theme/ContentLayout.vue'
+// lista de registros
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import SchoolList from '@/modules/school-management/components/SchoolList.vue'
 import { IonCol, IonRow } from '@ionic/vue'
 import { computed, onMounted, ref } from 'vue'
-import SchoolService from '../services/SchoolService'
 
+import SchoolService from '../services/SchoolService'
 // const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
@@ -68,13 +69,21 @@ onMounted(() => {
       <ion-title>Escolas ativas ({{ filteredDataList.length }})</ion-title>
     </ion-toolbar>
 
-    <IonRow class="ion-align-items-center ion-justify-content-between">
-      <IonCol size="11" size-md="10">
-        <SearchBox table="school" placeholder="Nome da escola" @update:search-result="searchResult = $event" @update:new-item="newItem = $event" />
+    <IonRow class="ion-align-items-center ion-justify-content-between ">
+      <IonCol size="12">
+        <SearchBox
+          table="school"
+          placeholder="Nome da escola"
+          :search-areas="['name', 'city', 'address']"
+          :filter-areas="[{ table: 'institution', relationship: 'institutionId', placeholder: 'Instituição' }]"
+          filter-type="list"
+          @update:search-result="searchResult = $event"
+          @update:new-item="newItem = $event"
+        />
       </IonCol>
-      <IonCol size="1" size-md="2" class="ion-text-end">
-        <!-- @TODO: Posicionar o botão de adicionar aqui -->
-      </IonCol>
+      <!-- <IonCol size="12">
+        <EduprimeLister />
+      </IonCol> -->
     </IonRow>
 
     <SchoolList :data-list="searchResult" />

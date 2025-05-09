@@ -58,17 +58,48 @@ export default class BaseService<T> {
     return data
   }
 
-  async searchByQuery(table: string, query: string) {
-    if (!query)
+  async searchByQuery(table: string, query: string, searchAreas: string[] = ['name']) {
+    if (!query || !searchAreas.length)
       return []
 
+    const searchAreaString = searchAreas.map(area => `${area}.ilike.%${query}%`).join(',')
     const { data, error } = await this.client
       .from(table)
       .select('*')
-      .ilike('name', `%${query}%`)
+      .or(searchAreaString)
 
     if (error)
       errorHandler(error, `Failed to find ${query} from ${table}`)
+    return data
+  }
+
+  async searchFilterByQuery(
+    table: string,
+    query: string,
+    searchAreas: string[] = ['name'],
+    filterAreas: { relationship: string, value: string }[],
+  ) {
+    if (!query || !searchAreas.length || !filterAreas.length)
+      return []
+    const searchAreaString = searchAreas
+      .map(area => `${area}.ilike.%${query}%`)
+      .join(',')
+
+    let queryBuilder = this.client
+      .from(table)
+      .select('*')
+      .or(searchAreaString)
+
+    // Aplicando múltiplos filtros individualmente dentro da consulta
+    filterAreas.forEach((item) => {
+      queryBuilder = queryBuilder.filter(item.relationship, 'eq', item.value)
+    })
+
+    const { data, error } = await queryBuilder
+
+    if (error)
+      errorHandler(error, `Failed to find ${query} from ${table}`)
+
     return data
   }
 
