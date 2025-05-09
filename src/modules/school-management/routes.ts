@@ -1,6 +1,7 @@
-import { book, create, list, people, school } from 'ionicons/icons'
+import { book, create, list, people, person, school } from 'ionicons/icons'
 import DashboardClass from './views/DashboardClass.vue'
 import DashboardCourse from './views/DashboardCourse.vue'
+import DashboardFunction from './views/DashboardFunction.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
 import DashboardSeries from './views/DashboardSeries.vue'
 import EditClass from './views/EditClass.vue'
@@ -9,6 +10,7 @@ import EditSchools from './views/EditSchools.vue'
 import EditSeries from './views/EditSeries.vue'
 import RegisterClass from './views/RegisterClass.vue'
 import RegisterCourse from './views/RegisterCourse.vue'
+import RegisterFunction from './views/RegisterFunction.vue'
 import RegisterSchool from './views/RegisterSchool.vue'
 import RegisterSeries from './views/RegisterSeries.vue'
 
@@ -160,6 +162,31 @@ const routes = [
       icon: create,
       name: 'Registrar curso',
       order: 12,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/Function/list',
+    name: 'FunctionListFunction',
+    component: DashboardFunction,
+    meta: {
+      moduleName: 'Schools',
+      moduleIcon: school,
+      icon: person,
+      name: 'Funções de servidor',
+      order: 13,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/Function/register',
+    name: 'RegisterFunction',
+    component: RegisterFunction,
+    meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Registrar função',
+      order: 14,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },

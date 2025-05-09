@@ -58,6 +58,20 @@ export default class BaseService<T> {
     return data
   }
 
+  async searchByQuery(table: string, query: string) {
+    if (!query)
+      return []
+
+    const { data, error } = await this.client
+      .from(table)
+      .select('*')
+      .ilike('name', `%${query}%`)
+
+    if (error)
+      errorHandler(error, `Failed to find ${query} from ${table}`)
+    return data
+  }
+
   async getAll(
     orderBy?: string,
     ascending = true,
