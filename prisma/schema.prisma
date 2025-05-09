@@ -774,18 +774,21 @@ model ContentBncc {
 }
 
 model School {
-  id                           String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  idpes                        Int?
-  INEPCode                     String?                @db.VarChar(100)
-  corporateName                String?                @db.VarChar(100)
-  acronym                      String?                @db.VarChar(100)
-  blockJournalEntries          Boolean?
+  id                  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  idpes               Int?
+  INEPCode            String?  @db.VarChar(100)
+  name                String   @db.VarChar(100)
+  corporateName       String?  @db.VarChar(100)
+  cnpj                Decimal? @db.Decimal(14, 0)
+  educationNetwork    Boolean?
+  phone               String?  @db.VarChar(15)
+  phone2              String?  @db.VarChar(15)
+  acronym             String?  @db.VarChar(100)
+  blockJournalEntries Boolean?
+
   operationalStatus            Boolean?
   usesAlternativeRules         Boolean?
-  educationNetwork             Boolean?
   administrativeDependency     Organ?
-  name                         String                 @db.VarChar(100)
-  cnpj                         Decimal?               @db.Decimal(14, 0)
   address                      String?                @db.VarChar(255)
   addressNumber                String?                @db.VarChar(10)
   additionalInfo               String?                @db.VarChar(255)
@@ -794,8 +797,6 @@ model School {
   state                        String?                @db.Char(2)
   postalCode                   String?                @db.Char(10)
   unusualLocation              Boolean?
-  phone                        String?                @db.VarChar(15)
-  phone2                       String?                @db.VarChar(15)
   email                        String?                @db.VarChar(255)
   website                      String?                @db.VarChar(255)
   operatingLocation            Location?
