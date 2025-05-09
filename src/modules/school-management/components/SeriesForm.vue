@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import type { Tables } from '@/types/database.types'
+import type { Decimal } from '@prisma/client/runtime/library'
 import EpInput from '@/components/EpInput.vue'
 import showToast from '@/utils/toast-alert'
-import { IonLabel, IonSegment, IonSegmentButton, IonSelect, IonSelectOption } from '@ionic/vue'
-import { useForm } from 'vee-validate'
+import { IonIcon, IonInput, IonLabel, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonSelect, IonSelectOption } from '@ionic/vue'
+import { listSharp } from 'ionicons/icons'
+import { Field, Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
@@ -11,8 +12,6 @@ import InstitutionService from '../../institution/services/InstitutionService'
 import SchoolService from '../../institution/services/SchoolService'
 import SeriesService from '../../institution/services/SeriesService'
 import CourseService from '../services/CourseService'
-import { Decimal } from '@prisma/client/runtime/library'
-
 
 defineEmits<{
   (e: 'cancel'): void
@@ -257,60 +256,113 @@ onMounted(async () => {
 </script>
 
 <template>
-  <IonSegment v-model="selectedSegment">
-    <IonSegmentButton value="general-info">
-      <IonLabel style="font-size: calc(1rem - 2px);">
-        Informações Gerais
-      </IonLabel>
-    </IonSegmentButton>
-  </IonSegment>
+  <Form>
+    <div class="ion-margin style-purple-lane" style="display: flex; align-items: center;">
+      <IonIcon :icon="listSharp" style="margin-right: 10px;" />
+      Nova série
+    </div>
+    <IonSegment
+      v-model="selectedSegment" mode="ios" :scrollable="false"
+      style="margin: 20px 0 0 0; padding: 3px 0 3px 0; font-size: 10px;" :style="{}"
+    >
+      <IonSegmentButton value="general" content-id="general">
+        <IonLabel>
+          Informações Cadastrais
+        </IonLabel>
+      </IonSegmentButton>
+      <IonSegmentButton value="rules" content-id="rules">
+        <IonLabel>Regras de avaliação</IonLabel>
+      </IonSegmentButton>
+    </IonSegment>
 
-  <div v-show="selectedSegment === 'general-info'">
-    <ion-list id="institutionList">
-      <IonSelect v-model="institutionId" :disabled="true" fill="outline" cancel-text="Cancelar"
-        label-placement="floating" justify="space-between" label="Instituição*" placeholder="Selecione" @ion-change="(e) => {
-          setFieldValue('institutionId', e.detail.value)
-        }">
-        <IonSelectOption v-for="institution in institutionList" :key="institution.id" :value="institution.id">
-          {{ institution.name }}
-        </IonSelectOption>
-      </IonSelect>
-    </ion-list>
+    <IonSegmentView>
+      <IonSegmentContent id="general">
+        <Field name="serieName">
+          <IonInput v-model="values.name" name="name" label="Nome*" label-placement="stacked" fill="outline" placeholder="Digite o nome da série" />
+        </Field>
 
-    <ion-list id="courseList">
-      <IonSelect v-model="courseId" fill="outline" cancel-text="Cancelar" label-placement="floating"
-        justify="space-between" label="Curso*" placeholder="Selecione" @ion-change="(e) => {
-          setFieldValue('courseId', e.detail.value)
-        }">
-        <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
-          {{ course.name }}
-        </IonSelectOption>
-      </IonSelect>
-    </ion-list>
+        <Field name="institutionList">
+          <IonSelect
+            v-model="institutionId" :disabled="true" fill="outline" cancel-text="Cancelar"
+            label-placement="stacked" justify="space-between" label="Instituição*" placeholder="Selecione" @ion-change="(e) => {
+              setFieldValue('institutionId', e.detail.value)
+            }"
+          >
+            <IonSelectOption v-for="institution in institutionList" :key="institution.id" :value="institution.id">
+              {{ institution.name }}
+            </IonSelectOption>
+          </IonSelect>
+        </Field>
 
-    <EpInput v-model="values.name" name="name" label="Nome*" placeholder="Digite o nome da série" />
+        <Field name="courseList">
+          <IonSelect
+            v-model="courseId" fill="outline" cancel-text="Cancelar" label-placement="stacked"
+            justify="space-between" label="Curso*" placeholder="Selecione" @ion-change="(e) => {
+              setFieldValue('courseId', e.detail.value)
+            }"
+          >
+            <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
+              {{ course.name }}
+            </IonSelectOption>
+          </IonSelect>
+        </Field>
 
-    <ion-list id="course_stage">
-      <IonSelect v-model="values.courseStage" fill="outline" cancel-text="Cancelar" label-placement="floating"
-        justify="space-between" label="Etapa Curso*" placeholder="Selecione"
-        @ion-change="(e) => setFieldValue('courseStage', e.target.value)">
-        <IonSelectOption v-for="stage in course_stage" :key="stage" :value="stage">
-          {{ stage }}
-        </IonSelectOption>
-      </IonSelect>
-    </ion-list>
+        <Field name="discipline">
+          <IonSelect
+            v-model="values.graduate" fill="outline" cancel-text="Cancelar" label-placement="stacked"
+            justify="space-between" label="Disciplina*" placeholder="Selecione"
+            @ion-change="(e) => setFieldValue('graduate', e.target.value)"
+          >
+            <IonSelectOption v-for="graduate in graduate" :key="graduate" :value="graduate">
+              {{ graduate }}
+            </IonSelectOption>
+          </IonSelect>
+        </Field>
 
-    <ion-list id="graduate">
-      <IonSelect v-model="values.graduate" fill="outline" cancel-text="Cancelar" label-placement="floating"
-        justify="space-between" label="Concluinte*" placeholder="Selecione"
-        @ion-change="(e) => setFieldValue('graduate', e.target.value)">
-        <IonSelectOption v-for="graduate in graduate" :key="graduate" :value="graduate">
-          {{ graduate }}
-        </IonSelectOption>
-      </IonSelect>
-    </ion-list>
+        <Field name="course_stage">
+          <IonSelect
+            v-model="values.courseStage" fill="outline" cancel-text="Cancelar" label-placement="stacked"
+            justify="space-between" label="Etapa Curso*" placeholder="Selecione"
+            @ion-change="(e) => setFieldValue('courseStage', e.target.value)"
+          >
+            <IonSelectOption v-for="stage in course_stage" :key="stage" :value="stage">
+              {{ stage }}
+            </IonSelectOption>
+          </IonSelect>
+        </Field>
 
-    <EpInput v-model="values.workload" name="workload" label="Carga Horária*" placeholder="Digite a carga horária" />
-    <EpInput v-model="values.schoolDays" name="schoolDays" label="Dias Letivos*" placeholder="Digite os dias letivos" />
-  </div>
+        <Field name="serieDescription">
+          <IonInput v-model="values.description" name="Descrição" label="Descrição" label-placement="stacked" fill="outline" placeholder="Digite uma descrição da série" />
+        </Field>
+      </IonSegmentContent>
+      <IonSegmentContent id="rules">
+        <EpInput v-model="values.workload" name="workload" label="Carga Horária*" placeholder="Digite a carga horária" />
+        <EpInput v-model="values.schoolDays" name="schoolDays" label="Dias Letivos*" placeholder="Digite os dias letivos" />
+      </IonSegmentContent>
+    </IonSegmentView>
+  </Form>
 </template>
+
+<style scoped>
+.error-message {
+  color: red;
+  font-size: 0.9em;
+}
+
+.style-purple-lane {
+  background: rgba(var(--ion-color-secondary-rgb), 0.15);
+  color: var(--ion-color-secondary);
+  padding: 2px 2px 2px 2px;
+  margin: 8px 2px 8px 2px;
+}
+
+ion-segment-content#general ion-input, ion-select {
+  margin: 10px 0px 12px 0px;
+  color: var(--ion-color-secondary);
+}
+
+ion-segment-content#complementary ion-input, ion-select {
+  margin: 10px 0px 12px 0px;
+  color: var(--ion-color-secondary);
+}
+</style>

@@ -49,6 +49,7 @@ const school = ref<School>({
   idpes: null,
   cnpj: null,
   address: null,
+  state: null,
   city: null,
   state: null,
   postalCode: null,
