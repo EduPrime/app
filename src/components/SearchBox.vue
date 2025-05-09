@@ -69,7 +69,7 @@ watch(() => props.filterAreas, async (newValue) => {
 }, { immediate: true })
 
 watch(searchQuery, async (newValue) => {
-  if (newValue.length > 3) {
+  if (newValue.length > 2) {
     await searchByQuery(searchQuery.value)
   }
   else {

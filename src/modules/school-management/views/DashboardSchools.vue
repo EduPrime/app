@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { Tables } from '@/types/database.types'
-import SearchBox from '@/components/SearchBox.vue'
+import SearchBox from '@/components/SearchBox.vue' // componente de busca personalidado
 import ContentLayout from '@/components/theme/ContentLayout.vue'
+// lista de registros
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import SchoolList from '@/modules/school-management/components/SchoolList.vue'
 import { IonCol, IonRow } from '@ionic/vue'
 import { computed, onMounted, ref } from 'vue'
-import SchoolService from '../services/SchoolService'
 
+import SchoolService from '../services/SchoolService'
 // const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
@@ -80,7 +81,11 @@ onMounted(() => {
           @update:new-item="newItem = $event"
         />
       </IonCol>
+      <!-- <IonCol size="12">
+        <EduprimeLister />
+      </IonCol> -->
     </IonRow>
+
     <SchoolList :data-list="searchResult" />
   </ContentLayout>
 </template>
