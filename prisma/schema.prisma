@@ -99,46 +99,6 @@ model Classroom {
   @@schema("public")
 }
 
-enum timeSerial {
-  Anual
-  Creche
-
-  @@schema("public")
-}
-
-enum graduate {
-  Fundamental
-  Medio       @map("Médio")
-  Superior
-  Infantil
-
-  @@schema("public")
-}
-
-enum teachingType {
-  Regular
-  Creche
-
-  @@schema("public")
-}
-
-enum regimeType {
-  Presencial
-  Semipresencial
-  EAD
-
-  @@schema("public")
-}
-
-enum courseModality {
-  ensino_regular     @map("Ensino Regular")
-  especial           @map("Ensino Especial")
-  EJA
-  profissionalizante @map("Ensino Profissionalizante")
-
-  @@schema("public")
-}
-
 model Course {
   id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name              String           @db.VarChar(100)
@@ -199,6 +159,7 @@ model Discipline {
   StudentFeedback      StudentFeedback[]
   TeacherAttendance    TeacherAttendance[]
   thematicUnit         ThematicUnit[]
+  SeriesDiscipline     SeriesDiscipline[]     @relation(map: "seriesdiscipline_discipline_id_fkey")
 
   @@map("discipline")
   @@schema("public")
@@ -967,32 +928,53 @@ model SchoolSettings {
 }
 
 model Series {
-  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name          String          @db.VarChar(100)
-  courseId      String          @db.Uuid
-  timetableId   String?         @db.Uuid
-  metadata      Json?
-  createdAt     DateTime?       @default(now()) @db.Timestamp(6)
-  deletedAt     DateTime?       @db.Timestamp(6)
-  updatedAt     DateTime?       @updatedAt @db.Timestamp(6)
-  updatedBy     String?         @db.Uuid
-  tenantId      String?
-  userCreated   String?         @db.VarChar(255)
-  institutionId String          @db.Uuid
-  courseStage   String
-  graduate      String
-  workload      Decimal?        @db.Decimal
-  schoolDays    String
-  schoolId      String?         @db.Uuid
-  classroom     Classroom[]
-  enrollment    Enrollment[]
-  preenrollment PreEnrollment[]
-  course        Course          @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_courseid_fkey")
-  institution   Institution     @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_institution_fkey")
-  School        School?         @relation(fields: [schoolId], references: [id])
-  thematicUnit  ThematicUnit[]
+  id                 String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name               String             @db.VarChar(100)
+  description        String?            @db.VarChar(255)
+  standardAge        Int?
+  ageRangeMin        Int?
+  ageRangeMax        Int?
+  outOfRangeAgeBlock Boolean            @default(false)
+  outOfRangeAgeWarn  Boolean            @default(false)
+  courseId           String             @db.Uuid
+  createdAt          DateTime?          @default(now()) @db.Timestamp(6)
+  deletedAt          DateTime?          @db.Timestamp(6)
+  updatedAt          DateTime?          @updatedAt @db.Timestamp(6)
+  updatedBy          String?            @db.Uuid
+  tenantId           String?
+  userCreated        String?            @db.VarChar(255)
+  institutionId      String             @db.Uuid
+  workload           Decimal?           @db.Decimal
+  schoolDays         String
+  schoolId           String?            @db.Uuid
+  classroom          Classroom[]
+  enrollment         Enrollment[]
+  preenrollment      PreEnrollment[]
+  course             Course             @relation(fields: [courseId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_courseid_fkey")
+  institution        Institution        @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "series_institution_fkey")
+  School             School?            @relation(fields: [schoolId], references: [id])
+  thematicUnit       ThematicUnit[]
+  SeriesDiscipline   SeriesDiscipline[] @relation(map: "seriesdiscipline_series_id_fkey")
 
   @@map("series")
+  @@schema("public")
+}
+
+model SeriesDiscipline {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  seriesId     String     @db.Uuid
+  disciplineId String     @db.Uuid
+  year         Int
+  workload     Decimal    @db.Decimal
+  createdAt    DateTime   @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  updatedAt    DateTime?  @updatedAt @db.Timestamp(6)
+  updatedBy    String?    @db.Uuid
+  tenantId     String?
+  series       Series     @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "seriesdiscipline_series_id_fkey")
+  discipline   Discipline @relation(fields: [disciplineId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "seriesdiscipline_discipline_id_fkey")
+
+  @@map("seriesDiscipline")
   @@schema("public")
 }
 
@@ -1457,6 +1439,46 @@ enum Language {
   XAVANTE        @map("Xavante")
   YANOMAMI       @map("Yanomami")
   OUTRO          @map("Outro")
+
+  @@schema("public")
+}
+
+enum timeSerial {
+  Anual
+  Creche
+
+  @@schema("public")
+}
+
+enum graduate {
+  Fundamental
+  Medio       @map("Médio")
+  Superior
+  Infantil
+
+  @@schema("public")
+}
+
+enum teachingType {
+  Regular
+  Creche
+
+  @@schema("public")
+}
+
+enum regimeType {
+  Presencial
+  Semipresencial
+  EAD
+
+  @@schema("public")
+}
+
+enum courseModality {
+  ensino_regular     @map("Ensino Regular")
+  especial           @map("Ensino Especial")
+  EJA
+  profissionalizante @map("Ensino Profissionalizante")
 
   @@schema("public")
 }
