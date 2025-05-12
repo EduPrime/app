@@ -9,7 +9,7 @@ export default class StageService extends BaseService<Stage> {
     super(table) // Passando o nome da tabela para a classe base
   }
 
-  async isInsideStage(dates: string[]): Promise<{ date: string, inside: boolean }[]> {
+  async isInsideStage(dates: string[], origin: string | undefined): Promise<{ date: string, inside: boolean }[]> {
     try {
       const { data: intervals, error } = await this.client
         .from(table)
@@ -27,9 +27,11 @@ export default class StageService extends BaseService<Stage> {
 
       const result = dates.map((dateStr) => {
         const date = new Date(dateStr)
-        const isInside = parsedIntervals.some(interval =>
-          date >= interval.start && date <= interval.end,
-        )
+        const isInside = origin === 'frequency'
+          ? parsedIntervals.some(interval =>
+              date >= interval.start && date <= interval.end && date <= new Date())
+          : parsedIntervals.some(interval =>
+              date >= interval.start && date <= interval.end)
 
         return {
           date: date.toISOString().split('T')[0], // Formata como YYYY-MM-DD
