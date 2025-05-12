@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Tables } from '@/types/database.types'
 import EduprimeList from '@/components/ListWithAction.vue'
+import EduprimeRegistredItems from '@/components/RegistredItems.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
 import SchoolList from '@/modules/school-management/components/SchoolList.vue'
@@ -133,7 +134,7 @@ onMounted(() => {
       @did-dismiss="setSeeModal(false)"
     >
       <IonContent>
-        {{ seeModal.data }}
+        <EduprimeRegistredItems :items="seeModal.data" />
       </IonContent>
     </IonModal>
   </ContentLayout>
