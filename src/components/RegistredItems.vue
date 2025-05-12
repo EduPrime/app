@@ -28,6 +28,7 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const emits = defineEmits(['close', 'edit'])
 
 const route = useRoute()
 const metaIcon = ref((route.meta.icon as string) || '')
@@ -38,16 +39,19 @@ const metaIcon = ref((route.meta.icon as string) || '')
 
 <template>
   <IonPage>
-    <div class="ion-padding-top ion-content" style="margin-top: 8px;">
+    <div class="ion-padding-top ion-padding-horizontal" style="margin-top: 8px;">
       <IonCardHeader
         id="accordionContentHeader" class="ion-no-padding" style="padding: 8px; margin-bottom: 10px;"
         :translucent="true"
       >
         <div style="display: flex; align-items: center; height: 15px;">
           <IonIcon :icon="metaIcon" style="margin-right: 10px;" />
-          {{ name }}
+          {{ props.name }}
         </div>
       </IonCardHeader>
+    </div>
+
+    <div class="ion-content" style=" overflow-y: auto; height: 100%;">
       <IonRow>
         <IonCol size="12">
           <IonItemDivider
@@ -189,13 +193,13 @@ const metaIcon = ref((route.meta.icon as string) || '')
       <IonGrid>
         <IonRow>
           <IonCol size="6">
-            <IonButton :disabled="false" color="danger" expand="full">
-              Cancelar
+            <IonButton :disabled="false" color="danger" expand="full" @click="emits('close', false)">
+              Fechar
             </IonButton>
           </IonCol>
           <IonCol size="6">
-            <IonButton :disabled="false" color="secondary" expand="full">
-              Salvar
+            <IonButton :disabled="false" color="secondary" expand="full" @click="emits('edit', true)">
+              Editar
             </IonButton>
           </IonCol>
         </IonRow>

@@ -3,8 +3,6 @@ import type { Tables } from '@/types/database.types'
 import EduprimeList from '@/components/ListWithAction.vue'
 import EduprimeRegistredItems from '@/components/RegistredItems.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
-import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
-import SchoolList from '@/modules/school-management/components/SchoolList.vue'
 import { IonButton, IonContent, IonIcon, IonModal } from '@ionic/vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
@@ -17,10 +15,10 @@ import RegisterSchool from './RegisterSchool.vue'
 const schoolService = new SchoolService()
 const dataList = ref<Tables<'school'>[]>([])
 // const schoolData = ref<Array<{ school: Tables<'school'>, courses: Tables<'course'>[], series: Tables<'series'>[] }> | []>([])
-const schoolCount = ref(0)
-const classCount = ref(0)
-const approvalRate = ref(0)
-const teacherCount = ref(0)
+// const schoolCount = ref(0)
+// const classCount = ref(0)
+// const approvalRate = ref(0)
+// const teacherCount = ref(0)
 const searchQuery = ref('')
 const isModalAddSchool = ref(false)
 
@@ -41,6 +39,14 @@ function setSeeModal(open: boolean) {
   if (open) {
     seeModal.value.modal = false
     setTimeout(() => (seeModal.value.modal = true), 10)
+  }
+}
+
+function setEditModal(open: boolean) {
+  editModal.value.modal = open
+  if (open) {
+    editModal.value.modal = false
+    setTimeout(() => (editModal.value.modal = true), 10)
   }
 }
 
@@ -78,65 +84,63 @@ onMounted(() => {
 
 <template>
   <ContentLayout>
-    <SchoolCards
+    <!-- <SchoolCards
       :student-count="schoolCount"
       :teacher-count="teacherCount"
       :class-count="classCount"
       :approval-rate="approvalRate"
-    />
+    /> -->
     <!--  -->
     <!--  -->
 
-    <ion-toolbar>
+    <!-- <ion-toolbar>
       <ion-title>Escolas ativas ({{ filteredDataList.length }})</ion-title>
-    </ion-toolbar>
-    <SearchBox table="school" placeholder="Nome da escola" @update:search-result="searchResult = $event" @update:new-item="newItem = $event" />
+    </ion-toolbar> -->
 
-    <ion-row class="ion-align-items-center ion-justify-content-between">
-      <ion-col size="10">
-        <ion-searchbar v-model="searchQuery" placeholder="Buscar escola" />
-      </ion-col>
-      <ion-col size="2" class="ion-text-end">
-        <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="setModalAddSchool(true)">
-          <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
-          <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
-          <span class="ion-hide-sm-down">Novo</span>
-        </IonButton>
-      </ion-col>
-    </ion-row>
+    <div class="ion-margin-top">
+      <SearchBox table="school" placeholder="Nome da escola" @update:search-result="searchResult = $event" @update:new-item="newItem = $event" />
 
-    <pre>
-      {{ seeModal.modal }}
-      {{ editModal.modal }}
-      {{ deleteModal.modal }}
-    </pre>
+      <ion-row class="ion-align-items-center ion-justify-content-between">
+        <ion-col size="10">
+          <ion-searchbar v-model="searchQuery" placeholder="Buscar escola" />
+        </ion-col>
+        <ion-col size="2" class="ion-text-end">
+          <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="setModalAddSchool(true)">
+            <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
+            <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
+            <span class="ion-hide-sm-down">Novo</span>
+          </IonButton>
+        </ion-col>
+      </ion-row>
 
-    <EduprimeList :data-list="filteredDataList" @update:delete="deleteModal = $event" @update:edit="editModal = $event" @update:see="($event) => { console.log($event); seeModal = $event; }" />
+      <EduprimeList :data-list="filteredDataList" @update:delete="deleteModal = $event" @update:edit="editModal = $event" @update:see="($event) => { console.log($event); seeModal = $event; }" />
 
-    <SchoolList :data-list="filteredDataList" />
-    <IonModal
-      :is-open="isModalAddSchool"
-      :expand-to-scroll="false"
-      :initial-breakpoint="0.95"
-      :breakpoints="[0, 0.7, 0.95, 1]"
-      @ion-modal-did-dismiss="setModalAddSchool(false)"
-    >
-      <IonContent>
-        <RegisterSchool :close-modal="() => setModalAddSchool(false)" />
-      </IonContent>
-    </IonModal>
-    <!-- Dismiss não funionou, estudar uma solução para isso -->
-    <IonModal
-      :is-open="seeModal.modal"
-      :expand-to-scroll="false"
-      :initial-breakpoint="0.95"
-      :breakpoints="[0, 0.7, 0.95, 1]"
-      @did-dismiss="setSeeModal(false)"
-    >
-      <IonContent>
-        <EduprimeRegistredItems :items="seeModal.data" name="Detalhes da escola" />
-      </IonContent>
-    </IonModal>
+      <!-- <SchoolList :data-list="filteredDataList" /> -->
+      <IonModal
+        :is-open="isModalAddSchool"
+        :expand-to-scroll="false"
+        :initial-breakpoint="0.95"
+        :breakpoints="[0, 0.7, 0.95, 1]"
+        @ion-modal-did-dismiss="setModalAddSchool(false)"
+      >
+        <IonContent>
+          <RegisterSchool :close-modal="() => setModalAddSchool(false)" />
+        </IonContent>
+      </IonModal>
+      <!-- Dismiss não funionou, estudar uma solução para isso -->
+
+      <IonModal
+        :is-open="seeModal.modal"
+        :expand-to-scroll="false"
+        :initial-breakpoint="0.95"
+        :breakpoints="[0, 0.7, 0.95, 1]"
+        @did-dismiss="setSeeModal(false)"
+      >
+        <IonContent>
+          <EduprimeRegistredItems :items="seeModal.data" name="Detalhes da escola" @close="setSeeModal(false)" @edit="setEditModal(true)" />
+        </IonContent>
+      </IonModal>
+    </div>
   </ContentLayout>
 </template>
 
