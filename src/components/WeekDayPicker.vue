@@ -12,6 +12,7 @@ import { Swiper, SwiperSlide } from 'swiper/vue'
 import { computed, defineEmits, defineProps, onMounted, ref, watch } from 'vue'
 import ScheduleService from '../services/ScheduleService'
 
+import StageService from '../services/StageService'
 import 'swiper/css'
 
 // @TODO: Quando possível implementar a prop feriados para receber o valor de forma dinamica e aposentar a variável ref() events
@@ -31,13 +32,14 @@ const props = defineProps<Props>()
 const emits = defineEmits(['update:modelValue', 'update:invalidDay'])
 
 const scheduleService = new ScheduleService()
+const stageService = new StageService()
 const validDays = ref()
 const pulseAtEnd = ref('')
 const currentWeekday = ref()
 
 // variáveis de controle para IonAlert de mudança não salvas
 const isAlertOpen = ref(false)
-const dateToAlert = ref< Moment | undefined>(moment())
+const dateToAlert = ref<Moment | undefined>(moment())
 const weekToAlert = ref('')
 
 const getSwiper = ref()
@@ -45,6 +47,7 @@ const currentDate = ref(moment())
 const monthYear = ref(new Date().toISOString())
 const weekDays = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const weeksInMonth = ref<{ date: Moment, weekday: string }[][]>([])
+const blockedDays = ref<{ date: string, inside: boolean }[]>([])
 const selectedDate = ref<Moment | undefined>(moment())
 const events = ref([
   { date: '2024-06-01', type: 'holiday', title: 'Holiday' },
@@ -63,9 +66,6 @@ const slideOpts = {
 }
 
 const modal = ref()
-
-//  Esta função serve para fechar o modal
-//  const dismiss = () => modal.value.$el.dismiss()
 
 // Variável para armazenar o valor de mês e ano selecionado
 const monthYearValue = ref(`${new Date().toISOString().slice(0, 8)}01`)
@@ -88,11 +88,6 @@ async function getValidDaysInScheduleService() {
 
       return data
     }
-    // Passa um map nas informações vindas de getSchedule e retorna apenas os dias da semana
-    // validDays.value = data.map((day: any) => {
-    //   return day.weekday
-    // })
-    // console.log('Dados carregados loadDataSchedule:', data)
   }
   catch (error) {
     console.error('Erro ao carregar os dados:', error)
@@ -173,22 +168,6 @@ function getColorForDate(date: Moment) {
   }
   return 'primary'
 }
-
-// Metodo para   adsasdasd lidar com datas desabilitadas
-
-// function isDateDisabled(date: Moment) {
-//   const formattedDate = date.format('YYYY-MM-DD')
-//   const event = events.value.find(event => event.date === formattedDate)
-//   return event?.type === 'disabled'
-// }
-
-//  @TODO: Atenção, estudar melhor o uso desta função posteriormente
-
-// function onMonthYearChange(event: any) {
-//   const selectedDate = moment(event.detail.value)
-//   currentDate.value = selectedDate.startOf('month')
-//   loadVisibleMonth()
-// }
 
 function updateDatetimeButton() {
   monthYear.value = currentDate.value.format('YYYY-MM-DD')
@@ -306,6 +285,18 @@ function getDayName(sDate: Date | string | Moment | undefined) {
   return new Date(`${sDate}`).getDay()
 }
 
+async function insideStage() {
+  const dates = weeksInMonth.value.flatMap(week => week.map(day => day.date.toISOString()))
+
+  const boolDates = await stageService.isInsideStage(dates)
+  console.log('boolDate', boolDates)
+  blockedDays.value = boolDates
+}
+
+watch(weeksInMonth, async () => {
+  await insideStage()
+}, { immediate: true, deep: true })
+
 watch(selectedDate, (newValue) => {
   if (newValue) {
     emits('update:modelValue', {
@@ -405,8 +396,10 @@ watch(
                     <IonChip
                       :id="`${props.originPage}-${day.date.format('MM-DD')}`" class="ion-no-padding"
                       style="padding: 10px; margin: 0px"
-                      :disabled="(props?.frequency === 'disciplina' && !props.currentDiscipline) || (!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0)" :style="i === 0 ? 'margin-left: 10px;' : undefined"
-                      :color="getColorForDate(day.date)"
+                      :disabled="!(blockedDays.find(date => date.date === day.date.format('YYYY-MM-DD'))?.inside)
+                        || (props?.frequency === 'disciplina' && !props.currentDiscipline)
+                        || (!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0)"
+                      :style="i === 0 ? 'margin-left: 10px;' : undefined" :color="getColorForDate(day.date)"
                       @click="() => preSelectDate(day.date, day.weekday)"
                     >
                       <div>
@@ -434,14 +427,10 @@ watch(
   </ion-grid>
 
   <IonAlert
-    id="alertChangeDateWithoutSave"
-    class="custom-alert"
-    :is-open="isAlertOpen"
-    :on-did-dismiss="() => { setAlertOpen(false) }"
-    header="Alterações não salvas!"
+    id="alertChangeDateWithoutSave" class="custom-alert" :is-open="isAlertOpen"
+    :on-did-dismiss="() => { setAlertOpen(false) }" header="Alterações não salvas!"
     sub-header="Ao trocar de dia no calendário, todas as alterações realizadas serão perdidas!"
-    message="Deseja continuar sem salvar?"
-    :buttons="[
+    message="Deseja continuar sem salvar?" :buttons="[
       {
         text: 'Cancelar',
         role: 'cancel',
