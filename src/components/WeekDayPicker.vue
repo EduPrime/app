@@ -37,7 +37,7 @@ const currentWeekday = ref()
 
 // variáveis de controle para IonAlert de mudança não salvas
 const isAlertOpen = ref(false)
-const dateToAlert = ref< Moment | undefined>(moment())
+const dateToAlert = ref<Moment | undefined>(moment())
 const weekToAlert = ref('')
 
 const getSwiper = ref()
@@ -324,6 +324,7 @@ watch(
 
     if (newTeacherId && newCurrentClassroom) {
       validDays.value = await getValidDaysInScheduleService()
+      console.log('validDays', validDays.value)
       if (validDays.value.find((i: { weekday: string }) => i.weekday.slice(0, 3) === weekDays[getDayName(selectedDate.value)])) {
         emits('update:invalidDay', false)
       }
@@ -405,8 +406,8 @@ watch(
                     <IonChip
                       :id="`${props.originPage}-${day.date.format('MM-DD')}`" class="ion-no-padding"
                       style="padding: 10px; margin: 0px"
-                      :disabled="(props?.frequency === 'disciplina' && !props.currentDiscipline) || (!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0)" :style="i === 0 ? 'margin-left: 10px;' : undefined"
-                      :color="getColorForDate(day.date)"
+                      :disabled="(props?.frequency === 'disciplina' && !props.currentDiscipline) || (!validDays || validDays && validDays?.filter((d: any) => d.weekday.slice(0, 3) === day.weekday).length === 0)"
+                      :style="i === 0 ? 'margin-left: 10px;' : undefined" :color="getColorForDate(day.date)"
                       @click="() => preSelectDate(day.date, day.weekday)"
                     >
                       <div>
@@ -434,14 +435,10 @@ watch(
   </ion-grid>
 
   <IonAlert
-    id="alertChangeDateWithoutSave"
-    class="custom-alert"
-    :is-open="isAlertOpen"
-    :on-did-dismiss="() => { setAlertOpen(false) }"
-    header="Alterações não salvas!"
+    id="alertChangeDateWithoutSave" class="custom-alert" :is-open="isAlertOpen"
+    :on-did-dismiss="() => { setAlertOpen(false) }" header="Alterações não salvas!"
     sub-header="Ao trocar de dia no calendário, todas as alterações realizadas serão perdidas!"
-    message="Deseja continuar sem salvar?"
-    :buttons="[
+    message="Deseja continuar sem salvar?" :buttons="[
       {
         text: 'Cancelar',
         role: 'cancel',

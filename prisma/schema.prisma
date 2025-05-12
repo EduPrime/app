@@ -821,7 +821,7 @@ model School {
   generalUseRooms              Room[]
   labsAndFunctionalAreas       Lab[]
   supportFacilities            Facility[]
-  insideClassroooms            Int?
+  insideClassrooms             Int?
   outsideClassrooms            Int?
   refrigeratedClassrooms       Int?
   accessibleClassrooms         Int?
@@ -829,7 +829,7 @@ model School {
   localNetworkAvailable        Boolean?
   connectionTypes              ConnectionType?
   devicesUsedByStudents        Device[]
-  availabeDesktops             Int?
+  availableDesktops            Int?
   availableLaptops             Int?
   availableTablets             Int?
   teachingEquipments           TeachingEquipment[]
@@ -1204,12 +1204,13 @@ model ServerFunction {
   id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name         String    @db.VarChar(100)
   abbreviation String    @db.VarChar(10)
+  description  String?   @db.VarChar(255)
   createdAt    DateTime  @default(now()) @db.Timestamp(6)
   deletedAt    DateTime? @db.Timestamp(6)
   updatedAt    DateTime? @updatedAt @db.Timestamp(6)
   updatedBy    String?   @db.Uuid
   tenantId     String?
-  userCreated  String?   @db.VarChar(255)
+  userCreated  String?   @db.Uuid
 
   Servers Servers[] @relation(map: "fk_server_function")
 
