@@ -288,7 +288,7 @@ function getDayName(sDate: Date | string | Moment | undefined) {
 async function insideStage() {
   const dates = weeksInMonth.value.flatMap(week => week.map(day => day.date.toISOString()))
 
-  const boolDates = await stageService.isInsideStage(dates)
+  const boolDates = await stageService.isInsideStage(dates, props.originPage)
   console.log('boolDate', boolDates)
   blockedDays.value = boolDates
 }
