@@ -8,10 +8,64 @@ import {
 } from 'validations-br'
 import { defineRule } from 'vee-validate'
 
-defineRule('required', required)
-defineRule('min', min)
-defineRule('max', max)
-defineRule('email', email)
+const fieldLabels: Record<string, string> = {
+  inepCode: "Código INEP",
+  schoolName: "Nome da Escola",
+  corporateName: "Razão Social",
+  cnpj: "CNPJ",
+  educationNetwork: "Rede de Ensino",
+  postalCode: "CEP",
+  state: "Estado",
+  address: "Endereço",
+  addressNumber: "Número",
+  additionalInfo: "Complemento",
+  neighborhood: "Bairro",
+  city: "Município",
+  unusualLocation: "Localização diferenciada da escola",
+  phone1: "Telefone 1",
+  phone2: "Telefone 2",
+  email: "E-mail",
+  website: "Site",
+  abbreviation: "Sigla",
+  blockJournalEntries: "Bloquear lançamento no diário",
+  usesAlternativeRules: "Utiliza regra alternativa de avaliação",
+  operationalStatus: "Situação de Funcionamento",
+  administrativeDependency: "Dependência Administrativa",
+  // Add more mappings as needed
+}
+
+defineRule('required', (value: string, _, context) => {
+  const fieldLabel = fieldLabels[context.field] || context.field
+  if (!value) {
+    return `O campo "${fieldLabel}" é obrigatório.`
+  }
+  return true
+})
+
+defineRule('min', (value: string, [min]: [number], context) => {
+  const fieldLabel = fieldLabels[context.field] || context.field
+  if (value.length < min) {
+    return `O campo "${fieldLabel}" deve ter pelo menos ${min} caracteres.`
+  }
+  return true
+})
+
+defineRule('max', (value: string, [max]: [number], context) => {
+  const fieldLabel = fieldLabels[context.field] || context.field
+  if (value.length > max) {
+    return `O campo "${fieldLabel}" deve ter no máximo ${max} caracteres.`
+  }
+  return true
+})
+
+defineRule('email', (value: string, _, context) => {
+  const fieldLabel = fieldLabels[context.field] || context.field
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  if (!emailRegex.test(value)) {
+    return `O campo "${fieldLabel}" deve ser um e-mail válido.`
+  }
+  return true
+})
 
 defineRule('cpf', (value: string) => {
   if (!value || !validateCPF(value)) {
@@ -102,5 +156,14 @@ defineRule('somaAtividades', (_value: string, _, context) => {
 
   if (soma > 10)
     return 'A soma das atividades não pode ultrapassar 10'
+  return true
+})
+
+defineRule('postalCode', (value: string, _, context) => {
+  const fieldLabel = fieldLabels[context.field] || context.field
+  const postalCodeRegex = /^\d{5}-\d{3}$/
+  if (!postalCodeRegex.test(value)) {
+    return `O campo "${fieldLabel}" deve ser um CEP válido.`
+  }
   return true
 })

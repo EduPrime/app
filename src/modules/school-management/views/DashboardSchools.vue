@@ -122,7 +122,7 @@ onMounted(() => {
       @ion-modal-did-dismiss="setModalAddSchool(false)"
     >
       <IonContent>
-        <RegisterSchool />
+        <RegisterSchool :close-modal="() => setModalAddSchool(false)" />
       </IonContent>
     </IonModal>
     <!-- Dismiss não funionou, estudar uma solução para isso -->
