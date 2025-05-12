@@ -130,7 +130,7 @@ onMounted(() => {
       :expand-to-scroll="false"
       :initial-breakpoint="0.95"
       :breakpoints="[0, 0.7, 0.95, 1]"
-      @ion-modal-did-dismiss="setSeeModal(false)"
+      @did-dismiss="setSeeModal(false)"
     >
       <IonContent>
         {{ seeModal.data }}
