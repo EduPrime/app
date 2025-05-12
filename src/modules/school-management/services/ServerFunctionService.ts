@@ -5,7 +5,8 @@ import errorHandler from '@/utils/error-handler'
 interface ServerFunctionToSave {
   id?: string
   name: string
-  abbreviation?: string
+  abbreviation: string
+  description?: string
   tenantId?: string | null
   userCreated?: string | null
 }
@@ -66,38 +67,53 @@ export default class ServerFunctionService extends BaseService<ServerFunction> {
   }
 
   async upsertServerFunction(serverFunction: ServerFunctionToSave) {
-    try {
-      const now = new Date().toISOString()
+    const now = new Date().toISOString()
 
-      const payload: Partial<ServerFunction> & { id?: string } = {
-        name: serverFunction.name,
-        abbreviation: serverFunction.abbreviation,
-        tenantId: serverFunction.tenantId || null,
-        userCreated: (serverFunction as any).description || null,
-        deletedAt: null,
-        updatedAt: new Date(now),
-        ...((serverFunction.id) && { id: serverFunction.id }),
-      }
-
-      const { data, error } = await this.client
+    let existing = null
+    if (serverFunction.id) {
+      const { data, error: fetchError } = await this.client
         .from(table)
-        .upsert(payload, { onConflict: 'id' })
         .select('*')
+        .eq('id', serverFunction.id)
+        .is('deletedAt', null)
+        .maybeSingle()
 
-      if (error) {
-        errorHandler(error, 'Erro ao inserir/atualizar função de servidor')
-      }
-
-      if (!data || data.length === 0) {
-        throw new Error('Nenhuma função de servidor foi atualizada ou inserida')
-      }
-
-      return data as ServerFunction[]
+      if (fetchError)
+        errorHandler(fetchError, 'Erro ao buscar função de servidor existente por ID')
+      existing = data
     }
-    catch (error) {
-      errorHandler(error, 'Erro inesperado ao inserir/atualizar função de servidor')
-      return []
+    else if (serverFunction.name) {
+      const { data, error: fetchError } = await this.client
+        .from(table)
+        .select('*')
+        .eq('name', serverFunction.name)
+        .is('deletedAt', null)
+        .maybeSingle()
+
+      if (fetchError)
+        errorHandler(fetchError, 'Erro ao buscar função de servidor existente por nome')
+      existing = data
     }
+
+    const payload: Partial<ServerFunction> & { id?: string } = {
+      name: serverFunction.name,
+      abbreviation: serverFunction.abbreviation,
+      description: serverFunction.description || null,
+      tenantId: serverFunction.tenantId || null,
+      userCreated: serverFunction.userCreated || null,
+      deletedAt: null,
+      updatedAt: now,
+      ...(existing?.id && { id: existing.id }),
+    }
+
+    const { data, error } = await this.client
+      .from(table)
+      .upsert(payload)
+      .select()
+
+    if (error)
+      errorHandler(error, 'Erro ao inserir/atualizar função de servidor')
+    return data as ServerFunction[]
   }
 
   async softDeleteServerFunction(serverFunctionId: string, userId?: string) {
