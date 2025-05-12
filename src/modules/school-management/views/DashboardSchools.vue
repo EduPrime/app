@@ -24,7 +24,7 @@ const teacherCount = ref(0)
 const searchQuery = ref('')
 const isModalAddSchool = ref(false)
 
-const seeModal = ref({ modal: false, data: undefined })
+const seeModal = ref({ modal: false, data: undefined as any })
 const editModal = ref({ modal: false, data: undefined })
 const deleteModal = ref({ modal: false, data: undefined })
 
@@ -134,7 +134,7 @@ onMounted(() => {
       @did-dismiss="setSeeModal(false)"
     >
       <IonContent>
-        <EduprimeRegistredItems :items="seeModal.data" />
+        <EduprimeRegistredItems :items="seeModal.data" name="Detalhes da escola" />
       </IonContent>
     </IonModal>
   </ContentLayout>
