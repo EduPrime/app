@@ -8,6 +8,7 @@ import {
   IonGrid,
   IonIcon,
   IonInput,
+  IonPage,
   IonRow,
   IonTextarea,
   IonToolbar,
@@ -111,8 +112,8 @@ function autoResizeTextarea() {
 </script>
 
 <template>
-  <div class="mobile-function-content">
-    <IonContent class="ion-padding ion-no-padding" :fullscreen="false">
+  <IonPage>
+    <IonContent class="ion-padding ion-no-padding">
       <div class="style-purple-lane" style="display: flex; align-items: center;">
         <IonIcon :icon="personSharp" style="margin-right: 10px;" />
         {{ modalTitle }}
@@ -142,7 +143,7 @@ function autoResizeTextarea() {
               </Field>
             </IonCol>
           </IonRow>
-
+  
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field, errors }" name="abbreviation">
@@ -162,7 +163,7 @@ function autoResizeTextarea() {
               </Field>
             </IonCol>
           </IonRow>
-
+  
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field, errors }" name="description" rules="max:180">
@@ -193,37 +194,34 @@ function autoResizeTextarea() {
           </IonRow>
         </IonGrid>
       </Form>
-    </IonContent>
-
-    <IonFooter slot="fixed-bottom" class="ion-no-border footer-fixed">
-      <IonToolbar>
-        <IonGrid>
-          <IonRow class="action-buttons-fixed">
-            <IonCol size="6">
-              <IonButton color="danger" expand="block" @click="handleCancel()">
-                Cancelar
-              </IonButton>
-            </IonCol>
-            <IonCol size="6">
-              <IonButton expand="block" type="submit" form="function-form-mobile">
-                Salvar
-              </IonButton>
-            </IonCol>
-          </IonRow>
-        </IonGrid>
-      </IonToolbar>
-    </IonFooter>
-  </div>
+    </IonContent>  
+    <div>
+      <IonGrid>
+        <IonRow>
+          <IonCol size="6">
+            <IonButton color="danger" expand="block" @click="handleCancel()">
+              Cancelar
+            </IonButton>
+          </IonCol>
+          <IonCol size="6">
+            <IonButton expand="block" type="submit" form="function-form-mobile">
+              Salvar
+            </IonButton>
+          </IonCol>
+        </IonRow>
+      </IonGrid>
+    </div>
+  </IonPage>
 </template>
 
 <style scoped>
-.drag-handle {
+/* .drag-handle {
   width: 36px;
   height: 4px;
   border-radius: 2px;
   margin: 10px auto;
   background-color: var(--ion-color-medium);
-}
+} */
 
 .style-purple-lane {
   background: rgba(var(--ion-color-secondary-rgb), 0.15);
@@ -248,40 +246,40 @@ function autoResizeTextarea() {
   padding-left: 16px;
 }
 
-.action-buttons-fixed {
+/* .action-buttons-fixed {
   margin: 0;
   padding: 8px;
-}
+} */
 
 ion-input.has-error,
 ion-textarea.has-error {
   --border-color: var(--ion-color-danger);
 }
 
-.mobile-function-content {
+/* .mobile-function-content {
   height: 100%;
   display: flex;
   flex-direction: column;
-}
+} */
 
-.footer-fixed {
+/* .footer-fixed {
   position: sticky;
   bottom: 0;
   z-index: 10;
-}
+} */
 
-ion-content {
+/* ion-content {
   --padding-bottom: 80px;
-}
+} */
 
-ion-modal .modal-wrapper {
+/* ion-modal .modal-wrapper {
   --height: 70%;
-}
+} */
 
-.action-buttons-fixed {
+/* .action-buttons-fixed {
   position: sticky;
   bottom: 0;
   background: var(--ion-color-light);
   padding: 8px 0;
-}
+} */
 </style>
