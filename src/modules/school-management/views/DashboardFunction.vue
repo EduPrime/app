@@ -4,7 +4,7 @@ import type { Tables } from '@/types/database.types'
 import ListWithActionFunction from '@/components/ListWithActionFunction.vue'
 import FunctionDetailView from '@/components/FunctionDetailView.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
-import { IonButton, IonCol, IonContent, IonIcon, IonModal, IonPage, IonRow, IonSearchbar } from '@ionic/vue'
+import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCol, IonContent, IonIcon, IonModal, IonPage, IonRow, IonSearchbar, IonText } from '@ionic/vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -153,7 +153,13 @@ onMounted(() => {
               router.push({ name: 'RegisterFunction', params: { id: event.data?.id } })
             }
           }" 
-          @update:see="($event) => { seeModal = $event }" 
+          @update:see="(event) => { 
+            if (isMobileDevice()) {
+              seeModal = event
+            } else {
+              router.push({ name: 'FunctionDetails', params: { id: event.data?.id } })
+            }
+          }" 
         />
 
         <IonModal
@@ -181,7 +187,11 @@ onMounted(() => {
               :items="seeModal.data" 
               name="Detalhes da função" 
               @close="setSeeModal(false)" 
-              @edit="setEditModal(true)" 
+              @edit="() => {
+                editingId = seeModal.data?.id;
+                setSeeModal(false);
+                setEditModal(true);
+              }" 
             />
           </IonContent>
         </IonModal>
@@ -202,25 +212,33 @@ onMounted(() => {
           </IonContent>
         </IonModal>
 
-        <IonModal
-          :is-open="deleteModal.modal"
-          :expand-to-scroll="false"
-          :initial-breakpoint="0.3"
-          :breakpoints="[0, 0.3, 0.5]"
-          @ion-modal-did-dismiss="deleteModal.modal = false"
-        >
-          <IonContent class="ion-padding">
-            <h2>Confirmação</h2>
-            <p>Tem certeza que deseja excluir esta função?</p>
-            <IonRow>
-              <IonCol>
-                <IonButton color="medium" expand="block" @click="deleteModal.modal = false">Cancelar</IonButton>
-              </IonCol>
-              <IonCol>
-                <IonButton color="danger" expand="block" @click="handleDelete()">Excluir</IonButton>
-              </IonCol>
-            </IonRow>
-          </IonContent>
+        <IonModal id="delete-modal" :is-open="deleteModal.modal" @ion-modal-did-dismiss="deleteModal.modal = false">
+          <IonCard class="ion-no-margin">
+            <IonCardHeader>
+              <IonCardTitle>Excluir função</IonCardTitle>
+              <IonText class="ion-padding-vertical">
+                Tem certeza que deseja excluir esta função?
+              </IonText>
+              <div style="display: flex;">
+                <IonButton
+                  size="small"
+                  style="margin-left: auto; margin-right: 8px; text-transform: capitalize;"
+                  color="medium"
+                  @click="deleteModal.modal = false"
+                >
+                  Cancelar
+                </IonButton>
+                <IonButton
+                  style="text-transform: capitalize;"
+                  size="small"
+                  color="danger"
+                  @click="handleDelete()"
+                >
+                  Confirmar
+                </IonButton>
+              </div>
+            </IonCardHeader>
+          </IonCard>
         </IonModal>
       </div>
     </ContentLayout>
@@ -239,5 +257,11 @@ ion-segment {
 
 .custom-button {
   max-width: 120px;
+}
+#delete-modal {
+  --width: 300px;
+  --height: auto;
+  --border-radius: 10px;
+  --box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
 }
 </style>
