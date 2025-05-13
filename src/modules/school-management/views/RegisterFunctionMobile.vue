@@ -4,18 +4,17 @@ import {
   IonButton,
   IonCol,
   IonContent,
-  IonFooter,
   IonGrid,
   IonIcon,
   IonInput,
+  IonPage,
+
   IonRow,
   IonTextarea,
-  IonToolbar,
-  IonPage
 } from '@ionic/vue'
 import { personSharp } from 'ionicons/icons'
 import { ErrorMessage, Field, Form } from 'vee-validate'
-import { computed, nextTick, onMounted, ref, watchEffect, reactive, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue'
 import ServerFunctionService from '../services/ServerFunctionService'
 
 const props = defineProps<{
@@ -50,22 +49,23 @@ const modalTitle = computed(() => isEditing.value ? 'Editar função' : 'Nova fu
 
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
-    const enabled = !!formValues.value.name || !!formValues.value.abbreviation || !!formValues.value.description;
-    return enabled;
+    const enabled = !!formValues.value.name || !!formValues.value.abbreviation || !!formValues.value.description
+    return enabled
   }
-  
-  return hasChanges.value;
+
+  return hasChanges.value
 })
 
 function checkForChanges() {
-  if (!isEditing.value) return;
-  
-  const hasNameChanged = formValues.value.name !== originalFormValues.value.name;
-  const hasAbbreviationChanged = formValues.value.abbreviation !== originalFormValues.value.abbreviation;
-  const hasDescriptionChanged = formValues.value.description !== originalFormValues.value.description;
-  
-  hasChanges.value = hasNameChanged || hasAbbreviationChanged || hasDescriptionChanged;
-  console.log('Mobile: Verificando mudanças:', { hasNameChanged, hasAbbreviationChanged, hasDescriptionChanged, hasChanges: hasChanges.value });
+  if (!isEditing.value)
+    return
+
+  const hasNameChanged = formValues.value.name !== originalFormValues.value.name
+  const hasAbbreviationChanged = formValues.value.abbreviation !== originalFormValues.value.abbreviation
+  const hasDescriptionChanged = formValues.value.description !== originalFormValues.value.description
+
+  hasChanges.value = hasNameChanged || hasAbbreviationChanged || hasDescriptionChanged
+  console.log('Mobile: Verificando mudanças:', { hasNameChanged, hasAbbreviationChanged, hasDescriptionChanged, hasChanges: hasChanges.value })
 }
 
 watchEffect(() => {
@@ -79,54 +79,55 @@ watchEffect(() => {
 watch(
   () => ({ ...formValues.value }),
   (newValues) => {
-    console.log('Mobile: Valores do formulário mudaram:', newValues);
-    
+    console.log('Mobile: Valores do formulário mudaram:', newValues)
+
     if (isEditing.value) {
-      checkForChanges();
+      checkForChanges()
     }
   },
-  { deep: true, immediate: true }
-);
+  { deep: true, immediate: true },
+)
 
 onMounted(async () => {
   if (props.editId) {
     console.log('Mobile: ID da função para edição:', props.editId)
-    
+
     const fn = await serverFunctionService.getServerFunctionById(props.editId)
-    
+
     console.log('Mobile: Função encontrada:', fn)
-    
+
     if (fn) {
       const loadedValues = {
         id: fn.id,
         name: fn.name,
         abbreviation: fn.abbreviation || '',
         description: (fn as any).description || '',
-      };
-      
-      formValues.value = { ...loadedValues };
-      originalFormValues.value = { ...loadedValues };
-      hasChanges.value = false; 
-      
+      }
+
+      formValues.value = { ...loadedValues }
+      originalFormValues.value = { ...loadedValues }
+      hasChanges.value = false
+
       autoResizeTextarea()
     }
-  } else {
+  }
+  else {
     formValues.value = {
       id: '',
       name: '',
       abbreviation: '',
       description: '',
-    };
+    }
     originalFormValues.value = {
       id: '',
       name: '',
       abbreviation: '',
       description: '',
-    };
-    hasChanges.value = false;
+    }
+    hasChanges.value = false
   }
 })
-  
+
 async function handleSubmit(values: any) {
   const payload = {
     id: isEditing.value ? props.editId : undefined,
@@ -164,7 +165,8 @@ function autoResizeTextarea() {
     el.style.height = 'auto'
     el.style.height = `${Math.max(80, el.scrollHeight)}px`
     console.log('Mobile: Nova altura:', el.style.height)
-  } else {
+  }
+  else {
     console.log('Mobile: Elemento textarea não encontrado')
   }
 }
@@ -172,12 +174,12 @@ function autoResizeTextarea() {
 
 <template>
   <IonPage>
-    <IonContent class="ion-padding ion-no-padding" >
+    <IonContent class="ion-padding ion-no-padding">
       <div class="style-purple-lane" style="display: flex; align-items: center;">
         <IonIcon :icon="personSharp" style="margin-right: 10px;" />
         {{ modalTitle }}
       </div>
-      <Form id="function-form-mobile" :initial-values="formValues" :key="formValues.id || 'new'" @submit="handleSubmit">
+      <Form id="function-form-mobile" :key="formValues.id || 'new'" :initial-values="formValues" @submit="handleSubmit">
         <IonGrid>
           <IonRow>
             <IonCol size="12">
@@ -185,12 +187,12 @@ function autoResizeTextarea() {
                 <IonInput
                   v-bind="field"
                   v-model="formValues.name"
-                  @ionInput="field.onInput"
                   label="Nome da função"
                   label-placement="stacked"
                   fill="outline"
                   placeholder="Digite o nome da função"
                   :class="{ 'has-error': errors.length > 0 }"
+                  @ion-input="field.onInput"
                 >
                   <div slot="label" class="required-field">
                     Nome da função <span class="required-text">(Obrigatório)</span>
@@ -205,19 +207,18 @@ function autoResizeTextarea() {
             </IonCol>
           </IonRow>
 
-
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field, errors }" name="abbreviation">
                 <IonInput
                   v-bind="field"
                   v-model="formValues.abbreviation"
-                  @ionInput="field.onInput"
                   label="Abreviação"
                   label-placement="stacked"
                   fill="outline"
                   placeholder="Digite a abreviação"
                   :class="{ 'has-error': errors.length > 0 }"
+                  @ion-input="field.onInput"
                 />
                 <ErrorMessage v-slot="{ message }" name="abbreviation">
                   <div class="error-message">
@@ -227,7 +228,6 @@ function autoResizeTextarea() {
               </Field>
             </IonCol>
           </IonRow>
-
 
           <IonRow>
             <IonCol size="12">
@@ -259,7 +259,7 @@ function autoResizeTextarea() {
           </IonRow>
         </IonGrid>
       </Form>
-    </IonContent>  
+    </IonContent>
     <div>
       <IonGrid>
         <IonRow>
@@ -281,11 +281,13 @@ function autoResizeTextarea() {
 
 <style scoped>
 /* .drag-handle {
+/* .drag-handle {
   width: 36px;
   height: 4px;
   border-radius: 2px;
   margin: 10px auto;
   background-color: var(--ion-color-medium);
+} */
 } */
 
 .style-purple-lane {
@@ -312,8 +314,10 @@ function autoResizeTextarea() {
 }
 
 /* .action-buttons-fixed {
+/* .action-buttons-fixed {
   margin: 0;
   padding: 8px;
+} */
 } */
 
 ion-input.has-error,
@@ -322,29 +326,31 @@ ion-textarea.has-error {
 }
 
 /* .mobile-function-content {
+/* .mobile-function-content {
   height: 100%;
   display: flex;
   flex-direction: column;
-}
+} */
 
-.footer-fixed {
+/* .footer-fixed {
   position: sticky;
   bottom: 0;
   z-index: 10;
-}
+} */
 
-ion-content {
+/* ion-content {
   --padding-bottom: 80px;
-}
+} */
 
-ion-modal .modal-wrapper {
+/* ion-modal .modal-wrapper {
   --height: 70%;
-}
+} */
 
-.action-buttons-fixed {
+/* .action-buttons-fixed {
   position: sticky;
   bottom: 0;
   background: var(--ion-color-light);
   padding: 8px 0;
+} */
 } */
 </style>
