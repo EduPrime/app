@@ -280,7 +280,7 @@ function autoResizeTextarea() {
 </template>
 
 <style scoped>
-/* .drag-handle {
+
 /* .drag-handle {
   width: 36px;
   height: 4px;
@@ -288,7 +288,7 @@ function autoResizeTextarea() {
   margin: 10px auto;
   background-color: var(--ion-color-medium);
 } */
-} */
+
 
 .style-purple-lane {
   background: rgba(var(--ion-color-secondary-rgb), 0.15);
@@ -314,10 +314,8 @@ function autoResizeTextarea() {
 }
 
 /* .action-buttons-fixed {
-/* .action-buttons-fixed {
   margin: 0;
   padding: 8px;
-} */
 } */
 
 ion-input.has-error,
@@ -351,6 +349,5 @@ ion-textarea.has-error {
   bottom: 0;
   background: var(--ion-color-light);
   padding: 8px 0;
-} */
 } */
 </style>
