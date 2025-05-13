@@ -179,7 +179,7 @@ const routes = [
     },
   },
   {
-    path: '/Function/register',
+    path: '/Function/register/:id?',
     name: 'RegisterFunction',
     component: RegisterFunction,
     meta: {

@@ -14,7 +14,7 @@ import {
 } from '@ionic/vue'
 import { personSharp } from 'ionicons/icons'
 import { ErrorMessage, Field, Form } from 'vee-validate'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watchEffect } from 'vue'
 // Router não é necessário neste componente pois usa emits para navegação
 import ServerFunctionService from '../services/ServerFunctionService'
 
@@ -41,9 +41,23 @@ const formValues = ref({
 const isEditing = computed(() => Boolean(props.editId))
 const modalTitle = computed(() => isEditing.value ? 'Editar função' : 'Nova função')
 
+// Observa mudanças na descrição e ajusta o tamanho do textarea automaticamente
+watchEffect(() => {
+  if (formValues.value.description) {
+    nextTick(() => {
+      autoResizeTextarea()
+    })
+  }
+})
+
 onMounted(async () => {
   if (props.editId) {
+    console.log('Mobile: ID da função para edição:', props.editId)
+    
     const fn = await serverFunctionService.getServerFunctionById(props.editId)
+    
+    console.log('Mobile: Função encontrada:', fn)
+    
     if (fn) {
       formValues.value = {
         id: fn.id,
@@ -51,12 +65,11 @@ onMounted(async () => {
         abbreviation: fn.abbreviation || '',
         description: (fn as any).description || '',
       }
-      await nextTick()
       autoResizeTextarea()
     }
   }
 })
-
+  
 async function handleSubmit(values: any) {
   const payload = {
     id: isEditing.value ? props.editId : undefined,
@@ -90,9 +103,10 @@ function trimDescription(event: any) {
 function autoResizeTextarea() {
   const el = descriptionRef.value
   if (el) {
+    el.style.height = '80px'
     el.style.height = 'auto'
-    el.style.height = `${el.scrollHeight}px`
-  }
+    el.style.height = `${Math.max(80, el.scrollHeight)}px`
+  } 
 }
 </script>
 
@@ -103,7 +117,7 @@ function autoResizeTextarea() {
         <IonIcon :icon="personSharp" style="margin-right: 10px;" />
         {{ modalTitle }}
       </div>
-      <Form id="function-form-mobile" :initial-values="formValues" @submit="handleSubmit">
+      <Form id="function-form-mobile" :initial-values="formValues" :key="formValues.id || 'new'" @submit="handleSubmit">
         <IonGrid>
           <IonRow>
             <IonCol size="12">
@@ -155,6 +169,7 @@ function autoResizeTextarea() {
                 <IonTextarea
                   v-bind="field"
                   ref="descriptionRef"
+                  v-model="formValues.description"
                   label="Descrição da função"
                   label-placement="stacked"
                   fill="outline"

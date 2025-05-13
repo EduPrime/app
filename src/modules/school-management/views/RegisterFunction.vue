@@ -13,7 +13,7 @@ import {
   IonToolbar,
 } from '@ionic/vue'
 import { ErrorMessage, Field, Form } from 'vee-validate'
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ServerFunctionService from '../services/ServerFunctionService'
 
@@ -25,15 +25,29 @@ const initialFormValues = { id: '', name: '', abbreviation: '', description: '' 
 const formValues = ref({ ...initialFormValues })
 const isEditing = ref(false)
 const serverFunctionId = computed(() => route.params.id as string | undefined)
+const pageTitle = computed(() => isEditing.value ? 'Editar função' : 'Nova função')
 const descriptionRef = ref<HTMLTextAreaElement | null>(null)
+
+// Observa mudanças na descrição e ajusta o tamanho do textarea automaticamente
+watchEffect(() => {
+  if (formValues.value.description) {
+    nextTick(() => {
+      autoResizeTextarea()
+    })
+  }
+})
 
 onMounted(async () => {
   if (serverFunctionId.value) {
+    console.log('ID da função para edição:', serverFunctionId.value)
+
     isEditing.value = true
     const fn = await serverFunctionService.getServerFunctionById(serverFunctionId.value)
+
+    console.log('Função encontrada:', fn)
+    
     if (fn) {
       formValues.value = { id: fn.id, name: fn.name, abbreviation: fn.abbreviation, description: (fn as any).description ?? '' }
-      await nextTick()
       autoResizeTextarea()
     }
   }
@@ -68,8 +82,11 @@ function trimDescription(event: Event) {
 function autoResizeTextarea() {
   const el = descriptionRef.value
   if (el) {
+    
+    el.style.height = '80px'
+    
     el.style.height = 'auto'
-    el.style.height = `${el.scrollHeight}px`
+    el.style.height = `${Math.max(80, el.scrollHeight)}px`
   }
 }
 </script>
@@ -79,15 +96,14 @@ function autoResizeTextarea() {
     <IonHeader>
       <IonToolbar>
         <IonTitle class="page-title">
-          Nova função
+          {{ pageTitle }}
         </IonTitle>
       </IonToolbar>
       <div class="toolbar-accent" />
     </IonHeader>
 
-    ```
     <IonContent :scroll-y="true" class="ion-padding content-with-footer">
-      <Form id="function-form" :initial-values="formValues" @submit="handleSubmit">
+      <Form id="function-form" :initial-values="formValues" :key="formValues.id || 'new'" @submit="handleSubmit">
         <IonGrid>
           <IonRow>
             <IonCol size="12">
@@ -131,6 +147,7 @@ function autoResizeTextarea() {
                     class="description-native"
                     placeholder=" "
                     maxlength="181"
+                    v-model="formValues.description"
                     @input="(event) => {
                       field.onInput(event);
                       trimDescription(event);
