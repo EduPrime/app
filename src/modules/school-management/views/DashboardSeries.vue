@@ -1,27 +1,21 @@
 <script setup lang="ts">
 import type { Tables } from '@/types/database.types'
+import EduprimeList from '@/components/ListWithAction.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
-// import SchoolCards from '@/modules/school-management/components/SchoolCards.vue'
-import SeriesList from '@/modules/school-management/components/SeriesList.vue'
 import { IonButton, IonCol, IonContent, IonIcon, IonModal, IonRow } from '@ionic/vue'
-import { set } from 'better-auth/*'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import SeriesService from '../services/SeriesService'
 import RegisterSeries from './RegisterSeries.vue'
 
-const router = useRouter()
-
-// Estados para os dados da instituição e carregamento
 const seriesService = new SeriesService()
 const dataList = ref<Tables<'series'>[]>([])
-const schoolCount = ref(154)
-const classCount = ref(25)
-const approvalRate = ref(48)
-const teacherCount = ref(30)
 const searchQuery = ref('')
 const isModalAddSchool = ref(false)
+
+const seeModal = ref({ modal: false, data: undefined })
+const editModal = ref({ modal: false, data: undefined })
+const deleteModal = ref({ modal: false, data: undefined })
 
 function setModalAddSeries(open: boolean) {
   isModalAddSchool.value = open
@@ -36,14 +30,14 @@ const filteredDataList = computed(() => {
     return dataList.value
   }
 
-  return dataList.value.filter((series: Tables<'series'>) =>
+  return dataList.value.filter((series: any) =>
     series.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
   )
 })
 
 async function loadSeries() {
   try {
-    const series = await seriesService.getAll() // getAll() pode retornar null
+    const series = await seriesService.getAllSeries() // getAll() pode retornar null
     dataList.value = series ?? [] // Se retornar null, atribuímos um array vazio
   }
   catch (error) {
@@ -62,38 +56,34 @@ onMounted(() => {
 
 <template>
   <ContentLayout>
-    <!-- <SchoolCards
-      :student-count="schoolCount" :class-count="classCount" :approval-rate="approvalRate"
-      :teacher-count="teacherCount"
-    /> -->
-    <ion-toolbar>
-      <!-- <ion-title>Séries ativas ({{ filteredDataList.length }})</ion-title> -->
-    </ion-toolbar>
-    <IonRow class="ion-align-items-center ion-justify-content-between">
-      <IonCol size="10">
-        <ion-searchbar v-model="searchQuery" placeholder="Buscar séries" />
-      </IonCol>
-      <IonCol size="2" class="ion-text-end">
-        <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="setModalAddSeries(true)">
-          <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
-          <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
-          <span class="ion-hide-sm-down">Novo</span>
-        </IonButton>
-      </IonCol>
-    </IonRow>
-    <SeriesList :data-list="filteredDataList" />
+    <div class="ion-margin-top">
+      <IonRow class="ion-align-items-center ion-justify-content-between">
+        <IonCol size="10">
+          <ion-searchbar v-model="searchQuery" placeholder="Buscar séries" />
+        </IonCol>
+        <IonCol size="2" class="ion-text-end">
+          <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="setModalAddSeries(true)">
+            <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
+            <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
+            <span class="ion-hide-sm-down">Novo</span>
+          </IonButton>
+        </IonCol>
+      </IonRow>
+      <!-- <SeriesList :data-list="filteredDataList" /> -->
+      <EduprimeList :data-list="filteredDataList" @update:delete="deleteModal = $event" @update:edit="editModal = $event" @update:see="($event) => { console.log($event); seeModal = $event; }" />
 
-    <IonModal
-      :is-open="isModalAddSchool"
-      :expand-to-scroll="false"
-      :initial-breakpoint="0.95"
-      :breakpoints="[0, 0.7, 0.95, 1]"
-      @ion-modal-did-dismiss="setModalAddSeries(false)"
-    >
-      <IonContent>
-        <RegisterSeries />
-      </IonContent>
-    </IonModal>
+      <IonModal
+        :is-open="isModalAddSchool"
+        :expand-to-scroll="false"
+        :initial-breakpoint="0.95"
+        :breakpoints="[0, 0.7, 0.95, 1]"
+        @ion-modal-did-dismiss="setModalAddSeries(false)"
+      >
+        <IonContent>
+          <RegisterSeries :close-modal="() => setModalAddSeries(false)" />
+        </IonContent>
+      </IonModal>
+    </div>
   </ContentLayout>
 </template>
 
@@ -105,5 +95,14 @@ ion-label h2 {
 
 ion-searchbar {
   --background: var(--ion-color-light);
+}
+
+ion-segment {
+  --background: rgba(var(--ion-color-tertiary-rgb), 0.15);
+  --color: var(--ion-color-secondary);
+}
+
+.custom-button {
+  max-width: 120px;
 }
 </style>

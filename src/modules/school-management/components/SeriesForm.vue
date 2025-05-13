@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import type { Decimal } from '@prisma/client/runtime/library'
-import EpInput from '@/components/EpInput.vue'
 import showToast from '@/utils/toast-alert'
-import { IonIcon, IonInput, IonLabel, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonSelect, IonSelectOption } from '@ionic/vue'
+import { IonButton, IonCol, IonGrid, IonIcon, IonInput, IonItem, IonLabel, IonList, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonSelect, IonSelectOption } from '@ionic/vue'
 import { listSharp } from 'ionicons/icons'
 import { Field, Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import * as yup from 'yup'
 import InstitutionService from '../../institution/services/InstitutionService'
-import SchoolService from '../../institution/services/SchoolService'
 import SeriesService from '../../institution/services/SeriesService'
 import CourseService from '../services/CourseService'
 
@@ -22,11 +20,10 @@ defineExpose({
   registerSeries,
 })
 
-const selectedSegment = ref('general-info')
+const selectedSegment = ref('general')
 const router = useRouter()
 const route = useRouter()
 const seriesId = computed(() => route.currentRoute.value.params.id) as { value: string }
-const schoolService = new SchoolService()
 const seriesService = new SeriesService()
 const courseService = new CourseService()
 const institutionService = new InstitutionService()
@@ -241,8 +238,30 @@ async function loadInstitution() {
   }
 }
 
+// Lista de disciplinas disponíveis
+const disciplineOptions = [
+  { id: 1, name: 'Matemática' },
+  { id: 2, name: 'Português' },
+  { id: 3, name: 'História' },
+  { id: 4, name: 'Geografia' },
+]
+
+// Lista dinâmica de disciplinas selecionadas
+const disciplines = ref([
+  { name: '', year: '', workload: '' }, // Campo inicial vazio
+])
+
+// Adiciona uma nova disciplina
+function addDiscipline() {
+  disciplines.value.push({ name: '', year: '', workload: '' })
+}
+
+// Remove uma disciplina pelo índice
+function removeDiscipline(index: number) {
+  disciplines.value.splice(index, 1)
+}
+
 onMounted(async () => {
-  schoolId.value = (await schoolService.getAll())?.at(0)?.id
   await loadSeries()
   await loadInstitution()
   if (seriesId.value) {
@@ -270,8 +289,8 @@ onMounted(async () => {
           Informações Cadastrais
         </IonLabel>
       </IonSegmentButton>
-      <IonSegmentButton value="rules" content-id="rules">
-        <IonLabel>Regras de avaliação</IonLabel>
+      <IonSegmentButton value="discipline-info" content-id="discipline-info">
+        <IonLabel>Disciplinas</IonLabel>
       </IonSegmentButton>
     </IonSegment>
 
@@ -307,22 +326,10 @@ onMounted(async () => {
           </IonSelect>
         </Field>
 
-        <Field name="discipline">
-          <IonSelect
-            v-model="values.graduate" fill="outline" cancel-text="Cancelar" label-placement="stacked"
-            justify="space-between" label="Disciplina*" placeholder="Selecione"
-            @ion-change="(e) => setFieldValue('graduate', e.target.value)"
-          >
-            <IonSelectOption v-for="graduate in graduate" :key="graduate" :value="graduate">
-              {{ graduate }}
-            </IonSelectOption>
-          </IonSelect>
-        </Field>
-
         <Field name="course_stage">
           <IonSelect
             v-model="values.courseStage" fill="outline" cancel-text="Cancelar" label-placement="stacked"
-            justify="space-between" label="Etapa Curso*" placeholder="Selecione"
+            justify="space-between" label="Etapas do Curso*" placeholder="Selecione"
             @ion-change="(e) => setFieldValue('courseStage', e.target.value)"
           >
             <IonSelectOption v-for="stage in course_stage" :key="stage" :value="stage">
@@ -335,9 +342,59 @@ onMounted(async () => {
           <IonInput v-model="values.description" name="Descrição" label="Descrição" label-placement="stacked" fill="outline" placeholder="Digite uma descrição da série" />
         </Field>
       </IonSegmentContent>
-      <IonSegmentContent id="rules">
-        <EpInput v-model="values.workload" name="workload" label="Carga Horária*" placeholder="Digite a carga horária" />
-        <EpInput v-model="values.schoolDays" name="schoolDays" label="Dias Letivos*" placeholder="Digite os dias letivos" />
+      <IonSegmentContent id="discipline-info">
+        <IonList>
+          <IonItem v-for="(discipline, index) in disciplines" :key="index">
+            <IonGrid>
+              <IonRow>
+                <IonCol size="12">
+                  <IonSelect
+                    v-model="discipline.name"
+                    label="Disciplina"
+                    label-placement="stacked"
+                    placeholder="Selecione uma disciplina"
+                    cancel-text="Cancelar"
+                    fill="outline"
+                  >
+                    <IonSelectOption v-for="option in disciplineOptions" :key="option.id" :value="option.name">
+                      {{ option.name }}
+                    </IonSelectOption>
+                  </IonSelect>
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol size="6">
+                  <IonInput
+                    v-model="discipline.workload"
+                    label-placement="stacked"
+                    label="Carga horária"
+                    placeholder="Digite a carga horária"
+                    fill="outline"
+                  />
+                </IonCol>
+                <IonCol size="6">
+                  <IonInput
+                    v-model="discipline.year"
+                    label-placement="stacked"
+                    label="Ano"
+                    placeholder="Digite o ano"
+                    fill="outline"
+                  />
+                </IonCol>
+
+                <IonCol size="12" class="ion-text-end">
+                  <IonButton color="danger" @click="removeDiscipline(index)">
+                    Remover
+                  </IonButton>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+          </IonItem>
+        </IonList>
+
+        <IonButton expand="block" @click="addDiscipline">
+          Adicionar Disciplina
+        </IonButton>
       </IonSegmentContent>
     </IonSegmentView>
   </Form>
