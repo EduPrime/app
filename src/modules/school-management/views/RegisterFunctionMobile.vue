@@ -11,11 +11,11 @@ import {
   IonRow,
   IonTextarea,
   IonToolbar,
+  IonPage
 } from '@ionic/vue'
 import { personSharp } from 'ionicons/icons'
 import { ErrorMessage, Field, Form } from 'vee-validate'
-import { computed, nextTick, onMounted, ref, watchEffect } from 'vue'
-// Router não é necessário neste componente pois usa emits para navegação
+import { computed, nextTick, onMounted, ref, watchEffect, reactive, watch } from 'vue'
 import ServerFunctionService from '../services/ServerFunctionService'
 
 const props = defineProps<{
@@ -27,7 +27,6 @@ const emits = defineEmits<{
   (e: 'cancel'): void
 }>()
 
-// Não precisamos do router aqui pois o componente pai gerencia a navegação
 const serverFunctionService = new ServerFunctionService()
 
 const descriptionRef = ref<HTMLTextAreaElement | null>(null)
@@ -38,10 +37,37 @@ const formValues = ref({
   description: '',
 })
 
+const originalFormValues = ref({
+  id: '',
+  name: '',
+  abbreviation: '',
+  description: '',
+})
+
+const hasChanges = ref(false)
 const isEditing = computed(() => Boolean(props.editId))
 const modalTitle = computed(() => isEditing.value ? 'Editar função' : 'Nova função')
 
-// Observa mudanças na descrição e ajusta o tamanho do textarea automaticamente
+const saveButtonEnabled = computed(() => {
+  if (!isEditing.value) {
+    const enabled = !!formValues.value.name || !!formValues.value.abbreviation || !!formValues.value.description;
+    return enabled;
+  }
+  
+  return hasChanges.value;
+})
+
+function checkForChanges() {
+  if (!isEditing.value) return;
+  
+  const hasNameChanged = formValues.value.name !== originalFormValues.value.name;
+  const hasAbbreviationChanged = formValues.value.abbreviation !== originalFormValues.value.abbreviation;
+  const hasDescriptionChanged = formValues.value.description !== originalFormValues.value.description;
+  
+  hasChanges.value = hasNameChanged || hasAbbreviationChanged || hasDescriptionChanged;
+  console.log('Mobile: Verificando mudanças:', { hasNameChanged, hasAbbreviationChanged, hasDescriptionChanged, hasChanges: hasChanges.value });
+}
+
 watchEffect(() => {
   if (formValues.value.description) {
     nextTick(() => {
@@ -49,6 +75,18 @@ watchEffect(() => {
     })
   }
 })
+
+watch(
+  () => ({ ...formValues.value }),
+  (newValues) => {
+    console.log('Mobile: Valores do formulário mudaram:', newValues);
+    
+    if (isEditing.value) {
+      checkForChanges();
+    }
+  },
+  { deep: true, immediate: true }
+);
 
 onMounted(async () => {
   if (props.editId) {
@@ -59,14 +97,33 @@ onMounted(async () => {
     console.log('Mobile: Função encontrada:', fn)
     
     if (fn) {
-      formValues.value = {
+      const loadedValues = {
         id: fn.id,
         name: fn.name,
         abbreviation: fn.abbreviation || '',
         description: (fn as any).description || '',
-      }
+      };
+      
+      formValues.value = { ...loadedValues };
+      originalFormValues.value = { ...loadedValues };
+      hasChanges.value = false; 
+      
       autoResizeTextarea()
     }
+  } else {
+    formValues.value = {
+      id: '',
+      name: '',
+      abbreviation: '',
+      description: '',
+    };
+    originalFormValues.value = {
+      id: '',
+      name: '',
+      abbreviation: '',
+      description: '',
+    };
+    hasChanges.value = false;
   }
 })
   
@@ -80,7 +137,6 @@ async function handleSubmit(values: any) {
 
   await serverFunctionService.upsertServerFunction(payload)
 
-  // Exibe mensagem de sucesso
   showToast('Nova função cadastrada com sucesso', 'top', 'success')
 
   handleSaved()
@@ -101,18 +157,22 @@ function trimDescription(event: any) {
 }
 
 function autoResizeTextarea() {
+  console.log('Mobile: Ajustando altura do textarea')
   const el = descriptionRef.value
   if (el) {
     el.style.height = '80px'
     el.style.height = 'auto'
     el.style.height = `${Math.max(80, el.scrollHeight)}px`
-  } 
+    console.log('Mobile: Nova altura:', el.style.height)
+  } else {
+    console.log('Mobile: Elemento textarea não encontrado')
+  }
 }
 </script>
 
 <template>
-  <div class="mobile-function-content">
-    <IonContent class="ion-padding ion-no-padding" :fullscreen="false">
+  <IonPage>
+    <IonContent class="ion-padding ion-no-padding" >
       <div class="style-purple-lane" style="display: flex; align-items: center;">
         <IonIcon :icon="personSharp" style="margin-right: 10px;" />
         {{ modalTitle }}
@@ -124,6 +184,8 @@ function autoResizeTextarea() {
               <Field v-slot="{ field, errors }" name="name" rules="required|min:3|max:180">
                 <IonInput
                   v-bind="field"
+                  v-model="formValues.name"
+                  @ionInput="field.onInput"
                   label="Nome da função"
                   label-placement="stacked"
                   fill="outline"
@@ -143,11 +205,14 @@ function autoResizeTextarea() {
             </IonCol>
           </IonRow>
 
+
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field, errors }" name="abbreviation">
                 <IonInput
                   v-bind="field"
+                  v-model="formValues.abbreviation"
+                  @ionInput="field.onInput"
                   label="Abreviação"
                   label-placement="stacked"
                   fill="outline"
@@ -162,6 +227,7 @@ function autoResizeTextarea() {
               </Field>
             </IonCol>
           </IonRow>
+
 
           <IonRow>
             <IonCol size="12">
@@ -193,37 +259,34 @@ function autoResizeTextarea() {
           </IonRow>
         </IonGrid>
       </Form>
-    </IonContent>
-
-    <IonFooter slot="fixed-bottom" class="ion-no-border footer-fixed">
-      <IonToolbar>
-        <IonGrid>
-          <IonRow class="action-buttons-fixed">
-            <IonCol size="6">
-              <IonButton color="danger" expand="block" @click="handleCancel()">
-                Cancelar
-              </IonButton>
-            </IonCol>
-            <IonCol size="6">
-              <IonButton expand="block" type="submit" form="function-form-mobile">
-                Salvar
-              </IonButton>
-            </IonCol>
-          </IonRow>
-        </IonGrid>
-      </IonToolbar>
-    </IonFooter>
-  </div>
+    </IonContent>  
+    <div>
+      <IonGrid>
+        <IonRow>
+          <IonCol size="6">
+            <IonButton color="danger" expand="block" @click="handleCancel()">
+              Cancelar
+            </IonButton>
+          </IonCol>
+          <IonCol size="6">
+            <IonButton expand="block" type="submit" form="function-form-mobile" :disabled="!saveButtonEnabled">
+              Salvar
+            </IonButton>
+          </IonCol>
+        </IonRow>
+      </IonGrid>
+    </div>
+  </IonPage>
 </template>
 
 <style scoped>
-.drag-handle {
+/* .drag-handle {
   width: 36px;
   height: 4px;
   border-radius: 2px;
   margin: 10px auto;
   background-color: var(--ion-color-medium);
-}
+} */
 
 .style-purple-lane {
   background: rgba(var(--ion-color-secondary-rgb), 0.15);
@@ -248,17 +311,17 @@ function autoResizeTextarea() {
   padding-left: 16px;
 }
 
-.action-buttons-fixed {
+/* .action-buttons-fixed {
   margin: 0;
   padding: 8px;
-}
+} */
 
 ion-input.has-error,
 ion-textarea.has-error {
   --border-color: var(--ion-color-danger);
 }
 
-.mobile-function-content {
+/* .mobile-function-content {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -283,5 +346,5 @@ ion-modal .modal-wrapper {
   bottom: 0;
   background: var(--ion-color-light);
   padding: 8px 0;
-}
+} */
 </style>

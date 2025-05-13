@@ -163,12 +163,10 @@ onMounted(() => {
           :breakpoints="[0, 0.7, 0.95, 1]"
           @ion-modal-did-dismiss="setModalAddFunction(false)"
         >
-          <IonContent>
-            <RegisterFunctionMobile 
-              @saved="loadFunctions(); setModalAddFunction(false)" 
-              @cancel="setModalAddFunction(false)" 
-            />
-          </IonContent>
+          <RegisterFunctionMobile 
+            @saved="loadFunctions(); setModalAddFunction(false)" 
+            @cancel="setModalAddFunction(false)" 
+          />
         </IonModal>
 
         <IonModal

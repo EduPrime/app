@@ -13,7 +13,7 @@ import {
   IonToolbar,
 } from '@ionic/vue'
 import { ErrorMessage, Field, Form } from 'vee-validate'
-import { computed, nextTick, onMounted, ref, watchEffect } from 'vue'
+import { computed, nextTick, onMounted, ref, watchEffect, reactive, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ServerFunctionService from '../services/ServerFunctionService'
 
@@ -23,12 +23,35 @@ const serverFunctionService = new ServerFunctionService()
 
 const initialFormValues = { id: '', name: '', abbreviation: '', description: '' }
 const formValues = ref({ ...initialFormValues })
+const originalFormValues = ref({ ...initialFormValues })
 const isEditing = ref(false)
 const serverFunctionId = computed(() => route.params.id as string | undefined)
 const pageTitle = computed(() => isEditing.value ? 'Editar função' : 'Nova função')
 const descriptionRef = ref<HTMLTextAreaElement | null>(null)
+const hasChanges = ref(false)
 
-// Observa mudanças na descrição e ajusta o tamanho do textarea automaticamente
+// Função para verificar se houve mudanças nos campos
+function checkForChanges() {
+  if (!isEditing.value) return;
+  
+  const hasNameChanged = formValues.value.name !== originalFormValues.value.name;
+  const hasAbbreviationChanged = formValues.value.abbreviation !== originalFormValues.value.abbreviation;
+  const hasDescriptionChanged = formValues.value.description !== originalFormValues.value.description;
+  
+  hasChanges.value = hasNameChanged || hasAbbreviationChanged || hasDescriptionChanged;
+  console.log('Verificando mudanças:', { hasNameChanged, hasAbbreviationChanged, hasDescriptionChanged, hasChanges: hasChanges.value });
+}
+
+const saveButtonEnabled = computed(() => {
+  if (!isEditing.value) {
+    const enabled = !!formValues.value.name || !!formValues.value.abbreviation || !!formValues.value.description;
+    return enabled;
+  }
+  
+  console.log('Modo edição - Botão habilitado:', hasChanges.value);
+  return hasChanges.value;
+})
+
 watchEffect(() => {
   if (formValues.value.description) {
     nextTick(() => {
@@ -36,6 +59,18 @@ watchEffect(() => {
     })
   }
 })
+
+watch(
+  () => ({ ...formValues.value }),
+  (newValues) => {
+    console.log('Valores do formulário mudaram:', newValues);
+    
+    if (isEditing.value) {
+      checkForChanges();
+    }
+  },
+  { deep: true, immediate: true }
+)
 
 onMounted(async () => {
   if (serverFunctionId.value) {
@@ -47,9 +82,24 @@ onMounted(async () => {
     console.log('Função encontrada:', fn)
     
     if (fn) {
-      formValues.value = { id: fn.id, name: fn.name, abbreviation: fn.abbreviation, description: (fn as any).description ?? '' }
-      autoResizeTextarea()
+      // Armazena os valores originais
+      const loadedValues = { 
+        id: fn.id, 
+        name: fn.name, 
+        abbreviation: fn.abbreviation || '', 
+        description: (fn as any).description ?? '' 
+      };
+      
+      formValues.value = { ...loadedValues };
+      originalFormValues.value = { ...loadedValues };
+      hasChanges.value = false; 
+      
+      autoResizeTextarea();
     }
+  } else {
+    formValues.value = { ...initialFormValues };
+    originalFormValues.value = { ...initialFormValues };
+    hasChanges.value = false;
   }
 })
 
@@ -63,10 +113,8 @@ async function handleSubmit(values: any) {
 
   await serverFunctionService.upsertServerFunction(payload)
 
-  // Exibe mensagem de sucesso
   showToast('Nova função cadastrada com sucesso', 'top', 'success')
 
-  // Navega para a lista de funções
   router.push({ name: 'FunctionListFunction' })
 }
 
@@ -80,13 +128,15 @@ function trimDescription(event: Event) {
     el.value = el.value.slice(0, 180)
 }
 function autoResizeTextarea() {
+  console.log('Ajustando altura do textarea')
   const el = descriptionRef.value
   if (el) {
-    
     el.style.height = '80px'
-    
     el.style.height = 'auto'
     el.style.height = `${Math.max(80, el.scrollHeight)}px`
+    console.log('Nova altura:', el.style.height)
+  } else {
+    console.log('Elemento textarea não encontrado')
   }
 }
 </script>
@@ -109,7 +159,14 @@ function autoResizeTextarea() {
             <IonCol size="12">
               <Field v-slot="{ field }" name="name" label="Nome da função" rules="required|min:3|max:180">
                 <div class="floating-input">
-                  <input v-bind="field" type="text" class="floating-native" placeholder=" ">
+                  <input 
+                    v-bind="field" 
+                    v-model="formValues.name"
+                    type="text" 
+                    class="floating-native" 
+                    placeholder=" "
+                    @input="field.onInput"
+                  >
                   <label class="floating-label"><span>Nome da função </span><span class="required-text">(Obrigatório)</span></label>
                 </div>
                 <ErrorMessage v-slot="{ message }" name="name">
@@ -125,7 +182,14 @@ function autoResizeTextarea() {
             <IonCol size="12">
               <Field v-slot="{ field }" name="abbreviation">
                 <div class="floating-input">
-                  <input v-bind="field" type="text" class="floating-native" placeholder=" ">
+                  <input 
+                    v-bind="field" 
+                    v-model="formValues.abbreviation"
+                    type="text" 
+                    class="floating-native" 
+                    placeholder=" "
+                    @input="field.onInput"
+                  >
                   <label class="floating-label"><span>Abreviação</span></label>
                 </div>
                 <ErrorMessage v-slot="{ message }" name="abbreviation">
@@ -178,7 +242,7 @@ function autoResizeTextarea() {
               </IonButton>
             </IonCol>
             <IonCol size="6">
-              <IonButton expand="block" type="submit" form="function-form">
+              <IonButton expand="block" type="submit" form="function-form" :disabled="!saveButtonEnabled">
                 Salvar
               </IonButton>
             </IonCol>
