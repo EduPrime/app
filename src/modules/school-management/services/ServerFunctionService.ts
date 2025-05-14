@@ -23,6 +23,7 @@ export default class ServerFunctionService extends BaseService<ServerFunction> {
       .from(table)
       .select('*')
       .is('deletedAt', null)
+      .order('name')
 
     if (error) {
       errorHandler(error, 'Erro ao buscar funções de servidor')
