@@ -318,7 +318,7 @@ model TeacherAttendance {
   id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   date         DateTime       @db.Date
   totalClasses Int
-  type         attendanceType
+  type         frequencyType?
   teacherId    String         @db.Uuid
   classroomId  String         @db.Uuid
   disciplineId String?        @db.Uuid
@@ -796,7 +796,7 @@ model School {
   educationNetwork             Boolean?
   administrativeDependency     Organ?
   name                         String                 @db.VarChar(100)
-  cnpj                         Decimal?               @db.Decimal(14, 0)
+  cnpj                         String?                @db.VarChar(18)
   address                      String?                @db.VarChar(255)
   addressNumber                String?                @db.VarChar(10)
   additionalInfo               String?                @db.VarChar(255)
