@@ -1,18 +1,9 @@
-import { book, create, list, people, person, school } from 'ionicons/icons'
-import DashboardClass from './views/DashboardClass.vue'
-import DashboardCourse from './views/DashboardCourse.vue'
+import { create, person, school } from 'ionicons/icons'
 import DashboardFunction from './views/DashboardFunction.vue'
 // import DashboardSchools from './views/DashboardSchools.vue'
-import DashboardSeries from './views/DashboardSeries.vue'
-import EditClass from './views/EditClass.vue'
-import EditCourse from './views/EditCourse.vue'
-import EditSeries from './views/EditSeries.vue'
 import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
-import RegisterClass from './views/RegisterClass.vue'
-import RegisterCourse from './views/RegisterCourse.vue'
 import RegisterFunction from './views/RegisterFunction.vue'
 // import RegisterSchool from './views/RegisterSchool.vue'
-import RegisterSeries from './views/RegisterSeries.vue'
 
 const routes = [
   // {
@@ -54,117 +45,117 @@ const routes = [
   //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
   //   },
   // },
-  {
-    path: '/Class/list',
-    name: 'ClassListClass',
-    component: DashboardClass,
-    meta: {
-      moduleName: 'Schools',
-      moduleIcon: school,
-      icon: people,
-      name: 'Turmas',
-      order: 4,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
-  {
-    path: '/Class/register',
-    name: 'RegisterClass',
-    component: RegisterClass,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Registrar turma',
-      order: 5,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
-  {
-    path: '/Class/edit/:id',
-    name: 'EditClass',
-    component: EditClass,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Editar turma',
-      order: 6,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
-  {
-    path: '/Series/list',
-    name: 'SeriesListSeries',
-    component: DashboardSeries,
-    meta: {
-      moduleName: 'Schools',
-      moduleIcon: school,
-      icon: list,
-      name: 'Séries',
-      order: 7,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
-  {
-    path: '/Series/edit/:id',
-    name: 'EditSeries',
-    component: EditSeries,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Editar série',
-      order: 8,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
-  {
-    path: '/Series/register',
-    name: 'RegisterSeries',
-    component: RegisterSeries,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Registrar série',
-      order: 9,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
-  {
-    path: '/Course/list',
-    name: 'CourseListCourse',
-    component: DashboardCourse,
-    meta: {
-      moduleName: 'Schools',
-      moduleIcon: school,
-      icon: book,
-      name: 'Cursos',
-      order: 10,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
-  {
-    path: '/Course/edit/:id',
-    name: 'EditCourse',
-    component: EditCourse,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Editar curso',
-      order: 11,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
-  {
-    path: '/Course/register',
-    name: 'RegisterCourse',
-    component: RegisterCourse,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Registrar curso',
-      order: 12,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
+  // {
+  //   path: '/Class/list',
+  //   name: 'ClassListClass',
+  //   component: DashboardClass,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     moduleIcon: school,
+  //     icon: people,
+  //     name: 'Turmas',
+  //     order: 4,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Class/register',
+  //   name: 'RegisterClass',
+  //   component: RegisterClass,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     icon: create,
+  //     name: 'Registrar turma',
+  //     order: 5,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Class/edit/:id',
+  //   name: 'EditClass',
+  //   component: EditClass,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     icon: create,
+  //     name: 'Editar turma',
+  //     order: 6,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Series/list',
+  //   name: 'SeriesListSeries',
+  //   component: DashboardSeries,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     moduleIcon: school,
+  //     icon: list,
+  //     name: 'Séries',
+  //     order: 7,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Series/edit/:id',
+  //   name: 'EditSeries',
+  //   component: EditSeries,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     icon: create,
+  //     name: 'Editar série',
+  //     order: 8,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Series/register',
+  //   name: 'RegisterSeries',
+  //   component: RegisterSeries,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     icon: create,
+  //     name: 'Registrar série',
+  //     order: 9,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Course/list',
+  //   name: 'CourseListCourse',
+  //   component: DashboardCourse,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     moduleIcon: school,
+  //     icon: book,
+  //     name: 'Cursos',
+  //     order: 10,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Course/edit/:id',
+  //   name: 'EditCourse',
+  //   component: EditCourse,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     icon: create,
+  //     name: 'Editar curso',
+  //     order: 11,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Course/register',
+  //   name: 'RegisterCourse',
+  //   component: RegisterCourse,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     icon: create,
+  //     name: 'Registrar curso',
+  //     order: 12,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
   {
     path: '/Function/list',
     name: 'FunctionListFunction',
