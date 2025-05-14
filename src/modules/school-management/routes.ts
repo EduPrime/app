@@ -4,6 +4,7 @@ import DashboardCourse from './views/DashboardCourse.vue'
 import DashboardFunction from './views/DashboardFunction.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
 import DashboardSeries from './views/DashboardSeries.vue'
+import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
 import EditClass from './views/EditClass.vue'
 import EditCourse from './views/EditCourse.vue'
 import EditSchools from './views/EditSchools.vue'
@@ -187,6 +188,18 @@ const routes = [
       icon: create,
       name: 'Registrar função',
       order: 14,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/Function/details/:id',
+    name: 'FunctionDetails',
+    component: FunctionDetailsDesktop,
+    meta: {
+      moduleName: 'Schools',
+      icon: person,
+      name: 'Detalhes da função',
+      order: 15,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
