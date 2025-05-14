@@ -65,7 +65,6 @@ function checkForChanges() {
   const hasDescriptionChanged = formValues.value.description !== originalFormValues.value.description
 
   hasChanges.value = hasNameChanged || hasAbbreviationChanged || hasDescriptionChanged
-  console.log('Mobile: Verificando mudanças:', { hasNameChanged, hasAbbreviationChanged, hasDescriptionChanged, hasChanges: hasChanges.value })
 }
 
 watchEffect(() => {
@@ -138,7 +137,11 @@ async function handleSubmit(values: any) {
 
   await serverFunctionService.upsertServerFunction(payload)
 
-  showToast('Nova função cadastrada com sucesso', 'top', 'success')
+  const successMessage = isEditing.value
+    ? 'Função atualizada com sucesso'
+    : 'Nova função cadastrada com sucesso'
+    
+  showToast(successMessage, 'top', 'success')
 
   handleSaved()
 }
@@ -158,16 +161,11 @@ function trimDescription(event: any) {
 }
 
 function autoResizeTextarea() {
-  console.log('Mobile: Ajustando altura do textarea')
   const el = descriptionRef.value
   if (el) {
     el.style.height = '80px'
     el.style.height = 'auto'
     el.style.height = `${Math.max(80, el.scrollHeight)}px`
-    console.log('Mobile: Nova altura:', el.style.height)
-  }
-  else {
-    console.log('Mobile: Elemento textarea não encontrado')
   }
 }
 </script>

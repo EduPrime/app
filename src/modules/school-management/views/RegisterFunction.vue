@@ -39,7 +39,6 @@ function checkForChanges() {
   const hasDescriptionChanged = formValues.value.description !== originalFormValues.value.description;
   
   hasChanges.value = hasNameChanged || hasAbbreviationChanged || hasDescriptionChanged;
-  console.log('Verificando mudanças:', { hasNameChanged, hasAbbreviationChanged, hasDescriptionChanged, hasChanges: hasChanges.value });
 }
 
 const saveButtonEnabled = computed(() => {
@@ -48,7 +47,6 @@ const saveButtonEnabled = computed(() => {
     return enabled;
   }
   
-  console.log('Modo edição - Botão habilitado:', hasChanges.value);
   return hasChanges.value;
 })
 
@@ -113,9 +111,16 @@ async function handleSubmit(values: any) {
 
   await serverFunctionService.upsertServerFunction(payload)
 
-  showToast('Nova função cadastrada com sucesso', 'top', 'success')
+  const successMessage = isEditing.value
+    ? 'Função atualizada com sucesso'
+    : 'Nova função cadastrada com sucesso'
+    
+  showToast(successMessage, 'top', 'success')
 
-  router.push({ name: 'FunctionListFunction' })
+  router.push({ 
+    name: 'FunctionListFunction',
+    query: { refresh: Date.now().toString() } 
+  })
 }
 
 function resetForm() {
@@ -128,15 +133,11 @@ function trimDescription(event: Event) {
     el.value = el.value.slice(0, 180)
 }
 function autoResizeTextarea() {
-  console.log('Ajustando altura do textarea')
   const el = descriptionRef.value
   if (el) {
     el.style.height = '80px'
     el.style.height = 'auto'
     el.style.height = `${Math.max(80, el.scrollHeight)}px`
-    console.log('Nova altura:', el.style.height)
-  } else {
-    console.log('Elemento textarea não encontrado')
   }
 }
 </script>

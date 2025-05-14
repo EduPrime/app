@@ -6,12 +6,14 @@ import FunctionDetailView from '@/components/FunctionDetailView.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCol, IonContent, IonIcon, IonModal, IonPage, IonRow, IonSearchbar, IonText } from '@ionic/vue'
 import { add } from 'ionicons/icons'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ServerFunctionService from '../services/ServerFunctionService'
 import RegisterFunctionMobile from './RegisterFunctionMobile.vue'
+import showToast from '@/utils/toast-alert'
 
 const router = useRouter()
+const route = router.currentRoute
 const serverFunctionService = new ServerFunctionService()
 const dataList = ref<ServerFunction[]>([])
 const searchQuery = ref('')
@@ -35,14 +37,18 @@ const adaptedDataList = computed(() => {
 })
 
 const filteredDataList = computed(() => {
-  if (!searchQuery.value) {
-    return adaptedDataList.value
-  }
-
-  return adaptedDataList.value.filter(item =>
-    item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-    || (item.abbreviation && item.abbreviation.toLowerCase().includes(searchQuery.value.toLowerCase())),
-  )
+  // Primeiro filtra a lista se houver uma consulta de busca
+  const filtered = searchQuery.value
+    ? adaptedDataList.value.filter(item =>
+        item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
+        || (item.abbreviation && item.abbreviation.toLowerCase().includes(searchQuery.value.toLowerCase()))
+      )
+    : adaptedDataList.value
+  
+  // Depois ordena a lista alfabeticamente pelo nome
+  return filtered.sort((a, b) => {
+    return a.name.localeCompare(b.name)
+  })
 })
 
 function setModalAddFunction(open: boolean) {
@@ -72,18 +78,32 @@ function editItem(id: string) {
 }
 
 function setSeeModal(open: boolean) {
-  seeModal.value.modal = open
   if (open) {
     seeModal.value.modal = false
     setTimeout(() => (seeModal.value.modal = true), 10)
   }
+  else {
+    seeModal.value.modal = open
+  }
 }
 
 function setEditModal(open: boolean) {
-  editModal.value.modal = open
   if (open) {
     editModal.value.modal = false
     setTimeout(() => (editModal.value.modal = true), 10)
+  }
+  else {
+    editModal.value.modal = open
+  }
+}
+
+function setDeleteModal(open: boolean) {
+  if (open) {
+    deleteModal.value.modal = false
+    setTimeout(() => (deleteModal.value.modal = true), 10)
+  }
+  else {
+    deleteModal.value.modal = open
   }
 }
 
@@ -102,21 +122,39 @@ function isMobileDevice() {
 }
 
 async function handleDelete() {
-  if (deleteModal.value.data?.id) {
+  if (deleteModal.value?.data?.id) {
     try {
       await serverFunctionService.softDeleteServerFunction(deleteModal.value.data.id)
       loadFunctions()
-      deleteModal.value.modal = false
+      setDeleteModal(false)
     }
-    catch (error) {
+    catch (error: any) {
       console.error('Erro ao excluir função:', error)
+      
+      // Verifica se é o erro específico de servidores vinculados
+      if (error.message && error.message.includes('servidores vinculados')) {
+        showToast('Não é possível excluir: Existem servidores vinculados a essa função', 'top', 'warning')
+      }
     }
+  } else {
+    console.error('ID da função não encontrado para exclusão:', deleteModal)
   }
 }
 
 onMounted(() => {
   loadFunctions()
 })
+
+// Observar mudanças na rota para recarregar a lista quando retornar do cadastro (Caso para RegisterFunction pós salvar nova função)
+watch(
+  () => route.value.query,
+  (query) => {
+    if (query.refresh) {
+      loadFunctions()
+    }
+  },
+  { deep: true }
+)
 </script>
 
 <template>
@@ -138,18 +176,16 @@ onMounted(() => {
 
         <ListWithActionFunction
           :data-list="filteredDataList"
-          @update:delete="deleteModal = $event" 
+          @update:delete="(event) => {
+            deleteModal = event;
+            setDeleteModal(true);
+          }" 
           @update:edit="(event) => { 
             
             if (isMobileDevice()) {
-              
-              
               editingId = event.data?.id
-              
-              
               setEditModal(true)
             } else {
-              
               router.push({ name: 'RegisterFunction', params: { id: event.data?.id } })
             }
           }" 
@@ -165,7 +201,7 @@ onMounted(() => {
         <IonModal
           :is-open="isModalAddFunction"
           :expand-to-scroll="false"
-          :initial-breakpoint="isMobileDevice() ? 0.7 : 0.95"
+          :initial-breakpoint="0.95"
           :breakpoints="[0, 0.7, 0.95, 1]"
           @ion-modal-did-dismiss="setModalAddFunction(false)"
         >
@@ -178,7 +214,7 @@ onMounted(() => {
         <IonModal
           :is-open="seeModal.modal"
           :expand-to-scroll="false"
-          :initial-breakpoint="isMobileDevice() ? 0.7 : 0.95"
+          :initial-breakpoint="0.95"
           :breakpoints="[0, 0.7, 0.95, 1]"
           @did-dismiss="setSeeModal(false)"
         >
@@ -199,7 +235,7 @@ onMounted(() => {
         <IonModal
           :is-open="editModal.modal"
           :expand-to-scroll="false"
-          :initial-breakpoint="isMobileDevice() ? 0.7 : 0.95"
+          :initial-breakpoint="0.95"
           :breakpoints="[0, 0.7, 0.95, 1]"
           @ion-modal-did-dismiss="setEditModal(false)"
         >
@@ -212,7 +248,7 @@ onMounted(() => {
           </IonContent>
         </IonModal>
 
-        <IonModal id="delete-modal" :is-open="deleteModal.modal" @ion-modal-did-dismiss="deleteModal.modal = false">
+        <IonModal id="delete-modal" :is-open="deleteModal.modal" @ion-modal-did-dismiss="setDeleteModal(false)">
           <IonCard class="ion-no-margin">
             <IonCardHeader>
               <IonCardTitle>Excluir função</IonCardTitle>
@@ -224,7 +260,7 @@ onMounted(() => {
                   size="small"
                   style="margin-left: auto; margin-right: 8px; text-transform: capitalize;"
                   color="medium"
-                  @click="deleteModal.modal = false"
+                  @click="setDeleteModal(false)"
                 >
                   Cancelar
                 </IonButton>

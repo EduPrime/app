@@ -122,6 +122,24 @@ export default class ServerFunctionService extends BaseService<ServerFunction> {
       return []
     }
 
+    const { data: servers, error: assocError } = await this.client
+      .from('servers')
+      .select('id')
+      .eq('functionId', serverFunctionId)
+      .is('deletedAt', null)
+
+    if (assocError) {
+      errorHandler(assocError, 'Erro ao verificar servidores associados')
+      return []
+    }
+
+    console.log('Servidores associados:', servers)
+    console.log('Servidor Função Id:', serverFunctionId)
+
+    if (servers && servers.length > 0) {
+      throw new Error('Não é possível excluir: existem servidores vinculados a essa função.')
+    }
+
     const now = new Date().toISOString()
     const updateFields: Record<string, any> = {
       deletedAt: now,
