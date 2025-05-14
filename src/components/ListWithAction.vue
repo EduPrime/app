@@ -35,11 +35,9 @@ const itemSliding = ref<(InstanceType<typeof IonItemSliding> | null)[]>([])
 
 const innerWidth = window.innerWidth
 
-function handleOpened(index: number) {
-  isOpen.value[index] = true
-
-  // Marca o item como aberto ao deslizar
-}
+// function handleOpened(index: number) {
+//   isOpen.value[index] = true
+// }
 </script>
 
 <template>
@@ -63,8 +61,8 @@ function handleOpened(index: number) {
           <div v-if="innerWidth < 992">
             <IonItemSliding
               v-for="(item, index) in props.dataList" :key="index" ref="itemSliding"
-              @ion-drag="console.log('ion-drag')"
             >
+              <!-- @ion-drag="console.log('ion-drag')" -->
               <IonItem>
                 <IonLabel color="primary" class="ion-no-margin" style="margin-top: 5px; margin-bottom: 5px;">
                   <h2>{{ item.name || 'Item sem nome' }}</h2>
@@ -75,23 +73,26 @@ function handleOpened(index: number) {
                 <IonIcon :icon="isOpen[index] ? arrowForward : arrowBack" style="font-size: 18pt;" />
               </IonItem>
 
-              <IonItemOptions side="end" style="border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);" @ion-swipe="handleOpened(index)">
-                <!-- <IonItemOption color="tertiary" @click="emits('update:see', { modal: true, data: item })">
-                <div style="width: 40px; display: flex; justify-content: center;">
-                  <IonIcon :icon="eye" style="font-size: 18pt;" />
-                </div>
-              </IonItemOption>
-              <IonItemOption color="primary" @click="emits('update:edit', { modal: true, data: item })">
-                <div style="width: 40px; display: flex; justify-content: center;">
-                  <IonIcon :icon="pencilSharp" style="font-size: 18pt;" />
-                </div>
-              </IonItemOption>
-              <IonItemOption color="danger" @click="emits('update:delete', { modal: true, data: item })">
-                <div style="width: 40px; display: flex; justify-content: center;">
-                  <IonIcon :icon="trashSharp" style="font-size: 18pt;" />
-                </div>
-              </IonItemOption> -->
-                <IonItemOption style="background-color: white; border-left: 1px solid var(--ion-color-primary);" @click="emits('update:see', { modal: true, data: item })">
+              <IonItemOptions side="end" style="border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);">
+                <!-- @ion-swipe="handleOpened(index)" -->
+
+                <IonItemOption color="tertiary" @click="emits('update:see', { modal: true, data: item })">
+                  <div style="width: 40px; display: flex; justify-content: center;">
+                    <IonIcon :icon="eye" style="font-size: 18pt;" />
+                  </div>
+                </IonItemOption>
+                <IonItemOption color="primary" @click="emits('update:edit', { modal: true, data: item })">
+                  <div style="width: 40px; display: flex; justify-content: center;">
+                    <IonIcon :icon="pencilSharp" style="font-size: 18pt;" />
+                  </div>
+                </IonItemOption>
+                <IonItemOption color="danger" @click="emits('update:delete', { modal: true, data: item })">
+                  <div style="width: 40px; display: flex; justify-content: center;">
+                    <IonIcon :icon="trashSharp" style="font-size: 18pt;" />
+                  </div>
+                </IonItemOption>
+
+                <!-- <IonItemOption style="background-color: white; border-left: 1px solid var(--ion-color-primary);" @click="emits('update:see', { modal: true, data: item })">
                   <div style="width: 40px; display: flex; justify-content: center;">
                     <IonIcon color="tertiary" :icon="eye" style="font-size: 18pt;" />
                   </div>
@@ -105,7 +106,7 @@ function handleOpened(index: number) {
                   <div style="width: 40px; display: flex; justify-content: center;">
                     <IonIcon color="danger" :icon="trashSharp" style="font-size: 18pt;" />
                   </div>
-                </IonItemOption>
+                </IonItemOption> -->
               </IonItemOptions>
             </IonItemSliding>
           </div>
