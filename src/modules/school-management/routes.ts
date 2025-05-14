@@ -2,59 +2,58 @@ import { book, create, list, people, person, school } from 'ionicons/icons'
 import DashboardClass from './views/DashboardClass.vue'
 import DashboardCourse from './views/DashboardCourse.vue'
 import DashboardFunction from './views/DashboardFunction.vue'
-import DashboardSchools from './views/DashboardSchools.vue'
+// import DashboardSchools from './views/DashboardSchools.vue'
 import DashboardSeries from './views/DashboardSeries.vue'
-import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
 import EditClass from './views/EditClass.vue'
 import EditCourse from './views/EditCourse.vue'
-import EditSchools from './views/EditSchools.vue'
 import EditSeries from './views/EditSeries.vue'
+import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
 import RegisterClass from './views/RegisterClass.vue'
 import RegisterCourse from './views/RegisterCourse.vue'
 import RegisterFunction from './views/RegisterFunction.vue'
-import RegisterSchool from './views/RegisterSchool.vue'
+// import RegisterSchool from './views/RegisterSchool.vue'
 import RegisterSeries from './views/RegisterSeries.vue'
 
 const routes = [
-  {
-    path: '/Schools/list',
-    name: 'InstitutionListInstitutions',
-    component: DashboardSchools,
-    meta: {
-      moduleName: 'Schools',
-      moduleIcon: school,
-      icon: school,
-      name: 'Escolas',
-      order: 1,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
-  {
-    path: '/Schools/edit/:id',
-    name: 'EditSchools',
-    component: EditSchools,
-    moduleName: 'Schools',
-    moduleIcon: school,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Editar escola',
-      order: 2,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
-  {
-    path: '/Schools/register',
-    name: 'RegisterSchool',
-    component: RegisterSchool,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Registrar escola',
-      order: 3,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
+  // {
+  //   path: '/Schools/list',
+  //   name: 'InstitutionListInstitutions',
+  //   component: DashboardSchools,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     moduleIcon: school,
+  //     icon: school,
+  //     name: 'Escolas',
+  //     order: 1,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Schools/edit/:id',
+  //   name: 'EditSchools',
+  //   component: EditSchools,
+  //   moduleName: 'Schools',
+  //   moduleIcon: school,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     icon: create,
+  //     name: 'Editar escola',
+  //     order: 2,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Schools/register',
+  //   name: 'RegisterSchool',
+  //   component: RegisterSchool,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     icon: create,
+  //     name: 'Registrar escola',
+  //     order: 3,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
   {
     path: '/Class/list',
     name: 'ClassListClass',

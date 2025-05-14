@@ -38,7 +38,7 @@ function handleSwipeClosed(index: number) {
 
 onMounted(() => {
   window.addEventListener('resize', updateInnerWidth)
-  isOpen.value = Array.from({ length: props.dataList.length }).fill(false)
+  isOpen.value = Array.from<boolean>({ length: props.dataList.length }).fill(false)
 })
 
 onUnmounted(() => {
