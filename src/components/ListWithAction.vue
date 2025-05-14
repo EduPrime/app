@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList } from '@ionic/vue'
-import { eye, pencilSharp, school, trashSharp } from 'ionicons/icons'
+import { arrowBack, arrowForward, eye, pencilSharp, school, trashSharp } from 'ionicons/icons'
+import { ref } from 'vue'
 
 interface Props {
   dataList: {
@@ -28,6 +29,17 @@ interface Props {
 
 const props = defineProps<Props>()
 const emits = defineEmits(['update:see', 'update:edit', 'update:delete'])
+
+const isOpen = ref<boolean[]>([])
+const itemSliding = ref<(InstanceType<typeof IonItemSliding> | null)[]>([])
+
+const innerWidth = window.innerWidth
+
+function handleOpened(index: number) {
+  isOpen.value[index] = true
+
+  // Marca o item como aberto ao deslizar
+}
 </script>
 
 <template>
@@ -44,18 +56,27 @@ const emits = defineEmits(['update:see', 'update:edit', 'update:delete'])
     <div v-if="true">
       <IonCardContent class="ion-no-padding">
         <!-- listando -->
-
+        <!-- <pre>
+          list: {{ list }}
+        </pre> -->
         <IonList>
-          <IonItemSliding v-for="(item, index) in props.dataList" :key="index">
-            <IonItem>
-              <IonLabel class="ion-no-margin" style="margin-top: 5px; margin-bottom: 5px;">
-                <h2>{{ item.name || 'Item sem nome' }}</h2>
-                <p>{{ item.address || 'Sem endereço' }}</p>
-              </IonLabel>
-            </IonItem>
+          <div v-if="innerWidth < 992">
+            <IonItemSliding
+              v-for="(item, index) in props.dataList" :key="index" ref="itemSliding"
+              @ion-drag="console.log('ion-drag')"
+            >
+              <IonItem>
+                <IonLabel color="primary" class="ion-no-margin" style="margin-top: 5px; margin-bottom: 5px;">
+                  <h2>{{ item.name || 'Item sem nome' }}</h2>
+                  <p style="color: rgba(var(--ion-color-primary-rgb), 0.6);">
+                    {{ item.address || 'Sem endereço' }}
+                  </p>
+                </IonLabel>
+                <IonIcon :icon="isOpen[index] ? arrowForward : arrowBack" style="font-size: 18pt;" />
+              </IonItem>
 
-            <IonItemOptions>
-              <IonItemOption color="tertiary" @click="emits('update:see', { modal: true, data: item })">
+              <IonItemOptions side="end" style="border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);" @ion-swipe="handleOpened(index)">
+                <!-- <IonItemOption color="tertiary" @click="emits('update:see', { modal: true, data: item })">
                 <div style="width: 40px; display: flex; justify-content: center;">
                   <IonIcon :icon="eye" style="font-size: 18pt;" />
                 </div>
@@ -69,11 +90,58 @@ const emits = defineEmits(['update:see', 'update:edit', 'update:delete'])
                 <div style="width: 40px; display: flex; justify-content: center;">
                   <IonIcon :icon="trashSharp" style="font-size: 18pt;" />
                 </div>
-              </IonItemOption>
-            </IonItemOptions>
-          </IonItemSliding>
+              </IonItemOption> -->
+                <IonItemOption style="background-color: white; border-left: 1px solid var(--ion-color-primary);" @click="emits('update:see', { modal: true, data: item })">
+                  <div style="width: 40px; display: flex; justify-content: center;">
+                    <IonIcon color="tertiary" :icon="eye" style="font-size: 18pt;" />
+                  </div>
+                </IonItemOption>
+                <IonItemOption style="background-color: white;" @click="emits('update:edit', { modal: true, data: item })">
+                  <div style="width: 40px; display: flex; justify-content: center;">
+                    <IonIcon color="primary" :icon="pencilSharp" style="font-size: 18pt;" />
+                  </div>
+                </IonItemOption>
+                <IonItemOption style="background-color: white;" @click="emits('update:delete', { modal: true, data: item })">
+                  <div style="width: 40px; display: flex; justify-content: center;">
+                    <IonIcon color="danger" :icon="trashSharp" style="font-size: 18pt;" />
+                  </div>
+                </IonItemOption>
+              </IonItemOptions>
+            </IonItemSliding>
+          </div>
+          <div v-else>
+            <IonItem v-for="(item, index) in props.dataList" :key="index">
+              <IonLabel color="primary" class="ion-no-margin" style="margin-top: 5px; margin-bottom: 5px;">
+                <h2>{{ item.name || 'Item sem nome' }}</h2>
+                <p style="color: rgba(var(--ion-color-primary-rgb), 0.6);">
+                  {{ item.address || 'Sem endereço' }}
+                </p>
+              </IonLabel>
+              <div style="display: flex; min-height: 100%;">
+                <IonItemOption style="background-color: white;" @click="emits('update:see', { modal: true, data: item })">
+                  <div style="width: 40px; display: flex; justify-content: center;">
+                    <IonIcon color="tertiary" :icon="eye" size="large" />
+                  </div>
+                </IonItemOption>
+                <IonItemOption style="background-color: white;" @click="emits('update:edit', { modal: true, data: item })">
+                  <div style="width: 40px; display: flex; justify-content: center;">
+                    <IonIcon color="primary" :icon="pencilSharp" size="large" />
+                  </div>
+                </IonItemOption>
+                <IonItemOption style="background-color: white;" @click="emits('update:delete', { modal: true, data: item })">
+                  <div style="width: 40px; display: flex; justify-content: center;">
+                    <IonIcon color="danger" :icon="trashSharp" size="large" />
+                  </div>
+                </IonItemOption>
+              </div>
+            </IonItem>
+          </div>
         </IonList>
       </IonCardContent>
     </div>
   </IonCard>
 </template>
+
+<style scoped>
+
+</style>
