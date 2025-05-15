@@ -796,7 +796,7 @@ model School {
   educationNetwork             Boolean?
   administrativeDependency     Organ?
   name                         String                 @db.VarChar(100)
-  cnpj                         Int?
+  cnpj                         String?                @db.VarChar(14)
   address                      String?                @db.VarChar(255)
   addressNumber                String?                @db.VarChar(10)
   additionalInfo               String?                @db.VarChar(255)
