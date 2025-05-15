@@ -12,6 +12,7 @@ import SeriesService from '../services/SeriesService'
 
 defineProps<{
   closeModal: (status: boolean) => void
+  editId?: string
 }>()
 
 defineEmits<{
@@ -19,9 +20,6 @@ defineEmits<{
   (e: 'save'): void
 }>()
 
-defineExpose({
-  registerSeries,
-})
 const selectedSegment = ref('general')
 const router = useRouter()
 const route = useRouter()
@@ -62,11 +60,19 @@ const formValues = ref({
   tenantId: null,
   userCreated: null,
   institutionId: '',
+  ageRangeMin: '',
+  ageRangeMax: '',
+  standardAge: '',
+  schoolDays: '',
+  workload: '',
 })
 // Configura o formulário com os valores iniciais
 const { values } = useForm({
   initialValues: formValues.value,
 })
+
+const isEditing = computed(() => Boolean(props.editId))
+const modalTitle = computed(() => isEditing.value ? 'Editar Série' : 'Nova Série')
 
 // Adiciona uma nova disciplina
 function addDiscipline() {
@@ -120,66 +126,6 @@ async function saveSeriesAndDisciplines() {
 watch(values, (newValues) => {
   formValues.value = { ...newValues }
 })
-
-async function registerSeries() {
-  const validationResult = await validate()
-
-  if (!validationResult.valid) {
-    const displayErrors = Object.values(errors.value).join(', ')
-    showToast(displayErrors, 'top', 'warning')
-  }
-  else {
-    const formData = {
-      id: seriesId.value,
-      schoolId: schoolId.value,
-      courseId: courseId.value,
-      institutionId: institutionId.value,
-      courseStage: values.courseStage,
-      graduate: values.graduate,
-      name: values.name,
-      workload: values.workload,
-      schoolDays: values.schoolDays,
-      timetableId: null,
-      metadata: null,
-      createdAt: null,
-      updatedAt: null,
-      deletedAt: null,
-      updatedBy: null,
-      userCreated: null,
-      tenantId: null,
-    }
-    console.log('FormData:', formData)
-    try {
-      let result
-      if (seriesId.value) {
-        result = await seriesService.update(seriesId.value, formData)
-        if (result) {
-          showToast('Série atualizada com sucesso')
-          setTimeout(() => {
-            router.push('/Series/list').then(() => {
-              location.reload()
-            })
-          }, 2000)
-        }
-      }
-      else {
-        result = await seriesService.create(formData)
-        if (result) {
-          showToast('Série cadastrada com sucesso!', 'top', 'success')
-          setTimeout(() => {
-            router.push('/Series/list').then(() => {
-              location.reload()
-            })
-          }, 2000)
-        }
-      }
-    }
-    catch (error) {
-      console.error('Erro ao salvar série:', error)
-      showToast('Erro ao cadastrar série. Tente novamente.', 'top', 'danger')
-    }
-  }
-}
 
 async function loadSeries() {
   try {
@@ -275,7 +221,7 @@ onMounted(async () => {
       <Form class="ion-margin-horizontal" :initial-values="formValues" @submit="saveSeriesAndDisciplines">
         <div class="ion-margin style-purple-lane" style="display: flex; align-items: center;">
           <IonIcon :icon="listSharp" style="margin-right: 10px;" />
-          Nova série
+          {{ modalTitle }}
         </div>
         <IonSegment
           v-model="selectedSegment" mode="ios" :scrollable="false"
@@ -342,6 +288,78 @@ onMounted(async () => {
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
 
+            <Field v-slot="{ field, errors }" name="workload">
+              <IonInput
+                v-model="formValues.workload"
+                v-bind="field"
+                label="Carga horária"
+                label-placement="stacked"
+                fill="outline"
+                placeholder="Digite a carga horária"
+              />
+              <span class="error-message">{{ errors[0] }}</span>
+            </Field>
+
+            <IonRow>
+              <IonCol size="6">
+                <Field v-slot="{ field, errors }" name="schoolDays">
+                  <IonInput
+                    v-model="formValues.schoolDays"
+                    v-bind="field"
+                    label="Dias letivos"
+                    label-placement="stacked"
+                    fill="outline"
+                    placeholder="Digite os dias letivos"
+                  />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+              </IonCol>
+              <IonCol size="6">
+                <Field v-slot="{ field, errors }" name="standardAge">
+                  <IonInput
+                    v-model="formValues.standardAge"
+                    v-bind="field"
+                    label="Idade padrão"
+                    label-placement="stacked"
+                    fill="outline"
+                    placeholder="Digite a idade padrão"
+                  />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+              </IonCol>
+            </IonRow>
+            <IonLabel color="primary" class="ion-no-margin">
+              Faixa etária
+            </IonLabel>
+            <IonRow>
+              <IonCol size="6">
+                <Field v-slot="{ field, errors }" name="ageRangeMin">
+                  <IonInput
+                    v-model="formValues.ageRangeMin"
+                    v-bind="field"
+                    label="Mínima"
+                    label-placement="stacked"
+                    fill="outline"
+                    placeholder="Digite a idade mínima"
+                  />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+              </IonCol>
+              <IonCol size="6">
+                <Field v-slot="{ field, errors }" name="ageRangeMax">
+                  <IonInput
+                    v-model="formValues.ageRangeMax"
+                    v-bind="field"
+                    label="Máxima"
+                    label-placement="stacked"
+                    fill="outline"
+                    placeholder="Digite a idade máxima"
+                  />
+                  <span class="error-message">{{ errors[0] }}</span>
+                </Field>
+              </IonCol>
+            </IonRow>
+
             <Field v-slot="{ field, errors }" name="description">
               <IonInput
                 v-model="formValues.description"
@@ -349,7 +367,7 @@ onMounted(async () => {
                 label="Descrição"
                 label-placement="stacked"
                 fill="outline"
-                placeholder="Digite uma descrição da série"
+                placeholder="Digite uma descrição"
               />
               <span class="error-message">{{ errors[0] }}</span>
             </Field>

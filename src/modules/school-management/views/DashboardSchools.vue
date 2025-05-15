@@ -6,10 +6,11 @@ import ContentLayout from '@/components/theme/ContentLayout.vue'
 import { IonButton, IonContent, IonIcon, IonModal } from '@ionic/vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import SchoolService from '../services/SchoolService'
 import RegisterSchool from './RegisterSchool.vue'
 
-// const router = useRouter()
+const router = useRouter()
 
 // Estados para os dados da instituição e carregamento
 const schoolService = new SchoolService()
@@ -73,9 +74,22 @@ async function loadSchools() {
   }
 }
 
-// function navigateToRegister() {
-//   router.push({ name: 'RegisterSchool' })
-// }
+function isMobileDevice() {
+  return window.innerWidth <= 768
+}
+
+function navigateToRegister() {
+  switch (isMobileDevice()) {
+    case true:
+      // Se for um dispositivo móvel, defina o ID de edição como indefinido e mostre a folha móvel
+      // editingId.value = undefined
+      setModalAddSchool(true)
+      break
+    case false:
+      // Caso contrário, navegue para a página de registro
+      router.push({ name: 'RegisterSchool' })
+  }
+}
 
 onMounted(() => {
   loadSchools()
@@ -105,7 +119,7 @@ onMounted(() => {
           <ion-searchbar v-model="searchQuery" placeholder="Buscar escola" />
         </ion-col>
         <ion-col size="2" class="ion-text-end">
-          <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="setModalAddSchool(true)">
+          <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
             <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
             <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
             <span class="ion-hide-sm-down">Novo</span>

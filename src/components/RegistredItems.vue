@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IonButton, IonCardHeader, IonCol, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText } from '@ionic/vue'
-import { bookOutline, business, businessOutline, callOutline, checkmarkCircleOutline, documentOutline, fileTrayOutline, globeOutline, locationOutline, mailOutline, mapOutline, personOutline, pinOutline, schoolOutline } from 'ionicons/icons'
+import { apps, bookOutline, briefcaseOutline, business, businessOutline, calendarOutline, callOutline, checkmarkCircleOutline, documentOutline, fileTrayOutline, globeOutline, locationOutline, mailOutline, mapOutline, personOutline, pinOutline, schoolOutline, timeOutline } from 'ionicons/icons'
 
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -9,6 +9,10 @@ interface Props {
   items: {
     status?: string
     name: string
+    courseName?: string
+    institutionName?: string
+    workload?: number
+    schoolDays?: string
     email?: string
     website?: string
     address?: string
@@ -21,6 +25,12 @@ interface Props {
     state?: string
     postalCode?: string
     neighborhood?: string
+    disciplines?: [
+      {
+        disciplineName?: string
+        workload?: number
+      },
+    ]
 
   }
   type?: string
@@ -76,10 +86,52 @@ const metaIcon = ref((route.meta.icon as string) || '')
             <div v-if="props.items.name" style="display: flex; align-items: center; padding: 6px;">
               <IonIcon
                 slot="start" color="primary" style="padding-right: 10px;"
-                :icon="props.type && props.type === 'person' ? personOutline : business"
+                :icon="props.type && props.type === 'person' ? personOutline : props.type === 'settings'
+                  ? apps
+                  : business"
               />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
                 {{ props.items.name }}
+              </IonText>
+            </div>
+
+            <div v-if="props.items.institutionName" style="display: flex; align-items: center; padding: 6px;">
+              <IonIcon
+                slot="start" color="primary" style="padding-right: 10px;"
+                :icon="business"
+              />
+              <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+                {{ props.items.institutionName }}
+              </IonText>
+            </div>
+
+            <div v-if="props.items.courseName" style="display: flex; align-items: center; padding: 6px;">
+              <IonIcon
+                slot="start" color="primary" style="padding-right: 10px;"
+                :icon="briefcaseOutline"
+              />
+              <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+                {{ props.items.courseName }}
+              </IonText>
+            </div>
+
+            <div v-if="props.items.workload" style="display: flex; align-items: center; padding: 6px;">
+              <IonIcon
+                slot="start" color="primary" style="padding-right: 10px;"
+                :icon="timeOutline"
+              />
+              <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+                {{ props.items.workload }} horas
+              </IonText>
+            </div>
+
+            <div v-if="props.items.schoolDays" style="display: flex; align-items: center; padding: 6px;">
+              <IonIcon
+                slot="start" color="primary" style="padding-right: 10px;"
+                :icon="calendarOutline"
+              />
+              <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+                {{ props.items.schoolDays }} dias letivos
               </IonText>
             </div>
 
@@ -139,6 +191,7 @@ const metaIcon = ref((route.meta.icon as string) || '')
         </IonCol>
         <IonCol size="12">
           <IonItemDivider
+            v-if="props.items.address"
             style="border-color: rgba(var(--ion-color-primary-rgb), 0.25);"
             class="ion-no-padding"
           >
@@ -185,6 +238,36 @@ const metaIcon = ref((route.meta.icon as string) || '')
                 {{ props.items.neighborhood }}
               </IonText>
             </div>
+            <div v-if="props.items.disciplines && props.items.disciplines.length > 0" class="shadow-card" style=" align-items: center; padding: 6px;">
+              <IonCard>
+                <IonGrid>
+                  <IonRow>
+                    <IonCol size="6">
+                      <IonText color="primary" style="font-weight: bold; font-size: 10pt">
+                        Disciplina
+                      </IonText>
+                    </IonCol>
+                    <IonCol size="6">
+                      <IonText color="primary" style="font-weight: bold; font-size: 10pt">
+                        Carga Horária
+                      </IonText>
+                    </IonCol>
+                  </IonRow>
+                  <IonRow v-for="(d, index) in props.items.disciplines" :key="index">
+                    <IonCol size="6">
+                      <IonText color="primary" style="font-size: 10pt; padding-top: 2px;">
+                        {{ d.disciplineName }}
+                      </IonText>
+                    </IonCol>
+                    <IonCol size="6">
+                      <IonText color="primary" style="font-size: 10pt; padding-top: 2px;">
+                        {{ d.workload || '-' }}
+                      </IonText>
+                    </IonCol>
+                  </IonRow>
+                </IonGrid>
+              </IonCard>
+            </div>
           </IonList>
         </IonCol>
       </IonRow>
@@ -222,5 +305,13 @@ const metaIcon = ref((route.meta.icon as string) || '')
 ion-card-header#accordionContentHeader {
     --background: rgba(var(--ion-color-secondary-rgb), 0.15);
     --color: var(--ion-color-secondary);
+}
+
+.shadow-card {
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15); /* Sombra mais visível */
+  border-radius: 8px; /* Bordas arredondadas */
+  padding: 10px; /* Espaçamento interno */
+  margin: 10px 4px; /* Espaçamento externo com margens laterais */
+  background-color: #ffffff; /* Fundo branco para destacar a sombra */
 }
 </style>

@@ -4,10 +4,6 @@ import DashboardCourse from './views/DashboardCourse.vue'
 import DashboardFunction from './views/DashboardFunction.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
 import DashboardSeries from './views/DashboardSeries.vue'
-import EditClass from './views/EditClass.vue'
-import EditCourse from './views/EditCourse.vue'
-import EditSchools from './views/EditSchools.vue'
-import EditSeries from './views/EditSeries.vue'
 import RegisterClass from './views/RegisterClass.vue'
 import RegisterCourse from './views/RegisterCourse.vue'
 import RegisterFunction from './views/RegisterFunction.vue'
@@ -28,20 +24,7 @@ const routes = [
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
-  {
-    path: '/Schools/edit/:id',
-    name: 'EditSchools',
-    component: EditSchools,
-    moduleName: 'Schools',
-    moduleIcon: school,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Editar escola',
-      order: 2,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
+
   {
     path: '/Schools/register',
     name: 'RegisterSchool',
@@ -79,18 +62,7 @@ const routes = [
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
-  {
-    path: '/Class/edit/:id',
-    name: 'EditClass',
-    component: EditClass,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Editar turma',
-      order: 6,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
+
   {
     path: '/Series/list',
     name: 'SeriesListSeries',
@@ -104,18 +76,7 @@ const routes = [
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
-  {
-    path: '/Series/edit/:id',
-    name: 'EditSeries',
-    component: EditSeries,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Editar série',
-      order: 8,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
+
   {
     path: '/Series/register',
     name: 'RegisterSeries',
@@ -141,18 +102,7 @@ const routes = [
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
-  {
-    path: '/Course/edit/:id',
-    name: 'EditCourse',
-    component: EditCourse,
-    meta: {
-      moduleName: 'Schools',
-      icon: create,
-      name: 'Editar curso',
-      order: 11,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
+
   {
     path: '/Course/register',
     name: 'RegisterCourse',
