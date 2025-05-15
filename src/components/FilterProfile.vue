@@ -226,7 +226,7 @@ function pulse() {
 }
 
 watch(() => filteredOcupation.value.frequency, (newValue) => {
-  if (newValue === 'disciplina') {
+  if (newValue === 'Disciplina') {
     pulse()
   }
 }, { immediate: true, deep: true })
@@ -259,8 +259,10 @@ onMounted(async () => {
 </script>
 
 <template>
-  <IonContent v-show="isFilterCollapse" class="" style="--background: rgba(249, 211, 227, 0.3); height: 235px;"
-    :style="`box-shadow: inset 0 0 10px ${hexToRgb(colorStyle.primary, '0.2')}`">
+  <IonContent
+    v-show="isFilterCollapse" class="" style="--background: rgba(249, 211, 227, 0.3); height: 235px;"
+    :style="`box-shadow: inset 0 0 10px ${hexToRgb(colorStyle.primary, '0.2')}`"
+  >
     <ion-text color="secondary">
       <h4>Filtros</h4>
       <p style="font-size: 14px;">
@@ -279,7 +281,7 @@ onMounted(async () => {
           </IonItem>
         </IonCol>
       </IonRow>
-      <IonRow v-if="props.discipline || filteredOcupation.frequency === 'disciplina'">
+      <IonRow v-if="props.discipline || filteredOcupation.frequency === 'Disciplina'">
         <IonCol size="6">
           <IonItem class="ion-filter-item" color="tertiary" @click="setModalSerie(true)">
             <IonLabel class="custom-ion-label">
@@ -308,8 +310,10 @@ onMounted(async () => {
     </IonGrid>
   </IonContent>
 
-  <IonModal :is-open="isModalSchool" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
-    @ion-modal-did-dismiss="setModalSchool(false)">
+  <IonModal
+    :is-open="isModalSchool" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
+    @ion-modal-did-dismiss="setModalSchool(false)"
+  >
     <div class="block">
       <ion-list v-for="(sch, i) in ocupation" :key="i" :value="sch.schoolName">
         <IonItem @click="setSchool(sch)">
@@ -319,8 +323,10 @@ onMounted(async () => {
     </div>
   </IonModal>
 
-  <IonModal :is-open="isModalSerie" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
-    @ion-modal-did-dismiss="setModalSerie(false)">
+  <IonModal
+    :is-open="isModalSerie" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
+    @ion-modal-did-dismiss="setModalSerie(false)"
+  >
     <div class="block">
       <ion-list v-for="(classItem, i) in filteredClasses" :key="i" :value="classItem.classroomName">
         <IonItem @click="setClasses(classItem)">
@@ -330,8 +336,10 @@ onMounted(async () => {
     </div>
   </IonModal>
 
-  <IonModal :is-open="isModalDiscipline" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
-    @ion-modal-did-dismiss="setModalDiscipline(false)">
+  <IonModal
+    :is-open="isModalDiscipline" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
+    @ion-modal-did-dismiss="setModalDiscipline(false)"
+  >
     <div class="block">
       <ion-list v-for="(d, i) in filteredDisciplines" :key="i" :value="d.disciplineName">
         <IonItem @click="setDiscipline(d)">
@@ -342,7 +350,8 @@ onMounted(async () => {
   </IonModal>
 
   <div
-    :style="{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isFilterCollapse ? '0' : '5px' }">
+    :style="{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: isFilterCollapse ? '0' : '5px' }"
+  >
     <ion-text v-show="!isFilterCollapse" color="secondary" class="ion-padding-vertical">
       <div v-if="filteredOcupation?.schoolName" class="ion-content">
         <span style="margin-right: 10px; margin-left: 2px; color: var(--ion-color-tertiary); font-weight: 700;">{{
@@ -351,10 +360,13 @@ onMounted(async () => {
         <IonChip color="tertiary" class="ion-no-margin">
           Turma: {{ filteredOcupation.classroomName }}
         </IonChip>
-        <IonChip v-if="filteredOcupation?.disciplineName" color="tertiary" class="ion-no-margin"
-          style="margin-left: 5px;">
+        <IonChip
+          v-if="filteredOcupation?.disciplineName" color="tertiary" class="ion-no-margin"
+          style="margin-left: 5px;"
+        >
           {{ filteredOcupation?.disciplineName?.slice(0, 15) }} <span
-            v-if="filteredOcupation?.disciplineName?.length > 15">...</span>
+            v-if="filteredOcupation?.disciplineName?.length > 15"
+          >...</span>
         </IonChip>
       </div>
       <ion-text v-else color="secondary">
@@ -369,9 +381,11 @@ onMounted(async () => {
         </p>
       </ion-text>
     </ion-text>
-    <IonButton color="tertiary"
+    <IonButton
+      color="tertiary"
       :style="{ marginTop: isFilterCollapse ? '-20px' : '2px', marginLeft: 'auto', marginRight: isFilterCollapse ? '10px' : '10px' }"
-      @click="setFilterCollapse(!isFilterCollapse)">
+      @click="setFilterCollapse(!isFilterCollapse)"
+    >
       <IonIcon slot="icon-only" :icon="isFilterCollapse ? arrowUp : arrowDown" />
     </IonButton>
   </div>
