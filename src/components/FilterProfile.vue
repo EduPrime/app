@@ -283,7 +283,7 @@ onMounted(async () => {
       </IonRow>
       <IonRow v-if="props.discipline || filteredOcupation.frequency === 'Disciplina'">
         <IonCol size="6">
-          <IonItem class="ion-filter-item" color="tertiary" @click="setModalSerie(true)">
+          <IonItem class="ion-filter-item clickable-item" color="tertiary" @click="setModalSerie(true)">
             <IonLabel class="custom-ion-label">
               {{ filteredOcupation.classroomName || 'Turma' }}
             </IonLabel>
@@ -291,7 +291,10 @@ onMounted(async () => {
           </IonItem>
         </IonCol>
         <IonCol size="6">
-          <IonItem class="ion-filter-item" :class="pulseAtEnd" color="primary" @click="setModalDiscipline(true)">
+          <IonItem
+            class="ion-filter-item clickable-item" :class="pulseAtEnd" color="primary"
+            @click="setModalDiscipline(true)"
+          >
             <IonLabel class="custom-ion-label">
               {{ filteredOcupation.disciplineName || 'Disciplina' }}
             </IonLabel>
@@ -301,7 +304,7 @@ onMounted(async () => {
       </IonRow>
       <IonRow v-else>
         <IonCol size="12">
-          <IonItem class="ion-filter-item" color="tertiary" @click="setModalSerie(true)">
+          <IonItem class="ion-filter-item clickable-item" color="tertiary" @click="setModalSerie(true)">
             <IonLabel>{{ filteredOcupation.classroomName || 'Selecione uma turma' }}</IonLabel>
             <IonIcon slot="start" :icon="peopleOutline" />
           </IonItem>
@@ -314,12 +317,17 @@ onMounted(async () => {
     :is-open="isModalSchool" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
     @ion-modal-did-dismiss="setModalSchool(false)"
   >
-    <div class="block">
-      <ion-list v-for="(sch, i) in ocupation" :key="i" :value="sch.schoolName">
-        <IonItem @click="setSchool(sch)">
-          <IonLabel>{{ sch.schoolName }}</IonLabel>
-        </IonItem>
-      </ion-list>
+    <div class="modal-wrapper">
+      <div class="modal-scrollable">
+        <ion-list>
+          <IonItem
+            v-for="(sch, i) in ocupation" :key="i" :value="sch.schoolName" class="clickable-item"
+            @click="setSchool(sch)"
+          >
+            <IonLabel>{{ sch.schoolName }}</IonLabel>
+          </IonItem>
+        </ion-list>
+      </div>
     </div>
   </IonModal>
 
@@ -327,25 +335,35 @@ onMounted(async () => {
     :is-open="isModalSerie" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
     @ion-modal-did-dismiss="setModalSerie(false)"
   >
-    <div class="block">
-      <ion-list v-for="(classItem, i) in filteredClasses" :key="i" :value="classItem.classroomName">
-        <IonItem @click="setClasses(classItem)">
-          <IonLabel>{{ classItem.classroomName }}</IonLabel>
-        </IonItem>
-      </ion-list>
+    <div class="modal-wrapper">
+      <div class="modal-scrollable">
+        <ion-list>
+          <IonItem
+            v-for="(classItem, i) in filteredClasses" :key="i" :value="classItem.classroomName"
+            class="clickable-item" @click="setClasses(classItem)"
+          >
+            <IonLabel>{{ classItem.classroomName }}</IonLabel>
+          </IonItem>
+        </ion-list>
+      </div>
     </div>
   </IonModal>
 
   <IonModal
-    :is-open="isModalDiscipline" :initial-breakpoint="0.6" :breakpoints="[0, 0.6, 0.87]"
+    :is-open="isModalDiscipline" :initial-breakpoint="0.8" :breakpoints="[0, 0.8, 0.9]"
     @ion-modal-did-dismiss="setModalDiscipline(false)"
   >
-    <div class="block">
-      <ion-list v-for="(d, i) in filteredDisciplines" :key="i" :value="d.disciplineName">
-        <IonItem @click="setDiscipline(d)">
-          <IonLabel>{{ d.disciplineName }}</IonLabel>
-        </IonItem>
-      </ion-list>
+    <div class="modal-wrapper">
+      <div class="modal-scrollable">
+        <ion-list>
+          <IonItem
+            v-for="(d, i) in filteredDisciplines" :key="i" :value="d.disciplineName" class="clickable-item"
+            @click="setDiscipline(d)"
+          >
+            <IonLabel>{{ d.disciplineName }}</IonLabel>
+          </IonItem>
+        </ion-list>
+      </div>
     </div>
   </IonModal>
 
@@ -519,5 +537,24 @@ ion-select::part(label) {
 
 .custom-icon {
   margin-right: 8px;
+}
+
+.modal-wrapper {
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  box-sizing: border-box;
+  max-height: 90%;
+  /* força o conteúdo a nunca ultrapassar o modal */
+}
+
+.clickable-item {
+  cursor: pointer;
 }
 </style>
