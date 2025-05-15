@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IonButtons, IonFooter, IonHeader, IonMenuButton, IonNote, IonTitle, IonToolbar } from '@ionic/vue'
+import { IonButtons, IonFooter, IonHeader, IonIcon, IonMenuButton, IonNote, IonTitle, IonToolbar } from '@ionic/vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -47,13 +47,13 @@ watch(
 
 <template>
   <ion-page>
-    <IonHeader mode="md" :translucent="true" class="">
+    <IonHeader :translucent="true" class="">
       <IonToolbar>
         <IonButtons slot="start">
           <IonMenuButton color="primary" />
         </IonButtons>
         <slot name="header-buttons" />
-        <!-- <IonIcon v-if="metaIcon" slot="start" :icon="metaIcon" size="large" class="ion-margin-start" /> -->
+        <IonIcon v-if="metaIcon" slot="start" :icon="metaIcon" size="large" class="ion-margin-start" />
         <IonTitle>{{ metaName }}</IonTitle>
         <slot name="header-right" />
       </IonToolbar>
@@ -61,7 +61,7 @@ watch(
 
     <ion-content :class="screenWidth > 768 ? '' : 'ion-no-padding'" :fullscreen="true">
       <div v-if="screenWidth < 768" style="height: 56px;" />
-      <IonHeader mode="md" collapse="condense">
+      <IonHeader collapse="condense">
         <IonToolbar>
           <slot name="header-buttons" />
           <IonTitle size="large">
