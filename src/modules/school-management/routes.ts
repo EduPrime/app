@@ -1,4 +1,5 @@
-import { create, person, school } from 'ionicons/icons'
+import { create, person, school, trailSign } from 'ionicons/icons'
+import DashboardCurses from './views/DashboardCurses.vue'
 import DashboardFunction from './views/DashboardFunction.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
 import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
@@ -31,6 +32,7 @@ const routes = [
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
+
   // {
   //   path: '/Schools/edit/:id',
   //   name: 'EditSchools',
@@ -169,6 +171,7 @@ const routes = [
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
+
   {
     path: '/Function/register/:id?',
     name: 'RegisterFunction',
@@ -190,6 +193,18 @@ const routes = [
       icon: person,
       name: 'Detalhes da função',
       order: 15,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/Courses/list',
+    name: 'RegisterCourse',
+    component: DashboardCurses,
+    meta: {
+      moduleName: 'Schools',
+      icon: trailSign,
+      name: 'Registrar curso',
+      order: 16,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
