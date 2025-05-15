@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IonButton, IonCardHeader, IonCol, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText } from '@ionic/vue'
+import { IonButton, IonCardHeader, IonCol, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText, IonGrid } from '@ionic/vue'
 import { bookOutline, business, businessOutline, callOutline, checkmarkCircleOutline, documentOutline, fileTrayOutline, globeOutline, locationOutline, mailOutline, mapOutline, personOutline, pinOutline, schoolOutline } from 'ionicons/icons'
 
 import { ref } from 'vue'
@@ -35,6 +35,16 @@ const metaIcon = ref((route.meta.icon as string) || '')
 
 //  metaName.value = (route.meta.name as string) || ''
 //     metaIcon.value = (route.meta.icon as string) || ''
+
+function formatPostalCode(postalCode?: string): string {
+  if (!postalCode) return '';
+  // Remove non-digits and format as 00000-000
+  const digits = postalCode.replace(/\D/g, '');
+  if (digits.length === 8) {
+    return digits.replace(/(\d{5})(\d{3})/, '$1-$2');
+  }
+  return postalCode;
+}
 </script>
 
 <template>
@@ -172,7 +182,7 @@ const metaIcon = ref((route.meta.icon as string) || '')
             <div v-if="props.items.postalCode" style="display: flex; align-items: center; padding: 6px;">
               <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="pinOutline" />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.postalCode }}
+                {{ formatPostalCode(props.items.postalCode) }}
               </IonText>
             </div>
 

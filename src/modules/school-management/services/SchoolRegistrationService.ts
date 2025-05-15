@@ -1,105 +1,106 @@
 import type { School } from '@prisma/client'
 import BaseService from '@/services/BaseService'
 import errorHandler from '@/utils/error-handler'
+import { SchoolFormValues } from '../types/types'
 
-interface SchoolRegistrationData {
-  id?: string
-  name: string
-  institutionId: string
-  idpes?: number | null
-  INEPCode?: string | null
-  corporateName?: string | null
-  acronym?: string | null
-  blockJournalEntries?: boolean | null
-  operationalStatus?: boolean | null
-  usesAlternativeRules?: boolean | null
-  educationNetwork?: boolean | null
-  administrativeDependency?: string | null
-  cnpj?: number | null
-  address?: string | null
-  addressNumber?: string | null
-  additionalInfo?: string | null
-  neighborhood?: string | null
-  city?: string | null
-  state?: string | null
-  postalCode?: string | null
-  unusualLocation?: boolean | null
-  phone?: string | null
-  phone2?: string | null
-  email?: string | null
-  website?: string | null
-  operatingLocation?: string | null
-  buildingUsage?: string | null
-  sharedSchool?: boolean | null
-  sharedSchoolINEPCode?: string | null
-  potableWaterAvailable?: boolean | null
-  sewageAvailable?: boolean | null
-  electricityAvailable?: boolean | null
-  wasteDisposal?: string | null
-  wasteTreatmentBySchool?: boolean | null
-  foodServiceAvailable?: boolean | null
-  communitySharedSpaces?: boolean | null
-  usesSurroundingSpaces?: boolean | null
-  specificFacilities?: boolean | null
-  insideClassroooms?: number | null
-  outsideClassrooms?: number | null
-  refrigeratedClassrooms?: number | null
-  accessibleClassrooms?: number | null
-  internetAvailable?: boolean | null
-  localNetworkAvailable?: boolean | null
-  connectionTypes?: string | null
-  devicesUsedByStudents?: string[] | null
-  availabeDesktops?: number | null
-  availableLaptops?: number | null
-  availableTablets?: number | null
-  teachingEquipments?: string[] | null
-  administrativeStaffNumber?: number | null
-  teachingStaffNumber?: number | null
-  generalServicesStaffNumber?: number | null
-  securityStaffNumber?: number | null
-  schoolManagementStaffNumber?: number | null
-  healthcareStaffNumber?: number | null
-  socialAssistanceStaffNumber?: number | null
-  specializedAssistance?: boolean | null
-  elementaryEducationModel?: string | null
-  pedagogicalMaterials?: string[] | null
-  collegiateBodies?: string[] | null
-  studentSelectionCriteria?: string[] | null
-  wasPedagogicalProjectUpdated?: boolean | null
-  indigenousEducationAvailable?: boolean | null
-  indigenousEducationLanguages?: string[] | null
-  linkedWithSuperiorEducation?: boolean | null
-  headSchoolCode?: string | null
-  IESCode?: string | null
-  active?: boolean | null
-  abbreviation?: string | null
-  longitude?: string | null
-  latitude?: string | null
-  totalArea?: string | null
-  builtArea?: string | null
-  availableArea?: string | null
-  blockDiaryEntries?: boolean | null
-  regulation?: number | null
-  logoUrl?: string | null
-  access?: number | null
-  managerid?: string | null
-  managerPosition?: string | null
-  operationLocation?: string | null
-  condition?: number | null
-  sharedSchooLinePCode?: number | null
-  creationDecree?: string | null
-  numberOfFloors?: number | null
-  floorType?: number | null
-  energyMeter?: number | null
-  hasExternalArea?: boolean | null
-  metadata?: any | null
-  updatedBy?: string | null
-  tenantId?: string | null
-  userCreated?: string | null
-  createdAt?: string | null
-  updatedAt?: string | null
-  deletedAt?: string | null
-}
+// interface SchoolRegistrationData {
+//   id?: string
+//   name: string
+//   institutionId: string
+//   idpes?: number | null
+//   INEPCode?: string | null
+//   corporateName?: string | null
+//   acronym?: string | null
+//   blockJournalEntries?: boolean | null
+//   operationalStatus?: boolean | null
+//   usesAlternativeRules?: boolean | null
+//   educationNetwork?: string | null
+//   administrativeDependency?: string | null
+//   cnpj?: string | null
+//   address?: string | null
+//   addressNumber?: string | null
+//   additionalInfo?: string | null
+//   neighborhood?: string | null
+//   city?: string | null
+//   state?: string | null
+//   postalCode?: string | null
+//   unusualLocation?: string | null
+//   phone?: string | null
+//   phone2?: string | null
+//   email?: string | null
+//   website?: string | null
+//   operatingLocation?: string | null
+//   buildingUsage?: string | null
+//   sharedSchool?: boolean | null
+//   sharedSchoolINEPCode?: string | null
+//   potableWaterAvailable?: boolean | null
+//   sewageAvailable?: boolean | null
+//   electricityAvailable?: boolean | null
+//   wasteDisposal?: string | null
+//   wasteTreatmentBySchool?: boolean | null
+//   foodServiceAvailable?: boolean | null
+//   communitySharedSpaces?: boolean | null
+//   usesSurroundingSpaces?: boolean | null
+//   specificFacilities?: boolean | null
+//   insideClassrooms?: number | null
+//   outsideClassrooms?: number | null
+//   refrigeratedClassrooms?: number | null
+//   accessibleClassrooms?: number | null
+//   internetAvailable?: boolean | null
+//   localNetworkAvailable?: boolean | null
+//   connectionTypes?: string | null
+//   devicesUsedByStudents?: string[] | null
+//   availableDesktops?: number | null
+//   availableLaptops?: number | null
+//   availableTablets?: number | null
+//   teachingEquipments?: string[] | null
+//   administrativeStaffNumber?: number | null
+//   teachingStaffNumber?: number | null
+//   generalServicesStaffNumber?: number | null
+//   securityStaffNumber?: number | null
+//   schoolManagementStaffNumber?: number | null
+//   healthcareStaffNumber?: number | null
+//   socialAssistanceStaffNumber?: number | null
+//   specializedAssistance?: boolean | null
+//   elementaryEducationModel?: string | null
+//   pedagogicalMaterials?: string[] | null
+//   collegiateBodies?: string[] | null
+//   studentSelectionCriteria?: string[] | null
+//   wasPedagogicalProjectUpdated?: boolean | null
+//   indigenousEducationAvailable?: boolean | null
+//   indigenousEducationLanguages?: string[] | null
+//   linkedWithSuperiorEducation?: boolean | null
+//   headSchoolCode?: string | null
+//   IESCode?: string | null
+//   active?: boolean | null
+//   abbreviation?: string | null
+//   longitude?: string | null
+//   latitude?: string | null
+//   totalArea?: string | null
+//   builtArea?: string | null
+//   availableArea?: string | null
+//   blockDiaryEntries?: boolean | null
+//   regulation?: number | null
+//   logoUrl?: string | null
+//   access?: number | null
+//   managerid?: string | null
+//   managerPosition?: string | null
+//   operationLocation?: string | null
+//   condition?: number | null
+//   sharedSchooLinePCode?: number | null
+//   creationDecree?: string | null
+//   numberOfFloors?: number | null
+//   floorType?: number | null
+//   energyMeter?: number | null
+//   hasExternalArea?: boolean | null
+//   metadata?: any | null
+//   updatedBy?: string | null
+//   tenantId?: string | null
+//   userCreated?: string | null
+//   createdAt?: string | null
+//   updatedAt?: string | null
+//   deletedAt?: string | null
+// }
 
 const table = 'school' as const
 
@@ -110,7 +111,6 @@ export default class SchoolRegistrationService extends BaseService<School> {
   }
 
   async getSchoolRegistrationById(id: string): Promise<School | null> {
-
     const { data, error } = await this.client
       .from(table)
       .select('*')
@@ -120,6 +120,7 @@ export default class SchoolRegistrationService extends BaseService<School> {
 
     if (error) {
       errorHandler(error, 'Erro ao buscar escola')
+      return null
     }
 
     return data
@@ -142,7 +143,7 @@ export default class SchoolRegistrationService extends BaseService<School> {
   }
 
   async schoolExistsByName(name: string, institutionId: string, exceptId?: string): Promise<boolean> {
-
+    console.log('schoolExistsByName', name, institutionId, exceptId)
     let query = this.client
       .from(table)
       .select('id')
@@ -158,6 +159,7 @@ export default class SchoolRegistrationService extends BaseService<School> {
 
     if (error) {
       errorHandler(error, 'Erro ao verificar existência de escola')
+      return false
     }
 
     return !!(data && data.length > 0)
@@ -180,50 +182,89 @@ export default class SchoolRegistrationService extends BaseService<School> {
 
     if (error) {
       errorHandler(error, 'Erro ao verificar existência de escola pelo código INEP')
+      return false
     }
 
     return !!(data && data.length > 0)
   }
 
-  async upsertSchoolRegistration(schoolData: SchoolRegistrationData): Promise<School> {
-    const now = new Date().toISOString()
+  // async upsertSchoolRegistration(schoolData: SchoolFormValues): Promise<School> {
+  //   const now = new Date().toISOString()
 
-    if (!schoolData.id || (schoolData.id && await this.getSchoolRegistrationById(schoolData.id))) {
-      const nameExists = await this.schoolExistsByName(
-        schoolData.name,
-        schoolData.institutionId,
-        schoolData.id
-      )
+  //   // Busca o primeiro institutionId da tabela institution, se não vier no payload
+  //   let institutionId = schoolData.institutionId
+  //   if (!institutionId || institutionId.trim() === '') {
+  //     const { data: institutionData, error: institutionError } = await this.client
+  //       .from('institution')
+  //       .select('id')
+  //       .order('createdAt', { ascending: true })
+  //       .limit(1)
+  //       .single()
 
-      if (nameExists) {
-        errorHandler(new Error('CONFLICT'), 'Já existe uma escola com este nome na instituição')
-        throw new Error('Já existe uma escola com este nome na instituição')
-      }
+  //     if (institutionError || !institutionData?.id) {
+  //       errorHandler(institutionError, 'Não foi possível obter institutionId')
+  //       throw new Error('Não foi possível obter institutionId')
+  //     }
+  //     institutionId = institutionData.id
+  //   }
 
-      if (schoolData.INEPCode) {
-        const inepExists = await this.schoolExistsByINEPCode(schoolData.INEPCode, schoolData.id)
-        if (inepExists) {
-          errorHandler(new Error('CONFLICT'), 'Já existe uma escola com este código INEP')
-          throw new Error('Já existe uma escola com este código INEP')
-        }
-      }
-    }
+  //   // Limpa campos uuid que vierem como string vazia
+  //   const cleanUUID = (value?: string | null) =>
+  //     value && value.trim() !== '' ? value : undefined
 
-    const payload: SchoolRegistrationData = {
-      ...schoolData,
-      updatedAt: now,
-      ...(schoolData.id ? {} : { createdAt: now })
-    }
+  //   const payload: SchoolFormValues = {
+  //     ...schoolData,
+  //     id: cleanUUID(schoolData.id),
+  //     institutionId,
+  //     managerid: cleanUUID(schoolData.managerid),
+  //     updatedBy: cleanUUID(schoolData.updatedBy),
+  //     tenantId: cleanUUID(schoolData.tenantId),
+  //     userCreated: cleanUUID(schoolData.userCreated),
+  //     createdAt: schoolData.id ? schoolData.createdAt : now,
+  //     updatedAt: now,
+  //   }
+
+  //   // Verifica duplicidade de nome
+  //   const nameExists = await this.schoolExistsByName(
+  //     payload.name,
+  //     payload.institutionId,
+  //     payload.id
+  //   )
+  //   if (nameExists) {
+  //     errorHandler(new Error('CONFLICT'), 'Já existe uma escola com este nome na instituição')
+  //   }
+
+  //   // Verifica duplicidade de INEPCode
+  //   if (payload.INEPCode) {
+  //     const inepExists = await this.schoolExistsByINEPCode(payload.INEPCode, payload.id)
+  //     if (inepExists) {
+  //       errorHandler(new Error('CONFLICT'), 'Já existe uma escola com este código INEP')
+  //     }
+  //   }
+
+  //   const { data, error } = await this.client
+  //     .from(table)
+  //     .upsert(payload, { onConflict: 'id' })
+  //     .select()
+  //     .single()
+
+  //   if (error) {
+  //     errorHandler(error, 'Erro ao salvar registro de escola')
+  //   }
+
+  //   return data as School
+  // }
+
+  async upsertUPDATINGSchoolRegistration(schoolData: SchoolFormValues): Promise<School> {
 
     const { data, error } = await this.client
       .from(table)
-      .upsert(payload, { onConflict: schoolData.id ? 'id' : undefined })
+      .upsert(schoolData, { onConflict: 'id' })
       .select()
       .single()
 
     if (error) {
       errorHandler(error, 'Erro ao salvar registro de escola')
-      throw new Error('Erro ao salvar registro de escola')
     }
 
     return data as School
