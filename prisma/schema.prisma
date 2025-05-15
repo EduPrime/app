@@ -831,7 +831,7 @@ model School {
   accessibleClassrooms         Int?
   internetAvailable            Boolean?
   localNetworkAvailable        Boolean?
-  connectionTypes              ConnectionType?
+  connectionTypes              ConnectionType[]
   devicesUsedByStudents        Device[]
   availableDesktops            Int?
   availableLaptops             Int?
