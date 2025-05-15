@@ -32,7 +32,7 @@
     "@ionic/vue": "^8.4.1",
     "@ionic/vue-router": "^8.4.1",
     "@maskito/core": "^3.2.1",
-    "@maskito/vue": "^3.2.1",
+    "@maskito/vue": "^3.7.2",
     "@prisma/client": "^6.2.1",
     "@supabase/postgrest-js": "^1.17.7",
     "@types/luxon": "^3.4.2",

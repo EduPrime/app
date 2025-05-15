@@ -67,6 +67,7 @@ export default class BaseService<T> {
       .from(table)
       .select('*')
       .or(searchAreaString)
+      .is('deletedAt', null)
 
     if (error)
       errorHandler(error, `Failed to find ${query} from ${table}`)
@@ -89,6 +90,7 @@ export default class BaseService<T> {
       .from(table)
       .select('*')
       .or(searchAreaString)
+      .is('deletedAt', null)
 
     // Aplicando múltiplos filtros individualmente dentro da consulta
     filterAreas.forEach((item) => {
@@ -108,7 +110,7 @@ export default class BaseService<T> {
     ascending = true,
     limit?: number,
   ) {
-    let query = this.client.from(this.table).select('*')
+    let query = this.client.from(this.table).select('*').is('deletedAt', null)
 
     if (orderBy) {
       query = query.order(orderBy as string, { ascending })
