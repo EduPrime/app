@@ -13,7 +13,7 @@ import {
   IonToolbar,
 } from '@ionic/vue'
 import { ErrorMessage, Field, Form } from 'vee-validate'
-import { computed, nextTick, onMounted, ref, watchEffect, reactive, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ServerFunctionService from '../services/ServerFunctionService'
 
@@ -32,22 +32,23 @@ const hasChanges = ref(false)
 
 // Função para verificar se houve mudanças nos campos
 function checkForChanges() {
-  if (!isEditing.value) return;
-  
-  const hasNameChanged = formValues.value.name !== originalFormValues.value.name;
-  const hasAbbreviationChanged = formValues.value.abbreviation !== originalFormValues.value.abbreviation;
-  const hasDescriptionChanged = formValues.value.description !== originalFormValues.value.description;
-  
-  hasChanges.value = hasNameChanged || hasAbbreviationChanged || hasDescriptionChanged;
+  if (!isEditing.value)
+    return
+
+  const hasNameChanged = formValues.value.name !== originalFormValues.value.name
+  const hasAbbreviationChanged = formValues.value.abbreviation !== originalFormValues.value.abbreviation
+  const hasDescriptionChanged = formValues.value.description !== originalFormValues.value.description
+
+  hasChanges.value = hasNameChanged || hasAbbreviationChanged || hasDescriptionChanged
 }
 
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
-    const enabled = !!formValues.value.name || !!formValues.value.abbreviation || !!formValues.value.description;
-    return enabled;
+    const enabled = !!formValues.value.name || !!formValues.value.abbreviation || !!formValues.value.description
+    return enabled
   }
-  
-  return hasChanges.value;
+
+  return hasChanges.value
 })
 
 watchEffect(() => {
@@ -60,44 +61,39 @@ watchEffect(() => {
 
 watch(
   () => ({ ...formValues.value }),
-  (newValues) => {
-    console.log('Valores do formulário mudaram:', newValues);
-    
+  () => {
     if (isEditing.value) {
-      checkForChanges();
+      checkForChanges()
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 )
 
 onMounted(async () => {
   if (serverFunctionId.value) {
-    console.log('ID da função para edição:', serverFunctionId.value)
-
     isEditing.value = true
     const fn = await serverFunctionService.getServerFunctionById(serverFunctionId.value)
 
-    console.log('Função encontrada:', fn)
-    
     if (fn) {
       // Armazena os valores originais
-      const loadedValues = { 
-        id: fn.id, 
-        name: fn.name, 
-        abbreviation: fn.abbreviation || '', 
-        description: (fn as any).description ?? '' 
-      };
-      
-      formValues.value = { ...loadedValues };
-      originalFormValues.value = { ...loadedValues };
-      hasChanges.value = false; 
-      
-      autoResizeTextarea();
+      const loadedValues = {
+        id: fn.id,
+        name: fn.name,
+        abbreviation: fn.abbreviation || '',
+        description: (fn as any).description ?? '',
+      }
+
+      formValues.value = { ...loadedValues }
+      originalFormValues.value = { ...loadedValues }
+      hasChanges.value = false
+
+      autoResizeTextarea()
     }
-  } else {
-    formValues.value = { ...initialFormValues };
-    originalFormValues.value = { ...initialFormValues };
-    hasChanges.value = false;
+  }
+  else {
+    formValues.value = { ...initialFormValues }
+    originalFormValues.value = { ...initialFormValues }
+    hasChanges.value = false
   }
 })
 
@@ -109,18 +105,39 @@ async function handleSubmit(values: any) {
     description: values.description,
   }
 
-  await serverFunctionService.upsertServerFunction(payload)
+  try {
+    await serverFunctionService.upsertServerFunction(payload)
 
-  const successMessage = isEditing.value
-    ? 'Função atualizada com sucesso'
-    : 'Nova função cadastrada com sucesso'
-    
-  showToast(successMessage, 'top', 'success')
+    const successMessage = isEditing.value
+      ? 'Função atualizada com sucesso'
+      : 'Nova função cadastrada com sucesso'
 
-  router.push({ 
-    name: 'FunctionListFunction',
-    query: { refresh: Date.now().toString() } 
-  })
+    showToast(successMessage, 'top', 'success')
+
+    router.push({
+      name: 'FunctionListFunction',
+      query: { refresh: Date.now().toString() },
+    })
+  }
+  catch (error: any) {
+    console.error('Erro ao salvar função:', error)
+
+    // Exibe mensagem específica dependendo do tipo de erro
+    if (error.message) {
+      if (error.message.includes('Nome de função já existente')) {
+        showToast('Não foi possível salvar nova função: Nome de função já existente', 'top', 'warning')
+      }
+      else if (error.message.includes('Abreviação de função já existente')) {
+        showToast('Não foi possível salvar nova função: Abreviação de função já existente', 'top', 'warning')
+      }
+      else {
+        showToast(`Erro ao salvar função: ${error.message}`, 'top', 'danger')
+      }
+    }
+    else {
+      showToast('Erro ao salvar função', 'top', 'danger')
+    }
+  }
 }
 
 function resetForm() {
@@ -154,17 +171,17 @@ function autoResizeTextarea() {
     </IonHeader>
 
     <IonContent :scroll-y="true" class="ion-padding content-with-footer">
-      <Form id="function-form" :initial-values="formValues" :key="formValues.id || 'new'" @submit="handleSubmit">
+      <Form id="function-form" :key="formValues.id || 'new'" :initial-values="formValues" @submit="handleSubmit">
         <IonGrid>
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field }" name="name" label="Nome da função" rules="required|min:3|max:180">
                 <div class="floating-input">
-                  <input 
-                    v-bind="field" 
+                  <input
+                    v-bind="field"
                     v-model="formValues.name"
-                    type="text" 
-                    class="floating-native" 
+                    type="text"
+                    class="floating-native"
                     placeholder=" "
                     @input="field.onInput"
                   >
@@ -181,14 +198,15 @@ function autoResizeTextarea() {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field }" name="abbreviation">
+              <Field v-slot="{ field }" name="abbreviation" label="Abreviação" rules="min:2|max:6">
                 <div class="floating-input">
-                  <input 
-                    v-bind="field" 
+                  <input
+                    v-bind="field"
                     v-model="formValues.abbreviation"
-                    type="text" 
-                    class="floating-native" 
+                    type="text"
+                    class="floating-native"
                     placeholder=" "
+                    :maxlength="7"
                     @input="field.onInput"
                   >
                   <label class="floating-label"><span>Abreviação</span></label>
@@ -209,10 +227,10 @@ function autoResizeTextarea() {
                   <textarea
                     v-bind="field"
                     ref="descriptionRef"
+                    v-model="formValues.description"
                     class="description-native"
                     placeholder=" "
                     maxlength="181"
-                    v-model="formValues.description"
                     @input="(event) => {
                       field.onInput(event);
                       trimDescription(event);

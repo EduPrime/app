@@ -1,16 +1,15 @@
 <script setup lang="ts">
 import type { ServerFunction } from '@prisma/client'
-import type { Tables } from '@/types/database.types'
-import ListWithActionFunction from '@/components/ListWithActionFunction.vue'
 import FunctionDetailView from '@/components/FunctionDetailView.vue'
+import ListWithActionFunction from '@/components/ListWithActionFunction.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
+import showToast from '@/utils/toast-alert'
 import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCol, IonContent, IonIcon, IonModal, IonPage, IonRow, IonSearchbar, IonText } from '@ionic/vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ServerFunctionService from '../services/ServerFunctionService'
 import RegisterFunctionMobile from './RegisterFunctionMobile.vue'
-import showToast from '@/utils/toast-alert'
 
 const router = useRouter()
 const route = router.currentRoute
@@ -22,7 +21,7 @@ const editingId = ref<string | undefined>(undefined)
 
 const seeModal = ref({ modal: false, data: undefined as any })
 const editModal = ref({ modal: false, data: undefined })
-const deleteModal = ref<{ modal: boolean; data: ServerFunction | undefined }>({ modal: false, data: undefined })
+const deleteModal = ref<{ modal: boolean, data: ServerFunction | undefined }>({ modal: false, data: undefined })
 
 const adaptedDataList = computed(() => {
   return dataList.value.map(item => ({
@@ -32,7 +31,7 @@ const adaptedDataList = computed(() => {
     description: item.description,
     createdAt: item.createdAt ? item.createdAt.toString() : undefined,
     updatedAt: item.updatedAt ? item.updatedAt.toString() : undefined,
-    deletedAt: item.deletedAt ? item.deletedAt.toString() : undefined
+    deletedAt: item.deletedAt ? item.deletedAt.toString() : undefined,
   }))
 })
 
@@ -41,10 +40,10 @@ const filteredDataList = computed(() => {
   const filtered = searchQuery.value
     ? adaptedDataList.value.filter(item =>
         item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
-        || (item.abbreviation && item.abbreviation.toLowerCase().includes(searchQuery.value.toLowerCase()))
+        || (item.abbreviation && item.abbreviation.toLowerCase().includes(searchQuery.value.toLowerCase())),
       )
     : adaptedDataList.value
-  
+
   // Depois ordena a lista alfabeticamente pelo nome
   return filtered.sort((a, b) => {
     return a.name.localeCompare(b.name)
@@ -63,17 +62,9 @@ function navigateToRegister() {
   if (isMobileDevice()) {
     editingId.value = undefined
     setModalAddFunction(true)
-  } else {
-    router.push({ name: 'RegisterFunction' })
   }
-}
-
-function editItem(id: string) {
-  if (isMobileDevice()) {
-    editingId.value = id
-    setEditModal(true)
-  } else {
-    router.push({ name: 'RegisterFunction', params: { id } })
+  else {
+    router.push({ name: 'RegisterFunction' })
   }
 }
 
@@ -127,16 +118,18 @@ async function handleDelete() {
       await serverFunctionService.softDeleteServerFunction(deleteModal.value.data.id)
       loadFunctions()
       setDeleteModal(false)
+      showToast('Função excluída com sucesso', 'top', 'success')
     }
     catch (error: any) {
       console.error('Erro ao excluir função:', error)
-      
+
       // Verifica se é o erro específico de servidores vinculados
       if (error.message && error.message.includes('servidores vinculados')) {
         showToast('Não é possível excluir: Existem servidores vinculados a essa função', 'top', 'warning')
       }
     }
-  } else {
+  }
+  else {
     console.error('ID da função não encontrado para exclusão:', deleteModal)
   }
 }
@@ -153,7 +146,7 @@ watch(
       loadFunctions()
     }
   },
-  { deep: true }
+  { deep: true },
 )
 </script>
 
@@ -179,23 +172,25 @@ watch(
           @update:delete="(event) => {
             deleteModal = event;
             setDeleteModal(true);
-          }" 
-          @update:edit="(event) => { 
-            
+          }"
+          @update:edit="(event) => {
+
             if (isMobileDevice()) {
               editingId = event.data?.id
               setEditModal(true)
-            } else {
+            }
+            else {
               router.push({ name: 'RegisterFunction', params: { id: event.data?.id } })
             }
-          }" 
-          @update:see="(event) => { 
+          }"
+          @update:see="(event) => {
             if (isMobileDevice()) {
               seeModal = event
-            } else {
+            }
+            else {
               router.push({ name: 'FunctionDetails', params: { id: event.data?.id } })
             }
-          }" 
+          }"
         />
 
         <IonModal
@@ -205,9 +200,10 @@ watch(
           :breakpoints="[0, 0.7, 0.95, 1]"
           @ion-modal-did-dismiss="setModalAddFunction(false)"
         >
-          <RegisterFunctionMobile 
-            @saved="loadFunctions(); setModalAddFunction(false)" 
-            @cancel="setModalAddFunction(false)" 
+          <RegisterFunctionMobile
+            @saved="loadFunctions(); setModalAddFunction(false)"
+            @cancel="setModalAddFunction(false)"
+            @error="(message, color) => { showToast(message, 'top', color); }"
           />
         </IonModal>
 
@@ -220,14 +216,14 @@ watch(
         >
           <IonContent>
             <FunctionDetailView
-              :items="seeModal.data" 
-              name="Detalhes da função" 
-              @close="setSeeModal(false)" 
+              :items="seeModal.data"
+              name="Detalhes da função"
+              @close="setSeeModal(false)"
               @edit="() => {
                 editingId = seeModal.data?.id;
                 setSeeModal(false);
                 setEditModal(true);
-              }" 
+              }"
             />
           </IonContent>
         </IonModal>
@@ -240,10 +236,11 @@ watch(
           @ion-modal-did-dismiss="setEditModal(false)"
         >
           <IonContent>
-            <RegisterFunctionMobile 
+            <RegisterFunctionMobile
               :edit-id="editingId"
-              @saved="loadFunctions(); setEditModal(false)" 
-              @cancel="setEditModal(false)" 
+              @saved="loadFunctions(); setEditModal(false)"
+              @cancel="setEditModal(false)"
+              @error="(message, color) => { showToast(message, 'top', color); }"
             />
           </IonContent>
         </IonModal>
