@@ -1,6 +1,20 @@
 <script setup lang="ts">
-import { IonButton, IonCol, IonContent, IonGrid, IonPage, IonRow, IonBadge } from '@ionic/vue'
+import { IonButton, IonCol, IonContent, IonGrid, IonPage, IonRow, IonBadge, IonCard, IonCardHeader, IonCardContent, IonLabel, IonItem, IonList, IonIcon } from '@ionic/vue'
 import { computed, onMounted, ref } from 'vue'
+import { 
+  locationOutline, 
+  homeOutline, 
+  mailOutline, 
+  callOutline, 
+  peopleOutline, 
+  documentTextOutline, 
+  calendarOutline, 
+  personOutline,
+  schoolOutline,
+  idCardOutline,
+  mapOutline,
+  medicalOutline
+} from 'ionicons/icons'
 import { useRoute, useRouter } from 'vue-router'
 import RegisterStudentService from '../services/RegisterStudentService'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
@@ -11,6 +25,8 @@ const router = useRouter()
 const registerStudentService = new RegisterStudentService()
 const studentDetails = ref<Student | null>(null)
 const loading = ref(true)
+
+// Ícones para uso no template - exportando diretamente na template
 
 async function loadStudentDetails() {
   try {
@@ -59,6 +75,56 @@ function getStatusLabel(status: string | null | undefined) {
   return statusMap[status] || { text: status, color: 'medium' }
 }
 
+// Função para obter dados do responsável baseado no responsibleType
+function getResponsibleData() {
+  if (!studentDetails.value) return {
+    name: '-',
+    relation: '-',
+    cpf: '-',
+    phone: '-',
+    email: '-'
+  }
+
+  // Define relação baseada no responsibleType
+  const getRelation = (type: string | null) => {
+    const relationMap: Record<string, string> = {
+      'PAI': 'Pai',
+      'MAE': 'Mãe',
+      'OUTRO': 'Outro'
+    }
+    return type ? relationMap[type] || type : 'Não definido'
+  }
+
+  // Obtém dados baseados no responsibleType
+  const type = studentDetails.value.responsibleType || 'PAI'
+  
+  if (type === 'PAI' && studentDetails.value.fatherName) {
+    return {
+      name: studentDetails.value.fatherName,
+      relation: getRelation(type),
+      cpf: studentDetails.value.fatherCpf,
+      phone: studentDetails.value.fatherPhone,
+      email: studentDetails.value.fatherEmail
+    }
+  } else if (type === 'MAE' && studentDetails.value.motherName) {
+    return {
+      name: studentDetails.value.motherName,
+      relation: getRelation(type),
+      cpf: studentDetails.value.motherCpf,
+      phone: studentDetails.value.motherPhone,
+      email: studentDetails.value.motherEmail
+    }
+  } else {
+    return {
+      name: studentDetails.value.guardianName,
+      relation: getRelation(type),
+      cpf: studentDetails.value.guardianCpf,
+      phone: studentDetails.value.guardianPhone,
+      email: studentDetails.value.guardianEmail
+    }
+  }
+}
+
 onMounted(() => {
   loadStudentDetails()
 })
@@ -73,8 +139,12 @@ onMounted(() => {
       <div v-else-if="studentDetails" class="student-details-container">
         <h1 class="student-title">{{ studentDetails.name }}</h1>
         
+        <!-- Seção de Informações Cadastrais -->
         <div class="detail-section">
-          <h2 class="section-title">Informações pessoais</h2>
+          <h2 class="section-title">
+            <IonIcon :icon="personOutline" style="margin-right: 8px; vertical-align: middle;"></IonIcon>
+            Informações Cadastrais
+          </h2>
           <IonGrid>
             <IonRow>
               <IonCol size="12" size-md="6">
@@ -85,8 +155,8 @@ onMounted(() => {
               </IonCol>
               <IonCol size="12" size-md="6">
                 <div class="detail-item">
-                  <span class="detail-label">Email</span>
-                  <span class="detail-value">{{ studentDetails.email || '-' }}</span>
+                  <span class="detail-label">Data de Nascimento</span>
+                  <span class="detail-value">{{ formatDate(studentDetails.birthdate) }}</span>
                 </div>
               </IonCol>
             </IonRow>
@@ -94,8 +164,13 @@ onMounted(() => {
             <IonRow>
               <IonCol size="12" size-md="6">
                 <div class="detail-item">
-                  <span class="detail-label">Telefone</span>
-                  <span class="detail-value">{{ studentDetails.phone || '-' }}</span>
+                  <span class="detail-label">Gênero</span>
+                  <span class="detail-value">
+                    <template v-if="studentDetails.gender">
+                      {{ studentDetails.gender === 'M' ? 'Masculino' : 'Feminino' }}
+                    </template>
+                    <template v-else>-</template>
+                  </span>
                 </div>
               </IonCol>
               <IonCol size="12" size-md="6">
@@ -113,28 +188,185 @@ onMounted(() => {
             <IonRow>
               <IonCol size="12" size-md="6">
                 <div class="detail-item">
-                  <span class="detail-label">Data de Nascimento</span>
-                  <span class="detail-value">{{ formatDate(studentDetails.birthdate) }}</span>
+                  <span class="detail-label">Naturalidade</span>
+                  <span class="detail-value">{{ studentDetails.placeOfBirth || '-' }}</span>
                 </div>
               </IonCol>
               <IonCol size="12" size-md="6">
                 <div class="detail-item">
-                  <span class="detail-label">Gênero</span>
-                  <span class="detail-value">
-                    <template v-if="studentDetails.gender">
-                      {{ studentDetails.gender === 'M' ? 'Masculino' : 'Feminino' }}
-                    </template>
-                    <template v-else>-</template>
-                  </span>
+                  <span class="detail-label">Estado</span>
+                  <span class="detail-value">{{ studentDetails.citystate || '-' }}</span>
                 </div>
               </IonCol>
             </IonRow>
 
             <IonRow>
-              <IonCol size="12">
+              <IonCol size="12" size-md="6">
                 <div class="detail-item">
-                  <span class="detail-label">Endereço</span>
-                  <span class="detail-value description">{{ studentDetails.address || '-' }}</span>
+                  <span class="detail-label">CPF</span>
+                  <span class="detail-value">{{ studentDetails.cpf || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Tipo Sanguíneo</span>
+                  <span class="detail-value">{{ studentDetails.bloodType || '-' }}</span>
+                </div>
+              </IonCol>
+            </IonRow>
+
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Tipo de Documento</span>
+                  <span class="detail-value">{{ studentDetails.docsType || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">RG</span>
+                  <span class="detail-value">{{ studentDetails.rgNumber || '-' }}</span>
+                </div>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </div>
+
+        <!-- Seção de Endereço -->
+        <div class="detail-section">
+          <h2 class="section-title">
+            <IonIcon :icon="locationOutline" style="margin-right: 8px; vertical-align: middle;"></IonIcon>
+            Endereço
+          </h2>
+          <IonGrid>
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">CEP</span>
+                  <span class="detail-value">{{ studentDetails.postalCode || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Cidade</span>
+                  <span class="detail-value">{{ studentDetails.city || '-' }}</span>
+                </div>
+              </IonCol>
+            </IonRow>
+
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Estado</span>
+                  <span class="detail-value">{{ studentDetails.rgState || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Logradouro</span>
+                  <span class="detail-value">{{ studentDetails.address || '-' }}</span>
+                </div>
+              </IonCol>
+            </IonRow>
+
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Número</span>
+                  <span class="detail-value">{{ studentDetails.numberAddress || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Bairro</span>
+                  <span class="detail-value">{{ studentDetails.neighborhood || '-' }}</span>
+                </div>
+              </IonCol>
+            </IonRow>
+
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Zona</span>
+                  <span class="detail-value">{{ studentDetails.residenceZone || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Complemento</span>
+                  <span class="detail-value">{{ studentDetails.complement || '-' }}</span>
+                </div>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </div>
+
+        <!-- Seção de Informações de Contato -->
+        <div class="detail-section">
+          <h2 class="section-title">
+            <IonIcon :icon="callOutline" style="margin-right: 8px; vertical-align: middle;"></IonIcon>
+            Informações de Contato
+          </h2>
+          <IonGrid>
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Telefone</span>
+                  <span class="detail-value">{{ studentDetails.phone || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Email</span>
+                  <span class="detail-value">{{ studentDetails.email || '-' }}</span>
+                </div>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </div>
+
+        <!-- Seção de Responsável -->
+        <div class="detail-section">
+          <h2 class="section-title">
+            <IonIcon :icon="peopleOutline" style="margin-right: 8px; vertical-align: middle;"></IonIcon>
+            Informações do Responsável
+          </h2>
+          <IonGrid>
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Nome do Responsável</span>
+                  <span class="detail-value">{{ getResponsibleData().name }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Tipo de Responsável</span>
+                  <span class="detail-value">{{ getResponsibleData().relation }}</span>
+                </div>
+              </IonCol>
+            </IonRow>
+
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">CPF do Responsável</span>
+                  <span class="detail-value">{{ getResponsibleData().cpf || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Telefone do Responsável</span>
+                  <span class="detail-value">{{ getResponsibleData().phone || '-' }}</span>
+                </div>
+              </IonCol>
+            </IonRow>
+
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Email do Responsável</span>
+                  <span class="detail-value">{{ getResponsibleData().email || '-' }}</span>
                 </div>
               </IonCol>
             </IonRow>
@@ -143,7 +375,10 @@ onMounted(() => {
 
         <!-- Seção para dados acadêmicos - Se desejar expandir no futuro -->
         <div class="detail-section">
-          <h2 class="section-title">Informações acadêmicas</h2>
+          <h2 class="section-title">
+            <IonIcon :icon="schoolOutline" style="margin-right: 8px; vertical-align: middle;"></IonIcon>
+            Informações acadêmicas
+          </h2>
           <p class="ion-padding-start">
             Nenhuma matrícula associada a este aluno.
           </p>
