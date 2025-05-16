@@ -25,11 +25,29 @@ import { ErrorMessage, Field, Form } from 'vee-validate'
 import { computed, nextTick, onMounted, ref, watchEffect, reactive, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import RegisterStudentService from '../services/RegisterStudentService'
+import SchoolService from '../services/SchoolService'
+import CourseService from '../services/CourseService' 
+import SeriesService from '../services/SeriesService'
 import { personOutline, homeOutline, callOutline, peopleOutline } from 'ionicons/icons'
 
 const route = useRoute()
 const router = useRouter()
 const registerStudentService = new RegisterStudentService()
+const schoolService = new SchoolService()
+const courseService = new CourseService()
+const seriesService = new SeriesService()
+
+// Dados para os selects na aba de matrícula
+const schools = ref<{id: string, name: string}[]>([])
+const courses = ref<{id: string, name: string}[]>([])
+const series = ref<{id: string, name: string, courseId: string}[]>([])
+const filteredSeries = ref<{id: string, name: string, courseId: string}[]>([])
+const shifts = ref([
+  { id: '1', name: 'Matutino' },
+  { id: '2', name: 'Vespertino' },
+  { id: '3', name: 'Noturno' },
+  { id: '4', name: 'Integral' }
+])
 
 const initialFormValues = { 
   id: '', 
@@ -133,7 +151,67 @@ watch(
   { deep: true, immediate: true }
 )
 
+// Carrega cursos quando a escola é selecionada
+watch(() => formValues.value.schoolId, async (newSchoolId) => {
+  if (newSchoolId) {
+    try {
+      // Limpa os valores anteriores
+      formValues.value.classId = ''
+      formValues.value.gradeId = ''
+      filteredSeries.value = []
+      
+      // Busca cursos diretamente (sem usar a tabela de relacionamento)
+      const { data: schoolCourses } = await courseService.client
+        .from('course')
+        .select('id, name')
+        .eq('schoolId', newSchoolId)
+        .is('deletedAt', null)
+      courses.value = schoolCourses || []
+      
+      // Busca séries para a escola selecionada
+      const schoolSeries = await seriesService.getSeriesBySchool(newSchoolId)
+      series.value = schoolSeries || []
+    } catch (error) {
+      console.error('Erro ao carregar cursos e séries para a escola:', error)
+      showToast('Erro ao carregar dados. Tente novamente.', 'top', 'danger')
+    }
+  } else {
+    courses.value = []
+    series.value = []
+    filteredSeries.value = []
+  }
+})
+
+// Filtra as turmas quando uma série (curso) é selecionada
+watch(() => formValues.value.classId, (newClassId) => {
+  // Limpa a turma selecionada quando a série muda
+  formValues.value.gradeId = ''
+  
+  if (newClassId) {
+    try {
+      // Filtra as turmas (series) que pertencem à série (curso) selecionada
+      filteredSeries.value = series.value.filter(s => s.courseId === newClassId)
+      
+      console.log('Turmas filtradas para o curso selecionado:', filteredSeries.value)
+    } catch (error) {
+      console.error('Erro ao filtrar turmas para a série:', error)
+      showToast('Erro ao filtrar dados. Tente novamente.', 'top', 'danger')
+    }
+  } else {
+    filteredSeries.value = []
+  }
+})
+
 onMounted(async () => {
+  // Carregar escolas do banco de dados
+  try {
+    const allSchools = await schoolService.getAll()
+    schools.value = allSchools || []
+  } catch (error) {
+    console.error('Erro ao carregar escolas:', error)
+    showToast('Erro ao carregar escolas. Tente novamente.', 'top', 'danger')
+  }
+  
   if (studentId.value) {
     console.log('ID do aluno para edição:', studentId.value)
 
@@ -190,6 +268,19 @@ onMounted(async () => {
       formValues.value = { ...loadedValues };
       originalFormValues.value = { ...loadedValues };
       hasChanges.value = false;
+      
+      // Se existe school ID, carrega os cursos e séries para essa escola
+      if (loadedValues.schoolId) {
+        const { data: schoolCourses } = await courseService.client
+          .from('course')
+          .select('id, name')
+          .eq('schoolId', loadedValues.schoolId)
+          .is('deletedAt', null)
+        courses.value = schoolCourses || []
+        
+        const schoolSeries = await seriesService.getSeriesBySchool(loadedValues.schoolId)
+        series.value = schoolSeries || []
+      }
     }
   } else {
     formValues.value = { ...initialFormValues };
@@ -1343,9 +1434,7 @@ watch(() => formValues.value.zipCode, async (novoCep) => {
                     class="ion-select-card-content"
                     @ion-change="field.onInput"
                   >
-                    <IonSelectOption value="1">Escola Municipal João da Silva</IonSelectOption>
-                    <IonSelectOption value="2">Escola Estadual Maria José</IonSelectOption>
-                    <IonSelectOption value="3">Colégio Aplicativo</IonSelectOption>
+                    <IonSelectOption v-for="school in schools" :key="school.id" :value="school.id">{{ school.name }}</IonSelectOption>
                   </IonSelect>
                   <ErrorMessage v-slot="{ message }" name="schoolId">
                     <div class="error-message">
@@ -1363,16 +1452,15 @@ watch(() => formValues.value.zipCode, async (novoCep) => {
                     v-bind="field" 
                     v-model="formValues.classId"
                     interface="popover"
-                    label="Selecionar turma (Obrigatório)"
+                    label="Selecionar série (Obrigatório)"
                     label-placement="floating"
                     cancel-text="Cancelar"
                     fill="outline"
                     class="ion-select-card-content"
                     @ion-change="field.onInput"
+                    :disabled="!formValues.schoolId"
                   >
-                    <IonSelectOption value="1">Turma A</IonSelectOption>
-                    <IonSelectOption value="2">Turma B</IonSelectOption>
-                    <IonSelectOption value="3">Turma C</IonSelectOption>
+                    <IonSelectOption v-for="course in courses" :key="course.id" :value="course.id">{{ course.name }}</IonSelectOption>
                   </IonSelect>
                   <ErrorMessage v-slot="{ message }" name="classId">
                     <div class="error-message">
@@ -1390,18 +1478,15 @@ watch(() => formValues.value.zipCode, async (novoCep) => {
                     v-bind="field" 
                     v-model="formValues.gradeId"
                     interface="popover"
-                    label="Selecionar série (Obrigatório)"
+                    label="Selecionar turma (Obrigatório)"
                     label-placement="floating"
                     cancel-text="Cancelar"
                     fill="outline"
                     class="ion-select-card-content"
                     @ion-change="field.onInput"
+                    :disabled="!formValues.classId"
                   >
-                    <IonSelectOption value="1">1º Ano</IonSelectOption>
-                    <IonSelectOption value="2">2º Ano</IonSelectOption>
-                    <IonSelectOption value="3">3º Ano</IonSelectOption>
-                    <IonSelectOption value="4">4º Ano</IonSelectOption>
-                    <IonSelectOption value="5">5º Ano</IonSelectOption>
+                    <IonSelectOption v-for="s in filteredSeries" :key="s.id" :value="s.id">{{ s.name }}</IonSelectOption>
                   </IonSelect>
                   <ErrorMessage v-slot="{ message }" name="gradeId">
                     <div class="error-message">
@@ -1425,11 +1510,9 @@ watch(() => formValues.value.zipCode, async (novoCep) => {
                     fill="outline"
                     class="ion-select-card-content"
                     @ion-change="field.onInput"
+                    :disabled="!formValues.schoolId"
                   >
-                    <IonSelectOption value="1">Matutino</IonSelectOption>
-                    <IonSelectOption value="2">Vespertino</IonSelectOption>
-                    <IonSelectOption value="3">Noturno</IonSelectOption>
-                    <IonSelectOption value="4">Integral</IonSelectOption>
+                    <IonSelectOption v-for="shift in shifts" :key="shift.id" :value="shift.id">{{ shift.name }}</IonSelectOption>
                   </IonSelect>
                   <ErrorMessage v-slot="{ message }" name="shiftId">
                     <div class="error-message">
