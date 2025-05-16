@@ -182,7 +182,11 @@ watch(
         @ion-modal-did-dismiss="setModalAddSeries(false)"
       >
         <IonContent>
-          <RegisterSeries :close-modal="() => setModalAddSeries(false)" />
+          <RegisterSeries
+            :close-modal="setModalAddSeries"
+            @cancel="setModalAddSeries(false)"
+            @saved="loadSeries(); setModalAddSeries(false)"
+          />
         </IonContent>
       </IonModal>
 
@@ -207,9 +211,6 @@ watch(
           />
         </IonContent>
       </IonModal>
-      <pre>{{ seeModal.data?.id }}</pre>
-
-      <!-- <pre>{{ seeModal.data }}</pre> -->
 
       <IonModal
         :is-open="editModal.modal"
@@ -220,7 +221,7 @@ watch(
       >
         <IonContent>
           <RegisterSeries
-            :edit-id="seeModal.data?.id"
+            :edit-id="editingId"
             :close-modal="setEditModal"
             @saved="loadSeries(); setEditModal(false)"
             @cancel="setEditModal(false)"

@@ -227,6 +227,7 @@ watch(
             />
           </IonContent>
         </IonModal>
+        <pre>{{ seeModal.data?.id }}</pre>
 
         <IonModal
           :is-open="editModal.modal"

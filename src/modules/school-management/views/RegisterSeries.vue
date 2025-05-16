@@ -2,46 +2,45 @@
 import showToast from '@/utils/toast-alert'
 import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPage, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonSelect, IonSelectOption } from '@ionic/vue'
 import { listSharp } from 'ionicons/icons'
-import { Field, Form, useForm, validate } from 'vee-validate'
+import { Field, Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import InstitutionService from '../../institution/services/InstitutionService'
 import CourseService from '../services/CourseService'
 import DisciplineService from '../services/DisciplineService'
 import SeriesService from '../services/SeriesService'
 
-defineProps<{
+const props = defineProps<{
   closeModal: (status: boolean) => void
   editId?: string
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'cancel'): void
-  (e: 'save'): void
+  (e: 'saved'): void
 }>()
 
 const selectedSegment = ref('general')
-const router = useRouter()
-const route = useRouter()
-const seriesId = computed(() => route.currentRoute.value.params.id) as { value: string }
 const seriesService = new SeriesService()
 const courseService = new CourseService()
 const disciplineService = new DisciplineService()
 const institutionService = new InstitutionService()
-const institutionId = ref()
-const schoolId = ref()
-const institutionList = ref()
-const disciplineList = ref()
-const seriesList = ref()
-const courseList = ref()
-const courseId = ref()
+
+const seriesId = computed(() => props.editId) // ID da série para edição
+const isEditing = computed(() => Boolean(seriesId.value)) // Verifica se está no modo de edição
+const modalTitle = computed(() => isEditing.value ? 'Editar Série' : 'Nova Série')
+
+const institutionList = ref<Array<{ id: string, name: string }>>([])
+const courseList = ref<Array<{ id: string, name: string }>>([])
+const disciplineList = ref<Array<{ id: string, name: string, workload: number }>>([])
+const hasChanges = ref(false)
 
 const disciplines = ref<Array<{
+  id: string | null
   disciplineId: string
   seriesId: string
   name: string
-  year: string
-  workload: string
+  year: number | null
+  workload: number | null
   createdAt: Date
   deletedAt: null | string
   updatedAt: null | string
@@ -50,38 +49,51 @@ const disciplines = ref<Array<{
 }>>([])
 
 const formValues = ref({
+  id: '',
   name: '',
   description: '',
   courseId: '',
-  createdAt: new Date(),
-  deletedAt: null,
-  updatedAt: null,
-  updatedBy: null,
-  tenantId: null,
-  userCreated: null,
   institutionId: '',
-  ageRangeMin: '',
-  ageRangeMax: '',
-  standardAge: '',
-  schoolDays: '',
-  workload: '',
-})
-// Configura o formulário com os valores iniciais
-const { values } = useForm({
-  initialValues: formValues.value,
+  ageRangeMin: null,
+  ageRangeMax: null,
+  standardAge: null,
+  schoolDays: null,
+  workload: null,
 })
 
-// const isEditing = computed(() => Boolean(props.editId))
-const modalTitle = computed(() => 'Editar Série')
+const originalFormValues = ref<{
+  name: string
+  description: string
+  courseId: string
+  institutionId: string
+  ageRangeMin: number | null
+  ageRangeMax: number | null
+  standardAge: number | null
+  schoolDays: number
+  workload: number
+  disciplines: Array<{
+    disciplineId: string
+    seriesId: string
+    name: string
+    year: number
+    workload: number
+    createdAt: Date
+    deletedAt: string | null
+    updatedAt: string | null
+    updatedBy: string | null
+    tenantId: string
+  }>
+}>({ ...formValues.value, disciplines: [] })
 
 // Adiciona uma nova disciplina
 function addDiscipline() {
   disciplines.value.push({
+    id: null,
     disciplineId: '',
     seriesId: '',
     name: '',
-    year: '',
-    workload: '',
+    workload: null,
+    year: null,
     createdAt: new Date(),
     deletedAt: null,
     updatedAt: null,
@@ -95,49 +107,84 @@ function removeDiscipline(index: number) {
   disciplines.value.splice(index, 1)
 }
 
-async function saveSeriesAndDisciplines() {
-  const series = {
-    ...formValues.value,
-    createdAt: formValues.value.createdAt.toISOString(),
-  }
-
-  const disciplinesToSave = disciplines.value.map(({ name, ...discipline }) => ({
-    ...discipline,
-    year: Number(discipline.year),
-    workload: Number(discipline.workload),
-    createdAt: new Date().toISOString(),
-  }))
-
-  try {
-    const result = await seriesService.upsertSeriesWithDisciplines(series, disciplinesToSave)
-
-    if (result) {
-      showToast('Série e disciplinas salvas com sucesso!', 'top', 'success')
-      router.push('/Series/list')
-    }
-  }
-  catch (error) {
-    console.error('Erro ao salvar série e disciplinas:', error)
-    showToast('Erro ao salvar série e disciplinas. Tente novamente.', 'top', 'danger')
+// Atualiza a carga horária de uma disciplina
+function updateWorkload(index: number, value: string) {
+  const selectedDiscipline = disciplineList.value.find(d => d.name === value)
+  if (selectedDiscipline) {
+    disciplines.value[index].workload = selectedDiscipline.workload
   }
 }
 
 // Sincroniza os valores do formulário com `formValues`
-watch(values, (newValues) => {
-  formValues.value = { ...newValues }
+const { values } = useForm({
+  initialValues: formValues.value,
 })
 
-async function loadSeries() {
+watch(values, (newValues) => {
+  formValues.value = { ...newValues }
+  checkForChanges()
+}, { deep: true })
+
+watch(disciplines, () => {
+  checkForChanges()
+}, { deep: true })
+
+// Verifica se houve alterações no formulário
+function checkForChanges() {
+  const formChanged = JSON.stringify(formValues.value) !== JSON.stringify(originalFormValues.value)
+  const disciplinesChanged = JSON.stringify(disciplines.value) !== JSON.stringify(originalFormValues.value.disciplines || [])
+  hasChanges.value = formChanged || disciplinesChanged
+}
+
+// Carrega os dados da série para edição
+async function loadSeriesData() {
+  if (seriesId.value) {
+    try {
+      const seriesData = await seriesService.getSeriesWithDetailsById(seriesId.value)
+      if (seriesData) {
+        formValues.value = {
+          id: seriesData.id,
+          name: seriesData.name || '',
+          description: seriesData.description || '',
+          courseId: seriesData.courseId || '',
+          institutionId: seriesData.institutionId || '',
+          ageRangeMin: seriesData.ageRangeMin || null,
+          ageRangeMax: seriesData.ageRangeMax || null,
+          standardAge: seriesData.standardAge || null,
+          schoolDays: seriesData.schoolDays || null,
+          workload: seriesData.workload || null,
+        }
+
+        // Carrega as disciplinas associadas à série
+        disciplines.value = seriesData.disciplines.map((discipline: { id: string, disciplineName: string, workload: number, year: number }) => ({
+          id: discipline.id,
+          name: discipline.disciplineName || '',
+          workload: discipline.workload || '',
+          year: discipline.year || '',
+        }))
+        originalFormValues.value = { ...formValues.value, disciplines: [...disciplines.value] }
+        hasChanges.value = false // Garante que o botão "Salvar" esteja desabilitado inicialmente
+      }
+      else {
+        console.error(`Série não encontrada para o ID: ${seriesId.value}`)
+      }
+    }
+    catch (error) {
+      console.error('Erro ao carregar dados da série:', error)
+    }
+  }
+}
+
+// Carrega as listas de instituições, cursos e disciplinas
+async function loadDropdownData() {
   try {
-    const [institutions, series, courses, disciplinas] = await Promise.all([
+    const [institutions, courses, disciplinas] = await Promise.all([
       institutionService.getAll(),
-      seriesService.getAllSeries(),
       courseService.getAllCourses(),
       disciplineService.getAllDiscipline(),
     ])
 
     institutionList.value = institutions?.map(item => ({ id: item.id, name: item.name })) || []
-    seriesList.value = series?.map(item => ({ id: item.id, name: item.name })) || []
     courseList.value = courses?.map(item => ({ id: item.id, name: item.name })) || []
     disciplineList.value = disciplinas?.map(item => ({ id: item.id, name: item.name, workload: item.workload })) || []
   }
@@ -145,72 +192,57 @@ async function loadSeries() {
     console.error('Erro ao carregar dados:', error)
   }
 }
-async function getSeriesData() {
-  if (seriesId.value) {
-    const seriesDbData = await seriesService.getById(seriesId.value)
-    if (seriesDbData) {
-      institutionId.value = seriesDbData.institutionId
-      courseId.value = seriesDbData.courseId
-      schoolId.value = seriesDbData.schoolId
-      setFieldValue('institutionId', seriesDbData.institutionId)
-      setFieldValue('schoolId', seriesDbData.schoolId)
-      setFieldValue('institutionId', seriesDbData.institutionId)
-      setFieldValue('schoolId', seriesDbData.schoolId)
-      setFieldValue('courseId', seriesDbData.courseId)
-      setFieldValue('name', seriesDbData.name)
-      setFieldValue('courseStage', seriesDbData.courseStage)
-      setFieldValue('graduate', seriesDbData.graduate)
-      setFieldValue('workload', seriesDbData.workload)
-      setFieldValue('schoolDays', seriesDbData.schoolDays)
-    }
-    else {
-      console.error(`Dados da série não encontrados para o ID: ${seriesId.value}`)
-    }
+
+// Salva a série e as disciplinas
+async function saveSeriesAndDisciplines() {
+  const series = {
+    ...formValues.value,
+    createdAt: isEditing.value ? undefined : new Date().toISOString(),
+    updatedAt: isEditing.value ? new Date().toISOString() : undefined,
+    deletedAt: null, // Add default value for deletedAt
+    updatedBy: null, // Add default value for updatedBy
   }
-}
 
-async function loadInstitution() {
-  try {
-    const institutions = await institutionService.getAll()
-
-    if (institutions && institutions.length === 1) {
-      institutionId.value = institutions[0].id
-      formValues.value.institutionId = institutions[0].id // Define o valor inicial
+  // Prepara as disciplinas para envio, garantindo que `disciplineId` seja preenchido
+  const disciplinesToSave = disciplines.value.map((discipline) => {
+    const selectedDiscipline = disciplineList.value.find(d => d.name === discipline.name)
+    if (!selectedDiscipline) {
+      throw new Error(`Disciplina "${discipline.name}" não encontrada na lista de disciplinas disponíveis.`)
     }
 
-    if (institutions) {
-      institutionList.value = institutions.map((institution: any) => ({
-        id: institution.id,
-        name: institution.name,
-      }))
+    return {
+      disciplineId: selectedDiscipline.id, // Garante que `disciplineId` seja preenchido
+      seriesId: series.id, // Vincula o ID da série
+      year: discipline.year,
+      workload: discipline.workload,
+      createdAt: discipline.createdAt || new Date().toISOString(),
+      updatedAt: isEditing.value ? new Date().toISOString() : undefined,
+      deletedAt: discipline.deletedAt || null,
+      tenantId: discipline.tenantId,
+    }
+  })
+
+  try {
+    const result = await seriesService.upsertSeriesWithDisciplines(series, disciplinesToSave)
+    if (result) {
+      showToast('Série salva com sucesso!', 'top', 'success')
+      emit('saved')
     }
   }
   catch (error) {
-    console.error('Erro ao carregar dados:', error)
+    console.error('Erro ao salvar série:', error)
+    showToast('Erro ao salvar série. Tente novamente.', 'top', 'danger')
   }
-}
-
-// Atualiza a carga horária com base na disciplina selecionada
-function updateWorkload(index: number, selectedDiscipline: string) {
-  const selected = disciplineList.value.find(d => d.name === selectedDiscipline)
-  if (!selected) {
-    console.warn(`Disciplina não encontrada: ${selectedDiscipline}`)
-    return
-  }
-
-  disciplines.value[index].workload = selected.workload
-  disciplines.value[index].disciplineId = selected.id
 }
 
 onMounted(async () => {
-  await loadSeries()
-  await loadInstitution()
-  if (seriesId.value) {
-    await getSeriesData()
-    if (institutionId.value)
-      setFieldValue('institutionId', institutionId.value)
-    if (courseId.value)
-      setFieldValue('courseId', courseId.value)
+  await loadDropdownData()
+  if (isEditing.value) {
+    await loadSeriesData()
+  }
+  else {
+    // Preenche o institutionId no modo de criação
+    formValues.value.institutionId = institutionList.value.length > 0 ? institutionList.value[0].id : ''
   }
 })
 </script>
@@ -236,10 +268,9 @@ onMounted(async () => {
             <IonLabel>Disciplinas</IonLabel>
           </IonSegmentButton>
         </IonSegment>
-        <pre>{{ $props.editId }}</pre>
         <IonSegmentView>
           <IonSegmentContent id="general">
-            <Field v-slot="{ field, errors }" name="name" rules="required">
+            <Field v-slot="{ field, errors }" name="name" label="Nome" rules="required">
               <IonInput
                 v-model="formValues.name"
                 v-bind="field"
@@ -253,7 +284,7 @@ onMounted(async () => {
 
             <Field v-slot="{ field, errors }" name="institutionId">
               <IonSelect
-                v-model="institutionId"
+                v-model="formValues.institutionId"
                 :disabled="true"
                 v-bind="field"
                 label="Instituição"
@@ -270,16 +301,17 @@ onMounted(async () => {
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
 
-            <Field v-slot="{ field, errors }" name="courseId" rules="required">
+            <Field v-slot="{ field, errors }" name="courseId" label="Curso" rules="required">
               <IonSelect
                 v-model="formValues.courseId"
                 v-bind="field"
-                label="Curso*"
+                label="Curso"
                 label-placement="stacked"
                 fill="outline"
                 placeholder="Selecione"
                 cancel-text="Cancelar"
                 justify="space-between"
+                aria-label="Curso"
               >
                 <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
                   {{ course.name }}
@@ -288,7 +320,7 @@ onMounted(async () => {
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
 
-            <Field v-slot="{ field, errors }" name="workload">
+            <Field v-slot="{ field, errors }" name="workload" label="Carga horária" rules="required">
               <IonInput
                 v-model="formValues.workload"
                 v-bind="field"
@@ -302,7 +334,7 @@ onMounted(async () => {
 
             <IonRow>
               <IonCol size="6">
-                <Field v-slot="{ field, errors }" name="schoolDays">
+                <Field v-slot="{ field, errors }" name="schoolDays" label="Dias letivos" rules="required">
                   <IonInput
                     v-model="formValues.schoolDays"
                     v-bind="field"
@@ -451,7 +483,7 @@ onMounted(async () => {
             </IonButton>
           </IonCol>
           <IonCol size="6">
-            <IonButton :disabled="false" color="secondary" expand="full" @click="saveSeriesAndDisciplines">
+            <IonButton :disabled="!hasChanges" color="secondary" expand="full" @click="saveSeriesAndDisciplines">
               Salvar
             </IonButton>
           </IonCol>
