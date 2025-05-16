@@ -1,6 +1,4 @@
 <script setup lang="ts">
-// import type CustomUser from '@/router/CustomUser'
-import type { RouteRecordNormalized } from 'vue-router'
 import NavItem from '@/components/NavItem.vue'
 import { AuthService } from '@/services/AuthService'
 import { useAuthStore } from '@/store/AuthStore'
@@ -18,14 +16,12 @@ import {
   handLeft,
   image,
   logOutOutline,
-  notificationsOutline,
   peopleOutline,
   person,
-  personCircleOutline,
   videocam,
 } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { type RouteRecordNormalized, useRoute, useRouter } from 'vue-router'
 
 const authService = new AuthService()
 const authStore = useAuthStore()
@@ -34,14 +30,14 @@ if (authStore.userLocal) {
   userRole.value = JSON.parse(authStore.userLocal) ? JSON.parse(authStore.userLocal).role : 'public'
 }
 
-type UserRole = 'PROFESSOR' | 'GESTORESCOLAR' | 'ADMIN' | 'GESTORMUNICIPAL';
+type UserRole = 'PROFESSOR' | 'GESTORESCOLAR' | 'ADMIN' | 'GESTORMUNICIPAL'
 
 const paths: Record<UserRole, string> = {
   PROFESSOR: '/home',
-  GESTORESCOLAR: '/student',
+  GESTORESCOLAR: '/teachers/manage',
   ADMIN: '/dashboard/Home',
   GESTORMUNICIPAL: '/dashboard/Home',
-};
+}
 
 const homeRoute = paths[userRole.value as UserRole]
 
@@ -198,40 +194,35 @@ const currentRouteName = computed(() => {
   return route.meta.name || 'EduPrime'
 })
 
-function hasShowFlag(route: RouteRecordNormalized) {
-  return route.meta.showInTab ?? true
+function hasShowFlag(routeAtr: RouteRecordNormalized) {
+  return routeAtr.meta.showInTab ?? true
 }
 
-function hasRequiredAttributes(route: RouteRecordNormalized) {
-  return route.meta && route.meta.moduleName && route.meta.moduleIcon && route.meta.requiredRole
+function hasRequiredAttributes(routeAtrib: RouteRecordNormalized) {
+  return routeAtrib.meta && routeAtrib.meta.moduleName && routeAtrib.meta.moduleIcon && routeAtrib.meta.requiredRole
 }
 
-// function checkUserAuthorization(route: CustomRouteRecordNormalized) {
-//   console.log(route.meta.requiredRole?.includes('public'))
-//   return route.meta.requiredRole?.includes(user.user_metadata.role) || route.meta.requiredRole?.includes('public')
-// }
-
-router.getRoutes().forEach((route) => {
-  if (hasRequiredAttributes(route) && hasShowFlag(route)) {
-    let moduleTab = dynamicTabs.find(tab => tab.name === route.meta.moduleName)
+router.getRoutes().forEach((routeItem) => {
+  if (hasRequiredAttributes(routeItem) && hasShowFlag(routeItem)) {
+    let moduleTab = dynamicTabs.find(tab => tab.name === routeItem.meta.moduleName)
     if (!moduleTab) {
       moduleTab = {
-        name: route.meta.moduleName,
-        icon: route.meta.moduleIcon,
+        name: routeItem.meta.moduleName,
+        icon: routeItem.meta.moduleIcon,
         color: 'primary', // ou qualquer cor padrão que você preferir
-        url: `/${(route.meta.moduleName as string).toLowerCase()}`,
-        order: route.meta.order || 0,
+        url: `/${(routeItem.meta.moduleName as string).toLowerCase()}`,
+        order: routeItem.meta.order || 0,
         children: [],
       }
       dynamicTabs.push(moduleTab)
     }
     moduleTab.children.push({
-      name: route.meta.name,
-      icon: route.meta.icon,
+      name: routeItem.meta.name,
+      icon: routeItem.meta.icon,
       color: 'tertiary',
-      url: route.path,
-      children: route.children || [],
-      order: route.meta.order || 0,
+      url: routeItem.path,
+      children: routeItem.children || [],
+      order: routeItem.meta.order || 0,
     })
   }
 })
@@ -299,30 +290,20 @@ async function logout() {
               <ion-item lines="full" button class="vertical-tab-button" :router-link="homeRoute" :detail="false">
                 <ion-img src="/icons/icon-256.webp" alt="Gestão Pedagógica" />
               </ion-item>
-              <ion-item v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button"
+              <ion-item
+                v-for="(tab, index) in tabs" :key="index" lines="full" button class="vertical-tab-button"
                 :detail="false" :class="selectedTab === index ? 'selected' : ''" :router-link="tab.children[0].url"
-                @click="selectTab(index)">
+                @click="selectTab(index)"
+              >
                 <ion-icon :icon="tab.icon" />
               </ion-item>
 
               <!-- Profile and Notifications button -->
             </ion-list>
             <div class="bottom-items">
-              <!-- <ion-item
-                lines="full" button class="vertical-tab-button" router-link="/notifications"
-                :detail="false"
-              >
-                <ion-icon :icon="notificationsOutline" />
-              </ion-item> -->
               <ion-item lines="full" button class="vertical-tab-button" :detail="false" @click="logout">
                 <ion-icon :icon="logOutOutline" />
               </ion-item>
-              <!-- <ion-item
-                lines="full" button class="vertical-tab-button" router-link="/profile"
-                :detail="false"
-              >
-                <ion-icon :icon="personCircleOutline" />
-              </ion-item> -->
             </div>
           </div>
           <div class="tree-view">
@@ -336,8 +317,6 @@ async function logout() {
                 </ion-menu-button>
               </template>
             </ion-item>
-
-            <ion-searchbar v-if="tabs[selectedTab].children.length > 4" />
             <!--------------------------
               @TODO: Recursive method to implement nested components for nav-items
             ------------------------------>

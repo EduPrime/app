@@ -1,12 +1,8 @@
 import type { CustomRouteRecordRaw } from '@/router/RouterType'
-import { createRouter, createWebHistory } from '@ionic/vue-router'
-import { home } from 'ionicons/icons'
-import { setActivePinia, getActivePinia } from 'pinia'
-import { useAuthStore } from '@/store/AuthStore'
-import { AuthService } from '@/services/AuthService'
 import pinia from '@/store/pinia'
 import { updateRoutes } from '@/utils/updateRoutes'
-
+import { home } from 'ionicons/icons'
+import { getActivePinia, setActivePinia } from 'pinia'
 
 // Função para carregar dinamicamente todas as rotas dos módulos
 const moduleRoutes: Record<string, any> = import.meta.glob('../modules/**/routes.ts', { eager: true })
@@ -32,6 +28,13 @@ const staticRoutes: Array<CustomRouteRecordRaw> = [
       icon: home,
       name: 'Main Dashboard',
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL'],
+    },
+  },
+  {
+    path: '',
+    redirect: '/teachers/manage',
+    meta: {
+      requiredRole: ['GESTORESCOLAR'],
     },
   },
   {
