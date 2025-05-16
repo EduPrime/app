@@ -2,25 +2,26 @@
 import type { Tables } from '@/types/database.types'
 import EduprimeList from '@/components/ListWithAction.vue'
 import EduprimeRegistredItems from '@/components/RegistredItems.vue'
+import SearchBox from '@/components/SearchBox.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import { IonButton, IonContent, IonIcon, IonModal } from '@ionic/vue'
 import { add } from 'ionicons/icons'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import CourseService from '../services/CourseService'
 // import RegisterSchool from './RegisterSchool.vue'  @TODO: usar como referencia para criar o registro de cursos
 
 const router = useRouter()
 
+//
+
+const searchResult = ref()
+
 // Estados para os dados da instituição e carregamento
 const courseService = new CourseService()
 const dataList = ref<Tables<'course'>[]>([])
-// const schoolData = ref<Array<{ course: Tables<'course'>, courses: Tables<'course'>[], series: Tables<'series'>[] }> | []>([])
-// const schoolCount = ref(0)
-// const classCount = ref(0)
-// const approvalRate = ref(0)
-// const teacherCount = ref(0)
-const searchQuery = ref('')
+
+// const searchQuery = ref('')
 const isModalAddSchool = ref(false)
 
 const seeModal = ref({ modal: false, data: undefined as any })
@@ -53,16 +54,6 @@ function setEditModal(open: boolean) {
 
 // const newItem = ref()
 // const searchResult = ref()
-
-const filteredDataList = computed(() => {
-  if (!searchQuery.value) {
-    return dataList.value
-  }
-
-  return dataList.value.filter((course: Tables<'courses'>) =>
-    course.name.toLowerCase().includes(searchQuery.value.toLowerCase()),
-  )
-})
 
 async function loardCourses() {
   try {
@@ -98,21 +89,26 @@ onMounted(() => {
 
 <template>
   <ContentLayout>
+    <!-- <pre>
+        searchResult: {{ searchResult?.at(0) }}
+    </pre> -->
     <div class="ion-margin-top">
-      <ion-row class="ion-align-items-center ion-justify-content-between">
-        <ion-col size="10">
-          <ion-searchbar v-model="searchQuery" placeholder="Buscar curso" />
-        </ion-col>
-        <ion-col size="2" class="ion-text-end">
-          <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
-            <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
-            <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
-            <span class="ion-hide-sm-down">Novo</span>
-          </IonButton>
-        </ion-col>
-      </ion-row>
+      <SearchBox
+        table="course"
+        placeholder="Busque o curso"
+        :search-areas="['name']"
+        filter-type="text"
+        @update:search-result="searchResult = $event"
+      >
+        <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
+          <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
+          <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
+          <span class="ion-hide-sm-down">Novo</span>
+        </IonButton>
+      </SearchBox>
+      <!-- :filter-areas="[{ table: 'institution', relationship: 'institutionId', placeholder: 'Instituição' }]" -->
 
-      <EduprimeList :data-list="filteredDataList" @update:delete="deleteModal = $event" @update:edit="editModal = $event" @update:see="($event) => { console.log($event); seeModal = $event; }" />
+      <EduprimeList :data-list="searchResult" @update:delete="deleteModal = $event" @update:edit="editModal = $event" @update:see="($event) => { console.log($event); seeModal = $event; }" />
 
       <!-- <SchoolList :data-list="filteredDataList" /> -->
       <IonModal

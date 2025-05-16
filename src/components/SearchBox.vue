@@ -69,7 +69,7 @@ watch(() => props.filterAreas, async (newValue) => {
 }, { immediate: true })
 
 watch(searchQuery, async (newValue) => {
-  if (newValue.length > 2) {
+  if (newValue.length > 1) {
     await searchByQuery(searchQuery.value)
   }
   else {
@@ -84,7 +84,7 @@ onMounted(async () => {
 
 <template>
   <IonRow>
-    <IonCol v-if="props.filterType === 'list' && props.filterAreas" size="12">
+    <IonCol v-if="props.filterType === 'list' && props.filterAreas" size="12" style="background-color: black;">
       <IonRow>
         <IonCol v-for="(item, index) in props.filterAreas" :key="index" size="12" :size-md="`${props.filterAreas.length === 1 ? 12 : 6}`">
           <div v-if="index === 0" style="padding-left: 6px; padding-right: 6px;">
@@ -106,8 +106,17 @@ onMounted(async () => {
       </IonRow>
     </IonCol>
 
-    <IonCol class="ion-no-padding ion-no-margin" size="12">
-      <IonSearchbar id="eduprime-search-bar" v-model="searchQuery" :placeholder="`${props.placeholder}`" />
+    <IonCol size="12">
+      <IonRow>
+        <IonCol size="10">
+          <IonSearchbar id="eduprime-search-bar" v-model="searchQuery" :placeholder="`${props.placeholder}`" />
+        </IonCol>
+        <IonCol size="2">
+          <div style="margin-top: 10px;">
+            <slot />
+          </div>
+        </IonCol>
+      </IonRow>
     </IonCol>
   </IonRow>
 </template>
@@ -120,7 +129,7 @@ onMounted(async () => {
   --placeholder-color: var(--ion-color-primary);
   --clear-button-color: var(--ion-color-primary);
   --border-radius: 4px;
-  padding: 0 16px;
+
 }
 
 .select {
@@ -128,5 +137,13 @@ onMounted(async () => {
   padding-right: 14px;
   border-radius: 3px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.d-flex {
+  display: flex;
+}
+
+.my-auto {
+  margin: auto 0
 }
 </style>

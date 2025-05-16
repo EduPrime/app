@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { IonButton, IonCardHeader, IonCol, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText, IonGrid } from '@ionic/vue'
-import { bookOutline, business, businessOutline, callOutline, checkmarkCircleOutline, documentOutline, fileTrayOutline, globeOutline, locationOutline, mailOutline, mapOutline, personOutline, pinOutline, schoolOutline } from 'ionicons/icons'
+import { IonButton, IonCardHeader, IonCol, IonGrid, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText } from '@ionic/vue'
+import { apps, bookOutline, business, businessOutline, callOutline, checkmarkCircleOutline, documentOutline, fileTrayOutline, globeOutline, locationOutline, mailOutline, mapOutline, personOutline, pinOutline, schoolOutline, time } from 'ionicons/icons'
 
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -21,6 +21,8 @@ interface Props {
     state?: string
     postalCode?: string
     neighborhood?: string
+    workload?: string
+    courseModality?: string
 
   }
   type?: string
@@ -37,18 +39,20 @@ const metaIcon = ref((route.meta.icon as string) || '')
 //     metaIcon.value = (route.meta.icon as string) || ''
 
 function formatPostalCode(postalCode?: string): string {
-  if (!postalCode) return '';
+  if (!postalCode)
+    return ''
   // Remove non-digits and format as 00000-000
-  const digits = postalCode.replace(/\D/g, '');
+  const digits = postalCode.replace(/\D/g, '')
   if (digits.length === 8) {
-    return digits.replace(/(\d{5})(\d{3})/, '$1-$2');
+    return digits.replace(/(\d{5})(\d{3})/, '$1-$2')
   }
-  return postalCode;
+  return postalCode
 }
 </script>
 
 <template>
   <IonPage>
+    <pre>{{ props.items }}</pre>
     <div class="ion-padding-top ion-padding-horizontal" style="margin-top: 8px;">
       <IonCardHeader
         id="accordionContentHeader" class="ion-no-padding" style="padding: 8px; margin-bottom: 10px;"
@@ -80,6 +84,26 @@ function formatPostalCode(postalCode?: string): string {
               />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
                 {{ props.items.status }}
+              </IonText>
+            </div>
+
+            <div v-if="props.items.workload" style="display: flex; align-items: center; padding: 6px;">
+              <IonIcon
+                slot="start" color="primary" style="padding-right: 10px;"
+                :icon="time"
+              />
+              <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+                Carga horária {{ props.items.workload }} horas
+              </IonText>
+            </div>
+
+            <div v-if="props.items.courseModality" style="display: flex; align-items: center; padding: 6px;">
+              <IonIcon
+                slot="start" color="primary" style="padding-right: 10px;"
+                :icon="apps"
+              />
+              <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+                {{ props.items.courseModality }}
               </IonText>
             </div>
 
@@ -147,7 +171,7 @@ function formatPostalCode(postalCode?: string): string {
             </div>
           </IonList>
         </IonCol>
-        <IonCol size="12">
+        <IonCol v-if="props.items.address" size="12">
           <IonItemDivider
             style="border-color: rgba(var(--ion-color-primary-rgb), 0.25);"
             class="ion-no-padding"
