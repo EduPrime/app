@@ -1173,28 +1173,32 @@ model Teacher {
 }
 
 model EvaluationRule {
-  id                   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name                 String    @db.VarChar(255)
-  gradeType            String    @db.VarChar(100)
-  progressionType      String    @db.VarChar(100)
-  parallelMakeupExam   String    @db.VarChar(100)
-  averageFormula       String    @db.VarChar(100)
-  makeupFormula        String?   @db.VarChar(100)
-  maximumGrade         Decimal   @default(10) @db.Decimal(3, 1)
-  minimumGrade         Decimal   @default(0) @db.Decimal(3, 1)
-  numberActivities     Int       @default(0)
-  average              Decimal   @default(0) @db.Decimal(3, 1)
-  frequencyType        String?   @db.VarChar(100)
-  feedbackType         String?   @db.VarChar(100)
-  attendancePercentage Decimal   @db.Decimal(5, 2)
-  conceptualLabel      Json?
-  frequencyReport      Json?
-  createdAt            DateTime  @default(now()) @db.Timestamp(6)
-  updatedAt            DateTime? @updatedAt @db.Timestamp(6)
-  updatedBy            String?   @db.Uuid
-  tenantId             String?   @db.Uuid
-  courseId             String    @db.Uuid
-  course               Course    @relation(fields: [courseId], references: [id], map: "rule_course_fkey")
+  id                     String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name                   String              @db.VarChar(255)
+  gradeType              gradeType?
+  roundingRuleByStage    roundingRule?
+  roundingRuleTotal      roundingRule?
+  progressionType        progressionType?
+  parallelMakeupExam     parallelMakeupExam?
+  averageFormula         averageFormula?
+  makeupFormula          makeupFormula?
+  maximumGrade           Decimal             @default(10) @db.Decimal(3, 1)
+  minimumGrade           Decimal             @default(0) @db.Decimal(3, 1)
+  numberActivities       Int                 @default(0)
+  average                Decimal             @default(0) @db.Decimal(3, 1)
+  frequencyType          frequencyType?
+  dontUseFrequencyToPass Boolean             @default(false)
+  decimalPlaces          Int                 @default(2)
+  feedbackType           feedbackType?
+  attendancePercentage   Decimal             @db.Decimal(5, 2)
+  conceptualLabel        Json?
+  frequencyReport        Json?
+  createdAt              DateTime            @default(now()) @db.Timestamp(6)
+  updatedAt              DateTime?           @updatedAt @db.Timestamp(6)
+  updatedBy              String?             @db.Uuid
+  tenantId               String?             @db.Uuid
+  courseId               String              @db.Uuid
+  course                 Course              @relation(fields: [courseId], references: [id], map: "rule_course_fkey")
 
   @@map("evaluationRule")
   @@schema("public")
@@ -1542,6 +1546,82 @@ enum bloodType {
   O_plus   @map("O+")
   O_minus  @map("O-")
   Outro
+
+  @@schema("public")
+}
+
+enum frequencyType {
+  DIARIA      @map("Diária")
+  DISCIPLINAR @map("Disciplina")
+
+  @@schema("public")
+}
+
+enum feedbackType {
+  PARECER_POR_ETAPA            @map("Um parecer por etapa, geral")
+  NAO_TEM_PARECER              @map("Não usar parecer descritivo")
+  PARECER_POR_DISCIPLINA       @map("Um parecer por disciplina e por etapa")
+  PARECER_POR_DISCIPLINA_GERAL @map("Um parecer por disciplina por ano letivo")
+  PARECER_POR_ANO_LETIVO       @map("Um parecer por ano letivo")
+
+  @@schema("public")
+}
+
+enum gradeType {
+  NUMERICA              @map("Numérica")
+  CONCEITUAL            @map("Conceitual")
+  PARECER               @map("Parecer descritivo")
+  NAO_USAR              @map("Não usar nota")
+  CONCEITUAL_E_NUMERICA @map("Conceitual e numérica")
+
+  @@schema("public")
+}
+
+enum roundingRule {
+  ARREDONDAR_PARA_PROXIMO_INTEIRO @map("Arredondar para o inteiro mais próximo")
+  ARREDONDAR_PARA_CIMA_INTEIRO    @map("Arredondar para o inteiro de cima")
+  ARREDONDAR_PARA_PROXIMO_MEIO    @map("Arredondar para o .0 ou .5 mais próximo")
+  ARREDONDAR_PARA_CIMA_MEIO       @map("Arredondar para o .0 ou .5 de cima")
+  ARREDONDAR_PARA_DECIMO          @map("Arredondar para o decimal mais próximo")
+  ARREDONDAR_PARA_CIMA_DECIMO     @map("Arredondar para o decimal de cima")
+
+  @@schema("public")
+}
+
+enum progressionType {
+  CONTINUADA                    @map("Continuada")
+  NAO_CONTINUADA_MEDIA          @map("Não continuada: Somente média")
+  NAO_CONTINUADA_MEDIA_PRESENCA @map("Não continuada: Média e presença")
+  NAO_CONTINUADA_MANUAL         @map("Não continuada manual")
+  NAO_CONTINUADA_MANUAL_CICLO   @map("Não continuada manual - ciclo")
+
+  @@schema("public")
+}
+
+enum parallelMakeupExam {
+  UMA_POR_ETAPA            @map("Usar uma recuperação paralela por etapa")
+  NAO_TEM_RECUPERACAO      @map("Não usar recuperação paralela")
+  UMA_POR_ETAPA_ESPECIFICA @map("Uma recuperação paralela em etapas específicas")
+
+  @@schema("public")
+}
+
+enum makeupFormula {
+  SOMA_COM_ATIVIDADES  @map("Recuperação soma com atividades")
+  SUBSTITUI_PIOR_NOTA  @map("Recuperação substitui atividade com pior nota ")
+  SUBSTITUI_NOTA_FINAL @map("Recuperação substitui nota final")
+  SUBSTITUI_NOTA_EXAME @map("Recuperação substitui nota do exame")
+  MEDIA_COM_NOTA_EXAME @map("Recuperação faz média com nota do exame")
+  MEDIA_COM_NOTA_FINAL @map("Recuperação faz média com nota final")
+  NAO_TEM_RECUPERACAO  @map("Não tem recuperação")
+
+  @@schema("public")
+}
+
+enum averageFormula {
+  MEDIA_ARITMETICA @map("Média aritmética")
+  MEDIA_PONDERADA  @map("Média ponderada entre soma das atividades e exame")
+  NAO_TEM_MEDIA    @map("Não tem média")
 
   @@schema("public")
 }

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Tables } from '@/types/database.types'
 import type { ServerFunction } from '@prisma/client'
 import FunctionDetailView from '@/components/FunctionDetailView.vue'
 import ListWithActionFunction from '@/components/ListWithActionFunction.vue'
@@ -69,16 +68,6 @@ function navigateToRegister() {
   }
 }
 
-function editItem(id: string) {
-  if (isMobileDevice()) {
-    editingId.value = id
-    setEditModal(true)
-  }
-  else {
-    router.push({ name: 'RegisterFunction', params: { id } })
-  }
-}
-
 function setSeeModal(open: boolean) {
   if (open) {
     seeModal.value.modal = false
@@ -129,6 +118,7 @@ async function handleDelete() {
       await serverFunctionService.softDeleteServerFunction(deleteModal.value.data.id)
       loadFunctions()
       setDeleteModal(false)
+      showToast('Função excluída com sucesso', 'top', 'success')
     }
     catch (error: any) {
       console.error('Erro ao excluir função:', error)
@@ -213,6 +203,7 @@ watch(
           <RegisterFunctionMobile
             @saved="loadFunctions(); setModalAddFunction(false)"
             @cancel="setModalAddFunction(false)"
+            @error="(message, color) => { showToast(message, 'top', color); }"
           />
         </IonModal>
 
@@ -249,6 +240,7 @@ watch(
               :edit-id="editingId"
               @saved="loadFunctions(); setEditModal(false)"
               @cancel="setEditModal(false)"
+              @error="(message, color) => { showToast(message, 'top', color); }"
             />
           </IonContent>
         </IonModal>

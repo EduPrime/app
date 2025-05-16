@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import showToast from '@/utils/toast-alert'
 import {
   IonButton,
   IonCol,
@@ -24,6 +23,7 @@ const props = defineProps<{
 const emits = defineEmits<{
   (e: 'saved'): void
   (e: 'cancel'): void
+  (e: 'error', message: string, color: 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'light' | 'medium' | 'dark'): void
 }>()
 
 const serverFunctionService = new ServerFunctionService()
@@ -77,9 +77,7 @@ watchEffect(() => {
 
 watch(
   () => ({ ...formValues.value }),
-  (newValues) => {
-    console.log('Mobile: Valores do formulário mudaram:', newValues)
-
+  () => {
     if (isEditing.value) {
       checkForChanges()
     }
@@ -89,11 +87,7 @@ watch(
 
 onMounted(async () => {
   if (props.editId) {
-    console.log('Mobile: ID da função para edição:', props.editId)
-
     const fn = await serverFunctionService.getServerFunctionById(props.editId)
-
-    console.log('Mobile: Função encontrada:', fn)
 
     if (fn) {
       const loadedValues = {
@@ -135,15 +129,28 @@ async function handleSubmit(values: any) {
     description: values.description,
   }
 
-  await serverFunctionService.upsertServerFunction(payload)
+  try {
+    await serverFunctionService.upsertServerFunction(payload)
+    handleSaved()
+  }
+  catch (error: any) {
+    console.error('Erro ao salvar função:', error)
 
-  const successMessage = isEditing.value
-    ? 'Função atualizada com sucesso'
-    : 'Nova função cadastrada com sucesso'
-
-  showToast(successMessage, 'top', 'success')
-
-  handleSaved()
+    if (error.message) {
+      if (error.message.includes('Nome de função já existente')) {
+        emits('error', 'Não foi possível salvar nova função: Nome de função já existente', 'warning')
+      }
+      else if (error.message.includes('Abreviação de função já existente')) {
+        emits('error', 'Não foi possível salvar nova função: Abreviação de função já existente', 'warning')
+      }
+      else {
+        emits('error', `Erro ao salvar função: ${error.message}`, 'danger')
+      }
+    }
+    else {
+      emits('error', 'Erro ao salvar função', 'danger')
+    }
+  }
 }
 
 function handleCancel() {
@@ -181,7 +188,7 @@ function autoResizeTextarea() {
         <IonGrid>
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="name" rules="required|min:3|max:180">
+              <Field v-slot="{ field, errors }" name="name" label="Nome da função" rules="required|min:3|max:180">
                 <IonInput
                   v-bind="field"
                   v-model="formValues.name"
@@ -207,7 +214,7 @@ function autoResizeTextarea() {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="abbreviation">
+              <Field v-slot="{ field, errors }" name="abbreviation" label="Abreviação" rules="min:2|max:6">
                 <IonInput
                   v-bind="field"
                   v-model="formValues.abbreviation"
@@ -215,6 +222,7 @@ function autoResizeTextarea() {
                   label-placement="stacked"
                   fill="outline"
                   placeholder="Digite a abreviação"
+                  :maxlength="7"
                   :class="{ 'has-error': errors.length > 0 }"
                   @ion-input="field.onInput"
                 />
@@ -229,7 +237,7 @@ function autoResizeTextarea() {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="description" rules="max:180">
+              <Field v-slot="{ field, errors }" name="description" label="Descrição da função" rules="max:180">
                 <IonTextarea
                   v-bind="field"
                   ref="descriptionRef"
@@ -239,7 +247,7 @@ function autoResizeTextarea() {
                   fill="outline"
                   placeholder="Digite uma descrição"
                   :class="{ 'has-error': errors.length > 0 }"
-                  :maxlength="180"
+                  :maxlength="181"
                   :auto-grow="true"
                   @ion-input="(event) => {
                     field.onInput(event);

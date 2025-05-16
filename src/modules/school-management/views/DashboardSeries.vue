@@ -4,7 +4,7 @@ import EduprimeList from '@/components/ListWithAction.vue'
 import EduprimeRegistredItems from '@/components/RegistredItems.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import showToast from '@/utils/toast-alert'
-import { IonButton, IonCol, IonContent, IonIcon, IonModal, IonRow } from '@ionic/vue'
+import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCol, IonContent, IonIcon, IonModal, IonRow, IonText } from '@ionic/vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -207,7 +207,9 @@ watch(
           />
         </IonContent>
       </IonModal>
-      <pre>{{ seeModal.data }}</pre>
+      <pre>{{ seeModal.data?.id }}</pre>
+
+      <!-- <pre>{{ seeModal.data }}</pre> -->
 
       <IonModal
         :is-open="editModal.modal"
@@ -218,7 +220,8 @@ watch(
       >
         <IonContent>
           <RegisterSeries
-            :edit-id="editingId"
+            :edit-id="seeModal.data?.id"
+            :close-modal="setEditModal"
             @saved="loadSeries(); setEditModal(false)"
             @cancel="setEditModal(false)"
           />

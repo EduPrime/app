@@ -13,7 +13,7 @@ import {
   IonToolbar,
 } from '@ionic/vue'
 import { ErrorMessage, Field, Form } from 'vee-validate'
-import { computed, nextTick, onMounted, reactive, ref, watch, watchEffect } from 'vue'
+import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ServerFunctionService from '../services/ServerFunctionService'
 
@@ -61,9 +61,7 @@ watchEffect(() => {
 
 watch(
   () => ({ ...formValues.value }),
-  (newValues) => {
-    console.log('Valores do formulário mudaram:', newValues)
-
+  () => {
     if (isEditing.value) {
       checkForChanges()
     }
@@ -73,12 +71,8 @@ watch(
 
 onMounted(async () => {
   if (serverFunctionId.value) {
-    console.log('ID da função para edição:', serverFunctionId.value)
-
     isEditing.value = true
     const fn = await serverFunctionService.getServerFunctionById(serverFunctionId.value)
-
-    console.log('Função encontrada:', fn)
 
     if (fn) {
       // Armazena os valores originais
@@ -111,18 +105,39 @@ async function handleSubmit(values: any) {
     description: values.description,
   }
 
-  await serverFunctionService.upsertServerFunction(payload)
+  try {
+    await serverFunctionService.upsertServerFunction(payload)
 
-  const successMessage = isEditing.value
-    ? 'Função atualizada com sucesso'
-    : 'Nova função cadastrada com sucesso'
+    const successMessage = isEditing.value
+      ? 'Função atualizada com sucesso'
+      : 'Nova função cadastrada com sucesso'
 
-  showToast(successMessage, 'top', 'success')
+    showToast(successMessage, 'top', 'success')
 
-  router.push({
-    name: 'FunctionListFunction',
-    query: { refresh: Date.now().toString() },
-  })
+    router.push({
+      name: 'FunctionListFunction',
+      query: { refresh: Date.now().toString() },
+    })
+  }
+  catch (error: any) {
+    console.error('Erro ao salvar função:', error)
+
+    // Exibe mensagem específica dependendo do tipo de erro
+    if (error.message) {
+      if (error.message.includes('Nome de função já existente')) {
+        showToast('Não foi possível salvar nova função: Nome de função já existente', 'top', 'warning')
+      }
+      else if (error.message.includes('Abreviação de função já existente')) {
+        showToast('Não foi possível salvar nova função: Abreviação de função já existente', 'top', 'warning')
+      }
+      else {
+        showToast(`Erro ao salvar função: ${error.message}`, 'top', 'danger')
+      }
+    }
+    else {
+      showToast('Erro ao salvar função', 'top', 'danger')
+    }
+  }
 }
 
 function resetForm() {
@@ -183,7 +198,7 @@ function autoResizeTextarea() {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field }" name="abbreviation">
+              <Field v-slot="{ field }" name="abbreviation" label="Abreviação" rules="min:2|max:6">
                 <div class="floating-input">
                   <input
                     v-bind="field"
@@ -191,6 +206,7 @@ function autoResizeTextarea() {
                     type="text"
                     class="floating-native"
                     placeholder=" "
+                    :maxlength="7"
                     @input="field.onInput"
                   >
                   <label class="floating-label"><span>Abreviação</span></label>

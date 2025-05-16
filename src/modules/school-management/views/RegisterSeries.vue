@@ -71,8 +71,8 @@ const { values } = useForm({
   initialValues: formValues.value,
 })
 
-const isEditing = computed(() => Boolean(props.editId))
-const modalTitle = computed(() => isEditing.value ? 'Editar Série' : 'Nova Série')
+// const isEditing = computed(() => Boolean(props.editId))
+const modalTitle = computed(() => 'Editar Série')
 
 // Adiciona uma nova disciplina
 function addDiscipline() {
@@ -236,7 +236,7 @@ onMounted(async () => {
             <IonLabel>Disciplinas</IonLabel>
           </IonSegmentButton>
         </IonSegment>
-
+        <pre>{{ $props.editId }}</pre>
         <IonSegmentView>
           <IonSegmentContent id="general">
             <Field v-slot="{ field, errors }" name="name" rules="required">
