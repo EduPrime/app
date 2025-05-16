@@ -907,6 +907,7 @@ model School {
   teacher                      Teacher[]
   TeacherAttendance            TeacherAttendance[]
 
+  @@unique([INEPCode, name], map: "uq_school_inepcode_on_conflict")
   @@map("school")
   @@schema("public")
 }
