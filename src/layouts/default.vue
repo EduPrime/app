@@ -34,7 +34,7 @@ type UserRole = 'PROFESSOR' | 'GESTORESCOLAR' | 'ADMIN' | 'GESTORMUNICIPAL'
 
 const paths: Record<UserRole, string> = {
   PROFESSOR: '/home',
-  GESTORESCOLAR: '/student',
+  GESTORESCOLAR: '/teachers/manage',
   ADMIN: '/dashboard/Home',
   GESTORMUNICIPAL: '/dashboard/Home',
 }
