@@ -36,6 +36,16 @@ const metaIcon = ref((route.meta.icon as string) || '')
 //  metaName.value = (route.meta.name as string) || ''
 //     metaIcon.value = (route.meta.icon as string) || ''
 
+function formatCnpj(cnpj?: string): string {
+  if (!cnpj) return '';
+  // Remove non-digits and format as 00.000.000/0000-00
+  const digits = cnpj.replace(/\D/g, '');
+  if (digits.length === 14) {
+    return digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+  }
+  return cnpj;
+}
+
 function formatPostalCode(postalCode?: string): string {
   if (!postalCode) return '';
   // Remove non-digits and format as 00000-000
@@ -99,7 +109,7 @@ function formatPostalCode(postalCode?: string): string {
                 :icon="fileTrayOutline"
               />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.cnpj }}
+                {{ formatCnpj(props.items.cnpj) }}
               </IonText>
             </div>
             <div v-if="props.items.phone" style="display: flex; align-items: center; padding: 6px;">

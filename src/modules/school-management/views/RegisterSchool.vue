@@ -26,7 +26,7 @@ const formValues = ref<SchoolFormValues>({
   INEPCode: '12343',
   name: 'Escola Primeiro de Maio',
   corporateName: 'Sociedade Educacional Primeiro de Maio',
-  cnpj: '73.819.874/0001-49',
+  cnpj: '73819874000149',
   educationNetwork: 'false',
   phone: '(91) 98010-1212',
   phone2: '(92) 99010-1212',
@@ -408,7 +408,7 @@ onMounted(async () => {
             </Field>
 
             <Field v-slot="{ field, errors }" name="cnpj" rules="">
-              <IonInput v-model="formValues.cnpj" v-maskito="cnpjOptions" v-bind="field" label="CNPJ" label-placement="stacked" fill="outline" placeholder="00.000.000/0000-00" />
+              <IonInput v-model="formValues.cnpj" v-imask="{mask: '00.000.000/0000-00'}" v-bind="field" label="CNPJ" label-placement="stacked" fill="outline" placeholder="00.000.000/0000-00" />
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
 

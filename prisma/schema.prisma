@@ -796,7 +796,7 @@ model School {
   educationNetwork             Boolean?
   administrativeDependency     Organ?
   name                         String                 @db.VarChar(100)
-  cnpj                         String?                @db.VarChar(18)
+  cnpj                         String?                @db.VarChar(14)
   address                      String?                @db.VarChar(255)
   addressNumber                String?                @db.VarChar(10)
   additionalInfo               String?                @db.VarChar(255)
@@ -831,7 +831,7 @@ model School {
   accessibleClassrooms         Int?
   internetAvailable            Boolean?
   localNetworkAvailable        Boolean?
-  connectionTypes              ConnectionType?
+  connectionType               ConnectionType[]
   devicesUsedByStudents        Device[]
   availableDesktops            Int?
   availableLaptops             Int?
@@ -907,6 +907,7 @@ model School {
   teacher                      Teacher[]
   TeacherAttendance            TeacherAttendance[]
 
+  @@unique([INEPCode, name], map: "uq_school_inepcode_on_conflict")
   @@map("school")
   @@schema("public")
 }
