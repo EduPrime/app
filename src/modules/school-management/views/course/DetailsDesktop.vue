@@ -19,7 +19,7 @@ async function loadDetails() {
     loading.value = true
     const id = route.params.id as string
     if (!id) {
-      router.push({ name: 'FunctionListFunction' }) // @TODO: Ajuste a rota
+      router.push({ name: 'RegisterCourse' })
       return
     }
 
@@ -27,7 +27,7 @@ async function loadDetails() {
     courseDetails.value = data
   }
   catch (error) {
-    console.error('Erro ao carregar detalhes da função:', error)
+    console.error('Erro ao carregar detalhes do curso:', error)
   }
   finally {
     loading.value = false
@@ -36,7 +36,7 @@ async function loadDetails() {
 
 function navigateToEdit() {
   if (courseDetails.value?.id) {
-    router.push({ name: 'RegisterFunction', params: { id: courseDetails.value.id } }) // @TODO: Ajuste a rota
+    router.push({ name: 'RegisterCourse', params: { id: courseDetails.value.id } })
   }
 }
 

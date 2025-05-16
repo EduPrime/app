@@ -158,11 +158,12 @@ export default class CourseService extends BaseService<Course> {
     }
 
     const payload: Partial<any> & { id?: string } = { // @TODO: Definir tipagem
-      name: item.name,
-      abbreviation: item.abbreviation,
-      description: item.description || null,
-      tenantId: item.tenantId || null,
-      userCreated: item.userCreated || null,
+      // name: item.name,
+      // abbreviation: item.abbreviation,
+      // description: item.description || null,
+      // tenantId: item.tenantId || null,
+      // userCreated: item.userCreated || null,
+      ...item,
       deletedAt: null,
       updatedAt: now,
       ...(existing?.id && { id: existing.id }),

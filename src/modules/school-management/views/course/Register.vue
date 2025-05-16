@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Institutions } from '../types/types'
 import showToast from '@/utils/toast-alert'
 import {
   IonButton,
@@ -9,6 +10,8 @@ import {
   IonHeader,
   IonPage,
   IonRow,
+  IonSelect,
+  IonSelectOption,
   IonTitle,
   IonToolbar,
 } from '@ionic/vue'
@@ -16,12 +19,28 @@ import { ErrorMessage, Field, Form } from 'vee-validate'
 import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CourseService from '../../services/CourseService'
+import InstitutionService from '../../services/InstitutionService'
 
 const route = useRoute()
 const router = useRouter()
 const courseService = new CourseService()
+const institutionService = new InstitutionService()
 
-const initialFormValues = { id: '', name: '', abbreviation: '', description: '' }
+const initialFormValues = {
+  id: '',
+  name: '',
+  abbreviation: '',
+  description: '',
+  institutionId: undefined,
+  schoolId: undefined,
+  workerId: undefined,
+  courseStage: undefined,
+  graduate: undefined,
+  teachingType: undefined,
+  regimeType: undefined,
+  courseModality: undefined,
+}
+
 const formValues = ref({ ...initialFormValues })
 const originalFormValues = ref({ ...initialFormValues })
 const isEditing = ref(false)
@@ -29,6 +48,7 @@ const itemId = computed(() => route.params.id as string | undefined)
 const pageTitle = computed(() => isEditing.value ? 'Editar curso' : 'Novo curso')
 const descriptionRef = ref<HTMLTextAreaElement | null>(null)
 const hasChanges = ref(false)
+const institutions = ref<Institutions[]>({} as Institutions[])
 
 // Curso para verificar se houve mudanças nos campos
 function checkForChanges() {
@@ -99,11 +119,11 @@ onMounted(async () => {
 
 async function handleSubmit(values: any) {
   const payload = {
+    ...values,
     id: isEditing.value ? itemId.value : undefined,
-    name: values.name,
-    abbreviation: values.abbreviation,
-    description: values.description,
   }
+
+  console.log('Payload', payload)
 
   try {
     await courseService.upsertItem(payload)
@@ -115,7 +135,7 @@ async function handleSubmit(values: any) {
     showToast(successMessage, 'top', 'success')
 
     router.push({
-      name: 'FunctionListFunction', // @TODO: Ajuste a rota
+      name: 'RegisterCourse',
       query: { refresh: Date.now().toString() },
     })
   }
@@ -157,6 +177,17 @@ function autoResizeTextarea() {
     el.style.height = `${Math.max(80, el.scrollHeight)}px`
   }
 }
+
+async function presetFirstInstitutionOnIonSelect() {
+  // Carregar instituições e preencher o input de instituição(IonSelect) com o primeiro elemento da consulta
+  const result = await institutionService.getInstitutions()
+  institutions.value = result ?? []
+  formValues.value.institutionId = institutions.value.length > 0 ? institutions.value[0]?.id : ''
+}
+
+onMounted(async () => {
+  await presetFirstInstitutionOnIonSelect()
+})
 </script>
 
 <template>
@@ -247,6 +278,31 @@ function autoResizeTextarea() {
               </Field>
             </IonCol>
           </IonRow>
+
+          <IonRow>
+            <IonCol size="12">
+              <Field v-slot="{ field, errors }" name="institutionId" rules="">
+                <IonSelect
+                  v-model="formValues.institutionId"
+                  v-bind="field"
+                  label="Instituição"
+                  label-placement="stacked"
+                  fill="outline"
+                  :items="institutions"
+                  placeholder="Selecione a instituição"
+                >
+                  <IonSelectOption
+                    v-for="(institution, index) in institutions"
+                    :key="index"
+                    :value="institution.id"
+                  >
+                    {{ institution.name }}
+                  </IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
+            </IonCol>
+          </ionrow>
         </IonGrid>
       </Form>
     </IonContent>

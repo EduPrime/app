@@ -14,7 +14,7 @@ import {
 import { personSharp } from 'ionicons/icons'
 import { ErrorMessage, Field, Form } from 'vee-validate'
 import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue'
-import ServerFunctionService from '../services/ServerFunctionService'
+import CourseService from '../../services/CourseService'
 
 const props = defineProps<{
   editId?: string
@@ -26,7 +26,7 @@ const emits = defineEmits<{
   (e: 'error', message: string, color: 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'light' | 'medium' | 'dark'): void
 }>()
 
-const serverFunctionService = new ServerFunctionService()
+const courseService = new CourseService()
 
 const descriptionRef = ref<HTMLTextAreaElement | null>(null)
 const formValues = ref({
@@ -45,7 +45,7 @@ const originalFormValues = ref({
 
 const hasChanges = ref(false)
 const isEditing = computed(() => Boolean(props.editId))
-const modalTitle = computed(() => isEditing.value ? 'Editar função' : 'Nova função')
+const modalTitle = computed(() => isEditing.value ? 'Editar curso' : 'Nova curso')
 
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
@@ -87,14 +87,14 @@ watch(
 
 onMounted(async () => {
   if (props.editId) {
-    const fn = await serverFunctionService.getServerFunctionById(props.editId)
+    const item = await courseService.getById(props.editId)
 
-    if (fn) {
+    if (item) {
       const loadedValues = {
-        id: fn.id,
-        name: fn.name,
-        abbreviation: fn.abbreviation || '',
-        description: (fn as any).description || '',
+        id: item.id,
+        name: item.name,
+        abbreviation: item.abbreviation || '',
+        description: (item as any).description || '',
       }
 
       formValues.value = { ...loadedValues }
@@ -130,25 +130,25 @@ async function handleSubmit(values: any) {
   }
 
   try {
-    await serverFunctionService.upsertServerFunction(payload)
+    await courseService.upsertItem(payload)
     handleSaved()
   }
   catch (error: any) {
-    console.error('Erro ao salvar função:', error)
+    console.error('Erro ao salvar curso:', error)
 
     if (error.message) {
-      if (error.message.includes('Nome de função já existente')) {
-        emits('error', 'Não foi possível salvar nova função: Nome de função já existente', 'warning')
+      if (error.message.includes('Nome de curso já existente')) {
+        emits('error', 'Não foi possível salvar nova curso: Nome de curso já existente', 'warning')
       }
-      else if (error.message.includes('Abreviação de função já existente')) {
-        emits('error', 'Não foi possível salvar nova função: Abreviação de função já existente', 'warning')
+      else if (error.message.includes('Abreviação de curso já existente')) {
+        emits('error', 'Não foi possível salvar nova curso: Abreviação de curso já existente', 'warning')
       }
       else {
-        emits('error', `Erro ao salvar função: ${error.message}`, 'danger')
+        emits('error', `Erro ao salvar curso: ${error.message}`, 'danger')
       }
     }
     else {
-      emits('error', 'Erro ao salvar função', 'danger')
+      emits('error', 'Erro ao salvar curso', 'danger')
     }
   }
 }
@@ -184,23 +184,23 @@ function autoResizeTextarea() {
         <IonIcon :icon="personSharp" style="margin-right: 10px;" />
         {{ modalTitle }}
       </div>
-      <Form id="function-form-mobile" :key="formValues.id || 'new'" :initial-values="formValues" @submit="handleSubmit">
+      <Form id="course-form-mobile" :key="formValues.id || 'new'" :initial-values="formValues" @submit="handleSubmit">
         <IonGrid>
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="name" label="Nome da função" rules="required|min:3|max:180">
+              <Field v-slot="{ field, errors }" name="name" label="Nome da curso" rules="required|min:3|max:180">
                 <IonInput
                   v-bind="field"
                   v-model="formValues.name"
-                  label="Nome da função"
+                  label="Nome da curso"
                   label-placement="stacked"
                   fill="outline"
-                  placeholder="Digite o nome da função"
+                  placeholder="Digite o nome da curso"
                   :class="{ 'has-error': errors.length > 0 }"
                   @ion-input="field.onInput"
                 >
                   <div slot="label" class="required-field">
-                    Nome da função <span class="required-text">(Obrigatório)</span>
+                    Nome da curso <span class="required-text">(Obrigatório)</span>
                   </div>
                 </IonInput>
                 <ErrorMessage v-slot="{ message }" name="name">
@@ -237,12 +237,12 @@ function autoResizeTextarea() {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="description" label="Descrição da função" rules="max:180">
+              <Field v-slot="{ field, errors }" name="description" label="Descrição da curso" rules="max:180">
                 <IonTextarea
                   v-bind="field"
                   ref="descriptionRef"
                   v-model="formValues.description"
-                  label="Descrição da função"
+                  label="Descrição da curso"
                   label-placement="stacked"
                   fill="outline"
                   placeholder="Digite uma descrição"
@@ -275,7 +275,7 @@ function autoResizeTextarea() {
             </IonButton>
           </IonCol>
           <IonCol size="6">
-            <IonButton expand="block" type="submit" form="function-form-mobile" :disabled="!saveButtonEnabled">
+            <IonButton expand="block" type="submit" form="course-form-mobile" :disabled="!saveButtonEnabled">
               Salvar
             </IonButton>
           </IonCol>

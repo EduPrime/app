@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { Course } from '@prisma/client'
-import FunctionDetailView from '@/components/FunctionDetailView.vue'
-import ListWithActionFunction from '@/components/ListWithActionFunction.vue'
+import CourseDetailView from '@/components/course/DetailsView.vue'
+import ListWithActionCourse from '@/components/course/ListWithAction.vue'
+import SearchBox from '@/components/SearchBox.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import showToast from '@/utils/toast-alert'
-import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCol, IonContent, IonIcon, IonModal, IonPage, IonRow, IonSearchbar, IonText } from '@ionic/vue'
+import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonContent, IonIcon, IonModal, IonPage, IonText } from '@ionic/vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
@@ -16,8 +17,9 @@ const route = router.currentRoute
 const courseService = new CourseService()
 const dataList = ref<Course[]>([])
 const searchQuery = ref('')
-const isModalAddFunction = ref(false)
+const isModalAddCourse = ref(false)
 const editingId = ref<string | undefined>(undefined)
+const searchResult = ref()
 
 const seeModal = ref({ modal: false, data: undefined as any })
 const editModal = ref({ modal: false, data: undefined })
@@ -50,21 +52,21 @@ const filteredDataList = computed(() => {
   })
 })
 
-function setModalAddFunction(open: boolean) {
-  isModalAddFunction.value = open
+function setModalAddCourse(open: boolean) {
+  isModalAddCourse.value = open
   if (open) {
-    isModalAddFunction.value = false
-    setTimeout(() => (isModalAddFunction.value = true), 10)
+    isModalAddCourse.value = false
+    setTimeout(() => (isModalAddCourse.value = true), 10)
   }
 }
 
 function navigateToRegister() {
   if (isMobileDevice()) {
     editingId.value = undefined
-    setModalAddFunction(true)
+    setModalAddCourse(true)
   }
   else {
-    router.push({ name: 'RegisterFunction' })
+    router.push({ name: 'NewCourse' })
   }
 }
 
@@ -121,7 +123,7 @@ async function handleDelete() {
       showToast('Curso excluído com sucesso', 'top', 'success')
     }
     catch (error: any) {
-      console.error('Erro ao excluir função:', error)
+      console.error('Erro ao excluir curso:', error)
 
       // @TODO: Adaptar a mensagem para series e/ou turmas vinculadas ao curso
       if (error.message && error.message.includes('series vinculadas')) {
@@ -138,7 +140,6 @@ onMounted(() => {
   loadCourses()
 })
 
-// Observar mudanças na rota para recarregar a lista quando retornar do cadastro (Caso para RegisterFunction pós salvar nova função)
 watch(
   () => route.value.query,
   (query) => {
@@ -154,20 +155,21 @@ watch(
   <IonPage>
     <ContentLayout>
       <div class="ion-margin-top">
-        <IonRow class="ion-align-items-center ion-justify-content-between">
-          <IonCol size="10">
-            <IonSearchbar v-model="searchQuery" placeholder="Buscar função" />
-          </IonCol>
-          <IonCol size="2" class="ion-text-end">
-            <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister()">
-              <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
-              <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
-              <span class="ion-hide-sm-down">Novo</span>
-            </IonButton>
-          </IonCol>
-        </IonRow>
+        <SearchBox
+          table="course"
+          placeholder="Busque o curso"
+          :search-areas="['name']"
+          filter-type="text"
+          @update:search-result="searchResult = $event"
+        >
+          <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
+            <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
+            <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
+            <span class="ion-hide-sm-down">Novo</span>
+          </IonButton>
+        </SearchBox>
 
-        <ListWithActionFunction
+        <ListWithActionCourse
           :data-list="filteredDataList"
           @update:delete="(event) => {
             deleteModal = event;
@@ -180,7 +182,7 @@ watch(
               setEditModal(true)
             }
             else {
-              router.push({ name: 'RegisterFunction', params: { id: event.data?.id } })
+              router.push({ name: 'RegisterCourse', params: { id: event.data?.id } })
             }
           }"
           @update:see="(event) => {
@@ -188,21 +190,21 @@ watch(
               seeModal = event
             }
             else {
-              router.push({ name: 'FunctionDetails', params: { id: event.data?.id } })
+              router.push({ name: 'CourseDetails', params: { id: event.data?.id } })
             }
           }"
         />
 
         <IonModal
-          :is-open="isModalAddFunction"
+          :is-open="isModalAddCourse"
           :expand-to-scroll="false"
           :initial-breakpoint="0.95"
           :breakpoints="[0, 0.7, 0.95, 1]"
-          @ion-modal-did-dismiss="setModalAddFunction(false)"
+          @ion-modal-did-dismiss="setModalAddCourse(false)"
         >
           <CourseMobile
-            @saved="loadCourses(); setModalAddFunction(false)"
-            @cancel="setModalAddFunction(false)"
+            @saved="loadCourses(); setModalAddCourse(false)"
+            @cancel="setModalAddCourse(false)"
             @error="(message, color) => { showToast(message, 'top', color); }"
           />
         </IonModal>
@@ -215,9 +217,9 @@ watch(
           @did-dismiss="setSeeModal(false)"
         >
           <IonContent>
-            <FunctionDetailView
+            <CourseDetailView
               :items="seeModal.data"
-              name="Detalhes da função"
+              name="Detalhes do curso"
               @close="setSeeModal(false)"
               @edit="() => {
                 editingId = seeModal.data?.id;
@@ -248,9 +250,9 @@ watch(
         <IonModal id="delete-modal" :is-open="deleteModal.modal" @ion-modal-did-dismiss="setDeleteModal(false)">
           <IonCard class="ion-no-margin">
             <IonCardHeader>
-              <IonCardTitle>Excluir função</IonCardTitle>
+              <IonCardTitle>Excluir curso</IonCardTitle>
               <IonText class="ion-padding-vertical">
-                Tem certeza que deseja excluir esta função?
+                Tem certeza que deseja excluir este curso?
               </IonText>
               <div style="display: flex;">
                 <IonButton

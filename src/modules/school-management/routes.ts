@@ -1,4 +1,6 @@
 import { create, person, school, trailSign } from 'ionicons/icons'
+import CourseDetailsDesktop from './views/course/DetailsDesktop.vue'
+import RegisterCourse from './views/course/Register.vue'
 import DashboardCorses from './views/DashboardCourses.vue'
 import DashboardFunction from './views/DashboardFunction.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
@@ -184,6 +186,20 @@ const routes = [
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
+
+  {
+    path: '/Course/register/:id?',
+    name: 'NewCourse',
+    component: RegisterCourse,
+    meta: {
+      moduleName: 'Schools',
+      icon: create, // @TODO: Change icon
+      name: 'Registrar curso',
+      order: 14,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+
   {
     path: '/Function/details/:id',
     name: 'FunctionDetails',
@@ -192,6 +208,19 @@ const routes = [
       moduleName: 'Schools',
       icon: person,
       name: 'Detalhes da função',
+      order: 15,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+
+  {
+    path: '/Course/details/:id',
+    name: 'CourseDetails',
+    component: CourseDetailsDesktop,
+    meta: {
+      moduleName: 'Schools',
+      icon: person, // @TODO: Change icon
+      name: 'Detalhes do curso',
       order: 15,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
@@ -215,6 +244,7 @@ const routes = [
     component: DashboardCorses,
     meta: {
       moduleName: 'Schools',
+      moduleIcon: school,
       icon: trailSign,
       name: 'Registrar curso',
       order: 16,
