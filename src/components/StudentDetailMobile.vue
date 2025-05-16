@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { IonButton, IonChip, IonCol, IonContent, IonGrid, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText, IonBadge } from '@ionic/vue'
+import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText, IonBadge } from '@ionic/vue'
 import { schoolSharp, mailOutline, callOutline, homeOutline, calendarOutline, personOutline, documentOutline, peopleOutline, mapOutline, locationOutline, flagOutline, businessOutline } from 'ionicons/icons'
 import { ref } from 'vue'
 
@@ -32,6 +32,7 @@ interface Props {
     guardianCpf?: string | null
     guardianPhone?: string | null
     guardianEmail?: string | null
+    cpf?: string | null
     fatherName?: string | null
     fatherEmail?: string | null
     fatherCpf?: string | null
@@ -130,6 +131,8 @@ function getResponsibleData() {
     }
   }
 }
+
+console.log("props.items", props.items)
 </script>
 
 <template>

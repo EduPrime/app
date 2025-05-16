@@ -34,6 +34,38 @@ const adaptedDataList = computed(() => {
     birthdate: item.birthdate ? item.birthdate.toString() : undefined,
     gender: item.gender,
     status: item.status,
+    // nationality: item.nationality,
+    // birthCity: item.birthCity,
+    // birthState: item.birthState,
+    // ethnicity: item.ethnicity,
+    cpf: item.cpf,
+    documentType: item.docsType,
+    zipCode: item.postalCode,
+    city: item.city,
+    state: item.citystate,
+    street: item.address,
+    number: item.numberAddress,
+    neighborhood: item.neighborhood,
+    zone: item.residenceZone,
+    complement: item.complement,
+    // Dados do responsável legal
+    guardianName: item.guardianName,
+    guardianCpf: item.guardianCpf,
+    guardianPhone: item.guardianPhone,
+    guardianEmail: item.guardianEmail,
+    // Dados do pai
+    fatherName: item.fatherName,
+    fatherEmail: item.fatherEmail,
+    fatherCpf: item.fatherCpf,
+    fatherPhone: item.fatherPhone,
+    // Dados da mãe
+    motherName: item.motherName,
+    motherEmail: item.motherEmail,
+    motherCpf: item.motherCpf,
+    motherPhone: item.motherPhone,
+    // Tipo de responsável
+    responsibleType: item.responsibleType,
+    // Datas
     createdAt: item.createdAt ? item.createdAt.toString() : undefined,
     updatedAt: item.updatedAt ? item.updatedAt.toString() : undefined,
     deletedAt: item.deletedAt ? item.deletedAt.toString() : undefined

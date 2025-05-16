@@ -3,6 +3,10 @@
 /* import MoveStudent from './views/MoveStudent.vue' */
 /* import RegisterPre_enrollment from './views/RegisterPre_enrollment.vue' */
 // import RegisterStudent from './views/RegisterStudent.vue'
+import DashboardEnrollment from './views/DashboardEnrollment.vue'
+import RegisterEnrollment from './views/RegisterEnrollment.vue'
+import EditEnrollment from './views/EditEnrollment.vue'
+import { create } from 'ionicons/icons'
 
 const routes = [
   {
@@ -49,43 +53,43 @@ const routes = [
   //     requiredRole: ['ADMIN', 'GESTORESCOLAR'],
   //   },
   // },
-  // {
-  //   path: '/student/enrollment',
-  //   name: 'EnrollmentList',
-  //   component: DashboardEnrollment,
-  //   meta: {
-  //     moduleName: 'Student',
-  //     moduleIcon: create,
-  //     icon: create,
-  //     name: 'Solicitações de matrícula',
-  //     order: 2,
-  //     requiredRole: ['ADMIN', 'GESTORESCOLAR'],
-  //   },
-  // },
-  // {
-  //   path: '/student/enrollment/register',
-  //   name: 'EnrollmentRegister',
-  //   component: RegisterEnrollment,
-  //   meta: {
-  //     moduleName: 'Student',
-  //     icon: create,
-  //     name: 'Matricular Aluno',
-  //     order: 3,
-  //     requiredRole: ['ADMIN', 'GESTORESCOLAR'],
-  //   },
-  // },
-  // {
-  //   path: '/student/enrollment/edit/:id',
-  //   name: 'EnrollmentEdit',
-  //   component: EditEnrollment,
-  //   meta: {
-  //     moduleName: 'Student',
-  //     icon: create,
-  //     name: 'Editar Matrícula',
-  //     order: 4,
-  //     requiredRole: ['ADMIN', 'GESTORESCOLAR'],
-  //   },
-  // },
+  {
+    path: '/student/enrollment',
+    name: 'EnrollmentList',
+    component: DashboardEnrollment,
+    meta: {
+      moduleName: 'Student',
+      moduleIcon: create,
+      icon: create,
+      name: 'Solicitações de matrícula',
+      order: 2,
+      requiredRole: ['ADMIN', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/student/enrollment/register',
+    name: 'EnrollmentRegister',
+    component: RegisterEnrollment,
+    meta: {
+      moduleName: 'Student',
+      icon: create,
+      name: 'Matricular Aluno',
+      order: 3,
+      requiredRole: ['ADMIN', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/student/enrollment/edit/:id',
+    name: 'EnrollmentEdit',
+    component: EditEnrollment,
+    meta: {
+      moduleName: 'Student',
+      icon: create,
+      name: 'Editar Matrícula',
+      order: 4,
+      requiredRole: ['ADMIN', 'GESTORESCOLAR'],
+    },
+  },
   /*   {
     path: '/student/enrollment/move/:id',
     name: 'StudentMove',
