@@ -31,7 +31,6 @@ const route = useRoute()
 const router = useRouter()
 const registerStudentService = new RegisterStudentService()
 
-// Valor inicial expandido para incluir todos os campos necessários
 const initialFormValues = { 
   id: '', 
   name: '', 
@@ -46,6 +45,12 @@ const initialFormValues = {
   ethnicity: '',
   documentType: '',
   documentNumber: '',
+  rgEmissor: '',
+  rgState: '',
+  rgIssueDate: '',
+  certidaoFolha: '',
+  certidaoLivro: '',
+  nisNumero: '',
   // Endereço
   zipCode: '',
   city: '',
@@ -56,7 +61,7 @@ const initialFormValues = {
   zone: '',
   complement: '',
   // Responsável
-  responsibleType: 'GUARDIAN', // PAI, MAE ou GUARDIAN
+  responsibleType: '', 
   guardianName: '',
   guardianRelationship: '',
   guardianCpf: '',
@@ -72,6 +77,9 @@ const initialFormValues = {
   motherEmail: '',
   status: 'ACTIVE',
   schoolId: '',
+  classId: '',
+  gradeId: '',
+  shiftId: '',
 }
 
 const formValues = ref({ ...initialFormValues })
@@ -81,31 +89,33 @@ const studentId = computed(() => route.params.id as string | undefined)
 const pageTitle = computed(() => isEditing.value ? 'Editar aluno' : 'Novo aluno')
 const hasChanges = ref(false)
 const showDatePicker = ref(false)
-const dateValue = ref('')
 
 // Controle de abas
 const activeTab = ref('personal')
+
+const brazilianStates = [
+  'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO',
+  'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
+  'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+];
 
 // Etapas do formulário
 const tabs = [
   { id: 'personal', label: 'Informações Cadastrais', icon: personOutline },
   { id: 'address', label: 'Endereço', icon: homeOutline },
   { id: 'contact', label: 'Contato', icon: callOutline },
-  { id: 'responsible', label: 'Responsável', icon: peopleOutline },
+  { id: 'matricula', label: 'Matrícula', icon: peopleOutline },
 ]
 
-// Função para verificar se houve mudanças nos campos
 function checkForChanges() {
   if (!isEditing.value) return;
   
-  // Verifica cada campo para determinar se houve mudanças
   const keys = Object.keys(formValues.value) as (keyof typeof formValues.value)[];
   hasChanges.value = keys.some(key => formValues.value[key] !== originalFormValues.value[key]);
 }
 
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
-    // Para um novo cadastro, verifica se pelo menos os campos obrigatórios estão preenchidos
     const enabled = !!formValues.value.name;
     return enabled;
   }
@@ -115,9 +125,7 @@ const saveButtonEnabled = computed(() => {
 
 watch(
   () => ({ ...formValues.value }),
-  (newValues) => {
-    console.log('Valores do formulário mudaram:', newValues);
-    
+  () => {
     if (isEditing.value) {
       checkForChanges();
     }
@@ -147,33 +155,26 @@ onMounted(async () => {
         schoolId: student.schoolId || ''
       };
       
-      // Distribua os valores de endereço nos campos específicos
       if (student.address) {
-        // O campo address equivale apenas à rua
         loadedValues.street = student.address;
       }
       
-      // Campo específico para cidade
       if (student.city) {
         loadedValues.city = student.city;
       }
       
-      // Campo específico para estado
       if (student.citystate) {
         loadedValues.state = student.citystate;
       }
       
-      // Campo específico para CEP (postalCode)
       if (student.postalCode) {
         loadedValues.zipCode = student.postalCode;
       }
       
-      // Campo específico para número do endereço (numbrAddress)
       if (student.numberAddress) {
         loadedValues.number = student.numberAddress;
       }
       
-      // Outros campos que possam existir no objeto student
       if (student.neighborhood) {
         loadedValues.neighborhood = student.neighborhood;
       }
@@ -215,14 +216,13 @@ async function handleSubmit(values: any) {
     documentNumber: values.documentNumber || null,
     
     // Endereço
-    postalCode: values.zipCode || null, // Campo zipCode do formulário mapeado para postalCode no banco
+    postalCode: values.zipCode || null, 
     city: values.city || null,
-    // O campo state não existe no banco, os campos corretos são citystate ou rgState para UF
     citystate: values.state || null, 
-    address: values.street || null, // Campo street do formulário mapeado para address no banco
-    numberAddress: values.number || null, // Campo number do formulário mapeado para numberAddress no banco
+    address: values.street || null, 
+    numberAddress: values.number || null,
     neighborhood: values.neighborhood || null,
-    residenceZone: values.zone || null, // Campo zone do formulário mapeado para residenceZone no banco
+    residenceZone: values.zone || null, 
     complement: values.complement || null,
     
     // Responsável
@@ -270,6 +270,44 @@ function handleDateChange(event: CustomEvent) {
   }
   showDatePicker.value = false;
 }
+
+async function buscarEndereco(cep: string) {
+  
+  try {
+    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const data = await response.json();
+    if (data.erro) {
+      throw new Error('CEP não encontrado');
+    }
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+const form = ref<any>(null);
+
+watch(() => formValues.value.zipCode, async (novoCep) => {
+  const cepLimpo = String(novoCep).replace(/\D/g, '');
+  if (cepLimpo && cepLimpo.length === 8) {
+    const endereco = await buscarEndereco(cepLimpo);
+    if (endereco) {
+      formValues.value.street = endereco.logradouro;
+      formValues.value.neighborhood = endereco.bairro;
+      formValues.value.city = endereco.localidade;
+      formValues.value.state = endereco.uf;
+
+      if (form.value) {
+        form.value.setFieldValue('street', endereco.logradouro);
+        form.value.setFieldValue('neighborhood', endereco.bairro);
+        form.value.setFieldValue('city', endereco.localidade);
+        form.value.setFieldValue('state', endereco.uf);
+      }
+    }
+  }
+});
+
 </script>
 
 <template>
@@ -282,7 +320,6 @@ function handleDateChange(event: CustomEvent) {
       </IonToolbar>
       <div class="toolbar-accent" />
       
-      <!-- Sistema de navegação por abas -->
       <IonToolbar>
         <IonSegment v-model="activeTab" class="custom-segment">
           <IonSegmentButton v-for="tab in tabs" :key="tab.id" :value="tab.id">
@@ -294,7 +331,7 @@ function handleDateChange(event: CustomEvent) {
     </IonHeader>
 
     <IonContent :scroll-y="true" class="ion-padding content-with-footer">
-      <Form id="student-form" :initial-values="formValues" :key="formValues.id || 'new'" @submit="handleSubmit">
+      <Form ref="form" @submit="handleSubmit" :initial-values="formValues" v-slot="{handleSubmit}">
         <IonGrid class="tab-content">
           <!-- Aba 1: Informações Cadastrais -->
           <div v-show="activeTab === 'personal'">
@@ -309,6 +346,7 @@ function handleDateChange(event: CustomEvent) {
                       v-model="formValues.name"
                       type="text" 
                       class="floating-native" 
+                      maxlength="101"
                       placeholder=" "
                       @input="field.onInput"
                     >
@@ -325,18 +363,16 @@ function handleDateChange(event: CustomEvent) {
 
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field }" name="birthdate">
+                <Field v-slot="{ field }" name="birthdate" rules="required|notFuture">
                   <div class="floating-input">
                     <input 
-                      readonly
                       v-bind="field" 
                       v-model="formValues.birthdate"
-                      type="text" 
+                      type="date" 
                       class="floating-native" 
                       placeholder=" "
-                      @click="showDatePicker = true"
                     >
-                    <label class="floating-label"><span>Data de Nascimento</span></label>
+                    <label class="floating-label"><span>Data de Nascimento </span><span class="required-text">(Obrigatório)</span></label>
                   </div>
                   <ErrorMessage v-slot="{ message }" name="birthdate">
                     <div class="error-message">
@@ -349,12 +385,12 @@ function handleDateChange(event: CustomEvent) {
 
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field }" name="gender">
+                <Field v-slot="{ field }" name="gender" label="Gênero" rules="required">
                   <IonSelect
                     v-bind="field" 
                     v-model="formValues.gender"
-                    interface="action-sheet"
-                    label="Gênero"
+                    interface="popover"
+                    label="Gênero (Obrigatório)"
                     label-placement="floating"
                     cancel-text="Cancelar"
                     fill="outline"
@@ -375,7 +411,7 @@ function handleDateChange(event: CustomEvent) {
 
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field }" name="nationality">
+                <Field v-slot="{ field }" name="nationality" label="Nacionalidade">
                   <div class="floating-input">
                     <input 
                       v-bind="field" 
@@ -398,7 +434,7 @@ function handleDateChange(event: CustomEvent) {
 
             <IonRow>
               <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="birthCity">
+                <Field v-slot="{ field }" name="birthCity" label="Cidade de Nascimento">
                   <div class="floating-input">
                     <input 
                       v-bind="field" 
@@ -418,19 +454,22 @@ function handleDateChange(event: CustomEvent) {
                 </Field>
               </IonCol>
               <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="birthState">
-                  <div class="floating-input">
-                    <input 
-                      v-bind="field" 
-                      v-model="formValues.birthState"
-                      type="text" 
-                      class="floating-native" 
-                      placeholder=" "
-                      maxlength="2"
-                      @input="field.onInput"
-                    >
-                    <label class="floating-label"><span>UF de Nascimento</span></label>
-                  </div>
+                <Field v-slot="{ field }" name="birthState" label="UF de Nascimento">
+                  <IonSelect
+                    v-bind="field" 
+                    v-model="formValues.birthState"
+                    interface="popover"
+                    label="UF de Nascimento"
+                    label-placement="floating"
+                    cancel-text="Cancelar"
+                    fill="outline"
+                    class="ion-select-card-content"
+                    @ion-change="field.onInput"
+                  >
+                    <IonSelectOption v-for="state in brazilianStates" :key="state" :value="state">
+                      {{ state }}
+                    </IonSelectOption>
+                  </IonSelect>
                   <ErrorMessage v-slot="{ message }" name="birthState">
                     <div class="error-message">
                       {{ message }}
@@ -442,12 +481,12 @@ function handleDateChange(event: CustomEvent) {
 
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field }" name="ethnicity">
+                <Field v-slot="{ field }" name="ethnicity" label="Raça/Etnia" rules="required">
                   <IonSelect
                     v-bind="field" 
                     v-model="formValues.ethnicity"
-                    interface="action-sheet"
-                    label="Raça/Etnia"
+                    interface="popover"
+                    label="Raça/Etnia (Obrigatório)"
                     label-placement="floating"
                     cancel-text="Cancelar"
                     fill="outline"
@@ -472,12 +511,12 @@ function handleDateChange(event: CustomEvent) {
 
             <IonRow>
               <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="documentType">
+                <Field v-slot="{ field }" name="documentType" label="Tipo de Documento" rules="required">
                   <IonSelect
                     v-bind="field" 
                     v-model="formValues.documentType"
-                    interface="action-sheet"
-                    label="Tipo de Documento"
+                    label="Tipo de Documento (Obrigatório)"
+                    interface="popover"
                     label-placement="floating"
                     cancel-text="Cancelar"
                     fill="outline"
@@ -486,8 +525,8 @@ function handleDateChange(event: CustomEvent) {
                   >
                     <IonSelectOption value="RG">RG</IonSelectOption>
                     <IonSelectOption value="CPF">CPF</IonSelectOption>
+                    <IonSelectOption value="NIS">NIS</IonSelectOption>
                     <IonSelectOption value="CERTIDAO">Certidão de Nascimento</IonSelectOption>
-                    <IonSelectOption value="OUTRO">Outro</IonSelectOption>
                   </IonSelect>
                   <ErrorMessage v-slot="{ message }" name="documentType">
                     <div class="error-message">
@@ -496,18 +535,20 @@ function handleDateChange(event: CustomEvent) {
                   </ErrorMessage>
                 </Field>
               </IonCol>
-              <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="documentNumber">
+              <!-- Campo CPF - exibido somente quando CPF for selecionado --> 
+              <IonCol size="12" size-md="6" v-if="formValues.documentType === 'CPF'">
+                <Field v-slot="{ field }" name="documentNumber" rules="required">
                   <div class="floating-input">
                     <input 
                       v-bind="field" 
                       v-model="formValues.documentNumber"
+                      v-imask="{ mask: '000.000.000-00' }"
                       type="text" 
                       class="floating-native" 
                       placeholder=" "
                       @input="field.onInput"
                     >
-                    <label class="floating-label"><span>Número do Documento</span></label>
+                    <label class="floating-label"><span>CPF</span></label>
                   </div>
                   <ErrorMessage v-slot="{ message }" name="documentNumber">
                     <div class="error-message">
@@ -516,6 +557,180 @@ function handleDateChange(event: CustomEvent) {
                   </ErrorMessage>
                 </Field>
               </IonCol>
+
+              <!-- Campos RG - exibidos somente quando RG for selecionado -->
+              <template v-if="formValues.documentType === 'RG'">
+                <IonCol size="12" size-md="6">
+                  <Field v-slot="{ field }" name="documentNumber">
+                    <div class="floating-input">
+                      <input 
+                        v-bind="field" 
+                        v-model="formValues.documentNumber"
+                        type="text" 
+                        class="floating-native" 
+                        placeholder=" "
+                        @input="field.onInput"
+                      >
+                      <label class="floating-label"><span>Número do RG</span></label>
+                    </div>
+                    <ErrorMessage v-slot="{ message }" name="documentNumber">
+                      <div class="error-message">
+                        {{ message }}
+                      </div>
+                    </ErrorMessage>
+                  </Field>
+                </IonCol>
+                <IonCol size="12" size-md="6">
+                  <Field v-slot="{ field }" name="rgIssueDate" rules="notFuture">
+                    <div class="floating-input">
+                      <input 
+                        v-bind="field" 
+                        v-model="formValues.rgIssueDate"
+                        type="date" 
+                        class="floating-native" 
+                        placeholder=" "
+                        @input="field.onInput"
+                      >
+                      <label class="floating-label"><span>Data de expedição</span></label>
+                    </div>
+                    <ErrorMessage v-slot="{ message }" name="rgIssueDate">
+                      <div class="error-message">
+                        {{ message }}
+                      </div>
+                    </ErrorMessage>
+                  </Field>
+                </IonCol>
+                <IonCol size="12" size-md="6">
+                  <Field v-slot="{ field }" name="rgState">
+                    <IonSelect
+                      v-bind="field" 
+                      v-model="formValues.rgState"
+                      interface="popover"
+                      label="Estado emissor"
+                      label-placement="floating"
+                      cancel-text="Cancelar"
+                      fill="outline"
+                      class="ion-select-card-content"
+                      @ion-change="field.onInput"
+                    >
+                      <IonSelectOption v-for="state in brazilianStates" :key="state" :value="state">
+                        {{ state }}
+                      </IonSelectOption>
+                    </IonSelect>
+                    <ErrorMessage v-slot="{ message }" name="rgState">
+                      <div class="error-message">
+                        {{ message }}
+                      </div>
+                    </ErrorMessage>
+                  </Field>
+                </IonCol>
+                <IonCol size="12" size-md="6">
+                  <Field v-slot="{ field }" name="rgEmissor">
+                    <div class="floating-input">
+                      <input 
+                        v-bind="field" 
+                        v-model="formValues.rgEmissor"
+                        type="text" 
+                        class="floating-native" 
+                        placeholder=" "
+                        @input="field.onInput"
+                      >
+                      <label class="floating-label"><span>Órgão emissor</span></label>
+                    </div>
+                    <ErrorMessage v-slot="{ message }" name="rgEmissor">
+                      <div class="error-message">
+                        {{ message }}
+                      </div>
+                    </ErrorMessage>
+                  </Field>
+                </IonCol>
+              </template>
+
+              <!-- Campos NIS - exibidos somente quando NIS for selecionado -->
+              <IonCol size="12" size-md="6" v-if="formValues.documentType === 'NIS'">
+                <Field v-slot="{ field }" name="nisNumero">
+                  <div class="floating-input">
+                    <input 
+                      v-bind="field" 
+                      v-model="formValues.nisNumero"
+                      type="text" 
+                      class="floating-native" 
+                      placeholder=" "
+                      @input="field.onInput"
+                    >
+                    <label class="floating-label"><span>Número de Identificação Social (NIS)</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="nisNumero">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+
+              <!-- Campos Certidão de Nascimento - exibidos somente quando CERTIDAO for selecionado -->
+              <template v-if="formValues.documentType === 'CERTIDAO'">
+                <IonCol size="12" size-md="6">
+                  <Field v-slot="{ field }" name="documentNumber">
+                    <div class="floating-input">
+                      <input 
+                        v-bind="field" 
+                        v-model="formValues.documentNumber"
+                        type="text" 
+                        class="floating-native" 
+                        placeholder=" "
+                        @input="field.onInput"
+                      >
+                      <label class="floating-label"><span>Número certidão de nascimento</span></label>
+                    </div>
+                    <ErrorMessage v-slot="{ message }" name="documentNumber">
+                      <div class="error-message">
+                        {{ message }}
+                      </div>
+                    </ErrorMessage>
+                  </Field>
+                </IonCol>
+                <IonCol size="12" size-md="6">
+                  <Field v-slot="{ field }" name="certidaoFolha">
+                    <div class="floating-input">
+                      <input 
+                        v-bind="field" 
+                        v-model="formValues.certidaoFolha"
+                        type="text" 
+                        class="floating-native" 
+                        placeholder=" "
+                        @input="field.onInput"
+                      >
+                      <label class="floating-label"><span>Folha certidão de nascimento</span></label>
+                    </div>
+                    <ErrorMessage v-slot="{ message }" name="certidaoFolha">
+                      <div class="error-message">
+                        {{ message }}
+                      </div>
+                    </ErrorMessage>
+                  </Field>
+                </IonCol>
+                <IonCol size="12" size-md="6">
+                  <Field v-slot="{ field }" name="certidaoLivro">
+                    <div class="floating-input">
+                      <input 
+                        v-bind="field" 
+                        v-model="formValues.certidaoLivro"
+                        type="text" 
+                        class="floating-native" 
+                        placeholder=" "
+                        @input="field.onInput"
+                      >
+                      <label class="floating-label"><span>Livro certidão de nascimento</span></label>
+                    </div>
+                    <ErrorMessage v-slot="{ message }" name="certidaoLivro">
+                      <div class="error-message">
+                        {{ message }}
+                      </div>
+                    </ErrorMessage>
+                  </Field>
+                </IonCol>
+              </template>
             </IonRow>
 
             <IonRow>
@@ -524,7 +739,7 @@ function handleDateChange(event: CustomEvent) {
                   <IonSelect
                     v-bind="field" 
                     v-model="formValues.status"
-                    interface="action-sheet"
+                    interface="popover"
                     label="Status"
                     label-placement="floating"
                     cancel-text="Cancelar"
@@ -554,18 +769,18 @@ function handleDateChange(event: CustomEvent) {
             
             <IonRow>
               <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="zipCode">
+                <Field v-slot="{ field }" name="zipCode" label="CEP" rules="required|cep" >
                   <div class="floating-input">
                     <input 
                       v-bind="field" 
                       v-model="formValues.zipCode"
+                      v-imask="{ mask: '00000-000' }"
                       type="text" 
                       class="floating-native" 
                       placeholder=" "
-                      maxlength="9"
                       @input="field.onInput"
                     >
-                    <label class="floating-label"><span>CEP</span></label>
+                    <label class="floating-label"><span>CEP </span><span class="required-text">(Obrigatório)</span></label>
                   </div>
                   <ErrorMessage v-slot="{ message }" name="zipCode">
                     <div class="error-message">
@@ -645,7 +860,7 @@ function handleDateChange(event: CustomEvent) {
 
             <IonRow>
               <IonCol size="12" size-md="4">
-                <Field v-slot="{ field }" name="number">
+                <Field v-slot="{ field }" name="number" label="Número">
                   <div class="floating-input">
                     <input 
                       v-bind="field" 
@@ -692,7 +907,7 @@ function handleDateChange(event: CustomEvent) {
                   <IonSelect
                     v-bind="field" 
                     v-model="formValues.zone"
-                    interface="action-sheet"
+                    interface="popover"
                     label="Zona"
                     label-placement="floating"
                     cancel-text="Cancelar"
@@ -742,18 +957,18 @@ function handleDateChange(event: CustomEvent) {
             
             <IonRow>
               <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="phone" rules="min:10">
+                <Field v-slot="{ field }" name="phone" label="Telefone" rules="required|phone">
                   <div class="floating-input">
                     <input 
                       v-bind="field" 
                       v-model="formValues.phone"
+                      v-imask="{ mask: '(00) 00000-0000' }"
                       type="tel" 
                       class="floating-native" 
                       placeholder=" "
-                      maxlength="15"
                       @input="field.onInput"
                     >
-                    <label class="floating-label"><span>Telefone</span></label>
+                    <label class="floating-label"><span>Telefone </span><span class="required-text">(Obrigatório)</span></label>
                   </div>
                   <ErrorMessage v-slot="{ message }" name="phone">
                     <div class="error-message">
@@ -786,27 +1001,26 @@ function handleDateChange(event: CustomEvent) {
                 </Field>
               </IonCol>
             </IonRow>
-          </div>
 
-          <!-- Aba 4: Responsável -->
-          <div v-show="activeTab === 'responsible'">
-            <h4 class="section-title">Responsável</h4>
+            <div class="section-separator">
+            <h4 class="section-title">Informações do Responsável</h4>
+          </div>
             
-            <IonRow>
-              <IonCol size="12">
-                <Field v-slot="{ field }" name="responsibleType">
-                  <IonSelect
+          <IonRow>
+            <IonCol size="12">
+              <Field v-slot="{ field }" name="responsibleType" label="Grau de parentesco" rules="required">
+                <IonSelect
                     v-bind="field" 
                     v-model="formValues.responsibleType"
-                    interface="action-sheet"
-                    label="Tipo de Responsável"
+                    interface="popover"
+                    label="Grau de parentesco (Obrigatório)"
                     label-placement="floating"
                     cancel-text="Cancelar"
                     fill="outline"
                     class="ion-select-card-content"
                     @ion-change="field.onInput"
                   >
-                    <IonSelectOption value="GUARDIAN">Responsável Legal</IonSelectOption>
+                    <IonSelectOption value="GUARDIAN">Guardião</IonSelectOption>
                     <IonSelectOption value="PAI">Pai</IonSelectOption>
                     <IonSelectOption value="MAE">Mãe</IonSelectOption>
                   </IonSelect>
@@ -819,7 +1033,7 @@ function handleDateChange(event: CustomEvent) {
               </IonCol>
             </IonRow>
 
-            <!-- Campos do responsável legal (exibidos quando responsibleType = GUARDIAN) -->
+            <!-- Campos do responsável legal -->
             <div v-show="formValues.responsibleType === 'GUARDIAN'">
               <IonRow>
                 <IonCol size="12">
@@ -836,29 +1050,6 @@ function handleDateChange(event: CustomEvent) {
                       <label class="floating-label"><span>Nome do Responsável</span></label>
                     </div>
                     <ErrorMessage v-slot="{ message }" name="guardianName">
-                      <div class="error-message">
-                        {{ message }}
-                      </div>
-                    </ErrorMessage>
-                  </Field>
-                </IonCol>
-              </IonRow>
-
-              <IonRow>
-                <IonCol size="12">
-                  <Field v-slot="{ field }" name="guardianRelationship">
-                    <div class="floating-input">
-                      <input 
-                        v-bind="field" 
-                        v-model="formValues.guardianRelationship"
-                        type="text" 
-                        class="floating-native" 
-                        placeholder=" "
-                        @input="field.onInput"
-                      >
-                      <label class="floating-label"><span>Grau de Parentesco</span></label>
-                    </div>
-                    <ErrorMessage v-slot="{ message }" name="guardianRelationship">
                       <div class="error-message">
                         {{ message }}
                       </div>
@@ -1132,7 +1323,122 @@ function handleDateChange(event: CustomEvent) {
                 </IonCol>
               </IonRow>
             </div>
+          </div>
 
+        <!-- Aba 4: Matrícula -->
+        <div v-show="activeTab === 'matricula'">
+            <h4 class="section-title">Matrícula</h4>
+            
+            <IonRow>
+              <IonCol size="12">
+                <Field v-slot="{ field }" name="schoolId" rules="required">
+                  <IonSelect
+                    v-bind="field" 
+                    v-model="formValues.schoolId"
+                    interface="popover"
+                    label="Selecionar escola (Obrigatório)"
+                    label-placement="floating"
+                    cancel-text="Cancelar"
+                    fill="outline"
+                    class="ion-select-card-content"
+                    @ion-change="field.onInput"
+                  >
+                    <IonSelectOption value="1">Escola Municipal João da Silva</IonSelectOption>
+                    <IonSelectOption value="2">Escola Estadual Maria José</IonSelectOption>
+                    <IonSelectOption value="3">Colégio Aplicativo</IonSelectOption>
+                  </IonSelect>
+                  <ErrorMessage v-slot="{ message }" name="schoolId">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <IonCol size="12">
+                <Field v-slot="{ field }" name="classId" rules="required">
+                  <IonSelect
+                    v-bind="field" 
+                    v-model="formValues.classId"
+                    interface="popover"
+                    label="Selecionar turma (Obrigatório)"
+                    label-placement="floating"
+                    cancel-text="Cancelar"
+                    fill="outline"
+                    class="ion-select-card-content"
+                    @ion-change="field.onInput"
+                  >
+                    <IonSelectOption value="1">Turma A</IonSelectOption>
+                    <IonSelectOption value="2">Turma B</IonSelectOption>
+                    <IonSelectOption value="3">Turma C</IonSelectOption>
+                  </IonSelect>
+                  <ErrorMessage v-slot="{ message }" name="classId">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <IonCol size="12">
+                <Field v-slot="{ field }" name="gradeId" rules="required">
+                  <IonSelect
+                    v-bind="field" 
+                    v-model="formValues.gradeId"
+                    interface="popover"
+                    label="Selecionar série (Obrigatório)"
+                    label-placement="floating"
+                    cancel-text="Cancelar"
+                    fill="outline"
+                    class="ion-select-card-content"
+                    @ion-change="field.onInput"
+                  >
+                    <IonSelectOption value="1">1º Ano</IonSelectOption>
+                    <IonSelectOption value="2">2º Ano</IonSelectOption>
+                    <IonSelectOption value="3">3º Ano</IonSelectOption>
+                    <IonSelectOption value="4">4º Ano</IonSelectOption>
+                    <IonSelectOption value="5">5º Ano</IonSelectOption>
+                  </IonSelect>
+                  <ErrorMessage v-slot="{ message }" name="gradeId">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <IonCol size="12">
+                <Field v-slot="{ field }" name="shiftId" rules="required">
+                  <IonSelect
+                    v-bind="field" 
+                    v-model="formValues.shiftId"
+                    interface="popover"
+                    label="Selecionar turno (Obrigatório)"
+                    label-placement="floating"
+                    cancel-text="Cancelar"
+                    fill="outline"
+                    class="ion-select-card-content"
+                    @ion-change="field.onInput"
+                  >
+                    <IonSelectOption value="1">Matutino</IonSelectOption>
+                    <IonSelectOption value="2">Vespertino</IonSelectOption>
+                    <IonSelectOption value="3">Noturno</IonSelectOption>
+                    <IonSelectOption value="4">Integral</IonSelectOption>
+                  </IonSelect>
+                  <ErrorMessage v-slot="{ message }" name="shiftId">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
           </div>
         </IonGrid>
       </Form>

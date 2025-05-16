@@ -63,6 +63,7 @@
     "swiper": "^11.1.15",
     "tus-js-client": "^4.2.3",
     "ulid": "^2.3.0",
+    "v-mask": "^2.3.0",
     "validations-br": "^1.4.0",
     "vee-validate": "^4.15.0",
     "vue": "^3.5.13",

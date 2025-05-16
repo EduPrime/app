@@ -68,7 +68,7 @@ defineRule('notFuture', (value: string) => {
   today.setHours(0, 0, 0, 0)
 
   if (inputDate > today) {
-    return 'A data está invcorreta.'
+    return 'A data está incorreta.'
   }
   return true
 })
