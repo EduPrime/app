@@ -1224,6 +1224,7 @@ model EvaluationRule {
   frequencyReport        Json?
   createdAt              DateTime            @default(now()) @db.Timestamp(6)
   updatedAt              DateTime?           @updatedAt @db.Timestamp(6)
+  deletedAt              DateTime?           @db.Timestamp(6)
   updatedBy              String?             @db.Uuid
   tenantId               String?             @db.Uuid
   courseId               String              @db.Uuid
