@@ -24,7 +24,7 @@ const editModal = ref({ modal: false, data: undefined })
 const deleteModal = ref<{ modal: boolean, data: ServerFunction | undefined }>({ modal: false, data: undefined })
 
 const adaptedDataList = computed(() => {
-  return dataList.value.map(item => ({
+  return dataList.value.map((item: { id: any, name: any, abbreviation: any, description: any, createdAt: { toString: () => any }, updatedAt: { toString: () => any }, deletedAt: { toString: () => any } }) => ({
     id: item.id,
     name: item.name,
     abbreviation: item.abbreviation,
@@ -38,14 +38,14 @@ const adaptedDataList = computed(() => {
 const filteredDataList = computed(() => {
   // Primeiro filtra a lista se houver uma consulta de busca
   const filtered = searchQuery.value
-    ? adaptedDataList.value.filter(item =>
+    ? adaptedDataList.value.filter((item: { name: string, abbreviation: string }) =>
         item.name.toLowerCase().includes(searchQuery.value.toLowerCase())
         || (item.abbreviation && item.abbreviation.toLowerCase().includes(searchQuery.value.toLowerCase())),
       )
     : adaptedDataList.value
 
   // Depois ordena a lista alfabeticamente pelo nome
-  return filtered.sort((a, b) => {
+  return filtered.sort((a: { name: string }, b: { name: any }) => {
     return a.name.localeCompare(b.name)
   })
 })
