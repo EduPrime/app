@@ -1,9 +1,11 @@
-import { create, person, school } from 'ionicons/icons'
-import DashboardFunction from './views/DashboardFunction.vue'
+import { book, create, list, people, person, school } from 'ionicons/icons'
+// import DashboardFunction from './views/DashboardFunction.vue'
+import DashboardSeries from './views/DashboardSeries.vue'
 // import DashboardSchools from './views/DashboardSchools.vue'
-import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
-import RegisterFunction from './views/RegisterFunction.vue'
+// import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
+// import RegisterFunction from './views/RegisterFunction.vue'
 // import RegisterSchool from './views/RegisterSchool.vue'
+import RegisterSeries from './views/RegisterSeriesMobile.vue'
 
 const routes = [
   // {
@@ -156,43 +158,96 @@ const routes = [
   //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
   //   },
   // },
+  // {
+  //   path: '/Function/list',
+  //   name: 'FunctionListFunction',
+  //   component: DashboardFunction,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     moduleIcon: school,
+  //     icon: person,
+  //     name: 'Funções de servidor',
+  //     order: 13,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Function/register/:id?',
+  //   name: 'RegisterFunction',
+  //   component: RegisterFunction,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     icon: create,
+  //     name: 'Registrar função',
+  //     order: 14,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Function/details/:id',
+  //   name: 'FunctionDetails',
+  //   component: FunctionDetailsDesktop,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     icon: create,
+  //     name: 'Registrar escola',
+  //     order: 3,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+
   {
-    path: '/Function/list',
-    name: 'FunctionListFunction',
-    component: DashboardFunction,
+    path: '/Series/list',
+    name: 'SeriesListSeries',
+    component: DashboardSeries,
     meta: {
       moduleName: 'Schools',
       moduleIcon: school,
-      icon: person,
-      name: 'Funções de servidor',
-      order: 13,
+      icon: list,
+      name: 'Séries',
+      order: 7,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
+
   {
-    path: '/Function/register/:id?',
-    name: 'RegisterFunction',
-    component: RegisterFunction,
+    path: '/Series/register',
+    name: 'RegisterSeries',
+    component: RegisterSeries,
     meta: {
       moduleName: 'Schools',
       icon: create,
-      name: 'Registrar função',
-      order: 14,
+      name: 'Registrar série',
+      order: 9,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
-  {
-    path: '/Function/details/:id',
-    name: 'FunctionDetails',
-    component: FunctionDetailsDesktop,
-    meta: {
-      moduleName: 'Schools',
-      icon: person,
-      name: 'Detalhes da função',
-      order: 15,
-      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
-    },
-  },
+
+  // {
+  //   path: '/Function/list',
+  //   name: 'FunctionListFunction',
+  //   component: DashboardFunction,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     moduleIcon: school,
+  //     icon: person,
+  //     name: 'Funções de servidor',
+  //     order: 13,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
+  // {
+  //   path: '/Function/register',
+  //   name: 'RegisterFunction',
+  //   component: RegisterFunction,
+  //   meta: {
+  //     moduleName: 'Schools',
+  //     icon: create,
+  //     name: 'Registrar função',
+  //     order: 14,
+  //     requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+  //   },
+  // },
 ]
 
 export default routes

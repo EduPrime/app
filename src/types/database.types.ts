@@ -367,8 +367,8 @@ export interface Database {
         }
         Insert: {
           course_modality?:
-          | Database['public']['Enums']['course_modality']
-          | null
+            | Database['public']['Enums']['course_modality']
+            | null
           course_stage?: string | null
           createdAt?: string
           deletedAt?: string | null
@@ -387,8 +387,8 @@ export interface Database {
         }
         Update: {
           course_modality?:
-          | Database['public']['Enums']['course_modality']
-          | null
+            | Database['public']['Enums']['course_modality']
+            | null
           course_stage?: string | null
           createdAt?: string
           deletedAt?: string | null
@@ -1315,8 +1315,8 @@ export interface Database {
           place_of_birth: string | null
           postalcode: string | null
           residence_zone:
-          | Database['public']['Enums']['residence_zone_type']
-          | null
+            | Database['public']['Enums']['residence_zone_type']
+            | null
           responsibleType: Database['public']['Enums']['responsibletype'] | null
           rg_issue_date: string | null
           rg_issuer: string | null
@@ -1360,11 +1360,11 @@ export interface Database {
           place_of_birth?: string | null
           postalcode?: string | null
           residence_zone?:
-          | Database['public']['Enums']['residence_zone_type']
-          | null
+            | Database['public']['Enums']['residence_zone_type']
+            | null
           responsibleType?:
-          | Database['public']['Enums']['responsibletype']
-          | null
+            | Database['public']['Enums']['responsibletype']
+            | null
           rg_issue_date?: string | null
           rg_issuer?: string | null
           rg_number?: string | null
@@ -1407,11 +1407,11 @@ export interface Database {
           place_of_birth?: string | null
           postalcode?: string | null
           residence_zone?:
-          | Database['public']['Enums']['residence_zone_type']
-          | null
+            | Database['public']['Enums']['residence_zone_type']
+            | null
           responsibleType?:
-          | Database['public']['Enums']['responsibletype']
-          | null
+            | Database['public']['Enums']['responsibletype']
+            | null
           rg_issue_date?: string | null
           rg_issuer?: string | null
           rg_number?: string | null
@@ -1764,65 +1764,65 @@ export interface Database {
     Enums: {
       attendance_status: 'PRESENT' | 'ABSENT' | 'EXCUSED'
       course_modality:
-      | 'Ensino Regular'
-      | 'EJA'
-      | 'Educação Profissional'
-      | 'Educação Especial'
+        | 'Ensino Regular'
+        | 'EJA'
+        | 'Educação Profissional'
+        | 'Educação Especial'
       course_stage_type:
-      | 'Etapa 1'
-      | 'Etapa 2'
-      | 'Etapa 3'
-      | 'Etapa 4'
-      | 'Etapa 5'
-      | 'Etapa 6'
+        | 'Etapa 1'
+        | 'Etapa 2'
+        | 'Etapa 3'
+        | 'Etapa 4'
+        | 'Etapa 5'
+        | 'Etapa 6'
       day_of_week:
-      | 'Segunda'
-      | 'Terça'
-      | 'Quarta'
-      | 'Quinta'
-      | 'Sexta'
-      | 'Sábado'
-      | 'Domingo'
+        | 'Segunda'
+        | 'Terça'
+        | 'Quarta'
+        | 'Quinta'
+        | 'Sexta'
+        | 'Sábado'
+        | 'Domingo'
       deficiency_type:
-      | 'Visual'
-      | 'Auditiva'
-      | 'Física'
-      | 'Intelectual'
-      | 'Mental'
-      | 'Múltipla'
-      | 'Outros'
-      | 'Não possui'
+        | 'Visual'
+        | 'Auditiva'
+        | 'Física'
+        | 'Intelectual'
+        | 'Mental'
+        | 'Múltipla'
+        | 'Outros'
+        | 'Não possui'
       ethnicity_type:
-      | 'Branca'
-      | 'Preta'
-      | 'Parda'
-      | 'Amarela'
-      | 'Indígena'
-      | 'Não declarada'
+        | 'Branca'
+        | 'Preta'
+        | 'Parda'
+        | 'Amarela'
+        | 'Indígena'
+        | 'Não declarada'
       gender_type: 'Masculino' | 'Feminino'
       graduate_status: 'Sim' | 'Não'
       marital_status_type:
-      | 'Solteiro'
-      | 'Casado'
-      | 'Divorciado'
-      | 'Viúvo'
-      | 'Separado'
-      | 'União Estável'
-      | 'Não Informado'
+        | 'Solteiro'
+        | 'Casado'
+        | 'Divorciado'
+        | 'Viúvo'
+        | 'Separado'
+        | 'União Estável'
+        | 'Não Informado'
       period: 'Manhã' | 'Tarde' | 'Noite'
       regime_type: 'Presencial' | 'EAD' | 'Semi-Presencial'
       residence_zone_type: 'Urbana' | 'Rural'
       responsibletype: 'Pai' | 'Mãe' | 'Ambos'
       situation_type:
-      | 'Pendente'
-      | 'Cursando'
-      | 'Aprovado'
-      | 'Aprovado pelo Conselho'
-      | 'Aprovado com Dependência'
-      | 'Reprovado'
-      | 'Transferido'
-      | 'Abandono'
-      | 'Falecido'
+        | 'Pendente'
+        | 'Cursando'
+        | 'Aprovado'
+        | 'Aprovado pelo Conselho'
+        | 'Aprovado com Dependência'
+        | 'Reprovado'
+        | 'Transferido'
+        | 'Abandono'
+        | 'Falecido'
       status: 'Ativo' | 'Inativo' | 'Graduado' | 'Suspenso' | 'Transferido'
       teaching_type: 'Complementar' | 'Padrão'
     }
@@ -1839,80 +1839,80 @@ export type Tables<
   | keyof (PublicSchema['Tables'] & PublicSchema['Views'])
   | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-  ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-    Database[PublicTableNameOrOptions['schema']]['Views'])
-  : never = never,
+    ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
+      Database[PublicTableNameOrOptions['schema']]['Views'])
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
     Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
     }
-  ? R
-  : never
+      ? R
+      : never
   : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] &
     PublicSchema['Views'])
-  ? (PublicSchema['Tables'] &
-    PublicSchema['Views'])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-  ? R
-  : never
-  : never
+    ? (PublicSchema['Tables'] &
+      PublicSchema['Views'])[PublicTableNameOrOptions] extends {
+        Row: infer R
+      }
+        ? R
+        : never
+    : never
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
   | keyof PublicSchema['Tables']
   | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-  ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
-  : never = never,
+    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
     Insert: infer I
   }
-  ? I
-  : never
+    ? I
+    : never
   : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-  ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
-  : never
+    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+      Insert: infer I
+    }
+      ? I
+      : never
+    : never
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
   | keyof PublicSchema['Tables']
   | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-  ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
-  : never = never,
+    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
     Update: infer U
   }
-  ? U
-  : never
+    ? U
+    : never
   : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-  ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
-    Update: infer U
-  }
-  ? U
-  : never
-  : never
+    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
+      Update: infer U
+    }
+      ? U
+      : never
+    : never
 
 export type Enums<
   PublicEnumNameOrOptions extends
   | keyof PublicSchema['Enums']
   | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
-  : never = never,
+    ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
+    : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
   : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
-  ? PublicSchema['Enums'][PublicEnumNameOrOptions]
-  : never
+    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
@@ -1921,10 +1921,10 @@ export type CompositeTypes<
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof Database
   }
-  ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
-  : never = never,
+    ? keyof Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
   ? Database[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema['CompositeTypes']
-  ? PublicSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
-  : never
+    ? PublicSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
+    : never

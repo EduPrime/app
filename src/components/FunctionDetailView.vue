@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IonButton, IonChip, IonCol, IonContent, IonGrid, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText } from '@ionic/vue'
-import { personSharp, documentTextOutline, textOutline } from 'ionicons/icons'
+import { documentTextOutline, personSharp, textOutline } from 'ionicons/icons'
 import { ref } from 'vue'
 
 interface Props {
@@ -39,7 +39,7 @@ const metaIcon = ref(personSharp)
             Informações gerais
           </IonLabel>
         </IonItemDivider>
-        
+
         <IonList>
           <!-- Tag com abreviação alinhada à esquerda -->
           <div v-if="props.items.abbreviation" class="abbreviation-tag ion-margin-vertical ion-text-left">
@@ -47,7 +47,7 @@ const metaIcon = ref(personSharp)
               {{ props.items.abbreviation }}
             </IonChip>
           </div>
-        
+
           <!-- Ícone e nome da função alinhados à esquerda -->
           <div style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="personSharp" />
@@ -55,18 +55,20 @@ const metaIcon = ref(personSharp)
               {{ props.items.name }}
             </IonText>
           </div>
-          
+
           <!-- Ícone e descrição da função alinhados à esquerda -->
           <div v-if="props.items.description" style="display: flex; align-items: flex-start; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="documentTextOutline" />
             <IonText color="primary" style="font-size: 11pt;">
-              <div class="description-text">{{ props.items.description }}</div>
+              <div class="description-text">
+                {{ props.items.description }}
+              </div>
             </IonText>
           </div>
         </IonList>
       </div>
     </IonContent>
-    
+
     <div>
       <IonGrid>
         <IonRow>
