@@ -2,6 +2,8 @@ import type { School } from '@prisma/client'
 import BaseService from '@/services/BaseService'
 import errorHandler from '@/utils/error-handler'
 
+const table = 'school'
+
 export default class SchoolService extends BaseService<School> {
   constructor() {
     super('school') // Passando o nome da tabela para a classe base
@@ -20,6 +22,24 @@ export default class SchoolService extends BaseService<School> {
     }
     catch (error) {
       errorHandler(error, 'Erro ao contar escolas')
+    }
+  }
+
+  async getAllSchools() {
+    try {
+      const { data: series, error: seriesError } = await this.client
+        .from(table) // Tabela de escolas
+        .select('id, name')
+
+      if (seriesError) {
+        errorHandler(seriesError, 'Erro ao buscar escolas')
+      }
+
+      // Retorna os dados das escolas
+      return series
+    }
+    catch (error) {
+      errorHandler(error, 'Erro ao buscar escolas')
     }
   }
 

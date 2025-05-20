@@ -19,7 +19,7 @@ const dataList = ref<Course[]>([])
 const searchQuery = ref('')
 const isModalAddCourse = ref(false)
 const editingId = ref<string | undefined>(undefined)
-const searchResult = ref()
+const sResult = ref()
 
 const seeModal = ref({ modal: false, data: undefined as any })
 const editModal = ref({ modal: false, data: undefined })
@@ -100,10 +100,16 @@ function setDeleteModal(open: boolean) {
   }
 }
 
-async function loadCourses() {
+async function loadCourses(SearchResult?: any) {
+  sResult.value = SearchResult
   try {
-    const courses = await courseService.getItems()
-    dataList.value = courses || []
+    if (SearchResult) {
+      dataList.value = SearchResult || []
+    }
+    else {
+      const courses = await courseService.getItems()
+      dataList.value = courses || []
+    }
   }
   catch (error) {
     console.error('Erro ao carregar funções:', error)
@@ -154,13 +160,16 @@ watch(
 <template>
   <IonPage>
     <ContentLayout>
+      <pre>
+        searchResult: {{ sResult }}
+      </pre>
       <div class="ion-margin-top">
         <SearchBox
           table="course"
           placeholder="Busque o curso"
           :search-areas="['name']"
           filter-type="text"
-          @update:search-result="searchResult = $event"
+          @update:search-result="loadCourses($event)"
         >
           <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
             <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
