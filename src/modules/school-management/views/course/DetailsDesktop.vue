@@ -3,6 +3,7 @@
 import type { Course } from '@prisma/client'
 
 import ContentLayout from '@/components/theme/ContentLayout.vue'
+import BaseService from '@/services/BaseService'
 import { IonButton, IonCol, IonGrid, IonPage, IonRow } from '@ionic/vue'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -11,8 +12,12 @@ import CourseService from '../../services/CourseService'
 const route = useRoute()
 const router = useRouter()
 const courseService = new CourseService()
+const baseService = new BaseService('course')
 const courseDetails = ref<Course | null>(null)
 const loading = ref(true)
+const institution = ref()
+const school = ref()
+// const evaluationRule = ref()
 
 async function loadDetails() {
   try {
@@ -23,8 +28,19 @@ async function loadDetails() {
       return
     }
 
-    const data = await courseService.getById(id)
+    const data: any = await courseService.getById(id)
     courseDetails.value = data
+    if (data && data.institutionId) {
+      institution.value = await baseService.getByInCustomTable('institution', data.institutionId)
+    }
+
+    if (data && data.schoolId) {
+      school.value = await baseService.getByInCustomTable('school', data.schoolId)
+    }
+
+    // if (data && data.evaluationRuleId) {
+    //   evaluationRule.value = await baseService.getByInCustomTable('evaluationRule', data.evaluationRuleId)
+    // }
   }
   catch (error) {
     console.error('Erro ao carregar detalhes do curso:', error)
@@ -52,6 +68,9 @@ onMounted(() => {
 <template>
   <IonPage>
     <ContentLayout>
+      <!-- <pre>
+        {{ courseDetails }}
+      </pre> -->
       <div v-if="loading" class="ion-text-center ion-padding">
         <p>Carregando detalhes do curso...</p>
       </div>
@@ -66,6 +85,18 @@ onMounted(() => {
           </h2>
           <IonGrid>
             <IonRow>
+              <IonCol v-if="institution && institution.name" size="12" size-md="12">
+                <div class="detail-item">
+                  <span class="detail-label">Instituição</span>
+                  <span class="detail-value">{{ institution.name || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol v-if="school && school.name" size="12" size-md="12">
+                <div class="detail-item">
+                  <span class="detail-label">Escola</span>
+                  <span class="detail-value">{{ school.name || '-' }}</span>
+                </div>
+              </IonCol>
               <IonCol size="12" size-md="6">
                 <div class="detail-item">
                   <span class="detail-label">Nome</span>
