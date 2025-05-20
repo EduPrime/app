@@ -37,7 +37,7 @@ const initialFormValues = {
   numberOfStages: '',
   description: '',
   timeSerialization: undefined,
-  institutionId: undefined,
+  institutionId: '',
   schoolId: undefined,
   evaluationRuleId: undefined,
   workerId: undefined,
@@ -437,8 +437,7 @@ onMounted(async () => {
             </IonCol>
           </IonRow>
 
-          <!-- @TODO: Número de etapas deveria ser etapas que contém ( esse campo deveria se referir as etapas de ENSINO ) -->
-          <!-- <IonRow>
+          <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field }" name="numberOfStages" label="Número de etapas" rules="min:2|max:6">
                 <div class="floating-input">
@@ -460,9 +459,9 @@ onMounted(async () => {
                 </ErrorMessage>
               </Field>
             </IonCol>
-          </IonRow> -->
+          </IonRow>
 
-          <!-- <IonRow>
+          <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field }" name="courseStage" label="Etapa do curso" rules="min:2|max:6">
                 <div class="floating-input">
@@ -484,7 +483,7 @@ onMounted(async () => {
                 </ErrorMessage>
               </Field>
             </IonCol>
-          </IonRow> -->
+          </IonRow>
 
           <!-- @TODO: Adicionar regra de avaliação ( está estático ) -->
 

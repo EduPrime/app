@@ -160,9 +160,9 @@ watch(
 <template>
   <IonPage>
     <ContentLayout>
-      <pre>
+      <!-- <pre>
         searchResult: {{ sResult }}
-      </pre>
+      </pre> -->
       <div class="ion-margin-top">
         <SearchBox
           table="course"
