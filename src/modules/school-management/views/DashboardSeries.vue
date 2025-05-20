@@ -84,9 +84,12 @@ const filteredDataList = computed(() => {
 
 async function loadSeries() {
   try {
-    const series = await seriesService.getAllSeriesWithDetails() // getAll() pode retornar null
-    dataList.value = series ?? [] // Se retornar null, atribuímos um array vazio
-    console.log(series)
+    const series = await seriesService.getAllSeriesWithDetails()
+    dataList.value = (series ?? []).map((item: Partial<Tables<'series'>>) => {
+      const { course_stage, graduate, ...filteredItem } = item // Remove os campos indesejados
+
+      return filteredItem as Tables<'series'>
+    })
   }
   catch (error) {
     console.error('Erro ao carregar as séries:', error)
@@ -147,7 +150,6 @@ watch(
           </IonButton>
         </IonCol>
       </IonRow>
-      <!-- <SeriesList :data-list="filteredDataList" /> -->
       <EduprimeList
         :data-list="filteredDataList"
         @update:delete="(event) => {

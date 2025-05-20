@@ -83,7 +83,12 @@ const originalFormValues = ref<{
     updatedBy: string | null
     tenantId: string
   }>
-}>({ ...formValues.value, disciplines: [] })
+}>({
+  ...formValues.value,
+  schoolDays: formValues.value.schoolDays ?? 0,
+  workload: formValues.value.workload ?? 0,
+  disciplines: [],
+})
 
 // Adiciona uma nova disciplina
 function addDiscipline() {
@@ -152,7 +157,7 @@ async function loadSeriesData() {
           ageRangeMax: seriesData.ageRangeMax || null,
           standardAge: seriesData.standardAge || null,
           schoolDays: seriesData.schoolDays || null,
-          workload: seriesData.workload || null,
+          workload: seriesData.workload ?? undefined,
         }
 
         // Carrega as disciplinas associadas à série
@@ -162,7 +167,16 @@ async function loadSeriesData() {
           workload: discipline.workload || '',
           year: discipline.year || '',
         }))
-        originalFormValues.value = { ...formValues.value, disciplines: [...disciplines.value] }
+        originalFormValues.value = {
+          ...formValues.value,
+          schoolDays: formValues.value.schoolDays ?? 0, // Default to 0 if null
+          workload: formValues.value.workload ?? 0, // Default to 0 if null or undefined
+          disciplines: disciplines.value.map(discipline => ({
+            ...discipline,
+            year: discipline.year ?? 0, // Default to 0 if null
+            workload: discipline.workload ?? 0, // Default to 0 if null
+          })),
+        }
         hasChanges.value = false // Garante que o botão "Salvar" esteja desabilitado inicialmente
       }
       else {
@@ -197,10 +211,12 @@ async function loadDropdownData() {
 async function saveSeriesAndDisciplines() {
   const series = {
     ...formValues.value,
-    createdAt: isEditing.value ? undefined : new Date().toISOString(),
-    updatedAt: isEditing.value ? new Date().toISOString() : undefined,
+    createdAt: isEditing.value ? null : new Date().toISOString(),
+    updatedAt: isEditing.value ? new Date().toISOString() : null,
     deletedAt: null, // Add default value for deletedAt
     updatedBy: null, // Add default value for updatedBy
+    workload: formValues.value.workload ?? undefined, // Ensure workload is undefined if null
+    schoolDays: formValues.value.schoolDays ?? 0, // Garante que schoolDays seja um número
   }
 
   // Prepara as disciplinas para envio, garantindo que `disciplineId` seja preenchido
@@ -213,12 +229,13 @@ async function saveSeriesAndDisciplines() {
     return {
       disciplineId: selectedDiscipline.id, // Garante que `disciplineId` seja preenchido
       seriesId: series.id, // Vincula o ID da série
-      year: discipline.year,
-      workload: discipline.workload,
-      createdAt: discipline.createdAt || new Date().toISOString(),
-      updatedAt: isEditing.value ? new Date().toISOString() : undefined,
+      year: discipline.year ?? 0, // Default to 0 if null
+      workload: discipline.workload ?? 0, // Default to 0 if null
+      createdAt: (discipline.createdAt || new Date()).toISOString(), // Ensure string format
+      updatedAt: isEditing.value ? new Date().toISOString() : null, // Ensure null if not editing
       deletedAt: discipline.deletedAt || null,
       tenantId: discipline.tenantId,
+      updatedBy: null, // Add default value for updatedBy
     }
   })
 

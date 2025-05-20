@@ -6,29 +6,30 @@ import { useRoute } from 'vue-router'
 
 interface Props {
   dataList: {
-    abbreviation: string | null
-    active: boolean
-    address: string | null
-    city: string | null
-    createdAt: string
-    deletedAt: string | null
-    email: string | null
+    abbreviation?: string | null
+    active?: boolean
+    address?: string | null
+    course_id?: string | null
+    city?: string | null
+    createdAt?: string
+    deletedAt?: string | null
+    email?: string | null
     id: string
-    institution_id: string
-    logourl: string | null
+    institution_id?: string | null
+    logourl?: string | null
     name: string
-    phone: string | null
-    postalcode: string | null
-    school_zone: string | null
-    social_network: string | null
-    state: string | null
-    updatedAt: string | null
-    user_created: string | null
-    website: string | null
-    serieDisciplines: [
+    phone?: string | null
+    postalcode?: string | null
+    school_zone?: string | null
+    social_network?: string | null
+    state?: string | null
+    updatedAt?: string | null
+    user_created?: string | null
+    website?: string | null
+    serieDisciplines?: [
       {
-        discipline: string | null
-        workload: number | null
+        discipline?: string | null
+        workload?: number | null
       },
     ]
   }[]
