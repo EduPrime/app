@@ -18,6 +18,7 @@ const loading = ref(true)
 const institution = ref()
 const school = ref()
 // const evaluationRule = ref()
+const tenantId = ref()
 
 async function loadDetails() {
   try {
@@ -36,6 +37,10 @@ async function loadDetails() {
 
     if (data && data.schoolId) {
       school.value = await baseService.getByInCustomTable('school', data.schoolId)
+    }
+
+    if (data && data.tenantId) {
+      tenantId.value = await baseService.getByInCustomTable('tenant', data.tenantId)
     }
 
     // if (data && data.evaluationRuleId) {
@@ -108,7 +113,8 @@ onMounted(() => {
                   <span class="detail-label">Abreviação</span>
                   <div class="detail-value">
                     <!-- @TODO: Ajuste a abreviação -->
-                    <span v-if="courseDetails.abbreviation" class="abbreviation-tag">{{ courseDetails.abbreviation }}</span>
+                    <span v-if="courseDetails.abbreviation" class="abbreviation-tag">{{ courseDetails.abbreviation
+                    }}</span>
                     <span v-else>-</span>
                   </div>
                 </div>
@@ -121,6 +127,60 @@ onMounted(() => {
                   <span class="detail-label">Descrição</span>
                   <!-- @TODO: Ajuste a descrição -->
                   <span class="detail-value description">{{ courseDetails.description || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="12">
+                <h2 class="section-title">
+                  Informações administrativas
+                </h2>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Nível de ensino</span>
+                  <span class="detail-value">{{ courseDetails.graduate || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Tipo de ensino</span>
+                  <span class="detail-value">{{ courseDetails.teachingType || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Modalidade do curso</span>
+                  <span class="detail-value">{{ courseDetails.courseModality || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Tipo de regime</span>
+                  <span class="detail-value">{{ courseDetails.regimeType || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Serialização de tempo</span>
+                  <span class="detail-value">{{ courseDetails.timeSerialization || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Carga horária</span>
+                  <span class="detail-value">{{ `${courseDetails.workload} Horas` || '-' }}</span>
+                </div>
+              </IonCol>
+
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Número de etapas</span>
+                  <span class="detail-value">{{ courseDetails.numberOfStages || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Etapa do curso</span>
+                  <span class="detail-value">{{ courseDetails.courseStage || '-' }}</span>
                 </div>
               </IonCol>
             </IonRow>
@@ -158,7 +218,8 @@ onMounted(() => {
 <style scoped>
 .details-container {
   padding: 16px;
-  padding-bottom: 80px; /* Espaço para o footer fixo */
+  padding-bottom: 80px;
+  /* Espaço para o footer fixo */
 }
 
 .detail-section {
@@ -236,7 +297,8 @@ onMounted(() => {
   }
 
   .details-container {
-    padding-bottom: 90px; /* Mais espaço no mobile */
+    padding-bottom: 90px;
+    /* Mais espaço no mobile */
   }
 }
 </style>
