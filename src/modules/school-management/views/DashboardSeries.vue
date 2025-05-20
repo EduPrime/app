@@ -20,7 +20,7 @@ const isModalAddSchool = ref(false)
 
 const seeModal = ref({ modal: false, data: undefined as any })
 const editModal = ref({ modal: false, data: undefined })
-const deleteModal = ref({ modal: false, data: undefined })
+const deleteModal = ref<{ modal: boolean, data: { id: string } | undefined }>({ modal: false, data: undefined })
 
 const editingId = ref<string | undefined>(undefined)
 

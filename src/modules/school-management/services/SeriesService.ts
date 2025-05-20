@@ -192,7 +192,12 @@ export default class SeriesService extends BaseService<TabelaType> {
       return { series: seriesData, disciplines: [...disciplinesToInsert, ...disciplinesToUpdate] }
     }
     catch (error) {
-      throw new Error(`Erro ao inserir ou atualizar série e disciplinas: ${error.message}`)
+      if (error instanceof Error) {
+        throw new TypeError(`Erro ao inserir ou atualizar série e disciplinas: ${error.message}`)
+      }
+      else {
+        throw new TypeError('Erro ao inserir ou atualizar série e disciplinas: Erro desconhecido')
+      }
     }
   }
 
@@ -223,7 +228,7 @@ export default class SeriesService extends BaseService<TabelaType> {
               .from('seriesDiscipline')
               .select(`
                 *,
-                discipline:disciplineId (name) -- Faz o join com a tabela de disciplinas para obter o nome
+                discipline:disciplineId (name)
               `)
               .eq('seriesId', series.id)
               .is('deletedAt', null)
@@ -238,7 +243,7 @@ export default class SeriesService extends BaseService<TabelaType> {
               courseName: series.course?.name || 'Curso não informado',
               institutionName: series.institution?.name || 'Instituição não informada',
               disciplines: (disciplines || []).map(d => ({
-                ...d,
+                ...(typeof d === 'object' && d !== null ? d : {}),
                 disciplineName: d.discipline?.name || 'Disciplina não informada',
               })),
             }
@@ -288,7 +293,7 @@ export default class SeriesService extends BaseService<TabelaType> {
           .from('seriesDiscipline')
           .select(`
             *,
-            discipline:disciplineId (name) -- Faz o join com a tabela de disciplinas para obter o nome
+            discipline:disciplineId (name)
           `)
           .eq('seriesId', seriesId)
           .is('deletedAt', null)
@@ -306,7 +311,7 @@ export default class SeriesService extends BaseService<TabelaType> {
           courseName: series.course?.name || 'Curso não informado',
           institutionName: series.institution?.name || 'Instituição não informada',
           disciplines: (disciplines || []).map(d => ({
-            ...d,
+            ...(typeof d === 'object' && d !== null ? d : {}),
             disciplineName: d.discipline?.name || 'Disciplina não informada',
           })),
         }
