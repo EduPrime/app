@@ -410,7 +410,7 @@ onMounted(async () => {
                 <IonGrid>
                   <IonRow>
                     <IonCol size="12">
-                      <Field v-slot="{ field, errors }" name="discipline.name">
+                      <Field v-slot="{ field, errors }" name="discipline.name" label="Disciplina" rules="required">
                         <IonSelect
                           v-model="discipline.name"
                           v-bind="field"
@@ -431,7 +431,7 @@ onMounted(async () => {
                   </IonRow>
                   <IonRow>
                     <IonCol size="6">
-                      <Field v-slot="{ field, errors }" name="workload" rules="required">
+                      <Field v-slot="{ field, errors }" name="workload" label="Carga horária" rules="required">
                         <IonInput
                           v-model="discipline.workload"
                           v-bind="field"
@@ -444,7 +444,7 @@ onMounted(async () => {
                       </Field>
                     </IonCol>
                     <IonCol size="6">
-                      <Field v-slot="{ field, errors }" name="year" rules="required">
+                      <Field v-slot="{ field, errors }" name="year" label="Ano" rules="required">
                         <IonInput
                           v-model="discipline.year"
                           v-bind="field"

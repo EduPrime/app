@@ -5,7 +5,7 @@ import DashboardSeries from './views/DashboardSeries.vue'
 import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
 import RegisterFunction from './views/RegisterFunction.vue'
 // import RegisterSchool from './views/RegisterSchool.vue'
-import RegisterSeries from './views/RegisterSeries.vue'
+import RegisterSeries from './views/RegisterSeriesMobile.vue'
 
 const routes = [
   // {

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList } from '@ionic/vue'
-import { arrowBack, arrowForward, eye, pencilSharp, school, trashSharp } from 'ionicons/icons'
+import { apps, arrowBack, arrowForward, eye, pencilSharp, school, trashSharp } from 'ionicons/icons'
 import { ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 interface Props {
   dataList: {
@@ -36,21 +37,18 @@ interface Props {
 const props = defineProps<Props>()
 const emits = defineEmits(['update:see', 'update:edit', 'update:delete'])
 
+const route = useRoute()
 const isOpen = ref<boolean[]>([])
 const itemSliding = ref<(InstanceType<typeof IonItemSliding> | null)[]>([])
 
 const innerWidth = window.innerWidth
-
-// function handleOpened(index: number) {
-//   isOpen.value[index] = true
-// }
 </script>
 
 <template>
   <IonCard v-if="true">
     <IonCardHeader color="secondary">
       <div style="display: flex; align-items: center; height: 15px;">
-        <IonIcon :icon="school" style="margin-right: 10px; font-size: 16pt;" />
+        <IonIcon :icon="route?.meta?.icon ?? apps" style="margin-right: 10px; font-size: 16pt;" />
         <IonCardTitle style="font-size: medium;">
           Lista de registros ({{ props.dataList.length }})
         </IonCardTitle>

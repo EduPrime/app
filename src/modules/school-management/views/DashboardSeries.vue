@@ -9,7 +9,7 @@ import { add } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import SeriesService from '../services/SeriesService'
-import RegisterSeries from './RegisterSeries.vue'
+import RegisterSeries from './RegisterSeriesMobile.vue'
 
 const router = useRouter()
 const route = router.currentRoute
