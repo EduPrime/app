@@ -2,3 +2,12 @@
 	path = src/modules/teacher-journey
 	url = git@github.com:EduPrime/teacher_journey.git
 	branch = 'main'
+[submodule "timetable"]
+	path = timetable
+	url = https://github.com/EduPrime/module_timetable.git
+[submodule "module_timetable"]
+	path = module_timetable
+	url = https://github.com/EduPrime/module_timetable.git
+[submodule "src/modules/timetable"]
+	path = src/modules/timetable
+	url = https://github.com/EduPrime/module_timetable.git
