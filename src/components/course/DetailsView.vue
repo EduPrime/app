@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import BaseService from '@/services/BaseService'
 import { IonButton, IonChip, IonCol, IonContent, IonGrid, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText } from '@ionic/vue'
-import { documentTextOutline, personSharp } from 'ionicons/icons'
-
-import { computed } from 'vue'
+import { businessOutline, calendarOutline, constructOutline, desktopOutline, documentTextOutline, layersOutline, peopleOutline, pricetagOutline, ribbonOutline, schoolOutline, settingsOutline, timeOutline, trailSign } from 'ionicons/icons'
+import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 
 interface Props {
@@ -25,6 +25,7 @@ interface Props {
     description: string | null
     numberOfStages: string | null
     timeSerialization: string
+    evaluationRuleId: string
     graduate: string
     teachingType: string
     regimeType: string
@@ -35,11 +36,26 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const emits = defineEmits(['close', 'edit'])
-const route = useRoute()
-const metaIcon = computed(() => (route.meta.icon as string) || '')
 
+const emits = defineEmits(['close', 'edit'])
+const baseService = new BaseService('course')
+const route = useRoute()
+
+const metaIcon = computed(() => (route.meta.icon as string) || '')
+const institution = ref()
+const school = ref()
+const evaluationRules = ref()
 //
+
+watch(
+  () => props.items,
+  async () => {
+    institution.value = await baseService.getByInCustomTable('institution', props.items.institutionId)
+    school.value = await baseService.getByInCustomTable('school', props.items.schoolId)
+    evaluationRules.value = await baseService.getByInCustomTable('evaluationRule', props.items.evaluationRuleId)
+  },
+  { deep: true, immediate: true },
+)
 
 // Mapeando atributos para um array de objetos com ícones
 </script>
@@ -66,18 +82,46 @@ const metaIcon = computed(() => (route.meta.icon as string) || '')
 
         <IonList>
           <!-- Tag com abreviação alinhada à esquerda -->
-          <div v-if="props.items.abbreviation" class="abbreviation-tag ion-margin-vertical ion-text-left">
-            <IonChip color="primary">
-              {{ props.items.abbreviation }}
-            </IonChip>
-          </div>
 
           <!-- Ícone e nome da função alinhados à esquerda -->
           <div style="display: flex; align-items: center; padding: 6px;">
-            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="personSharp" />
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="trailSign" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
               {{ props.items.name }}
             </IonText>
+          </div>
+
+          <div v-if="institution" style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="businessOutline" />
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              {{ institution.name }}
+            </IonText>
+          </div>
+
+          <div v-if="school" style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="schoolOutline" />
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              {{ school.name }}
+            </IonText>
+          </div>
+
+          <div v-if="evaluationRules" style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="constructOutline" />
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              {{ evaluationRules.name }}
+            </IonText>
+          </div>
+
+          <div v-if="props.items.abbreviation" style="display: flex; align-items: center; padding: 6px;" class="ion-text-left">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="pricetagOutline" />
+
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              Abreviação
+            </IonText>
+
+            <IonChip color="primary">
+              {{ props.items.abbreviation }}
+            </IonChip>
           </div>
 
           <!-- Ícone e descrição da função alinhados à esquerda -->
@@ -86,6 +130,88 @@ const metaIcon = computed(() => (route.meta.icon as string) || '')
             <IonText color="primary" style="font-size: 11pt;">
               <div class="description-text">
                 {{ props.items.description }}
+              </div>
+            </IonText>
+          </div>
+
+          <IonItemDivider
+            style="border-color: rgba(var(--ion-color-primary-rgb), 0.25);"
+            class="ion-no-padding ion-padding-top"
+          >
+            <IonLabel color="primary" class="ion-no-margin">
+              Informações administrativass
+            </IonLabel>
+          </IonItemDivider>
+
+          <!-- Ícone e descrição da função alinhados à esquerda -->
+          <div v-if="props.items.graduate" style="display: flex; align-items: flex-start; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="ribbonOutline" />
+            <IonText color="primary" style="font-size: 11pt;">
+              <div class="description-text">
+                {{ props.items.graduate }}
+              </div>
+            </IonText>
+          </div>
+
+          <!-- Ícone e descrição da função alinhados à esquerda -->
+          <div v-if="props.items.teachingType" style="display: flex; align-items: flex-start; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="peopleOutline" />
+            <IonText color="primary" style="font-size: 11pt;">
+              <div class="description-text">
+                {{ props.items.teachingType }}
+              </div>
+            </IonText>
+          </div>
+          <div v-if="props.items.courseModality" style="display: flex; align-items: flex-start; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="desktopOutline" />
+            <IonText color="primary" style="font-size: 11pt;">
+              <div class="description-text">
+                {{ props.items.courseModality }}
+              </div>
+            </IonText>
+          </div>
+
+          <div v-if="props.items.regimeType" style="display: flex; align-items: flex-start; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="settingsOutline" />
+            <IonText color="primary" style="font-size: 11pt;">
+              <div class="description-text">
+                {{ props.items.regimeType }}
+              </div>
+            </IonText>
+          </div>
+
+          <div v-if="props.items.timeSerialization" style="display: flex; align-items: flex-start; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="calendarOutline" />
+            <IonText color="primary" style="font-size: 11pt;">
+              <div class="description-text">
+                {{ props.items.timeSerialization }}
+              </div>
+            </IonText>
+          </div>
+
+          <div v-if="props.items.workload" style="display: flex; align-items: flex-start; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="timeOutline" />
+            <IonText color="primary" style="font-size: 11pt;">
+              <div class="description-text">
+                {{ props.items.workload }} horas
+              </div>
+            </IonText>
+          </div>
+
+          <div v-if="props.items.numberOfStages" style="display: flex; align-items: flex-start; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="layersOutline" />
+            <IonText color="primary" style="font-size: 11pt;">
+              <div class="description-text">
+                Quantidade de etapas {{ props.items.numberOfStages }}
+              </div>
+            </IonText>
+          </div>
+
+          <div v-if="props.items.courseStage" style="display: flex; align-items: flex-start; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="schoolOutline" />
+            <IonText color="primary" style="font-size: 11pt;">
+              <div class="description-text">
+                Etapa do curso {{ props.items.courseStage }}
               </div>
             </IonText>
           </div>

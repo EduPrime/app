@@ -17,8 +17,8 @@ const courseDetails = ref<Course | null>(null)
 const loading = ref(true)
 const institution = ref()
 const school = ref()
-// const evaluationRule = ref()
-const tenantId = ref()
+const evaluationRule = ref()
+// const tenantId = ref()
 
 async function loadDetails() {
   try {
@@ -39,13 +39,9 @@ async function loadDetails() {
       school.value = await baseService.getByInCustomTable('school', data.schoolId)
     }
 
-    if (data && data.tenantId) {
-      tenantId.value = await baseService.getByInCustomTable('tenant', data.tenantId)
+    if (data && data.evaluationRuleId) {
+      evaluationRule.value = await baseService.getByInCustomTable('evaluationRule', data.evaluationRuleId)
     }
-
-    // if (data && data.evaluationRuleId) {
-    //   evaluationRule.value = await baseService.getByInCustomTable('evaluationRule', data.evaluationRuleId)
-    // }
   }
   catch (error) {
     console.error('Erro ao carregar detalhes do curso:', error)
@@ -73,9 +69,6 @@ onMounted(() => {
 <template>
   <IonPage>
     <ContentLayout>
-      <pre>
-        {{ courseDetails }}
-      </pre>
       <div v-if="loading" class="ion-text-center ion-padding">
         <p>Carregando detalhes do curso...</p>
       </div>
@@ -100,6 +93,12 @@ onMounted(() => {
                 <div class="detail-item">
                   <span class="detail-label">Escola</span>
                   <span class="detail-value">{{ school.name || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol v-if="evaluationRule && evaluationRule.name" size="12" size-md="12">
+                <div class="detail-item">
+                  <span class="detail-label">Regra de avaliação</span>
+                  <span class="detail-value">{{ evaluationRule.name || '-' }}</span>
                 </div>
               </IonCol>
               <IonCol size="12" size-md="6">

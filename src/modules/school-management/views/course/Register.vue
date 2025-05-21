@@ -38,7 +38,7 @@ const initialFormValues = {
   description: '',
   timeSerialization: undefined,
   institutionId: '',
-  schoolId: undefined,
+  // schoolId: undefined,
   evaluationRuleId: undefined,
   workerId: undefined,
   courseStage: undefined,
@@ -118,7 +118,7 @@ onMounted(async () => {
         numberOfStages: item.numberOfStages,
         timeSerialization: item.timeSerialization,
         courseStage: item.courseStage,
-        schoolId: item.schoolId,
+        // schoolId: item.schoolId,
         evaluationRuleId: item.evaluationRuleId,
         workerId: item.workerId,
       }
@@ -448,7 +448,7 @@ onMounted(async () => {
           </IonRow>
           <!-- @TODO: Adicionar regra de avaliação ( está estático ) -->
 
-          <IonRow class="ion-margin-vertical">
+          <!-- <IonRow class="ion-margin-vertical">
             <IonCol size="12">
               <Field v-slot="{ field, errors }" name="schoolId" rules="">
                 <IonSelect
@@ -470,7 +470,7 @@ onMounted(async () => {
                 <span class="error-message">{{ errors[0] }}</span>
               </Field>
             </IonCol>
-          </IonRow>
+          </IonRow> -->
 
           <IonRow>
             <IonCol size="12">
