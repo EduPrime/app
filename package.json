@@ -18,7 +18,8 @@
     "prepare": "husky",
     "type-check": "vue-tsc --noEmit",
     "prisma-dataload": "bun prisma/roles.ts && bun prisma/seed.ts",
-    "seed:script": "./prisma/seed_script.sh"
+    "seed:script": "./prisma/seed_script.sh",
+    "update:submodules": "bun update-submodules.ts"
   },
   "dependencies": {
     "@antfu/eslint-config": "^4.13.2",
@@ -73,6 +74,7 @@
   "devDependencies": {
     "@capacitor/cli": "^7.2.0",
     "@eslint/js": "^9.27.0",
+    "@types/bun": "latest",
     "@types/node": "^22.15.21",
     "@typescript-eslint/parser": "^8.32.1",
     "@vitejs/plugin-legacy": "^6.1.1",
