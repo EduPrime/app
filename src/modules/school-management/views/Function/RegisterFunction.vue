@@ -15,7 +15,7 @@ import {
 import { ErrorMessage, Field, Form } from 'vee-validate'
 import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import ServerFunctionService from '../services/ServerFunctionService'
+import ServerFunctionService from '../../services/ServerFunctionService'
 
 const route = useRoute()
 const router = useRouter()

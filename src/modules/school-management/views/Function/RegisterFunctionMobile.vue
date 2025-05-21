@@ -14,7 +14,7 @@ import {
 import { personSharp } from 'ionicons/icons'
 import { ErrorMessage, Field, Form } from 'vee-validate'
 import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue'
-import ServerFunctionService from '../services/ServerFunctionService'
+import ServerFunctionService from '../../services/ServerFunctionService'
 
 const props = defineProps<{
   editId?: string

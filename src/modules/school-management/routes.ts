@@ -1,8 +1,11 @@
-import { create, person, school } from 'ionicons/icons'
-import DashboardFunction from './views/DashboardFunction.vue'
+import { book, create, person, school } from 'ionicons/icons'
+import DashboardFunction from './views/Function/DashboardFunction.vue'
+import DashboardEvaluationRule from './views/EvaluationRule/DashboardEvaluationRule.vue'
 // import DashboardSchools from './views/DashboardSchools.vue'
-import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
-import RegisterFunction from './views/RegisterFunction.vue'
+import FunctionDetailsDesktop from './views/Function/FunctionDetailsDesktop.vue'
+import RegisterFunction from './views/Function/RegisterFunction.vue'
+import RegisterEvaluationRule from '../school-management/views/EvaluationRule/RegisterEvaluationRule.vue'
+import EvaluationRuleDetailsDesktop from '../school-management/views/EvaluationRule/EvaluationRuleDetailsDesktop.vue'
 // import RegisterSchool from './views/RegisterSchool.vue'
 
 const routes = [
@@ -190,6 +193,43 @@ const routes = [
       icon: person,
       name: 'Detalhes da função',
       order: 15,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/EvaluationRule/list',
+    name: 'EvaluationRuleListRule',
+    component: DashboardEvaluationRule,
+    meta: {
+      moduleName: 'Schools',
+      moduleIcon: school,
+      icon: book,
+      name: 'Regras de Avaliação',
+      order: 16,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/EvaluationRule/register/:id?',
+    name: 'RegisterEvaluationRule',
+    component: RegisterEvaluationRule,
+    meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Registrar regra de avaliação',
+      order: 17,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/EvaluationRule/details-desktop/:id',
+    name: 'EvaluationRuleDetailsDesktop',
+    component: EvaluationRuleDetailsDesktop,
+    meta: {
+      moduleName: 'Schools',
+      icon: book,
+      name: 'Detalhes da regra de avaliação (Desktop)',
+      order: 19,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },

@@ -2,7 +2,7 @@
 import { IonButton, IonCol, IonContent, IonGrid, IonPage, IonRow } from '@ionic/vue'
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import ServerFunctionService from '../services/ServerFunctionService'
+import ServerFunctionService from '../../services/ServerFunctionService'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import type { ServerFunction } from '@prisma/client'
 

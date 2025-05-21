@@ -8,8 +8,8 @@ import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCol, IonContent, Io
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import ServerFunctionService from '../services/ServerFunctionService'
-import RegisterFunctionMobile from './RegisterFunctionMobile.vue'
+import ServerFunctionService from '../../services/ServerFunctionService'
+import RegisterFunctionMobile from '../Function/RegisterFunctionMobile.vue'
 
 const router = useRouter()
 const route = router.currentRoute
