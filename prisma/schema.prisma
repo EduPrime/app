@@ -105,35 +105,37 @@ model Classroom {
 }
 
 model Course {
-  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String           @db.VarChar(100)
-  abbreviation      String?          @db.VarChar(10)
-  description       String?          @db.VarChar(255)
+  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String          @db.VarChar(100)
+  abbreviation      String?         @db.VarChar(10)
+  description       String?         @db.VarChar(255)
   numberOfStages    Int?
-  status            status?          @default(ACTIVE)
+  status            status?         @default(ACTIVE)
   metadata          Json?
-  createdAt         DateTime?        @default(now()) @db.Timestamp(6)
-  deletedAt         DateTime?        @db.Timestamp(6)
-  updatedAt         DateTime?        @updatedAt @db.Timestamp(6)
-  userCreated       String?          @db.VarChar(255)
-  updatedBy         String?          @db.Uuid
+  createdAt         DateTime?       @default(now()) @db.Timestamp(6)
+  deletedAt         DateTime?       @db.Timestamp(6)
+  updatedAt         DateTime?       @updatedAt @db.Timestamp(6)
+  userCreated       String?         @db.VarChar(255)
+  updatedBy         String?         @db.Uuid
   tenantId          String?
   timeSerialization timeSerial?
   courseStage       Int?
   graduate          graduate?
-  workload          Decimal?         @db.Decimal
+  workload          Decimal?        @db.Decimal
   teachingType      teachingType?
   regimeType        regimeType?
   courseModality    courseModality?
-  institutionId     String           @db.Uuid
-  schoolId          String?          @db.Uuid
-  institution       Institution      @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_institutionId_fkey")
-  School            School?          @relation(fields: [schoolId], references: [id])
-  CourseSchool      CourseSchool[]
-  enrollment        Enrollment[]
-  EvaluationRule    EvaluationRule[]
-  preenrollment     PreEnrollment[]
-  series            Series[]
+  institutionId     String          @db.Uuid
+  schoolId          String?         @db.Uuid
+  evaluationRuleId  String?         @db.Uuid
+
+  institution    Institution     @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_institutionId_fkey")
+  School         School?         @relation(fields: [schoolId], references: [id])
+  CourseSchool   CourseSchool[]
+  enrollment     Enrollment[]
+  EvaluationRule EvaluationRule? @relation(fields: [evaluationRuleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_evaluationruleid_fkey")
+  preenrollment  PreEnrollment[]
+  series         Series[]
 
   @@map("course")
   @@schema("public")
@@ -1227,8 +1229,8 @@ model EvaluationRule {
   deletedAt              DateTime?           @db.Timestamp(6)
   updatedBy              String?             @db.Uuid
   tenantId               String?             @db.Uuid
-  courseId               String              @db.Uuid
-  course                 Course              @relation(fields: [courseId], references: [id], map: "rule_course_fkey")
+
+  Course Course[] @relation(map: "course_evaluationruleid_fkey")
 
   @@map("evaluationRule")
   @@schema("public")
