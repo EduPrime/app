@@ -73,9 +73,9 @@ onMounted(() => {
 <template>
   <IonPage>
     <ContentLayout>
-      <!-- <pre>
+      <pre>
         {{ courseDetails }}
-      </pre> -->
+      </pre>
       <div v-if="loading" class="ion-text-center ion-padding">
         <p>Carregando detalhes do curso...</p>
       </div>
@@ -167,7 +167,7 @@ onMounted(() => {
               <IonCol size="12" size-md="6">
                 <div class="detail-item">
                   <span class="detail-label">Carga horária</span>
-                  <span class="detail-value">{{ `${courseDetails.workload} Horas` || '-' }}</span>
+                  <span class="detail-value">{{ courseDetails.workload ? `${courseDetails.workload} Horas` : '-' }}</span>
                 </div>
               </IonCol>
 

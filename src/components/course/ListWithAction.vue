@@ -13,9 +13,11 @@ interface Props {
   dataList: {
     id: string
     name: string
+    regimeType: string
     abbreviation?: string | null
     description?: string | null
     createdAt?: string
+    graduate?: string | null
     updatedAt?: string | null
     deletedAt?: string | null
   }[]
@@ -72,8 +74,8 @@ onUnmounted(() => {
               <IonItem>
                 <IonLabel color="primary" class="ion-no-margin course-name" style="margin-top: 5px; margin-bottom: 5px;">
                   <h2>{{ item.name || 'Função sem nome' }}</h2>
-                  <p v-if="item.abbreviation">
-                    {{ item.abbreviation }}
+                  <p v-if="item.regimeType">
+                    {{ item.regimeType }}
                   </p>
                 </IonLabel>
                 <IonIcon :icon="isOpen[index] ? arrowForward : arrowBack" style="font-size: 18pt;" />
@@ -102,8 +104,8 @@ onUnmounted(() => {
             <IonItem v-for="(item, index) in props.dataList" :key="index">
               <IonLabel color="primary" class="ion-no-margin course-name" style="margin-top: 5px; margin-bottom: 5px;">
                 <h2>{{ item.name || 'Função sem nome' }}</h2>
-                <p v-if="item.abbreviation">
-                  {{ item.abbreviation }}
+                <p v-if="item.regimeType">
+                  {{ item.regimeType }}
                 </p>
               </IonLabel>
               <div style="display: flex; min-height: 100%;">

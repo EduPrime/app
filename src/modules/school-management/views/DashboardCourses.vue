@@ -31,6 +31,8 @@ const adaptedDataList = computed(() => {
     name: item.name,
     abbreviation: item.abbreviation,
     description: item.description,
+    regimeType: item.regimeType,
+    graduate: item.graduate,
     createdAt: item.createdAt ? item.createdAt.toString() : undefined,
     updatedAt: item.updatedAt ? item.updatedAt.toString() : undefined,
     deletedAt: item.deletedAt ? item.deletedAt.toString() : undefined,
@@ -191,7 +193,7 @@ watch(
               setEditModal(true)
             }
             else {
-              router.push({ name: 'RegisterCourse', params: { id: event.data?.id } })
+              router.push({ name: 'NewCourse', params: { id: event.data?.id } })
             }
           }"
           @update:see="(event) => {

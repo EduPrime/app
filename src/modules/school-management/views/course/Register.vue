@@ -45,7 +45,7 @@ const initialFormValues = {
   graduate: undefined,
   teachingType: undefined,
   regimeType: undefined,
-  courseModality: undefined,
+  courseModality: null,
 }
 
 const formValues = ref({ ...initialFormValues })
@@ -110,6 +110,17 @@ onMounted(async () => {
         name: item.name,
         abbreviation: item.abbreviation || '', // @TODO: verificar do que se trata
         description: (item as any).description ?? '',
+        regimeType: item.regimeType,
+        graduate: item.graduate,
+        teachingType: item.teachingType,
+        courseModality: item.courseModality,
+        institutionId: item.institutionId,
+        numberOfStages: item.numberOfStages,
+        timeSerialization: item.timeSerialization,
+        courseStage: item.courseStage,
+        schoolId: item.schoolId,
+        evaluationRuleId: item.evaluationRuleId,
+        workerId: item.workerId,
       }
 
       formValues.value = { ...loadedValues }
@@ -264,55 +275,69 @@ onMounted(async () => {
           </IonRow>
 
           <IonRow>
-            <IonCol size="12">
-              <Field v-slot="{ field }" name="regimeType" label="Tipo de regime" rules="min:2|max:6">
-                <div class="floating-input">
-                  <input
-                    v-bind="field"
-                    v-model="formValues.regimeType"
-                    type="text"
-                    class="floating-native"
-                    placeholder=" "
-                    :maxlength="7"
-                    @input="field.onInput"
+            <IonCol size="12" class="ion-margin-top">
+              <Field v-slot="{ field, errors }" name="regimeType" rules="">
+                <IonSelect
+                  v-model="formValues.regimeType"
+                  v-bind="field"
+                  label="Tipo de regime"
+                  label-placement="floating"
+                  fill="outline"
+                  :items="[
+                    { value: 'Presencial', name: 'Presencial' },
+                    { value: 'Semipresencial', name: 'Semipresencial' },
+                    { value: 'EAD', name: 'Ensino a distância (EAD)' },
+                  ]"
+                >
+                  <IonSelectOption
+                    v-for="(regime, index) in [
+                      { value: 'Presencial', name: 'Presencial' },
+                      { value: 'Semipresencial', name: 'Semipresencial' },
+                      { value: 'EAD', name: 'Ensino a distância (EAD)' },
+                    ]"
+                    :key="index"
+                    :value="regime.value"
                   >
-                  <label class="floating-label"><span>Tipo de regime</span></label>
-                </div>
-                <ErrorMessage v-slot="{ message }" name="regimeType">
-                  <div class="error-message">
-                    {{ message }}
-                  </div>
-                </ErrorMessage>
+                    {{ regime.name }}
+                  </IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
               </Field>
             </IonCol>
           </IonRow>
 
           <IonRow>
-            <IonCol size="12">
-              <Field v-slot="{ field }" name="teachingType" label="Tipo de ensino" rules="min:2|max:6">
-                <div class="floating-input">
-                  <input
-                    v-bind="field"
-                    v-model="formValues.teachingType"
-                    type="text"
-                    class="floating-native"
-                    placeholder=" "
-                    :maxlength="7"
-                    @input="field.onInput"
+            <IonCol size="12" class="ion-margin-top">
+              <Field v-slot="{ field, errors }" name="teachingType" rules="">
+                <IonSelect
+                  v-model="formValues.teachingType"
+                  v-bind="field"
+                  label="Tipo de ensino"
+                  label-placement="floating"
+                  fill="outline"
+                  :items="[
+                    { value: 'Regular', name: 'regular' },
+                    { value: 'Creche', name: 'Creche' },
+                  ]"
+                >
+                  <IonSelectOption
+                    v-for="(modality, index) in [
+                      { value: 'Regular', name: 'regular' },
+                      { value: 'Creche', name: 'Creche' },
+                    ]"
+                    :key="index"
+                    :value="modality.value"
                   >
-                  <label class="floating-label"><span>Tipo de ensino</span></label>
-                </div>
-                <ErrorMessage v-slot="{ message }" name="teachingType">
-                  <div class="error-message">
-                    {{ message }}
-                  </div>
-                </ErrorMessage>
+                    {{ modality.name }}
+                  </IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
               </Field>
             </IonCol>
           </IonRow>
 
-          <IonRow class="ion-margin-vertical">
-            <IonCol size="12">
+          <IonRow>
+            <IonCol size="12" class="ion-margin-top">
               <Field v-slot="{ field, errors }" name="courseModality" rules="">
                 <IonSelect
                   v-model="formValues.courseModality"
@@ -320,14 +345,24 @@ onMounted(async () => {
                   label="Modalidade de curso"
                   label-placement="floating"
                   fill="outline"
-                  :items="['Ensino regular', 'Educação especial', 'Educação para jovens e adultos (EJA)', 'Educação profissional']"
+                  :items="[
+                    { value: 'Ensino Regular', name: 'Ensino regular' },
+                    { value: 'Ensino Especial', name: 'Educação especial' },
+                    { value: 'EJA', name: 'Educação para jovens e adultos (EJA)' },
+                    { value: 'Ensino profissional', name: 'Educação profissional' },
+                  ]"
                 >
                   <IonSelectOption
-                    v-for="(school, index) in ['Ensino regular', 'Educação especial', 'Educação para jovens e adultos (EJA)', 'Educação profissional']"
+                    v-for="(modality, index) in [
+                      { value: 'Ensino Regular', name: 'Ensino regular' },
+                      { value: 'Ensino Especial', name: 'Educação especial' },
+                      { value: 'EJA', name: 'Educação para jovens e adultos (EJA)' },
+                      { value: 'Ensino profissional', name: 'Educação profissional' },
+                    ]"
                     :key="index"
-                    :value="school"
+                    :value="modality.value"
                   >
-                    {{ school }}
+                    {{ modality.name }}
                   </IonSelectOption>
                 </IonSelect>
                 <span class="error-message">{{ errors[0] }}</span>
@@ -439,7 +474,7 @@ onMounted(async () => {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field }" name="numberOfStages" label="Número de etapas" rules="min:2|max:6">
+              <Field v-slot="{ field }" name="numberOfStages" label="Número de etapas" rules="min:1|max:2">
                 <div class="floating-input">
                   <input
                     v-bind="field"
@@ -463,7 +498,7 @@ onMounted(async () => {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field }" name="courseStage" label="Etapa do curso" rules="min:2|max:6">
+              <Field v-slot="{ field }" name="courseStage" label="Etapa do curso" rules="min:1|max:2">
                 <div class="floating-input">
                   <input
                     v-bind="field"
