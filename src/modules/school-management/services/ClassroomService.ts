@@ -43,8 +43,18 @@ export default class ClassroomService extends BaseService<Classroom> {
 
     if (error) {
       errorHandler(error, 'Erro ao buscar turmas')
+      return []
     }
-    return data as (Classroom & { series: any; school: any })[]
+
+    if (data && data.length > 0) {
+      data.forEach(classroom => {
+        if (classroom.series && classroom.series.courseId) {
+          (classroom as any).courseId = classroom.series.courseId
+        }
+      })
+    }
+
+    return data as (Classroom & { series: any; school: any; courseId?: string })[]
   }
 
   async getClassroomById(id: string) {
@@ -61,8 +71,14 @@ export default class ClassroomService extends BaseService<Classroom> {
 
     if (error) {
       errorHandler(error, 'Erro ao buscar turma por ID')
+      return null
     }
-    return data as (Classroom & { series: any; school: any }) | null
+
+    if (data && data.series && data.series.courseId) {
+      (data as any).courseId = data.series.courseId
+    }
+
+    return data as (Classroom & { series: any; school: any; courseId?: string }) | null
   }
 
   async getClassroomByName(name: string) {
@@ -79,8 +95,14 @@ export default class ClassroomService extends BaseService<Classroom> {
 
     if (error) {
       errorHandler(error, 'Erro ao buscar turma por nome')
+      return null
     }
-    return data as (Classroom & { series: any; school: any }) | null
+
+    if (data && data.series && data.series.courseId) {
+      (data as any).courseId = data.series.courseId
+    }
+
+    return data as (Classroom & { series: any; school: any; courseId?: string }) | null
   }
   async getClassroomByNameInsensitive(name: string, excludeId?: string) {
     if (!name) {
@@ -118,7 +140,15 @@ export default class ClassroomService extends BaseService<Classroom> {
       return []
     }
 
-    return data as (Classroom & { series: any; school: any })[]
+    if (data && data.length > 0) {
+      data.forEach(classroom => {
+        if (classroom.series && classroom.series.courseId) {
+          (classroom as any).courseId = classroom.series.courseId
+        }
+      })
+    }
+
+    return data as (Classroom & { series: any; school: any; courseId?: string })[]
   }
   async getClassroomsBySchoolId(schoolId: string) {
     if (!schoolId) {
@@ -137,7 +167,15 @@ export default class ClassroomService extends BaseService<Classroom> {
       return []
     }
 
-    return data as (Classroom & { series: any; school: any })[]
+    if (data && data.length > 0) {
+      data.forEach(classroom => {
+        if (classroom.series && classroom.series.courseId) {
+          (classroom as any).courseId = classroom.series.courseId
+        }
+      })
+    }
+
+    return data as (Classroom & { series: any; school: any; courseId?: string })[]
   }
 
   async upsertClassroom(classroom: ClassroomToSave) {

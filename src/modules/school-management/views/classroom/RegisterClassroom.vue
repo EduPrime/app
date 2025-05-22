@@ -168,11 +168,14 @@ async function loadCoursesBySchool(schoolId: string) {
   }
   try {
     const courses = await courseService.getCoursesBySchool(schoolId)
-    courseList.value = courses || []
+    courseList.value = (courses || []) as Course[]
     console.log('Cursos carregados:', courseList.value)
-    formValues.value.courseId = ''
-    formValues.value.seriesId = ''
-    seriesList.value = []
+    
+    if (!isEditing.value) {
+      formValues.value.courseId = ''
+      formValues.value.seriesId = ''
+      seriesList.value = []
+    }
   } catch (error) {
     console.error('Erro ao carregar cursos:', error)
     showToast('Erro ao carregar cursos', 'top', 'danger')
@@ -193,23 +196,25 @@ async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
       const allSchoolSeries = await seriesService.getSeriesBySchool(schoolId)
       if (allSchoolSeries && allSchoolSeries.length > 0) {
         console.log('Carregando todas as séries da escola como fallback')
-        seriesList.value = allSchoolSeries
+        seriesList.value = allSchoolSeries as Series[]
       } else {
         seriesList.value = []
       }
     } else {
-      seriesList.value = series
+      seriesList.value = series as Series[]
       console.log('Séries carregadas para o curso específico:', seriesList.value)
     }
     
-    formValues.value.seriesId = ''
+    if (!isEditing.value) {
+      formValues.value.seriesId = ''
+    }
   } catch (error) {
     console.error('Erro ao carregar séries:', error)
     showToast('Erro ao carregar séries', 'top', 'danger')
     
     try {
       const fallbackSeries = await seriesService.getSeriesBySchool(schoolId)
-      seriesList.value = fallbackSeries || []
+      seriesList.value = (fallbackSeries || []) as Series[]
       console.log('Carregando todas as séries da escola como fallback após erro')
     } catch {
       seriesList.value = []
@@ -308,6 +313,8 @@ onMounted(async () => {
         
         return ''
       }
+
+      console.log('Carregando classroom:', classroom)
       const loadedValues = {
         id: classroom.id,
         name: classroom.name,
@@ -329,7 +336,7 @@ onMounted(async () => {
         year: classroom.year?.toString() || '',
         isMultiSerialized: classroom.isMultiSerialized || false,
         schoolId: classroom.schoolId || '',
-        courseId: classroom.courseId || '',
+        courseId: (classroom as any).courseId || '',
       }
 
       formValues.value = { ...loadedValues }
