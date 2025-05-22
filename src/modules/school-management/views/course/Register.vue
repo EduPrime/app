@@ -6,7 +6,6 @@ import {
   IonButton,
   IonCol,
   IonContent,
-  IonFooter,
   IonGrid,
   IonHeader,
   IonPage,
@@ -24,6 +23,12 @@ import CourseService from '../../services/CourseService'
 import InstitutionService from '../../services/InstitutionService'
 import SchoolService from '../../services/SchoolService'
 
+interface Props {
+  editId?: string
+}
+
+const props = defineProps<Props>()
+const emits = defineEmits(['close', 'saved'])
 const route = useRoute()
 const router = useRouter()
 const courseService = new CourseService()
@@ -34,14 +39,14 @@ const initialFormValues = {
   id: '',
   name: '',
   abbreviation: '',
-  numberOfStages: '',
+  // numberOfStages: '',
   description: '',
   timeSerialization: undefined,
   institutionId: '',
   // schoolId: undefined,
   evaluationRuleId: undefined,
   workerId: undefined,
-  courseStage: undefined,
+  // courseStage: undefined,
   graduate: undefined,
   teachingType: undefined,
   regimeType: undefined,
@@ -50,8 +55,8 @@ const initialFormValues = {
 
 const formValues = ref({ ...initialFormValues })
 const originalFormValues = ref({ ...initialFormValues })
-const isEditing = ref(false)
-const itemId = computed(() => route.params.id as string | undefined)
+const isEditing = ref(!!props.editId)
+const itemId = computed(() => props.editId ?? route.params.id as string | undefined)
 const pageTitle = computed(() => isEditing.value ? 'Editar curso' : 'Novo curso')
 const descriptionRef = ref<HTMLTextAreaElement | null>(null)
 const hasChanges = ref(false)
@@ -67,13 +72,20 @@ function checkForChanges() {
   const hasNameChanged = formValues.value.name !== originalFormValues.value.name
   const hasAbbreviationChanged = formValues.value.abbreviation !== originalFormValues.value.abbreviation
   const hasDescriptionChanged = formValues.value.description !== originalFormValues.value.description
+  const hasSerializationChanged = formValues.value.timeSerialization !== originalFormValues.value.timeSerialization
+  const hasRegimeTypeChanged = formValues.value.regimeType !== originalFormValues.value.regimeType
+  const hasTeachingTypeChanged = formValues.value.teachingType !== originalFormValues.value.teachingType
+  const hasGraduateChanged = formValues.value.graduate !== originalFormValues.value.graduate
+  const hasInstitutionIdChanged = formValues.value.institutionId !== originalFormValues.value.institutionId
+  const hasCourseModalityChanged = formValues.value.courseModality !== originalFormValues.value.courseModality
+  const hasEvaluationRuleIdChanged = formValues.value.evaluationRuleId !== originalFormValues.value.evaluationRuleId
 
-  hasChanges.value = hasNameChanged || hasAbbreviationChanged || hasDescriptionChanged
+  hasChanges.value = hasNameChanged || hasTeachingTypeChanged || hasGraduateChanged || hasInstitutionIdChanged || hasCourseModalityChanged || hasEvaluationRuleIdChanged || hasAbbreviationChanged || hasDescriptionChanged || hasSerializationChanged || hasRegimeTypeChanged
 }
 
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
-    const enabled = !!formValues.value.name || !!formValues.value.abbreviation || !!formValues.value.description
+    const enabled = !!formValues.value.name || !!formValues.value.abbreviation || !!formValues.value.description || !!formValues.value.timeSerialization || !!formValues.value.regimeType || !!formValues.value.teachingType || !!formValues.value.graduate || !!formValues.value.institutionId || !!formValues.value.evaluationRuleId || !!formValues.value.courseModality
     return enabled
   }
 
@@ -153,7 +165,7 @@ async function handleSubmit(values: any) {
       : 'Novo curso cadastrado com sucesso'
 
     showToast(successMessage, 'top', 'success')
-
+    emits('saved', true)
     router.push({
       name: 'RegisterCourse',
       query: { refresh: Date.now().toString() },
@@ -270,6 +282,36 @@ onMounted(async () => {
                     {{ message }}
                   </div>
                 </ErrorMessage>
+              </Field>
+            </IonCol>
+          </IonRow>
+
+          <IonRow>
+            <IonCol size="12" class="ion-margin-top">
+              <Field v-slot="{ field, errors }" name="timeSerialization" rules="">
+                <IonSelect
+                  v-model="formValues.timeSerialization"
+                  v-bind="field"
+                  label="Serialização"
+                  label-placement="floating"
+                  fill="outline"
+                  :items="[
+                    { value: 'Anual', name: 'Anual' },
+                    { value: 'Creche', name: 'Creche' },
+                  ]"
+                >
+                  <IonSelectOption
+                    v-for="(periodo, index) in [
+                      { value: 'Anual', name: 'Anual' },
+                      { value: 'Creche', name: 'Creche' },
+                    ]"
+                    :key="index"
+                    :value="periodo.value"
+                  >
+                    {{ periodo.name }}
+                  </IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
               </Field>
             </IonCol>
           </IonRow>
@@ -472,7 +514,7 @@ onMounted(async () => {
             </IonCol>
           </IonRow> -->
 
-          <IonRow>
+          <!-- <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field }" name="numberOfStages" label="Número de etapas" rules="min:1|max:2">
                 <div class="floating-input">
@@ -494,9 +536,9 @@ onMounted(async () => {
                 </ErrorMessage>
               </Field>
             </IonCol>
-          </IonRow>
+          </IonRow> -->
 
-          <IonRow>
+          <!-- <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field }" name="courseStage" label="Etapa do curso" rules="min:1|max:2">
                 <div class="floating-input">
@@ -518,7 +560,7 @@ onMounted(async () => {
                 </ErrorMessage>
               </Field>
             </IonCol>
-          </IonRow>
+          </IonRow> -->
 
           <!-- @TODO: Adicionar regra de avaliação ( está estático ) -->
 
@@ -549,24 +591,38 @@ onMounted(async () => {
       </Form>
     </IonContent>
 
-    <IonFooter>
-      <IonToolbar>
-        <IonGrid>
-          <IonRow class="action-buttons-fixed">
-            <IonCol size="6">
-              <IonButton color="danger" expand="block" @click="resetForm">
-                Cancelar
-              </IonButton>
-            </IonCol>
-            <IonCol size="6">
-              <IonButton expand="block" type="submit" form="course-form" :disabled="!saveButtonEnabled">
-                Salvar
-              </IonButton>
-            </IonCol>
-          </IonRow>
-        </IonGrid>
-      </IonToolbar>
-    </IonFooter>
+    <!-- <div>
+      <IonGrid>
+        <IonRow>
+          <IonCol size="6">
+            <IonButton color="danger" expand="full" @click="resetForm">
+              Fechar
+            </IonButton>
+          </IonCol>
+          <IonCol size="6">
+            <IonButton color="secondary" expand="full" :disabled="!saveButtonEnabled" type="submit" form="course-form">
+              Salvar
+            </IonButton>
+          </IonCol>
+        </IonRow>
+      </IonGrid>
+    </div> -->
+    <div>
+      <IonGrid>
+        <IonRow class="action-buttons-fixed">
+          <IonCol size="6">
+            <IonButton color="danger" expand="full" @click="!route.path.includes('register') ? emits('close', false) : resetForm()">
+              Cancelar
+            </IonButton>
+          </IonCol>
+          <IonCol size="6">
+            <IonButton color="secondary" expand="full" :disabled="!saveButtonEnabled" type="submit" form="course-form">
+              Salvar
+            </IonButton>
+          </IonCol>
+        </IonRow>
+      </IonGrid>
+    </div>
   </IonPage>
 </template>
 

@@ -10,7 +10,7 @@ import { add } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import CourseService from '../services/CourseService'
-import CourseMobile from './course/Register.vue'
+import AddCourseMobile from './course/Register.vue'
 
 const router = useRouter()
 const route = router.currentRoute
@@ -221,7 +221,8 @@ watch(
           :breakpoints="[0, 0.7, 0.95, 1]"
           @ion-modal-did-dismiss="setModalAddCourse(false)"
         >
-          <CourseMobile
+          <AddCourseMobile
+            @close="setModalAddCourse(false)"
             @saved="loadCourses(); setModalAddCourse(false)"
             @cancel="setModalAddCourse(false)"
             @error="(message, color) => { showToast(message, 'top', color); }"
@@ -257,9 +258,10 @@ watch(
           @ion-modal-did-dismiss="setEditModal(false)"
         >
           <IonContent>
-            <CourseMobile
+            <AddCourseMobile
               :edit-id="editingId"
-              @saved="loadCourses(); setEditModal(false)"
+              @close="setEditModal(false)"
+              @saved="() => { loadCourses(); setEditModal(false) }"
               @cancel="setEditModal(false)"
               @error="(message, color) => { showToast(message, 'top', color); }"
             />
