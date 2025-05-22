@@ -469,6 +469,7 @@ onMounted(async () => {
             <IonCol size="12">
               <Field v-slot="{ field, errors }" name="evaluationRuleId" rules="">
                 <IonSelect
+
                   v-model="formValues.evaluationRuleId"
                   v-bind="field"
                   label="Regra de avaliação"
@@ -645,4 +646,30 @@ onMounted(async () => {
 .required-text { color:var(--ion-color-danger); }
 .error-message { color:var(--ion-color-danger); font-size:0.8rem; margin-top:4px; }
 .action-buttons-fixed { margin: 0; padding: 8px; }
+
+  ion-select {
+    /* --label-color: var(--ion-color-primary); */
+    /* --placeholder-opacity: 1; */
+    /* width: 100%; */
+    /* justify-content: center; */
+    --border-color: var(--ion-color-secondary);
+  }
+
+/*
+  ion-select::part(placeholder),
+  ion-select::part(text) {
+    flex: 0 0 auto;
+  } */
+
+  /* ion-select::part(text) {
+    color: var(--ion-color-secondary);
+  } */
+    /* ion-select::part(label) {
+    color: var(--ion-color-primary);
+  } */
+
+  ion-select::part(icon) {
+    color: var(--ion-color-secondary);
+    opacity: 1;
+  }
 </style>
