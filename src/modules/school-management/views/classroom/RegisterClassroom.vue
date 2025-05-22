@@ -23,13 +23,15 @@ import { useRoute, useRouter } from 'vue-router'
 import ClassroomService from '../../services/ClassroomService'
 import SeriesService from '../../services/SeriesService'
 import SchoolService from '../../services/SchoolService'
-import type { Series, School } from '@prisma/client'
+import CourseService from '../../services/CourseService'
+import type { Series, School, Course } from '@prisma/client'
 
 const route = useRoute()
 const router = useRouter()
 const classroomService = new ClassroomService()
 const seriesService = new SeriesService()
 const schoolService = new SchoolService()
+const courseService = new CourseService()
 
 const initialFormValues = {
   id: '',
@@ -52,6 +54,7 @@ const initialFormValues = {
   year: '',
   isMultiSerialized: false,
   schoolId: '',
+  courseId: '',
 }
 
 const formValues = ref({ ...initialFormValues })
@@ -64,15 +67,16 @@ const hasChanges = ref(false)
 
 const seriesList = ref<Series[]>([])
 const schoolList = ref<School[]>([])
+const courseList = ref<Course[]>([])
 
 const dayOfWeekOptions = [
-  { value: 'monday', label: 'Segunda-feira' },
-  { value: 'tuesday', label: 'Terça-feira' },
-  { value: 'wednesday', label: 'Quarta-feira' },
-  { value: 'thursday', label: 'Quinta-feira' },
-  { value: 'friday', label: 'Sexta-feira' },
-  { value: 'saturday', label: 'Sábado' },
-  { value: 'sunday', label: 'Domingo' },
+  { value: 'MONDAY', label: 'Segunda-feira' },
+  { value: 'TUESDAY', label: 'Terça-feira' },
+  { value: 'WEDNESDAY', label: 'Quarta-feira' },
+  { value: 'THURSDAY', label: 'Quinta-feira' },
+  { value: 'FRIDAY', label: 'Sexta-feira' },
+  { value: 'SATURDAY', label: 'Sábado' },
+  { value: 'SUNDAY', label: 'Domingo' },
 ]
 
 function formatTimeInput(value: string): string {
@@ -148,13 +152,68 @@ const statusOptions = [
 
 async function loadDependencies() {
   try {
-    const seriesData = await seriesService.getAll()
-    seriesList.value = seriesData || []
-
     const schoolData = await schoolService.getAll()
     schoolList.value = schoolData || []
+    console.log('Escolas carregadas:', schoolList.value)
   } catch (error) {
     console.error('Erro ao carregar dependências:', error)
+    showToast('Erro ao carregar escolas', 'top', 'danger')
+  }
+}
+
+async function loadCoursesBySchool(schoolId: string) {
+  if (!schoolId) {
+    courseList.value = []
+    return
+  }
+  try {
+    const courses = await courseService.getCoursesBySchool(schoolId)
+    courseList.value = courses || []
+    console.log('Cursos carregados:', courseList.value)
+    formValues.value.courseId = ''
+    formValues.value.seriesId = ''
+    seriesList.value = []
+  } catch (error) {
+    console.error('Erro ao carregar cursos:', error)
+    showToast('Erro ao carregar cursos', 'top', 'danger')
+    courseList.value = []
+  }
+}
+
+async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
+  if (!schoolId || !courseId) {
+    seriesList.value = []
+    return
+  }
+  try {
+    const series = await seriesService.getSeriesBySchoolAndCourse(schoolId, courseId)
+    
+    if (!series || series.length === 0) {
+      console.log('Nenhuma série encontrada para esta escola e curso')
+      const allSchoolSeries = await seriesService.getSeriesBySchool(schoolId)
+      if (allSchoolSeries && allSchoolSeries.length > 0) {
+        console.log('Carregando todas as séries da escola como fallback')
+        seriesList.value = allSchoolSeries
+      } else {
+        seriesList.value = []
+      }
+    } else {
+      seriesList.value = series
+      console.log('Séries carregadas para o curso específico:', seriesList.value)
+    }
+    
+    formValues.value.seriesId = ''
+  } catch (error) {
+    console.error('Erro ao carregar séries:', error)
+    showToast('Erro ao carregar séries', 'top', 'danger')
+    
+    try {
+      const fallbackSeries = await seriesService.getSeriesBySchool(schoolId)
+      seriesList.value = fallbackSeries || []
+      console.log('Carregando todas as séries da escola como fallback após erro')
+    } catch {
+      seriesList.value = []
+    }
   }
 }
 
@@ -171,13 +230,33 @@ const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
     const enabled = !!formValues.value.name || !!formValues.value.abbreviation || 
                    !!formValues.value.seriesId || !!formValues.value.schoolId ||
-                   !!formValues.value.maxStudents || !!formValues.value.year ||
-                   !!formValues.value.period || !!formValues.value.regimeType ||
-                   formValues.value.dayofweek.length > 0
+                   !!formValues.value.courseId || !!formValues.value.maxStudents || 
+                   !!formValues.value.year || !!formValues.value.period || 
+                   !!formValues.value.regimeType || formValues.value.dayofweek.length > 0
     return enabled
   }
 
   return hasChanges.value
+})
+
+watch(() => formValues.value.schoolId, (newSchoolId) => {
+  if (newSchoolId) {
+    loadCoursesBySchool(newSchoolId)
+  } else {
+    courseList.value = []
+    seriesList.value = []
+    formValues.value.courseId = ''
+    formValues.value.seriesId = ''
+  }
+})
+
+watch(() => formValues.value.courseId, (newCourseId) => {
+  if (newCourseId && formValues.value.schoolId) {
+    loadSeriesByCourseAndSchool(formValues.value.schoolId, newCourseId)
+  } else {
+    seriesList.value = []
+    formValues.value.seriesId = ''
+  }
 })
 
 watch(() => formValues.value.seriesId, (newSeriesId) => {
@@ -209,9 +288,25 @@ onMounted(async () => {
     const classroom = await classroomService.getClassroomById(classroomId.value)
 
     if (classroom) {
-      const formatTime = (time: Date | null | undefined) => {
+      const formatTime = (time: any) => {
         if (!time) return ''
-        return new Date(time).toISOString()
+        
+        if (typeof time === 'string' && time.match(/^\d{1,2}:\d{2}$/)) {
+          return time
+        }
+        
+        try {
+          const timeDate = new Date(time)
+          if (!isNaN(timeDate.getTime())) {
+            const hours = timeDate.getHours().toString().padStart(2, '0')
+            const minutes = timeDate.getMinutes().toString().padStart(2, '0')
+            return `${hours}:${minutes}`
+          }
+        } catch (e) {
+          console.error('Erro ao formatar horário:', e)
+        }
+        
+        return ''
       }
       const loadedValues = {
         id: classroom.id,
@@ -234,6 +329,7 @@ onMounted(async () => {
         year: classroom.year?.toString() || '',
         isMultiSerialized: classroom.isMultiSerialized || false,
         schoolId: classroom.schoolId || '',
+        courseId: classroom.courseId || '',
       }
 
       formValues.value = { ...loadedValues }
@@ -249,6 +345,33 @@ onMounted(async () => {
 })
 
 async function handleSubmit(values: any) {
+  const daysOfWeek = Array.isArray(values.dayofweek) ? 
+    values.dayofweek.map((day: string) => day.toUpperCase()) : 
+    values.dayofweek;
+  const convertTimeStringToTimestamp = (timeString: string | null): Date | null => {
+    if (!timeString) return null;
+    
+    if (timeString.match(/^\d{1,2}:\d{2}$/)) {
+      const [hours, minutes] = timeString.split(':').map(Number);
+      
+      const date = new Date();
+      date.setHours(0, 0, 0, 0); 
+      date.setUTCHours(hours);
+      date.setUTCMinutes(minutes);
+      date.setUTCSeconds(0);
+      date.setUTCMilliseconds(0);
+      
+      return date;
+    }
+    
+    return new Date(timeString);
+  };
+  
+  const startTime = convertTimeStringToTimestamp(values.startTime);
+  const startTimeInterval = convertTimeStringToTimestamp(values.startTimeInterval);
+  const endTimeInterval = convertTimeStringToTimestamp(values.endTimeInterval);
+  const endTime = convertTimeStringToTimestamp(values.endTime);
+  
   const payload = {
     id: isEditing.value ? classroomId.value : undefined,
     name: values.name,
@@ -258,11 +381,11 @@ async function handleSubmit(values: any) {
     exceededStudents: values.exceededStudents,
     totalStudents: values.totalStudents,
     pcdStudents: values.pcdStudents,
-    startTime: values.startTime ? new Date(values.startTime) : null,
-    startTimeInterval: values.startTimeInterval ? new Date(values.startTimeInterval) : null,
-    endTimeInterval: values.endTimeInterval ? new Date(values.endTimeInterval) : null,
-    endTime: values.endTime ? new Date(values.endTime) : null,
-    dayofweek: values.dayofweek,
+    startTime,
+    startTimeInterval,
+    endTimeInterval,
+    endTime,
+    dayofweek: daysOfWeek,
     room: values.room,
     regimeType: values.regimeType,
     period: values.period,
@@ -270,6 +393,7 @@ async function handleSubmit(values: any) {
     year: values.year,
     isMultiSerialized: values.isMultiSerialized,
     schoolId: values.schoolId,
+    courseId: values.courseId,
   }
 
   try {
@@ -372,34 +496,10 @@ function resetForm() {
             </IonCol>
           </IonRow>
 
+          <!-- Escola (primeiro campo) -->
           <IonRow>
-            <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="seriesId" label="Série" rules="required">
-                <div class="floating-input select-input">
-                  <IonSelect
-                    v-bind="field"
-                    v-model="formValues.seriesId"
-                    interface="alert"
-                    placeholder="Selecione uma série"
-                    class="select-native"
-                    @ionChange="(e) => { field.onChange(e.detail.value) }"
-                  >
-                    <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
-                      {{ series.name }}
-                    </IonSelectOption>
-                  </IonSelect>
-                  <label class="floating-label"><span>Série </span><span class="required-text">(Obrigatório)</span></label>
-                </div>
-                <ErrorMessage v-slot="{ message }" name="seriesId">
-                  <div class="error-message">
-                    {{ message }}
-                  </div>
-                </ErrorMessage>
-              </Field>
-            </IonCol>
-            
-            <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="schoolId">
+            <IonCol size="12">
+              <Field v-slot="{ field }" name="schoolId" rules="required">
                 <div class="floating-input select-input">
                   <IonSelect
                     v-bind="field"
@@ -410,12 +510,70 @@ function resetForm() {
                     @ionChange="(e) => { field.onChange(e.detail.value) }"
                   >
                     <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
-                      {{ school.corporateName }}
+                      {{ school.corporateName || school.name }}
                     </IonSelectOption>
                   </IonSelect>
-                  <label class="floating-label"><span>Escola</span></label>
+                  <label class="floating-label"><span>Escola</span><span class="required-text"> (Obrigatório)</span></label>
                 </div>
                 <ErrorMessage v-slot="{ message }" name="schoolId">
+                  <div class="error-message">
+                    {{ message }}
+                  </div>
+                </ErrorMessage>
+              </Field>
+            </IonCol>
+          </IonRow>
+          
+          <!-- Curso (segundo campo) -->
+          <IonRow>
+            <IonCol size="12">
+              <Field v-slot="{ field }" name="courseId" rules="required">
+                <div class="floating-input select-input">
+                  <IonSelect
+                    v-bind="field"
+                    v-model="formValues.courseId"
+                    interface="alert"
+                    placeholder="Selecione um curso"
+                    class="select-native"
+                    @ionChange="(e) => { field.onChange(e.detail.value) }"
+                    :disabled="!formValues.schoolId"
+                  >
+                    <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
+                      {{ course.name }}
+                    </IonSelectOption>
+                  </IonSelect>
+                  <label class="floating-label"><span>Curso</span><span class="required-text"> (Obrigatório)</span></label>
+                </div>
+                <ErrorMessage v-slot="{ message }" name="courseId">
+                  <div class="error-message">
+                    {{ message }}
+                  </div>
+                </ErrorMessage>
+              </Field>
+            </IonCol>
+          </IonRow>
+          
+          <!-- Série (terceiro campo) -->
+          <IonRow>
+            <IonCol size="12">
+              <Field v-slot="{ field }" name="seriesId" label="Série" rules="required">
+                <div class="floating-input select-input">
+                  <IonSelect
+                    v-bind="field"
+                    v-model="formValues.seriesId"
+                    interface="alert"
+                    placeholder="Selecione uma série"
+                    class="select-native"
+                    @ionChange="(e) => { field.onChange(e.detail.value) }"
+                    :disabled="!formValues.courseId || !formValues.schoolId"
+                  >
+                    <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
+                      {{ series.name }}
+                    </IonSelectOption>
+                  </IonSelect>
+                  <label class="floating-label"><span>Série</span><span class="required-text"> (Obrigatório)</span></label>
+                </div>
+                <ErrorMessage v-slot="{ message }" name="seriesId">
                   <div class="error-message">
                     {{ message }}
                   </div>
