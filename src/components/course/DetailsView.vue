@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import BaseService from '@/services/BaseService'
-import { IonButton, IonChip, IonCol, IonContent, IonGrid, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText } from '@ionic/vue'
+import { IonButton, IonCard, IonChip, IonCol, IonContent, IonGrid, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText } from '@ionic/vue'
 import { businessOutline, calendarOutline, constructOutline, desktopOutline, documentTextOutline, layersOutline, peopleOutline, pricetagOutline, ribbonOutline, schoolOutline, settingsOutline, timeOutline, trailSign } from 'ionicons/icons'
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
@@ -41,6 +41,8 @@ const emits = defineEmits(['close', 'edit'])
 const baseService = new BaseService('course')
 const route = useRoute()
 
+const series = ref()
+
 const metaIcon = computed(() => (route.meta.icon as string) || '')
 const institution = ref()
 const school = ref()
@@ -53,6 +55,7 @@ watch(
     institution.value = await baseService.getByInCustomTable('institution', props.items.institutionId)
     school.value = await baseService.getByInCustomTable('school', props.items.schoolId)
     evaluationRules.value = await baseService.getByInCustomTable('evaluationRule', props.items.evaluationRuleId)
+    series.value = await baseService.getByRelationalId('series', 'courseId', props.items.id, 'name, schoolDays')
   },
   { deep: true, immediate: true },
 )
@@ -214,6 +217,37 @@ watch(
                 Etapa do curso {{ props.items.courseStage }}
               </div>
             </IonText>
+          </div>
+
+          <div v-if="series && series.length > 0" style=" align-items: center; ">
+            <IonCard>
+              <IonGrid>
+                <IonRow>
+                  <IonCol size="6">
+                    <IonText color="primary" style="font-weight: bold; font-size: 10pt">
+                      Série
+                    </IonText>
+                  </IonCol>
+                  <IonCol size="6">
+                    <IonText color="primary" style="font-weight: bold; font-size: 10pt">
+                      Dias letivos
+                    </IonText>
+                  </IonCol>
+                </IonRow>
+                <IonRow v-for="(d, index) in series" :key="index">
+                  <IonCol size="6">
+                    <IonText color="primary" style="font-size: 10pt; padding-top: 2px;">
+                      {{ d.name }}
+                    </IonText>
+                  </IonCol>
+                  <IonCol size="6">
+                    <IonText color="primary" style="font-size: 10pt; padding-top: 2px;">
+                      {{ d.schoolDays || '-' }}
+                    </IonText>
+                  </IonCol>
+                </IonRow>
+              </IonGrid>
+            </IonCard>
           </div>
         </IonList>
       </div>

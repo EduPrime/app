@@ -4,7 +4,7 @@ import type { Course } from '@prisma/client'
 
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import BaseService from '@/services/BaseService'
-import { IonButton, IonCol, IonGrid, IonPage, IonRow } from '@ionic/vue'
+import { IonButton, IonCard, IonCol, IonGrid, IonPage, IonRow } from '@ionic/vue'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import CourseService from '../../services/CourseService'
@@ -17,6 +17,7 @@ const courseDetails = ref<Course | null>(null)
 const loading = ref(true)
 const institution = ref()
 const school = ref()
+const series = ref()
 const evaluationRule = ref()
 // const tenantId = ref()
 
@@ -42,6 +43,8 @@ async function loadDetails() {
     if (data && data.evaluationRuleId) {
       evaluationRule.value = await baseService.getByInCustomTable('evaluationRule', data.evaluationRuleId)
     }
+
+    series.value = await baseService.getByRelationalId('series', 'courseId', route.params.id, 'name, schoolDays')
   }
   catch (error) {
     console.error('Erro ao carregar detalhes do curso:', error)
@@ -180,6 +183,38 @@ onMounted(() => {
                 <div class="detail-item">
                   <span class="detail-label">Etapa do curso</span>
                   <span class="detail-value">{{ courseDetails.courseStage || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="12">
+                <div v-if="series && series.length > 0" style=" align-items: center; ">
+                  <IonCard>
+                    <IonGrid>
+                      <IonRow>
+                        <IonCol size="6">
+                          <IonText color="primary" style="font-weight: bold; font-size: 10pt">
+                            Série
+                          </IonText>
+                        </IonCol>
+                        <IonCol size="6">
+                          <IonText color="primary" style="font-weight: bold; font-size: 10pt">
+                            Dias letivos
+                          </IonText>
+                        </IonCol>
+                      </IonRow>
+                      <IonRow v-for="(d, index) in series" :key="index">
+                        <IonCol size="6">
+                          <IonText color="primary" style="font-size: 10pt; padding-top: 2px;">
+                            {{ d.name }}
+                          </IonText>
+                        </IonCol>
+                        <IonCol size="6">
+                          <IonText color="primary" style="font-size: 10pt; padding-top: 2px;">
+                            {{ d.schoolDays || '-' }}
+                          </IonText>
+                        </IonCol>
+                      </IonRow>
+                    </IonGrid>
+                  </IonCard>
                 </div>
               </IonCol>
             </IonRow>
