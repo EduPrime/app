@@ -95,6 +95,7 @@ function setEditModal(open: boolean) {
   }
   else {
     editModal.value.modal = open
+    loadClassrooms()
   }
 }
 

@@ -135,14 +135,14 @@ function validateIntervalTime(classStartTime: string, classEndTime: string, inte
 const periodOptions = [
   { value: 'MORNING', label: 'Manhã' },
   { value: 'AFTERNOON', label: 'Tarde' },
-  { value: 'NIGHT', label: 'Noite' },
-  { value: 'FULLTIME', label: 'Integral' },
+  { value: 'EVENING', label: 'Noite' },
+  { value: 'INTEGRAL', label: 'Integral' },
 ]
 
 const regimeTypeOptions = [
   { value: 'Presencial', label: 'Presencial' },
-  { value: 'Remoto', label: 'Remoto' },
-  { value: 'Hibrido', label: 'Híbrido' },
+  { value: 'Semipresencial', label: 'Semipresencial' },
+  { value: 'EAD', label: 'EAD' },
 ]
 
 const statusOptions = [
@@ -506,7 +506,7 @@ function resetForm() {
           <!-- Escola (primeiro campo) -->
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field }" name="schoolId" rules="required">
+              <Field v-slot="{ field }" name="schoolId" label="Escola" rules="required">
                 <div class="floating-input select-input">
                   <IonSelect
                     v-bind="field"
@@ -534,7 +534,7 @@ function resetForm() {
           <!-- Curso (segundo campo) -->
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field }" name="courseId" rules="required">
+              <Field v-slot="{ field }" name="courseId" label="Curso" rules="required">
                 <div class="floating-input select-input">
                   <IonSelect
                     v-bind="field"

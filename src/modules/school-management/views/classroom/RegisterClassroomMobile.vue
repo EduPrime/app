@@ -42,13 +42,13 @@ const seriesList = ref<Series[]>([])
 const schoolList = ref<School[]>([])
 
 const dayOfWeekOptions = [
-  { value: 'monday', label: 'Segunda-feira' },
-  { value: 'tuesday', label: 'Terça-feira' },
-  { value: 'wednesday', label: 'Quarta-feira' },
-  { value: 'thursday', label: 'Quinta-feira' },
-  { value: 'friday', label: 'Sexta-feira' },
-  { value: 'saturday', label: 'Sábado' },
-  { value: 'sunday', label: 'Domingo' },
+  { value: 'MONDAY', label: 'Segunda-feira' },
+  { value: 'TUESDAY', label: 'Terça-feira' },
+  { value: 'WEDNESDAY', label: 'Quarta-feira' },
+  { value: 'THURSDAY', label: 'Quinta-feira' },
+  { value: 'FRIDAY', label: 'Sexta-feira' },
+  { value: 'SATURDAY', label: 'Sábado' },
+  { value: 'SUNDAY', label: 'Domingo' },
 ]
 
 function formatTimeInput(value: string): string {
@@ -87,14 +87,14 @@ function validateTimeRange(startTime: string, endTime: string): boolean {
 const periodOptions = [
   { value: 'MORNING', label: 'Manhã' },
   { value: 'AFTERNOON', label: 'Tarde' },
-  { value: 'NIGHT', label: 'Noite' },
-  { value: 'FULLTIME', label: 'Integral' },
+  { value: 'EVENING', label: 'Noite' },
+  { value: 'INTEGRAL', label: 'Integral' },
 ]
 
 const regimeTypeOptions = [
   { value: 'Presencial', label: 'Presencial' },
-  { value: 'Remoto', label: 'Remoto' },
-  { value: 'Hibrido', label: 'Híbrido' },
+  { value: 'Semipresencial', label: 'Semipresencial' },
+  { value: 'EAD', label: 'EAD' },
 ]
 
 const statusOptions = [
@@ -322,7 +322,7 @@ function handleSaved() {
           
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="name" rules="required|min:3|max:180">
+              <Field v-slot="{ field, errors }" name="name" label="Nome da turma" rules="required|min:3|max:180">
                 <IonInput
                   v-bind="field"
                   v-model="formValues.name"

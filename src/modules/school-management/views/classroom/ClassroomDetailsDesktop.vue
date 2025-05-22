@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IonButton, IonCol, IonContent, IonGrid, IonPage, IonRow, IonChip, IonIcon } from '@ionic/vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ClassroomService from '../../services/ClassroomService'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
@@ -90,6 +90,13 @@ function goBack() {
 onMounted(() => {
   loadClassroomDetails()
 })
+
+watch(
+  () => route.params,
+  () => {
+    loadClassroomDetails()
+  }
+)
 </script>
 
 <template>
