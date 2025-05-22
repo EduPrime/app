@@ -200,7 +200,7 @@ watch(
               <IonCol size="12" size-md="4">
                 <div class="detail-item">
                   <span class="detail-label">Regime de ensino</span>
-                  <span class="detail-value">{{ classroomDetails.regimeType || 'Presencial' }}</span>
+                  <span class="detail-value">{{ classroomDetails.regimeType || '-' }}</span>
                 </div>
               </IonCol>
               <IonCol size="12" size-md="4">

@@ -36,9 +36,12 @@ const adaptedDataList = computed(() => {
     pcdStudents: item.pcdStudents,
     startTime: item.startTime,
     endTime: item.endTime,
+    startTimeInterval: item.startTimeInterval,
+    endTimeInterval: item.endTimeInterval,
     dayofweek: item.dayofweek,
     series: (item as any).series,
     school: (item as any).school,
+    regimeType: item.regimeType,
     createdAt: item.createdAt ? item.createdAt.toString() : undefined,
     updatedAt: item.updatedAt ? item.updatedAt.toString() : undefined,
     deletedAt: item.deletedAt ? item.deletedAt.toString() : undefined,
@@ -211,7 +214,6 @@ watch(
           }"
         />
 
-        <!-- Modais mobile -->
         <IonModal
           :is-open="isModalAddClassroom"
           :expand-to-scroll="false"

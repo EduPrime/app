@@ -12,13 +12,18 @@ interface Props {
     period?: string | null
     year: number
     maxStudents: number
+    exceededStudents?: number
     totalStudents?: number
     pcdStudents?: number
     startTime?: string | null
+    startTimeInterval?: string | null
+    endTimeInterval?: string | null
     endTime?: string | null
     dayofweek?: string[] | null
     series?: { name: string, abbreviation?: string } | null
-    school?: { corporateName: string } | null
+    school?: { corporateName: string, name?: string } | null
+    regimeType?: string | null
+    isMultiSerialized?: boolean | null
     updatedAt?: string
   }
   name?: string
@@ -56,25 +61,25 @@ function getPeriodLabel(period: string | null | undefined): string {
   const periods: Record<string, string> = {
     MORNING: 'Manhã',
     AFTERNOON: 'Tarde',
-    NIGHT: 'Noite',
-    FULLTIME: 'Integral'
+    EVENING: 'Noite',
+    INTEGRAL: 'Integral'
   };
   
   return periods[period] || period;
 }
+
+console.log("props", props)
 </script>
 
 <template>
   <IonPage>
     <IonContent class="ion-padding">
-      <!-- Título no mesmo estilo exato do formulário -->
       <div class="style-purple-lane" style="display: flex; align-items: center;">
         <IonIcon :icon="schoolOutline" style="margin-right: 10px;" />
         {{ props.name }}
       </div>
 
       <div class="classroom-detail-content">
-        <!-- Informações gerais header -->
         <IonItemDivider
           style="border-color: rgba(var(--ion-color-primary-rgb), 0.25);"
           class="ion-no-padding"
@@ -85,14 +90,12 @@ function getPeriodLabel(period: string | null | undefined): string {
         </IonItemDivider>
         
         <IonList>
-          <!-- Tag com abreviação alinhada à esquerda -->
           <div v-if="props.items.abbreviation" class="abbreviation-tag ion-margin-vertical ion-text-left">
             <IonChip color="primary">
               {{ props.items.abbreviation }}
             </IonChip>
           </div>
         
-          <!-- Ícone e nome da turma alinhados à esquerda -->
           <div style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="schoolOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
@@ -100,7 +103,6 @@ function getPeriodLabel(period: string | null | undefined): string {
             </IonText>
           </div>
           
-          <!-- Ícone e série da turma alinhados à esquerda -->
           <div v-if="props.items.series" style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="businessOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
@@ -108,15 +110,20 @@ function getPeriodLabel(period: string | null | undefined): string {
             </IonText>
           </div>
           
-          <!-- Ícone e sala da turma alinhados à esquerda -->
-          <div v-if="props.items.room" style="display: flex; align-items: center; padding: 6px;">
-            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="locationOutline" />
+          <div v-if="props.items.school" style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="businessOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-              Sala: {{ props.items.room }}
+              Escola: {{ props.items.school.name || props.items.school.corporateName }}
             </IonText>
           </div>
           
-          <!-- Ícone e ano da turma alinhados à esquerda -->
+          <div style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="locationOutline" />
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              Sala: {{ props.items.room || '-' }}
+            </IonText>
+          </div>
+          
           <div style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="calendarOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
@@ -124,7 +131,6 @@ function getPeriodLabel(period: string | null | undefined): string {
             </IonText>
           </div>
           
-          <!-- Ícone e período da turma alinhados à esquerda -->
           <div v-if="props.items.period" style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="timeOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
@@ -132,18 +138,41 @@ function getPeriodLabel(period: string | null | undefined): string {
             </IonText>
           </div>
           
-          <!-- Ícone e quantidade de estudantes da turma alinhados à esquerda -->
+          <div style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="schoolOutline" />
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              Regime: {{ props.items.regimeType || '-' }}
+            </IonText>
+          </div>
+          
+          <div style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="schoolOutline" />
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              Multisseriada: {{ props.items.isMultiSerialized ? 'Sim' : 'Não' }}
+            </IonText>
+          </div>
+          
           <div style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="peopleOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
               Estudantes: {{ props.items.totalStudents || 0 }}/{{ props.items.maxStudents }}
-              <span v-if="props.items.pcdStudents && props.items.pcdStudents > 0">
-                ({{ props.items.pcdStudents }} PCD)
-              </span>
             </IonText>
           </div>
           
-          <!-- Horários -->
+          <div style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="peopleOutline" />
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              Alunos PCD: {{ props.items.pcdStudents || 0 }}
+            </IonText>
+          </div>
+          
+          <div style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="peopleOutline" />
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              Vagas excedidas: {{ props.items.exceededStudents || 0 }}
+            </IonText>
+          </div>
+          
           <div v-if="props.items.startTime || props.items.endTime" style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="timeOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
@@ -151,7 +180,13 @@ function getPeriodLabel(period: string | null | undefined): string {
             </IonText>
           </div>
           
-          <!-- Dias da semana -->
+          <div style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="timeOutline" />
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              Intervalo: {{ formatTime(props.items.startTimeInterval) || '-' }} - {{ formatTime(props.items.endTimeInterval) || '-' }}
+            </IonText>
+          </div>
+          
           <div v-if="props.items.dayofweek && props.items.dayofweek.length > 0" style="display: flex; align-items: flex-start; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="calendarOutline" />
             <IonText color="primary" style="font-size: 11pt;">
