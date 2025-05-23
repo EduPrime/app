@@ -1,5 +1,8 @@
-import { create, person, school } from 'ionicons/icons'
+import { create, person, school, albums } from 'ionicons/icons'
 import DashboardFunction from './views/DashboardFunction.vue'
+import DashboardClassroom from './views/classroom/DashboardClassroom.vue'
+import RegisterClassroom from './views/classroom/RegisterClassroom.vue'
+import ClassroomDetailsDesktop from './views/classroom/ClassroomDetailsDesktop.vue'
 // import DashboardSchools from './views/DashboardSchools.vue'
 import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
 import RegisterFunction from './views/RegisterFunction.vue'
@@ -190,6 +193,43 @@ const routes = [
       icon: person,
       name: 'Detalhes da função',
       order: 15,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/Classroom/list',
+    name: 'ClassroomListClassroom',
+    component: DashboardClassroom,
+    meta: {
+      moduleName: 'Schools',
+      moduleIcon: school,
+      icon: albums,
+      name: 'Turmas',
+      order: 16,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/Classroom/register/:id?',
+    name: 'RegisterClassroom',
+    component: RegisterClassroom,
+    meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Registrar turma',
+      order: 17,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/Classroom/details/:id',
+    name: 'ClassroomDetails',
+    component: ClassroomDetailsDesktop,
+    meta: {
+      moduleName: 'Schools',
+      icon: school,
+      name: 'Detalhes da turma',
+      order: 18,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
