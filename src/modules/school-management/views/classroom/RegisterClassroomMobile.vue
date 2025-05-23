@@ -1,29 +1,27 @@
 <script setup lang="ts">
+import type { Course, School, Series } from '@prisma/client'
 import {
   IonButton,
+  IonCheckbox,
   IonCol,
   IonContent,
   IonGrid,
   IonIcon,
   IonInput,
+  IonItem,
+  IonLabel,
   IonPage,
   IonRow,
-  IonTextarea,
   IonSelect,
   IonSelectOption,
-  IonCheckbox,
-  IonItem,
-  IonDatetime,
-  IonLabel,
 } from '@ionic/vue'
 import { schoolOutline } from 'ionicons/icons'
 import { ErrorMessage, Field, Form } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
 import ClassroomService from '../../services/ClassroomService'
-import SeriesService from '../../services/SeriesService'
-import SchoolService from '../../services/SchoolService'
 import CourseService from '../../services/CourseService'
-import type { Series, School, Course } from '@prisma/client'
+import SchoolService from '../../services/SchoolService'
+import SeriesService from '../../services/SeriesService'
 
 const props = defineProps<{
   editId?: string
@@ -56,35 +54,36 @@ const dayOfWeekOptions = [
 ]
 
 function formatTimeInput(value: string): string {
-  const cleanValue = value.replace(/[^0-9]/g, '')
+  const cleanValue = value.replace(/\D/g, '')
 
   if (cleanValue.length >= 2) {
     const hours = cleanValue.substring(0, 2)
     const minutes = cleanValue.substring(2, 4)
-    
-    const hoursNum = parseInt(hours)
+
+    const hoursNum = Number.parseInt(hours)
     if (hoursNum > 23) {
-      return '23' + (minutes ? `:${minutes}` : ':')
+      return `23${minutes ? `:${minutes}` : ':'}`
     }
-    
+
     return hours + (minutes ? `:${minutes}` : ':')
   }
-  
+
   return cleanValue
 }
 
 function validateTimeRange(startTime: string, endTime: string): boolean {
-  if (!startTime || !endTime) return true
+  if (!startTime || !endTime)
+    return true
 
-  const regexTime = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
+  const regexTime = /^(?:[01]?\d|2[0-3]):[0-5]\d$/
   if (!regexTime.test(startTime) || !regexTime.test(endTime))
     return true
   const [startHour, startMinute] = startTime.split(':').map(Number)
   const [endHour, endMinute] = endTime.split(':').map(Number)
-  
+
   const startTotalMinutes = startHour * 60 + startMinute
   const endTotalMinutes = endHour * 60 + endMinute
-  
+
   return startTotalMinutes < endTotalMinutes
 }
 
@@ -140,8 +139,8 @@ async function loadDependencies() {
   try {
     const schoolData = await schoolService.getAvailableSchools()
     schoolList.value = schoolData || []
-    console.log('Escolas disponíveis carregadas:', schoolList.value)
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar dependências:', error)
   }
 }
@@ -154,14 +153,14 @@ async function loadCoursesBySchool(schoolId: string) {
   try {
     const courses = await courseService.getCoursesBySchool(schoolId)
     courseList.value = (courses || []) as Course[]
-    console.log('Cursos carregados:', courseList.value)
-    
+
     if (!isEditing.value) {
       formValues.value.courseId = ''
       formValues.value.seriesId = ''
       seriesList.value = []
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar cursos:', error)
     courseList.value = []
   }
@@ -174,31 +173,31 @@ async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
   }
   try {
     const series = await seriesService.getSeriesBySchoolAndCourse(schoolId, courseId)
-    
+
     if (!series || series.length === 0) {
-      console.log('Nenhuma série encontrada para esta escola e curso')
       const allSchoolSeries = await seriesService.getSeriesBySchool(schoolId)
       if (allSchoolSeries && allSchoolSeries.length > 0) {
-        console.log('Carregando todas as séries da escola como fallback')
         seriesList.value = allSchoolSeries as Series[]
-      } else {
+      }
+      else {
         seriesList.value = []
       }
-    } else {
-      seriesList.value = series as Series[]
-      console.log('Séries carregadas para o curso específico:', seriesList.value)
     }
-    
+    else {
+      seriesList.value = series as Series[]
+    }
+
     if (!isEditing.value) {
       formValues.value.seriesId = ''
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar séries:', error)
     try {
       const fallbackSeries = await seriesService.getSeriesBySchool(schoolId)
       seriesList.value = (fallbackSeries || []) as Series[]
-      console.log('Carregando todas as séries da escola como fallback após erro')
-    } catch {
+    }
+    catch {
       seriesList.value = []
     }
   }
@@ -206,11 +205,11 @@ async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
 
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
-    const enabled = !!formValues.value.name || !!formValues.value.abbreviation || 
-                   !!formValues.value.seriesId || !!formValues.value.schoolId ||
-                   !!formValues.value.maxStudents || !!formValues.value.year ||
-                   !!formValues.value.period || !!formValues.value.regimeType ||
-                   formValues.value.dayofweek.length > 0
+    const enabled = !!formValues.value.name || !!formValues.value.abbreviation
+      || !!formValues.value.seriesId || !!formValues.value.schoolId
+      || !!formValues.value.maxStudents || !!formValues.value.year
+      || !!formValues.value.period || !!formValues.value.regimeType
+      || formValues.value.dayofweek.length > 0
     return enabled
   }
   return hasChanges.value
@@ -238,7 +237,8 @@ watch(
 watch(() => formValues.value.schoolId, (newSchoolId) => {
   if (newSchoolId) {
     loadCoursesBySchool(newSchoolId)
-  } else {
+  }
+  else {
     courseList.value = []
     seriesList.value = []
     formValues.value.courseId = ''
@@ -249,7 +249,8 @@ watch(() => formValues.value.schoolId, (newSchoolId) => {
 watch(() => formValues.value.courseId, (newCourseId) => {
   if (newCourseId && formValues.value.schoolId) {
     loadSeriesByCourseAndSchool(formValues.value.schoolId, newCourseId)
-  } else {
+  }
+  else {
     seriesList.value = []
     formValues.value.seriesId = ''
   }
@@ -268,29 +269,31 @@ watch(() => formValues.value.seriesId, (newSeriesId) => {
 
 onMounted(async () => {
   await loadDependencies()
-  
+
   if (props.editId) {
     const classroom = await classroomService.getClassroomById(props.editId)
 
     if (classroom) {
       const formatTime = (time: Date | null | undefined) => {
-        if (!time) return ''
-        
+        if (!time)
+          return ''
+
         if (typeof time === 'string' && /^\d{1,2}:\d{2}$/.test(time)) {
           return time
         }
-        
+
         try {
           const timeDate = new Date(time)
-          if (!isNaN(timeDate.getTime())) {
+          if (!Number.isNaN(timeDate.getTime())) {
             const hours = timeDate.getHours().toString().padStart(2, '0')
             const minutes = timeDate.getMinutes().toString().padStart(2, '0')
             return `${hours}:${minutes}`
           }
-        } catch (e) {
+        }
+        catch (e) {
           console.error('Erro ao formatar horário:', e)
         }
-        
+
         return ''
       }
       const loadedValues = {
@@ -354,38 +357,39 @@ onMounted(async () => {
 
 async function handleSubmit(values: any) {
   const convertTimeStringToTimestamp = (timeString: string | null): Date | null => {
-    if (!timeString) return null;
-    
+    if (!timeString)
+      return null
+
     if (typeof timeString === 'string' && /^\d{1,2}:\d{2}$/.test(timeString)) {
-      const [hours, minutes] = timeString.split(':').map(Number);
-      
-      const date = new Date();
-      date.setHours(0, 0, 0, 0); 
-      date.setUTCHours(hours);
-      date.setUTCMinutes(minutes);
-      date.setUTCSeconds(0);
-      date.setUTCMilliseconds(0);
-      
-      return date;
+      const [hours, minutes] = timeString.split(':').map(Number)
+
+      const date = new Date()
+      date.setHours(0, 0, 0, 0)
+      date.setUTCHours(hours)
+      date.setUTCMinutes(minutes)
+      date.setUTCSeconds(0)
+      date.setUTCMilliseconds(0)
+
+      return date
     }
-    
-    return new Date(timeString);
-  };
-  
-  const startTime = convertTimeStringToTimestamp(values.startTime);
-  const startTimeInterval = convertTimeStringToTimestamp(values.startTimeInterval);
-  const endTimeInterval = convertTimeStringToTimestamp(values.endTimeInterval);
-  const endTime = convertTimeStringToTimestamp(values.endTime);
+
+    return new Date(timeString)
+  }
+
+  const startTime = convertTimeStringToTimestamp(values.startTime)
+  const startTimeInterval = convertTimeStringToTimestamp(values.startTimeInterval)
+  const endTimeInterval = convertTimeStringToTimestamp(values.endTimeInterval)
+  const endTime = convertTimeStringToTimestamp(values.endTime)
 
   const payload = {
     id: isEditing.value ? props.editId : undefined,
     name: values.name,
     abbreviation: values.abbreviation,
     seriesId: values.seriesId,
-    maxStudents: values.maxStudents ? parseInt(values.maxStudents) : 0,
-    exceededStudents: values.exceededStudents ? parseInt(values.exceededStudents) : 0,
-    totalStudents: values.totalStudents ? parseInt(values.totalStudents) : 0,
-    pcdStudents: values.pcdStudents ? parseInt(values.pcdStudents) : 0,
+    maxStudents: values.maxStudents ? Number.parseInt(values.maxStudents) : 0,
+    exceededStudents: values.exceededStudents ? Number.parseInt(values.exceededStudents) : 0,
+    totalStudents: values.totalStudents ? Number.parseInt(values.totalStudents) : 0,
+    pcdStudents: values.pcdStudents ? Number.parseInt(values.pcdStudents) : 0,
     startTime,
     startTimeInterval,
     endTimeInterval,
@@ -395,7 +399,7 @@ async function handleSubmit(values: any) {
     regimeType: values.regimeType,
     period: values.period,
     status: values.status,
-    year: values.year ? parseInt(values.year) : new Date().getFullYear(),
+    year: values.year ? Number.parseInt(values.year) : new Date().getFullYear(),
     isMultiSerialized: values.isMultiSerialized,
     schoolId: values.schoolId,
     courseId: values.courseId,
@@ -403,7 +407,7 @@ async function handleSubmit(values: any) {
 
   try {
     await classroomService.upsertClassroom(payload)
-    
+
     const successMessage = isEditing.value
       ? 'Turma atualizada com sucesso'
       : 'Nova turma cadastrada com sucesso'
@@ -449,7 +453,7 @@ function handleSaved() {
           <div class="section-header">
             <h3>Informações Básicas</h3>
           </div>
-          
+
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field, errors }" name="name" label="Nome da turma" rules="required|min:3|max:100">
@@ -604,8 +608,8 @@ function handleSaved() {
                   fill="outline"
                   placeholder="Digite o ano"
                   :class="{ 'has-error': errors.length > 0 }"
-                  @ion-input="field.onInput"
                   disabled
+                  @ion-input="field.onInput"
                 >
                   <div slot="label" class="required-field">
                     Ano <span class="required-text">(Obrigatório)</span>
@@ -699,10 +703,12 @@ function handleSaved() {
           <IonRow>
             <IonCol size="12">
               <IonItem lines="none" class="checkbox-item">
-                <IonCheckbox 
+                <IonCheckbox
                   v-model="formValues.isMultiSerialized"
-                  labelPlacement="end"
-                >Turma multisseriada</IonCheckbox>
+                  label-placement="end"
+                >
+                  Turma multisseriada
+                </IonCheckbox>
               </IonItem>
             </IonCol>
           </IonRow>
@@ -710,7 +716,7 @@ function handleSaved() {
           <div class="section-header">
             <h3>Capacidade e Ocupação</h3>
           </div>
-          
+
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field, errors }" name="maxStudents" label="Capacidade máxima" rules="required|checandoNumero|min:1">
@@ -811,7 +817,7 @@ function handleSaved() {
           <div class="section-header">
             <h3>Horários</h3>
           </div>
-            
+
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field, errors }" name="startTime" label="Horário de início" rules="formatoHora|required">
@@ -824,7 +830,7 @@ function handleSaved() {
                   fill="outline"
                   placeholder="Ex: 08:00"
                   :class="{ 'has-error': errors.length > 0 }"
-                  @ion-input="(e) => { 
+                  @ion-input="(e) => {
                     const formatted = formatTimeInput(e.detail.value || '');
                     formValues.startTime = formatted;
                     field.onChange(formatted);
@@ -845,7 +851,7 @@ function handleSaved() {
               </Field>
             </IonCol>
           </IonRow>
-          
+
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field, errors }" name="endTime" label="Horário de término" rules="formatoHora|required">
@@ -858,7 +864,7 @@ function handleSaved() {
                   fill="outline"
                   placeholder="Ex: 12:00"
                   :class="{ 'has-error': errors.length > 0 }"
-                  @ion-input="(e) => { 
+                  @ion-input="(e) => {
                     const formatted = formatTimeInput(e.detail.value || '');
                     formValues.endTime = formatted;
                     field.onChange(formatted);
@@ -889,12 +895,12 @@ function handleSaved() {
                   fill="outline"
                   placeholder="Ex: 10:00"
                   :class="{ 'has-error': errors.length > 0 }"
-                  @ion-input="(e) => { 
+                  @ion-input="(e) => {
                     const formatted = formatTimeInput(e.detail.value || '');
                     formValues.startTimeInterval = formatted;
                     field.onChange(formatted);
                   }"
-                ></IonInput>
+                />
                 <ErrorMessage v-slot="{ message }" name="startTimeInterval">
                   <div class="error-message">
                     {{ message }}
@@ -906,7 +912,7 @@ function handleSaved() {
               </Field>
             </IonCol>
           </IonRow>
-          
+
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field, errors }" name="endTimeInterval" label="Fim do intervalo" rules="formatoHora">
@@ -919,12 +925,12 @@ function handleSaved() {
                   fill="outline"
                   placeholder="Ex: 10:20"
                   :class="{ 'has-error': errors.length > 0 }"
-                  @ion-input="(e) => { 
+                  @ion-input="(e) => {
                     const formatted = formatTimeInput(e.detail.value || '');
                     formValues.endTimeInterval = formatted;
                     field.onChange(formatted);
                   }"
-                ></IonInput>
+                />
                 <ErrorMessage v-slot="{ message }" name="endTimeInterval">
                   <div class="error-message">
                     {{ message }}
@@ -938,22 +944,27 @@ function handleSaved() {
             <IonCol size="12">
               <Field v-slot="{ field }" name="dayofweek" label="Dias da semana" rules="required">
                 <div class="days-selection">
-                  <IonLabel class="ion-padding-start">Dias da semana</IonLabel>
+                  <IonLabel class="ion-padding-start">
+                    Dias da semana
+                  </IonLabel>
                   <div class="days-grid">
-                    <IonItem lines="none" class="checkbox-item" v-for="day in dayOfWeekOptions" :key="day.value">
-                      <IonCheckbox 
+                    <IonItem v-for="day in dayOfWeekOptions" :key="day.value" lines="none" class="checkbox-item">
+                      <IonCheckbox
                         :value="day.value"
                         :checked="formValues.dayofweek.includes(day.value)"
-                        labelPlacement="end"
+                        label-placement="end"
                         @ion-change="(e) => {
                           if (e.detail.checked) {
                             formValues.dayofweek.push(day.value);
-                          } else {
+                          }
+                          else {
                             formValues.dayofweek = formValues.dayofweek.filter(d => d !== day.value);
                           }
                           field.onChange(formValues.dayofweek);
                         }"
-                      >{{ day.label }}</IonCheckbox>
+                      >
+                        {{ day.label }}
+                      </IonCheckbox>
                     </IonItem>
                   </div>
                 </div>

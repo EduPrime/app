@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { IonButton, IonCol, IonContent, IonGrid, IonPage, IonRow, IonChip, IonIcon } from '@ionic/vue'
-import { computed, onMounted, ref, watch } from 'vue'
+import type { Classroom } from '@prisma/client'
+import ContentLayout from '@/components/theme/ContentLayout.vue'
+import { IonButton, IonChip, IonCol, IonGrid, IonPage, IonRow } from '@ionic/vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ClassroomService from '../../services/ClassroomService'
-import ContentLayout from '@/components/theme/ContentLayout.vue'
-import type { Classroom } from '@prisma/client'
-import { schoolOutline, timeOutline, calendarOutline, peopleOutline, locationOutline } from 'ionicons/icons'
 
 const route = useRoute()
 const router = useRouter()
@@ -17,12 +16,15 @@ const seriesData = ref<any>(null)
 const schoolData = ref<any>(null)
 
 function formatTime(time: string | null | undefined): string {
-  if (!time) return '-';
+  if (!time)
+    return '-'
   try {
-    const date = new Date(time);
-    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-  } catch (e) {
-    return '-';
+    const date = new Date(time)
+    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
+  }
+  catch (error) {
+    console.error('Erro ao formatar hora:', error)
+    return '-'
   }
 }
 
@@ -34,22 +36,23 @@ function getDayOfWeekLabel(day: string): string {
     THURSDAY: 'Quinta-feira',
     FRIDAY: 'Sexta-feira',
     SATURDAY: 'Sábado',
-    SUNDAY: 'Domingo'
-  };
-  return days[day] || day;
+    SUNDAY: 'Domingo',
+  }
+  return days[day] || day
 }
 
 function getPeriodLabel(period: string | null | undefined): string {
-  if (!period) return '-';
-  
+  if (!period)
+    return '-'
+
   const periods: Record<string, string> = {
     MORNING: 'Manhã',
     AFTERNOON: 'Tarde',
     NIGHT: 'Noite',
-    FULLTIME: 'Integral'
-  };
-  
-  return periods[period] || period;
+    FULLTIME: 'Integral',
+  }
+
+  return periods[period] || period
 }
 
 async function loadClassroomDetails() {
@@ -60,19 +63,19 @@ async function loadClassroomDetails() {
       router.push({ name: 'ClassroomListClassroom' })
       return
     }
-    
+
     const data = await classroomService.getClassroomById(id)
     classroomDetails.value = data
 
-    console.log("classroomDetails.value", classroomDetails.value)
-    
     if (data) {
       seriesData.value = (data as any).series
       schoolData.value = (data as any).school
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar detalhes da turma:', error)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -95,7 +98,7 @@ watch(
   () => route.params,
   () => {
     loadClassroomDetails()
-  }
+  },
 )
 </script>
 
@@ -106,10 +109,14 @@ watch(
         <p>Carregando detalhes da turma...</p>
       </div>
       <div v-else-if="classroomDetails" class="classroom-details-container">
-        <h1 class="classroom-title">{{ classroomDetails.name }}</h1>
-        
+        <h1 class="classroom-title">
+          {{ classroomDetails.name }}
+        </h1>
+
         <div class="detail-section">
-          <h2 class="section-title">Informações básicas</h2>
+          <h2 class="section-title">
+            Informações básicas
+          </h2>
           <IonGrid>
             <IonRow>
               <IonCol size="12" size-md="6">
@@ -168,7 +175,9 @@ watch(
         </div>
 
         <div class="detail-section">
-          <h2 class="section-title">Capacidade e Ocupação</h2>
+          <h2 class="section-title">
+            Capacidade e Ocupação
+          </h2>
           <IonGrid>
             <IonRow>
               <IonCol size="12" size-md="4">
@@ -214,7 +223,9 @@ watch(
         </div>
 
         <div class="detail-section">
-          <h2 class="section-title">Horários</h2>
+          <h2 class="section-title">
+            Horários
+          </h2>
           <IonGrid>
             <IonRow>
               <IonCol size="12" size-md="6">
@@ -263,10 +274,14 @@ watch(
           <IonGrid>
             <IonRow>
               <IonCol size="6">
-                <IonButton color="danger" expand="full" @click="goBack()">Fechar</IonButton>
+                <IonButton color="danger" expand="full" @click="goBack()">
+                  Fechar
+                </IonButton>
               </IonCol>
               <IonCol size="6">
-                <IonButton color="secondary" expand="full" @click="navigateToEdit()">Editar</IonButton>
+                <IonButton color="secondary" expand="full" @click="navigateToEdit()">
+                  Editar
+                </IonButton>
               </IonCol>
             </IonRow>
           </IonGrid>
@@ -275,7 +290,9 @@ watch(
 
       <div v-else class="ion-text-center ion-padding">
         <p>Turma não encontrada</p>
-        <IonButton color="medium" @click="goBack()">Voltar</IonButton>
+        <IonButton color="medium" @click="goBack()">
+          Voltar
+        </IonButton>
       </div>
     </ContentLayout>
   </IonPage>
@@ -362,7 +379,7 @@ watch(
   .detail-section {
     padding: 12px;
   }
-  
+
   .classroom-details-container {
     padding-bottom: 90px; /* Mais espaço no mobile */
   }

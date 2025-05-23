@@ -1,30 +1,30 @@
 <script setup lang="ts">
+import type { Course, School, Series } from '@prisma/client'
 import showToast from '@/utils/toast-alert'
 import {
   IonButton,
+  IonCheckbox,
   IonCol,
   IonContent,
   IonFooter,
   IonGrid,
   IonHeader,
+  IonInput,
+  IonItem,
   IonPage,
   IonRow,
-  IonTitle,
-  IonToolbar,
   IonSelect,
   IonSelectOption,
-  IonCheckbox,
-  IonItem,
-  IonInput
+  IonTitle,
+  IonToolbar,
 } from '@ionic/vue'
 import { ErrorMessage, Field, Form } from 'vee-validate'
-import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ClassroomService from '../../services/ClassroomService'
-import SeriesService from '../../services/SeriesService'
-import SchoolService from '../../services/SchoolService'
 import CourseService from '../../services/CourseService'
-import type { Series, School, Course } from '@prisma/client'
+import SchoolService from '../../services/SchoolService'
+import SeriesService from '../../services/SeriesService'
 
 const route = useRoute()
 const router = useRouter()
@@ -62,7 +62,6 @@ const originalFormValues = ref({ ...initialFormValues })
 const isEditing = ref(false)
 const classroomId = computed(() => route.params.id as string | undefined)
 const pageTitle = computed(() => isEditing.value ? 'Editar turma' : 'Nova turma')
-const descriptionRef = ref<HTMLTextAreaElement | null>(null)
 const hasChanges = ref(false)
 
 const seriesList = ref<Series[]>([])
@@ -80,55 +79,58 @@ const dayOfWeekOptions = [
 ]
 
 function formatTimeInput(value: string): string {
-  const cleanValue = value.replace(/[^0-9]/g, '')
-  
+  const cleanValue = value.replace(/\D/g, '')
+
   if (cleanValue.length >= 2) {
     const hours = cleanValue.substring(0, 2)
     const minutes = cleanValue.substring(2, 4)
-    
-    const hoursNum = parseInt(hours)
+
+    const hoursNum = Number.parseInt(hours)
     if (hoursNum > 23) {
-      return '23' + (minutes ? `:${minutes}` : ':')
+      return `23${minutes ? `:${minutes}` : ':'}`
     }
-    
+
     return hours + (minutes ? `:${minutes}` : ':')
   }
-  
+
   return cleanValue
 }
 
 function validateTimeRange(startTime: string, endTime: string): boolean {
-  if (!startTime || !endTime) return true
-  
+  if (!startTime || !endTime)
+    return true
+
   const [startHour, startMinute] = startTime.split(':').map(Number)
   const [endHour, endMinute] = endTime.split(':').map(Number)
-  
+
   const startTotalMinutes = startHour * 60 + startMinute
   const endTotalMinutes = endHour * 60 + endMinute
-  
+
   return startTotalMinutes < endTotalMinutes
 }
 
 function validateIntervalTime(classStartTime: string, classEndTime: string, intervalStartTime?: string, intervalEndTime?: string) {
-  if (!classStartTime || !classEndTime) return { startValid: true, endValid: true }
-  
+  if (!classStartTime || !classEndTime)
+    return { startValid: true, endValid: true }
+
   const toMinutes = (time: string) => {
-    if (!time) return 0
+    if (!time)
+      return 0
     const [hours, minutes] = time.split(':').map(Number)
     return hours * 60 + minutes
   }
-  
+
   const classStartMinutes = toMinutes(classStartTime)
   const classEndMinutes = toMinutes(classEndTime)
   const intervalStartMinutes = toMinutes(intervalStartTime || '')
   const intervalEndMinutes = toMinutes(intervalEndTime || '')
-  
-  const startValid = !intervalStartTime || 
-    (intervalStartMinutes >= classStartMinutes && intervalStartMinutes < classEndMinutes)
-  
-  const endValid = !intervalEndTime || 
-    (intervalEndMinutes > classStartMinutes && intervalEndMinutes <= classEndMinutes)
-  
+
+  const startValid = !intervalStartTime
+    || (intervalStartMinutes >= classStartMinutes && intervalStartMinutes < classEndMinutes)
+
+  const endValid = !intervalEndTime
+    || (intervalEndMinutes > classStartMinutes && intervalEndMinutes <= classEndMinutes)
+
   return { startValid, endValid }
 }
 
@@ -154,8 +156,8 @@ async function loadDependencies() {
   try {
     const schoolData = await schoolService.getAvailableSchools()
     schoolList.value = schoolData || []
-    console.log('Escolas disponíveis carregadas:', schoolList.value)
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar dependências:', error)
     showToast('Erro ao carregar escolas', 'top', 'danger')
   }
@@ -169,14 +171,14 @@ async function loadCoursesBySchool(schoolId: string) {
   try {
     const courses = await courseService.getCoursesBySchool(schoolId)
     courseList.value = (courses || []) as Course[]
-    console.log('Cursos carregados:', courseList.value)
-    
+
     if (!isEditing.value) {
       formValues.value.courseId = ''
       formValues.value.seriesId = ''
       seriesList.value = []
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar cursos:', error)
     showToast('Erro ao carregar cursos', 'top', 'danger')
     courseList.value = []
@@ -190,33 +192,33 @@ async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
   }
   try {
     const series = await seriesService.getSeriesBySchoolAndCourse(schoolId, courseId)
-    
+
     if (!series || series.length === 0) {
-      console.log('Nenhuma série encontrada para esta escola e curso')
       const allSchoolSeries = await seriesService.getSeriesBySchool(schoolId)
       if (allSchoolSeries && allSchoolSeries.length > 0) {
-        console.log('Carregando todas as séries da escola como fallback')
         seriesList.value = allSchoolSeries as Series[]
-      } else {
+      }
+      else {
         seriesList.value = []
       }
-    } else {
-      seriesList.value = series as Series[]
-      console.log('Séries carregadas para o curso específico:', seriesList.value)
     }
-    
+    else {
+      seriesList.value = series as Series[]
+    }
+
     if (!isEditing.value) {
       formValues.value.seriesId = ''
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar séries:', error)
     showToast('Erro ao carregar séries', 'top', 'danger')
-    
+
     try {
       const fallbackSeries = await seriesService.getSeriesBySchool(schoolId)
       seriesList.value = (fallbackSeries || []) as Series[]
-      console.log('Carregando todas as séries da escola como fallback após erro')
-    } catch {
+    }
+    catch {
       seriesList.value = []
     }
   }
@@ -233,11 +235,11 @@ function checkForChanges() {
 
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
-    const enabled = !!formValues.value.name || !!formValues.value.abbreviation || 
-                   !!formValues.value.seriesId || !!formValues.value.schoolId ||
-                   !!formValues.value.courseId || !!formValues.value.maxStudents || 
-                   !!formValues.value.year || !!formValues.value.period || 
-                   !!formValues.value.regimeType || formValues.value.dayofweek.length > 0
+    const enabled = !!formValues.value.name || !!formValues.value.abbreviation
+      || !!formValues.value.seriesId || !!formValues.value.schoolId
+      || !!formValues.value.courseId || !!formValues.value.maxStudents
+      || !!formValues.value.year || !!formValues.value.period
+      || !!formValues.value.regimeType || formValues.value.dayofweek.length > 0
     return enabled
   }
 
@@ -247,7 +249,8 @@ const saveButtonEnabled = computed(() => {
 watch(() => formValues.value.schoolId, (newSchoolId) => {
   if (newSchoolId) {
     loadCoursesBySchool(newSchoolId)
-  } else {
+  }
+  else {
     courseList.value = []
     seriesList.value = []
     formValues.value.courseId = ''
@@ -258,7 +261,8 @@ watch(() => formValues.value.schoolId, (newSchoolId) => {
 watch(() => formValues.value.courseId, (newCourseId) => {
   if (newCourseId && formValues.value.schoolId) {
     loadSeriesByCourseAndSchool(formValues.value.schoolId, newCourseId)
-  } else {
+  }
+  else {
     seriesList.value = []
     formValues.value.seriesId = ''
   }
@@ -294,27 +298,28 @@ onMounted(async () => {
 
     if (classroom) {
       const formatTime = (time: any) => {
-        if (!time) return ''
-        
+        if (!time)
+          return ''
+
         if (typeof time === 'string' && time.match(/^\d{1,2}:\d{2}$/)) {
           return time
         }
-        
+
         try {
           const timeDate = new Date(time)
-          if (!isNaN(timeDate.getTime())) {
+          if (!Number.isNaN(timeDate.getTime())) {
             const hours = timeDate.getHours().toString().padStart(2, '0')
             const minutes = timeDate.getMinutes().toString().padStart(2, '0')
             return `${hours}:${minutes}`
           }
-        } catch (e) {
+        }
+        catch (e) {
           console.error('Erro ao formatar horário:', e)
         }
-        
+
         return ''
       }
 
-      console.log('Carregando classroom:', classroom)
       const loadedValues = {
         id: classroom.id,
         name: classroom.name,
@@ -346,9 +351,9 @@ onMounted(async () => {
   }
   else {
     const currentYear = new Date().getFullYear().toString()
-    formValues.value = { 
+    formValues.value = {
       ...initialFormValues,
-      year: currentYear
+      year: currentYear,
     }
     originalFormValues.value = { ...formValues.value }
     hasChanges.value = false
@@ -356,42 +361,43 @@ onMounted(async () => {
 })
 
 async function handleSubmit(values: any) {
-  const daysOfWeek = Array.isArray(values.dayofweek) ? 
-    values.dayofweek.map((day: string) => day.toUpperCase()) : 
-    values.dayofweek;
+  const daysOfWeek = Array.isArray(values.dayofweek)
+    ? values.dayofweek.map((day: string) => day.toUpperCase())
+    : values.dayofweek
   const convertTimeStringToTimestamp = (timeString: string | null): Date | null => {
-    if (!timeString) return null;
-    
+    if (!timeString)
+      return null
+
     if (timeString.match(/^\d{1,2}:\d{2}$/)) {
-      const [hours, minutes] = timeString.split(':').map(Number);
-      
-      const date = new Date();
-      date.setHours(0, 0, 0, 0); 
-      date.setUTCHours(hours);
-      date.setUTCMinutes(minutes);
-      date.setUTCSeconds(0);
-      date.setUTCMilliseconds(0);
-      
-      return date;
+      const [hours, minutes] = timeString.split(':').map(Number)
+
+      const date = new Date()
+      date.setHours(0, 0, 0, 0)
+      date.setUTCHours(hours)
+      date.setUTCMinutes(minutes)
+      date.setUTCSeconds(0)
+      date.setUTCMilliseconds(0)
+
+      return date
     }
-    
-    return new Date(timeString);
-  };
-  
-  const startTime = convertTimeStringToTimestamp(values.startTime);
-  const startTimeInterval = convertTimeStringToTimestamp(values.startTimeInterval);
-  const endTimeInterval = convertTimeStringToTimestamp(values.endTimeInterval);
-  const endTime = convertTimeStringToTimestamp(values.endTime);
-  
+
+    return new Date(timeString)
+  }
+
+  const startTime = convertTimeStringToTimestamp(values.startTime)
+  const startTimeInterval = convertTimeStringToTimestamp(values.startTimeInterval)
+  const endTimeInterval = convertTimeStringToTimestamp(values.endTimeInterval)
+  const endTime = convertTimeStringToTimestamp(values.endTime)
+
   const payload = {
     id: isEditing.value ? classroomId.value : undefined,
     name: values.name,
     abbreviation: values.abbreviation,
     seriesId: values.seriesId,
-    maxStudents: values.maxStudents ? parseInt(values.maxStudents) : 0,
-    exceededStudents: values.exceededStudents ? parseInt(values.exceededStudents) : 0,
-    totalStudents: values.totalStudents ? parseInt(values.totalStudents) : 0,
-    pcdStudents: values.pcdStudents ? parseInt(values.pcdStudents) : 0,
+    maxStudents: values.maxStudents ? Number.parseInt(values.maxStudents) : 0,
+    exceededStudents: values.exceededStudents ? Number.parseInt(values.exceededStudents) : 0,
+    totalStudents: values.totalStudents ? Number.parseInt(values.totalStudents) : 0,
+    pcdStudents: values.pcdStudents ? Number.parseInt(values.pcdStudents) : 0,
     startTime,
     startTimeInterval,
     endTimeInterval,
@@ -401,7 +407,7 @@ async function handleSubmit(values: any) {
     regimeType: values.regimeType,
     period: values.period,
     status: values.status,
-    year: values.year ? parseInt(values.year) : new Date().getFullYear(), 
+    year: values.year ? Number.parseInt(values.year) : new Date().getFullYear(),
     isMultiSerialized: values.isMultiSerialized,
     schoolId: values.schoolId,
     courseId: values.courseId,
@@ -460,7 +466,7 @@ function resetForm() {
           <div class="section-header">
             <h2>Informações Básicas</h2>
           </div>
-          
+
           <IonRow>
             <IonCol size="12" size-md="6">
               <Field v-slot="{ field }" name="name" label="Nome da turma" rules="required|min:3|max:100">
@@ -483,7 +489,7 @@ function resetForm() {
                 </ErrorMessage>
               </Field>
             </IonCol>
-            
+
             <IonCol size="12" size-md="6">
               <Field v-slot="{ field }" name="abbreviation" rules="max:6">
                 <div class="floating-input">
@@ -517,7 +523,7 @@ function resetForm() {
                     interface="alert"
                     placeholder="Selecione uma escola"
                     class="select-native"
-                    @ionChange="(e) => { field.onChange(e.detail.value) }"
+                    @ion-change="(e) => { field.onChange(e.detail.value) }"
                   >
                     <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
                       {{ school.name }}
@@ -533,7 +539,7 @@ function resetForm() {
               </Field>
             </IonCol>
           </IonRow>
-          
+
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field }" name="courseId" label="Curso" rules="required">
@@ -544,8 +550,8 @@ function resetForm() {
                     interface="alert"
                     placeholder="Selecione um curso"
                     class="select-native"
-                    @ionChange="(e) => { field.onChange(e.detail.value) }"
                     :disabled="!formValues.schoolId"
+                    @ion-change="(e) => { field.onChange(e.detail.value) }"
                   >
                     <IonSelectOption v-for="course in courseList" :key="course.id" :value="course.id">
                       {{ course.name }}
@@ -561,7 +567,7 @@ function resetForm() {
               </Field>
             </IonCol>
           </IonRow>
-          
+
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field }" name="seriesId" label="Série" rules="required">
@@ -572,8 +578,8 @@ function resetForm() {
                     interface="alert"
                     placeholder="Selecione uma série"
                     class="select-native"
-                    @ionChange="(e) => { field.onChange(e.detail.value) }"
                     :disabled="!formValues.courseId || !formValues.schoolId"
+                    @ion-change="(e) => { field.onChange(e.detail.value) }"
                   >
                     <IonSelectOption v-for="series in seriesList" :key="series.id" :value="series.id">
                       {{ series.name }}
@@ -600,8 +606,8 @@ function resetForm() {
                     type="text"
                     class="floating-native"
                     placeholder=" "
-                    @input="field.onInput"
                     disabled
+                    @input="field.onInput"
                   >
                   <label class="floating-label"><span>Ano</span><span class="required-text"> (Obrigatório)</span></label>
                 </div>
@@ -622,7 +628,7 @@ function resetForm() {
                     interface="alert"
                     placeholder="Selecione um período"
                     class="select-native"
-                    @ionChange="(e) => { field.onChange(e.detail.value) }"
+                    @ion-change="(e) => { field.onChange(e.detail.value) }"
                   >
                     <IonSelectOption v-for="option in periodOptions" :key="option.value" :value="option.value">
                       {{ option.label }}
@@ -638,7 +644,7 @@ function resetForm() {
               </Field>
             </IonCol>
           </IonRow>
-          
+
           <IonRow>
             <IonCol size="12" size-md="6">
               <Field v-slot="{ field }" name="room" label="Sala">
@@ -660,7 +666,7 @@ function resetForm() {
                 </ErrorMessage>
               </Field>
             </IonCol>
-            
+
             <IonCol size="12" size-md="6">
               <Field v-slot="{ field }" name="regimeType" label="Regime de ensino">
                 <div class="floating-input select-input">
@@ -670,7 +676,7 @@ function resetForm() {
                     interface="alert"
                     placeholder="Selecione o regime de ensino"
                     class="select-native"
-                    @ionChange="(e) => { field.onChange(e.detail.value) }"
+                    @ion-change="(e) => { field.onChange(e.detail.value) }"
                   >
                     <IonSelectOption v-for="option in regimeTypeOptions" :key="option.value" :value="option.value">
                       {{ option.label }}
@@ -686,14 +692,16 @@ function resetForm() {
               </Field>
             </IonCol>
           </IonRow>
-          
+
           <IonRow>
             <IonCol size="12">
               <IonItem lines="none" class="checkbox-item">
-                <IonCheckbox 
+                <IonCheckbox
                   v-model="formValues.isMultiSerialized"
-                  labelPlacement="end"
-                >Turma multisseriada</IonCheckbox>
+                  label-placement="end"
+                >
+                  Turma multisseriada
+                </IonCheckbox>
               </IonItem>
             </IonCol>
           </IonRow>
@@ -701,7 +709,7 @@ function resetForm() {
           <div class="section-header">
             <h2>Capacidade e Ocupação</h2>
           </div>
-          
+
           <IonRow>
             <IonCol size="12" size-md="6">
               <Field v-slot="{ field }" name="maxStudents" label="Capacidade máxima" rules="required|checandoNumero|min:1">
@@ -723,7 +731,7 @@ function resetForm() {
                 </ErrorMessage>
               </Field>
             </IonCol>
-            
+
             <IonCol size="12" size-md="6">
               <Field v-slot="{ field }" name="totalStudents" label="Total de alunos" rules="checandoNumero|min:0">
                 <div class="floating-input">
@@ -733,8 +741,8 @@ function resetForm() {
                     type="text"
                     class="floating-native"
                     placeholder=" "
-                    @input="field.onInput"
                     :disabled="isEditing"
+                    @input="field.onInput"
                   >
                   <label class="floating-label"><span>Total de alunos</span></label>
                 </div>
@@ -768,7 +776,7 @@ function resetForm() {
                 </ErrorMessage>
               </Field>
             </IonCol>
-            
+
             <IonCol size="12" size-md="6">
               <Field v-slot="{ field }" name="pcdStudents" label="Alunos PCD" rules="checandoNumero|min:0">
                 <div class="floating-input">
@@ -805,8 +813,8 @@ function resetForm() {
                     type="text"
                     placeholder="Ex: 08:00"
                     label="Horário de início"
-                    labelPlacement="stacked"
-                    @ion-input="(e) => { 
+                    label-placement="stacked"
+                    @ion-input="(e) => {
                       const formatted = formatTimeInput(e.detail.value || '');
                       formValues.startTime = formatted;
                       field.onChange(formatted);
@@ -827,7 +835,7 @@ function resetForm() {
                 </div>
               </Field>
             </IonCol>
-            
+
             <IonCol size="12" size-md="6">
               <Field v-slot="{ field, errors }" name="endTime" label="Horário de término" rules="required|formatoHora">
                 <IonItem fill="outline" class="custom-item" :class="{ 'has-error': errors.length > 0 }">
@@ -837,8 +845,8 @@ function resetForm() {
                     type="text"
                     placeholder="Ex: 12:00"
                     label="Horário de término"
-                    labelPlacement="stacked"
-                    @ion-input="(e) => { 
+                    label-placement="stacked"
+                    @ion-input="(e) => {
                       const formatted = formatTimeInput(e.detail.value || '');
                       formValues.endTime = formatted;
                       field.onChange(formatted);
@@ -868,14 +876,13 @@ function resetForm() {
                     type="text"
                     placeholder="Ex: 10:00"
                     label="Início do intervalo"
-                    labelPlacement="stacked"
-                    @ion-input="(e) => { 
+                    label-placement="stacked"
+                    @ion-input="(e) => {
                       const formatted = formatTimeInput(e.detail.value || '');
                       formValues.startTimeInterval = formatted;
                       field.onChange(formatted);
                     }"
-                  >
-                  </IonInput>
+                  />
                 </IonItem>
                 <ErrorMessage v-slot="{ message }" name="startTimeInterval">
                   <div class="error-message">
@@ -890,7 +897,7 @@ function resetForm() {
                 </div>
               </Field>
             </IonCol>
-            
+
             <IonCol size="12" size-md="6">
               <Field v-slot="{ field, errors }" name="endTimeInterval" label="Fim do intervalo" rules="required|formatoHora">
                 <IonItem fill="outline" class="custom-item" :class="{ 'has-error': errors.length > 0 }">
@@ -900,14 +907,13 @@ function resetForm() {
                     type="text"
                     placeholder="Ex: 10:20"
                     label="Fim do intervalo"
-                    labelPlacement="stacked"
-                    @ion-input="(e) => { 
+                    label-placement="stacked"
+                    @ion-input="(e) => {
                       const formatted = formatTimeInput(e.detail.value || '');
                       formValues.endTimeInterval = formatted;
                       field.onChange(formatted);
                     }"
-                  >
-                  </IonInput>
+                  />
                 </IonItem>
                 <ErrorMessage v-slot="{ message }" name="endTimeInterval">
                   <div class="error-message">
@@ -927,20 +933,23 @@ function resetForm() {
                 <div class="days-selection">
                   <label class="days-label">Dias da semana</label>
                   <div class="days-grid">
-                    <IonItem lines="none" class="checkbox-item" v-for="day in dayOfWeekOptions" :key="day.value">
-                      <IonCheckbox 
+                    <IonItem v-for="day in dayOfWeekOptions" :key="day.value" lines="none" class="checkbox-item">
+                      <IonCheckbox
                         :value="day.value"
                         :checked="formValues.dayofweek.includes(day.value)"
-                        labelPlacement="end"
-                        @ionChange="(e) => {
+                        label-placement="end"
+                        @ion-change="(e) => {
                           if (e.detail.checked) {
                             formValues.dayofweek.push(day.value);
-                          } else {
+                          }
+                          else {
                             formValues.dayofweek = formValues.dayofweek.filter(d => d !== day.value);
                           }
                           field.onChange(formValues.dayofweek);
                         }"
-                      >{{ day.label }}</IonCheckbox>
+                      >
+                        {{ day.label }}
+                      </IonCheckbox>
                     </IonItem>
                   </div>
                 </div>
@@ -967,7 +976,7 @@ function resetForm() {
                     interface="alert"
                     placeholder="Selecione o status"
                     class="select-native"
-                    @ionChange="(e) => { field.onChange(e.detail.value) }"
+                    @ion-change="(e) => { field.onChange(e.detail.value) }"
                   >
                     <IonSelectOption v-for="option in statusOptions" :key="option.value" :value="option.value">
                       {{ option.label }}
@@ -1013,9 +1022,9 @@ function resetForm() {
   font-weight: bold; color: var(--ion-color-secondary);
 }
 
-.toolbar-accent { 
-  height: 4px; 
-  background-color: var(--ion-color-primary); 
+.toolbar-accent {
+  height: 4px;
+  background-color: var(--ion-color-primary);
 }
 
 .section-header {
@@ -1031,33 +1040,33 @@ function resetForm() {
   padding-bottom: 8px;
 }
 
-.content-with-footer { 
-  padding-bottom: 80px; 
+.content-with-footer {
+  padding-bottom: 80px;
 }
 
-.floating-input { 
-  position: relative; 
-  border: 1px solid var(--ion-color-primary); 
-  border-radius: 4px; 
-  margin-top: 16px; 
-  height: 56px; 
+.floating-input {
+  position: relative;
+  border: 1px solid var(--ion-color-primary);
+  border-radius: 4px;
+  margin-top: 16px;
+  height: 56px;
 }
 
-.floating-native { 
-  width: 100%; 
-  height: 100%; 
-  padding: 0 16px; 
-  border: none; 
-  outline: none; 
-  background: transparent; 
-  font-size: 1rem; 
-  color: var(--ion-color-dark-tint); 
-  display: flex; 
-  align-items: center; 
+.floating-native {
+  width: 100%;
+  height: 100%;
+  padding: 0 16px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--ion-color-dark-tint);
+  display: flex;
+  align-items: center;
 }
 
-.floating-native::placeholder { 
-  color: transparent; 
+.floating-native::placeholder {
+  color: transparent;
 }
 
 .select-input {
@@ -1106,47 +1115,47 @@ function resetForm() {
   gap: 8px;
 }
 
-.floating-label { 
-  position: absolute; 
-  top: 50%; 
-  left: 16px; 
-  transform: translateY(-50%); 
-  background: white; 
-  padding: 0 4px; 
-  font-size: 1rem; 
-  pointer-events: none; 
-  transition: 0.2s ease all; 
-  color: var(--ion-color-medium-shade); 
+.floating-label {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  background: white;
+  padding: 0 4px;
+  font-size: 1rem;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  color: var(--ion-color-medium-shade);
 }
 
-.top-label { 
-  top: 8px; 
-  transform: translateY(0); 
+.top-label {
+  top: 8px;
+  transform: translateY(0);
 }
 
-.floating-native:focus + .floating-label, 
-.floating-native:not(:placeholder-shown) + .floating-label, 
+.floating-native:focus + .floating-label,
+.floating-native:not(:placeholder-shown) + .floating-label,
 .select-native:not(.select-placeholder) + .floating-label,
 .datetime-native:not(.datetime-placeholder) + .floating-label {
-  top: -8px; 
-  transform: translateY(0); 
-  font-size: 0.75rem; 
-  color: var(--ion-color-primary); 
+  top: -8px;
+  transform: translateY(0);
+  font-size: 0.75rem;
+  color: var(--ion-color-primary);
 }
 
-.required-text { 
-  color: var(--ion-color-danger); 
+.required-text {
+  color: var(--ion-color-danger);
 }
 
-.error-message { 
-  color: var(--ion-color-danger); 
-  font-size: 0.8rem; 
-  margin-top: 4px; 
+.error-message {
+  color: var(--ion-color-danger);
+  font-size: 0.8rem;
+  margin-top: 4px;
   padding-left: 16px;
 }
 
-.action-buttons-fixed { 
-  margin: 0; 
-  padding: 8px; 
+.action-buttons-fixed {
+  margin: 0;
+  padding: 8px;
 }
 </style>
