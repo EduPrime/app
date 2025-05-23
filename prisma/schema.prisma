@@ -1437,6 +1437,8 @@ enum Room {
   LUNCHROOM              @map("Refeitório")
   OPEN_COURT             @map("Pátio aberto")
   CLOSED_COURT           @map("Pátio fechado")
+  COVERED_FIELD          @map("Quadra coberta")
+  OPEN_FIELD             @map("Quadra descoberta")
   SECRETARY              @map("Secretaria")
   PARKING                @map("Estacionamento")
   CAFETERIA              @map("Cantina")
