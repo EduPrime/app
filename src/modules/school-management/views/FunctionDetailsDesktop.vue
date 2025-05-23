@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { IonButton, IonCol, IonContent, IonGrid, IonPage, IonRow } from '@ionic/vue'
-import { computed, onMounted, ref } from 'vue'
+import type { ServerFunction } from '@prisma/client'
+import ContentLayout from '@/components/theme/ContentLayout.vue'
+import { IonButton, IonCol, IonGrid, IonPage, IonRow } from '@ionic/vue'
+import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ServerFunctionService from '../services/ServerFunctionService'
-import ContentLayout from '@/components/theme/ContentLayout.vue'
-import type { ServerFunction } from '@prisma/client'
 
 const route = useRoute()
 const router = useRouter()
@@ -20,12 +20,14 @@ async function loadFunctionDetails() {
       router.push({ name: 'FunctionListFunction' })
       return
     }
-    
+
     const data = await serverFunctionService.getServerFunctionById(id)
     functionDetails.value = data
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar detalhes da função:', error)
-  } finally {
+  }
+  finally {
     loading.value = false
   }
 }
@@ -52,10 +54,14 @@ onMounted(() => {
         <p>Carregando detalhes da função...</p>
       </div>
       <div v-else-if="functionDetails" class="function-details-container">
-        <h1 class="function-title">{{ functionDetails.name }}</h1>
-        
+        <h1 class="function-title">
+          {{ functionDetails.name }}
+        </h1>
+
         <div class="detail-section">
-          <h2 class="section-title">Informações básicas</h2>
+          <h2 class="section-title">
+            Informações básicas
+          </h2>
           <IonGrid>
             <IonRow>
               <IonCol size="12" size-md="6">
@@ -90,10 +96,14 @@ onMounted(() => {
           <IonGrid>
             <IonRow>
               <IonCol size="6">
-                <IonButton color="danger" expand="full" @click="goBack()">Fechar</IonButton>
+                <IonButton color="danger" expand="full" @click="goBack()">
+                  Fechar
+                </IonButton>
               </IonCol>
               <IonCol size="6">
-                <IonButton color="secondary" expand="full" @click="navigateToEdit()">Editar</IonButton>
+                <IonButton color="secondary" expand="full" @click="navigateToEdit()">
+                  Editar
+                </IonButton>
               </IonCol>
             </IonRow>
           </IonGrid>
@@ -102,7 +112,9 @@ onMounted(() => {
 
       <div v-else class="ion-text-center ion-padding">
         <p>Função não encontrada</p>
-        <IonButton color="medium" @click="goBack()">Voltar</IonButton>
+        <IonButton color="medium" @click="goBack()">
+          Voltar
+        </IonButton>
       </div>
     </ContentLayout>
   </IonPage>
@@ -187,7 +199,7 @@ onMounted(() => {
   .detail-section {
     padding: 12px;
   }
-  
+
   .function-details-container {
     padding-bottom: 90px; /* Mais espaço no mobile */
   }

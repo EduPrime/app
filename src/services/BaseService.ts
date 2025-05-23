@@ -43,6 +43,38 @@ export default class BaseService<T> {
     return data
   }
 
+  async getByRelationalId(customTable: string, relationshipName: string, id: string | string[], fields?: string): Promise<any[] | null> {
+    if (!id)
+      return null
+
+    const { data, error } = await this.client
+      .from(customTable)
+      .select(fields ?? '*')
+      .eq(relationshipName, id)
+
+    if (error)
+      errorHandler(error, `Failed to get record filtred by ID of ${relationshipName} in ${customTable}`)
+    return data
+  }
+
+  async getByInCustomTable(customTable: string, id: string): Promise<{
+    id: any
+    name: any
+  } | null> {
+    if (!id)
+      return null
+
+    const { data, error } = await this.client
+      .from(customTable)
+      .select('id, name')
+      .eq('id', id)
+      .single()
+
+    if (error)
+      errorHandler(error, 'Failed to get record by ID')
+    return data
+  }
+
   async getBySchoolId(schoolId: string): Promise<T | null> {
     if (!schoolId)
       return null
