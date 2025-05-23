@@ -1421,9 +1421,25 @@ enum Lab {
 }
 
 enum Room {
-  CLASSROOM     @map("Sala de aula")
-  AUDITORIUM    @map("Auditório")
-  COMMON_PLACES @map("Espaços comuns")
+  CLASSROOM              @map("Sala de aula")
+  AUDITORIUM             @map("Auditório")
+  COMMON_PLACES          @map("Espaços comuns")
+  WAREHOUSE              @map("Almoxarifado")
+  LIBRARY                @map("Biblioteca")
+  TEACHER_ROOM           @map("Sala de professores")
+  BATHROOM               @map("Banheiro")
+  ACCESSIBILITY_BATHROOM @map("Banheiro acessível")
+  TEACHER_BATHROOM       @map("Banheiro de professores")
+  KITCHEN                @map("Cozinha")
+  STUDENT_DORMROOM       @map("Dormitório de alunos")
+  TEACHER_DORMROOM       @map("Dormitório de professores")
+  POOL                   @map("Piscina")
+  LUNCHROOM              @map("Refeitório")
+  OPEN_COURT             @map("Pátio aberto")
+  CLOSED_COURT           @map("Pátio fechado")
+  SECRETARY              @map("Secretaria")
+  PARKING                @map("Estacionamento")
+  CAFETERIA              @map("Cantina")
 
   @@schema("public")
 }
