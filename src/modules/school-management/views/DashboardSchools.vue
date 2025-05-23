@@ -6,9 +6,9 @@ import ContentLayout from '@/components/theme/ContentLayout.vue'
 import { IonButton, IonContent, IonIcon, IonModal } from '@ionic/vue'
 import { add } from 'ionicons/icons'
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import SchoolService from '../services/SchoolService'
 import RegisterSchool from './RegisterSchool.vue'
-import { useRouter } from 'vue-router'
 
 const router = useRouter()
 

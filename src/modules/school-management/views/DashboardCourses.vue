@@ -12,10 +12,12 @@ import { useRouter } from 'vue-router'
 import CourseService from '../services/CourseService'
 import AddCourseMobile from './course/Register.vue'
 
+type ExtendedCourse = Course & { evaluationRuleId: string | null }
+
 const router = useRouter()
 const route = router.currentRoute
 const courseService = new CourseService()
-const dataList = ref<Course[]>([])
+const dataList = ref<ExtendedCourse[]>([])
 const searchQuery = ref('')
 const isModalAddCourse = ref(false)
 const editingId = ref<string | undefined>(undefined)
@@ -118,7 +120,7 @@ async function loadCourses(SearchResult?: any) {
     }
     else {
       const courses = await courseService.getItems()
-      dataList.value = courses || []
+      dataList.value = courses as ExtendedCourse[] || [] // tipei aqui como extended
     }
   }
   catch (error) {
@@ -225,7 +227,7 @@ watch(
             @close="setModalAddCourse(false)"
             @saved="loadCourses(); setModalAddCourse(false)"
             @cancel="setModalAddCourse(false)"
-            @error="(message, color) => { showToast(message, 'top', color); }"
+            @error="(message: string, color: 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'light' | 'medium' | 'dark') => { showToast(message, 'top', color); }"
           />
         </IonModal>
 
@@ -263,7 +265,7 @@ watch(
               @close="setEditModal(false)"
               @saved="() => { loadCourses(); setEditModal(false) }"
               @cancel="setEditModal(false)"
-              @error="(message, color) => { showToast(message, 'top', color); }"
+              @error="(message: string, color: 'primary' | 'secondary' | 'tertiary' | 'success' | 'warning' | 'danger' | 'light' | 'medium' | 'dark') => { showToast(message, 'top', color); }"
             />
           </IonContent>
         </IonModal>

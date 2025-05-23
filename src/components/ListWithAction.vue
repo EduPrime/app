@@ -24,12 +24,10 @@ interface Props {
     updatedAt: string | null
     user_created: string | null
     website: string | null
-    serieDisciplines: [
-      {
-        discipline: string | null
-        workload: number | null
-      },
-    ]
+    serieDisciplines?: {
+      discipline: string | null
+      workload: number | null
+    }[]
   }[]
 }
 

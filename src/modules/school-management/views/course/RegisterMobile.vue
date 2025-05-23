@@ -94,7 +94,7 @@ onMounted(async () => {
         id: item.id,
         name: item.name,
         abbreviation: item.abbreviation || '',
-        description: (item as any).description || '',
+        description: (item).description || '',
       }
 
       formValues.value = { ...loadedValues }

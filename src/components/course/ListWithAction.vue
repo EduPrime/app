@@ -13,7 +13,7 @@ interface Props {
   dataList: {
     id: string
     name: string
-    regimeType: string
+    regimeType?: string | null
     abbreviation?: string | null
     description?: string | null
     createdAt?: string
