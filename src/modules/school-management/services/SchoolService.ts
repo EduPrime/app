@@ -101,4 +101,24 @@ export default class SchoolService extends BaseService<School> {
       return 0
     }
   }
+  async getAvailableSchools(): Promise<School[]> {
+    try {
+      const { data, error } = await this.client
+        .from('school')
+        .select('*')
+        .is('deletedAt', null)
+        .order('name')
+
+      if (error) {
+        errorHandler(error, 'Erro ao buscar escolas disponíveis')
+        return []
+      }
+
+      return data as School[]
+    }
+    catch (error) {
+      errorHandler(error, 'Erro ao buscar escolas disponíveis')
+      return []
+    }
+  }
 }

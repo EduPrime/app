@@ -193,7 +193,7 @@ watch(
             <IonRow>
               <IonCol size="12" size-md="4">
                 <div class="detail-item">
-                  <span class="detail-label">Vagas excedidas</span>
+                  <span class="detail-label">Limite de excedentes</span>
                   <span class="detail-value">{{ classroomDetails.exceededStudents || 0 }} alunos</span>
                 </div>
               </IonCol>

@@ -51,7 +51,7 @@ const initialFormValues = {
   regimeType: '',
   period: '',
   status: '',
-  year: '',
+  year: new Date().getFullYear().toString(),
   isMultiSerialized: false,
   schoolId: '',
   courseId: '',
@@ -152,9 +152,9 @@ const statusOptions = [
 
 async function loadDependencies() {
   try {
-    const schoolData = await schoolService.getAll()
+    const schoolData = await schoolService.getAvailableSchools()
     schoolList.value = schoolData || []
-    console.log('Escolas carregadas:', schoolList.value)
+    console.log('Escolas disponíveis carregadas:', schoolList.value)
   } catch (error) {
     console.error('Erro ao carregar dependências:', error)
     showToast('Erro ao carregar escolas', 'top', 'danger')
@@ -345,8 +345,12 @@ onMounted(async () => {
     }
   }
   else {
-    formValues.value = { ...initialFormValues }
-    originalFormValues.value = { ...initialFormValues }
+    const currentYear = new Date().getFullYear().toString()
+    formValues.value = { 
+      ...initialFormValues,
+      year: currentYear
+    }
+    originalFormValues.value = { ...formValues.value }
     hasChanges.value = false
   }
 })
@@ -384,10 +388,10 @@ async function handleSubmit(values: any) {
     name: values.name,
     abbreviation: values.abbreviation,
     seriesId: values.seriesId,
-    maxStudents: values.maxStudents,
-    exceededStudents: values.exceededStudents,
-    totalStudents: values.totalStudents,
-    pcdStudents: values.pcdStudents,
+    maxStudents: values.maxStudents ? parseInt(values.maxStudents) : 0,
+    exceededStudents: values.exceededStudents ? parseInt(values.exceededStudents) : 0,
+    totalStudents: values.totalStudents ? parseInt(values.totalStudents) : 0,
+    pcdStudents: values.pcdStudents ? parseInt(values.pcdStudents) : 0,
     startTime,
     startTimeInterval,
     endTimeInterval,
@@ -397,7 +401,7 @@ async function handleSubmit(values: any) {
     regimeType: values.regimeType,
     period: values.period,
     status: values.status,
-    year: values.year,
+    year: values.year ? parseInt(values.year) : new Date().getFullYear(), 
     isMultiSerialized: values.isMultiSerialized,
     schoolId: values.schoolId,
     courseId: values.courseId,
@@ -453,20 +457,20 @@ function resetForm() {
     <IonContent :scroll-y="true" class="ion-padding content-with-footer">
       <Form id="classroom-form" :key="formValues.id || 'new'" :initial-values="formValues" @submit="handleSubmit">
         <IonGrid>
-          <!-- Seção Informações Básicas -->
           <div class="section-header">
             <h2>Informações Básicas</h2>
           </div>
           
           <IonRow>
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="name" label="Nome da turma" rules="required|min:3|max:180">
+              <Field v-slot="{ field }" name="name" label="Nome da turma" rules="required|min:3|max:100">
                 <div class="floating-input">
                   <input
                     v-bind="field"
                     v-model="formValues.name"
                     type="text"
                     class="floating-native"
+                    maxlength="101"
                     placeholder=" "
                     @input="field.onInput"
                   >
@@ -481,7 +485,7 @@ function resetForm() {
             </IonCol>
             
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="abbreviation" rules="max:10">
+              <Field v-slot="{ field }" name="abbreviation" rules="max:6">
                 <div class="floating-input">
                   <input
                     v-bind="field"
@@ -489,7 +493,7 @@ function resetForm() {
                     type="text"
                     class="floating-native"
                     placeholder=" "
-                    :maxlength="10"
+                    maxlength="7"
                     @input="field.onInput"
                   >
                   <label class="floating-label"><span>Abreviação</span></label>
@@ -503,7 +507,6 @@ function resetForm() {
             </IonCol>
           </IonRow>
 
-          <!-- Escola (primeiro campo) -->
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field }" name="schoolId" label="Escola" rules="required">
@@ -517,7 +520,7 @@ function resetForm() {
                     @ionChange="(e) => { field.onChange(e.detail.value) }"
                   >
                     <IonSelectOption v-for="school in schoolList" :key="school.id" :value="school.id">
-                      {{ school.corporateName || school.name }}
+                      {{ school.name }}
                     </IonSelectOption>
                   </IonSelect>
                   <label class="floating-label"><span>Escola</span><span class="required-text"> (Obrigatório)</span></label>
@@ -531,7 +534,6 @@ function resetForm() {
             </IonCol>
           </IonRow>
           
-          <!-- Curso (segundo campo) -->
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field }" name="courseId" label="Curso" rules="required">
@@ -560,7 +562,6 @@ function resetForm() {
             </IonCol>
           </IonRow>
           
-          <!-- Série (terceiro campo) -->
           <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field }" name="seriesId" label="Série" rules="required">
@@ -591,7 +592,7 @@ function resetForm() {
 
           <IonRow>
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="year" label="Ano" rules="required|checandoNumero">
+              <Field v-slot="{ field }" name="year" label="Ano">
                 <div class="floating-input">
                   <input
                     v-bind="field"
@@ -600,6 +601,7 @@ function resetForm() {
                     class="floating-native"
                     placeholder=" "
                     @input="field.onInput"
+                    disabled
                   >
                   <label class="floating-label"><span>Ano</span><span class="required-text"> (Obrigatório)</span></label>
                 </div>
@@ -612,7 +614,7 @@ function resetForm() {
             </IonCol>
 
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="period">
+              <Field v-slot="{ field }" name="period" label="Período" rules="required">
                 <div class="floating-input select-input">
                   <IonSelect
                     v-bind="field"
@@ -639,7 +641,7 @@ function resetForm() {
           
           <IonRow>
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="room">
+              <Field v-slot="{ field }" name="room" label="Sala">
                 <div class="floating-input">
                   <input
                     v-bind="field"
@@ -660,7 +662,7 @@ function resetForm() {
             </IonCol>
             
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="regimeType">
+              <Field v-slot="{ field }" name="regimeType" label="Regime de ensino">
                 <div class="floating-input select-input">
                   <IonSelect
                     v-bind="field"
@@ -696,7 +698,6 @@ function resetForm() {
             </IonCol>
           </IonRow>
 
-          <!-- Seção Capacidade e Ocupação -->
           <div class="section-header">
             <h2>Capacidade e Ocupação</h2>
           </div>
@@ -724,7 +725,7 @@ function resetForm() {
             </IonCol>
             
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="totalStudents" rules="checandoNumero|min:0">
+              <Field v-slot="{ field }" name="totalStudents" label="Total de alunos" rules="checandoNumero|min:0">
                 <div class="floating-input">
                   <input
                     v-bind="field"
@@ -748,7 +749,7 @@ function resetForm() {
 
           <IonRow>
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="exceededStudents" rules="checandoNumero|min:0">
+              <Field v-slot="{ field }" name="exceededStudents" label="Limite de excedentes" rules="checandoNumero|min:0">
                 <div class="floating-input">
                   <input
                     v-bind="field"
@@ -758,7 +759,7 @@ function resetForm() {
                     placeholder=" "
                     @input="field.onInput"
                   >
-                  <label class="floating-label"><span>Vagas excedidas</span></label>
+                  <label class="floating-label"><span>Limite de excedentes</span></label>
                 </div>
                 <ErrorMessage v-slot="{ message }" name="exceededStudents">
                   <div class="error-message">
@@ -769,7 +770,7 @@ function resetForm() {
             </IonCol>
             
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="pcdStudents" rules="checandoNumero|min:0">
+              <Field v-slot="{ field }" name="pcdStudents" label="Alunos PCD" rules="checandoNumero|min:0">
                 <div class="floating-input">
                   <input
                     v-bind="field"
@@ -790,7 +791,6 @@ function resetForm() {
             </IonCol>
           </IonRow>
 
-          <!-- Seção Horários -->
           <div class="section-header">
             <h2>Horários</h2>
           </div>
@@ -923,7 +923,7 @@ function resetForm() {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field }" name="dayofweek">
+              <Field v-slot="{ field }" name="dayofweek" label="Dias da semana" rules="required">
                 <div class="days-selection">
                   <label class="days-label">Dias da semana</label>
                   <div class="days-grid">
@@ -953,14 +953,13 @@ function resetForm() {
             </IonCol>
           </IonRow>
 
-          <!-- Seção Status -->
           <div class="section-header">
             <h2>Status</h2>
           </div>
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field }" name="status">
+              <Field v-slot="{ field }" name="status" label="Status" rules="required">
                 <div class="floating-input select-input">
                   <IonSelect
                     v-bind="field"

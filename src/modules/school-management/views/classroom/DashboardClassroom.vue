@@ -34,6 +34,7 @@ const adaptedDataList = computed(() => {
     maxStudents: item.maxStudents,
     totalStudents: item.totalStudents,
     pcdStudents: item.pcdStudents,
+    exceededStudents: item.exceededStudents,
     startTime: item.startTime,
     endTime: item.endTime,
     startTimeInterval: item.startTimeInterval,
@@ -42,6 +43,11 @@ const adaptedDataList = computed(() => {
     series: (item as any).series,
     school: (item as any).school,
     regimeType: item.regimeType,
+    status: item.status,
+    isMultiSerialized: item.isMultiSerialized,
+    courseId: (item as any).courseId,
+    schoolId: item.schoolId,
+    seriesId: item.seriesId,
     createdAt: item.createdAt ? item.createdAt.toString() : undefined,
     updatedAt: item.updatedAt ? item.updatedAt.toString() : undefined,
     deletedAt: item.deletedAt ? item.deletedAt.toString() : undefined,
@@ -224,6 +230,7 @@ watch(
           <RegisterClassroomMobile
             @saved="loadClassrooms(); setModalAddClassroom(false)"
             @cancel="setModalAddClassroom(false)"
+            @success="(message, color) => { showToast(message, 'top', color); }"
             @error="(message, color) => { showToast(message, 'top', color); }"
           />
         </IonModal>
@@ -240,6 +247,7 @@ watch(
               :edit-id="editingId"
               @saved="loadClassrooms(); setEditModal(false)"
               @cancel="setEditModal(false)"
+              @success="(message, color) => { showToast(message, 'top', color); }"
               @error="(message, color) => { showToast(message, 'top', color); }"
             />
           </IonContent>

@@ -151,7 +151,18 @@ console.log("props", props)
               Multisseriada: {{ props.items.isMultiSerialized ? 'Sim' : 'Não' }}
             </IonText>
           </div>
-          
+        </IonList>
+        
+        <IonItemDivider
+          style="border-color: rgba(var(--ion-color-primary-rgb), 0.25);"
+          class="ion-no-padding ion-margin-top"
+        >
+          <IonLabel color="primary" class="ion-no-margin">
+            Capacidade e ocupação
+          </IonLabel>
+        </IonItemDivider>
+        
+        <IonList>
           <div style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="peopleOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
@@ -169,10 +180,21 @@ console.log("props", props)
           <div style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="peopleOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-              Vagas excedidas: {{ props.items.exceededStudents || 0 }}
+              Limite de excedentes: {{ props.items.exceededStudents || 0 }}
             </IonText>
           </div>
-          
+        </IonList>
+        
+        <IonItemDivider
+          style="border-color: rgba(var(--ion-color-primary-rgb), 0.25);"
+          class="ion-no-padding ion-margin-top"
+        >
+          <IonLabel color="primary" class="ion-no-margin">
+            Horários
+          </IonLabel>
+        </IonItemDivider>
+        
+        <IonList>
           <div v-if="props.items.startTime || props.items.endTime" style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="timeOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
