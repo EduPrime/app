@@ -1,4 +1,4 @@
-import { create, person, school, albums } from 'ionicons/icons'
+import { create, person, school, albums, business } from 'ionicons/icons'
 import DashboardFunction from './views/DashboardFunction.vue'
 import DashboardClassroom from './views/classroom/DashboardClassroom.vue'
 import RegisterClassroom from './views/classroom/RegisterClassroom.vue'
@@ -7,6 +7,9 @@ import ClassroomDetailsDesktop from './views/classroom/ClassroomDetailsDesktop.v
 import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
 import RegisterFunction from './views/RegisterFunction.vue'
 // import RegisterSchool from './views/RegisterSchool.vue'
+import DashboardInstitution from './views/institution/DashboardInstitution.vue'
+import RegisterInstitution from './views/institution/RegisterInstitution.vue'
+import InstitutionDetailsDesktop from './views/institution/InstitutionDetailsDesktop.vue'
 
 const routes = [
   // {
@@ -230,6 +233,43 @@ const routes = [
       icon: school,
       name: 'Detalhes da turma',
       order: 18,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/Institution/list',
+    name: 'DashboardInstitution',
+    component: DashboardInstitution,
+    meta: {
+      moduleName: 'Schools',
+      moduleIcon: school,
+      icon: business,
+      name: 'Instituições',
+      order: 19,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/Institution/register/:id?',
+    name: 'RegisterInstitution',
+    component: RegisterInstitution,
+    meta: {
+      moduleName: 'Schools',
+      icon: create,
+      name: 'Registrar instituição',
+      order: 20,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/Institution/details/:id',
+    name: 'InstitutionDetails',
+    component: InstitutionDetailsDesktop,
+    meta: {
+      moduleName: 'Schools',
+      icon: business,
+      name: 'Detalhes da instituição',
+      order: 21,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },
