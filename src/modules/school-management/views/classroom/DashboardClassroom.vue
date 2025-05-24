@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import type { Classroom } from '@prisma/client'
-import ClassroomDetailView from './ClassroomDetailView.vue'
-import ListWithActionClassroom from './ListWithActionClassroom.vue'
-import RegisterClassroomMobile from './RegisterClassroomMobile.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import showToast from '@/utils/toast-alert'
 import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCol, IonContent, IonIcon, IonModal, IonPage, IonRow, IonSearchbar, IonText } from '@ionic/vue'
@@ -10,11 +7,17 @@ import { add } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ClassroomService from '../../services/ClassroomService'
+import CourseService from '../../services/CourseService'
+import ClassroomDetailView from './ClassroomDetailView.vue'
+import ListWithActionClassroom from './ListWithActionClassroom.vue'
+import RegisterClassroomMobile from './RegisterClassroomMobile.vue'
 
 const router = useRouter()
 const route = router.currentRoute
 const classroomService = new ClassroomService()
+const courseService = new CourseService()
 const dataList = ref<Classroom[]>([])
+const courseDataMap = ref<Record<string, any>>({})
 const searchQuery = ref('')
 const isModalAddClassroom = ref(false)
 const editingId = ref<string | undefined>(undefined)
@@ -24,34 +27,40 @@ const editModal = ref({ modal: false, data: undefined })
 const deleteModal = ref<{ modal: boolean, data: Classroom | undefined }>({ modal: false, data: undefined })
 
 const adaptedDataList = computed(() => {
-  return dataList.value.map(item => ({
-    id: item.id,
-    name: item.name,
-    abbreviation: item.abbreviation,
-    room: item.room,
-    period: item.period,
-    year: item.year,
-    maxStudents: item.maxStudents,
-    totalStudents: item.totalStudents,
-    pcdStudents: item.pcdStudents,
-    exceededStudents: item.exceededStudents,
-    startTime: item.startTime,
-    endTime: item.endTime,
-    startTimeInterval: item.startTimeInterval,
-    endTimeInterval: item.endTimeInterval,
-    dayofweek: item.dayofweek,
-    series: (item as any).series,
-    school: (item as any).school,
-    regimeType: item.regimeType,
-    status: item.status,
-    isMultiSerialized: item.isMultiSerialized,
-    courseId: (item as any).courseId,
-    schoolId: item.schoolId,
-    seriesId: item.seriesId,
-    createdAt: item.createdAt ? item.createdAt.toString() : undefined,
-    updatedAt: item.updatedAt ? item.updatedAt.toString() : undefined,
-    deletedAt: item.deletedAt ? item.deletedAt.toString() : undefined,
-  }))
+  return dataList.value.map((item) => {
+    const courseId = (item as any).series?.courseId
+    const course = courseId ? courseDataMap.value[courseId] : null
+
+    return {
+      id: item.id,
+      name: item.name,
+      abbreviation: item.abbreviation,
+      room: item.room,
+      period: item.period,
+      year: item.year,
+      maxStudents: item.maxStudents,
+      totalStudents: item.totalStudents,
+      pcdStudents: item.pcdStudents,
+      exceededStudents: item.exceededStudents,
+      startTime: item.startTime,
+      endTime: item.endTime,
+      startTimeInterval: item.startTimeInterval,
+      endTimeInterval: item.endTimeInterval,
+      dayofweek: item.dayofweek,
+      series: (item as any).series,
+      school: (item as any).school,
+      course,
+      regimeType: item.regimeType,
+      status: item.status,
+      isMultiSerialized: item.isMultiSerialized,
+      courseId: (item as any).courseId,
+      schoolId: item.schoolId,
+      seriesId: item.seriesId,
+      createdAt: item.createdAt ? item.createdAt.toString() : undefined,
+      updatedAt: item.updatedAt ? item.updatedAt.toString() : undefined,
+      deletedAt: item.deletedAt ? item.deletedAt.toString() : undefined,
+    }
+  })
 })
 
 const filteredDataList = computed(() => {
@@ -120,8 +129,18 @@ function setDeleteModal(open: boolean) {
 
 async function loadClassrooms() {
   try {
-    const classrooms = await classroomService.getClassrooms()
-    dataList.value = classrooms || []
+    const data = await classroomService.getClassrooms()
+    dataList.value = data || []
+
+    const courseIds = Array.from(new Set(
+      data
+        .filter(item => (item as any).series?.courseId)
+        .map(item => (item as any).series.courseId),
+    ))
+
+    if (courseIds.length > 0) {
+      courseDataMap.value = await courseService.loadCoursesByIds(courseIds)
+    }
   }
   catch (error) {
     console.error('Erro ao carregar turmas:', error)
@@ -146,12 +165,15 @@ async function handleDelete() {
       if (error.message) {
         if (error.message.includes('alunos matriculados')) {
           showToast('Não é possível excluir: Existem alunos matriculados nesta turma', 'top', 'warning')
-        } else if (error.message.includes('horários associados')) {
-          showToast('Não é possível excluir: Existem horários associados a esta turma', 'top', 'warning')
-        } else {
-          showToast('Erro ao excluir: ' + error.message, 'top', 'danger')
         }
-      } else {
+        else if (error.message.includes('horários associados')) {
+          showToast('Não é possível excluir: Existem horários associados a esta turma', 'top', 'warning')
+        }
+        else {
+          showToast(`Erro ao excluir: ${error.message}`, 'top', 'danger')
+        }
+      }
+      else {
         showToast('Erro desconhecido ao excluir turma', 'top', 'danger')
       }
     }

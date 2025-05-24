@@ -21,6 +21,8 @@ interface Props {
     dayofweek?: string[] | null
     series?: { name: string, abbreviation?: string } | null
     school?: { corporateName: string, name?: string } | null
+    course?: { name: string } | null
+    status?: string | null
     regimeType?: string | null
     isMultiSerialized?: boolean | null
     updatedAt?: string
@@ -70,6 +72,56 @@ function getPeriodLabel(period: string | null | undefined): string {
 
   return periods[period] || period
 }
+
+function getStatusLabel(status: string | null | undefined): string {
+  if (!status)
+    return '-'
+
+  const statuses: Record<string, string> = {
+    ACTIVE: 'Ativa',
+    INACTIVE: 'Inativa',
+    GRADUATED: 'Formada',
+    SUSPENDED: 'Suspensa',
+    TRANSFERRED: 'Transferida',
+  }
+
+  return statuses[status] || status
+}
+
+function getStatusStyle(status: string | null | undefined): Record<string, string> {
+  if (!status)
+    return {}
+
+  switch (status) {
+    case 'ACTIVE':
+      return {
+        background: 'rgba(56, 142, 60, 0.15)',
+        color: '#388E3C',
+      }
+    case 'INACTIVE':
+      return {
+        background: 'rgba(211, 47, 47, 0.15)',
+        color: '#D32F2F',
+      }
+    case 'GRADUATED':
+      return {
+        background: 'rgba(79, 41, 116, 0.1)',
+        color: '#4F2974',
+      }
+    case 'SUSPENDED':
+      return {
+        background: 'rgba(255, 193, 7, 0.15)',
+        color: '#FFC107',
+      }
+    case 'TRANSFERRED':
+      return {
+        background: 'rgba(158, 158, 158, 0.15)',
+        color: '#9E9E9E',
+      }
+    default:
+      return {}
+  }
+}
 </script>
 
 <template>
@@ -115,6 +167,27 @@ function getPeriodLabel(period: string | null | undefined): string {
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="businessOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
               Escola: {{ props.items.school.name || props.items.school.corporateName }}
+            </IonText>
+          </div>
+
+          <div v-if="props.items.course" style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="businessOutline" />
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              Curso: {{ props.items.course.name }}
+            </IonText>
+          </div>
+
+          <div style="display: flex; align-items: center; padding: 6px;">
+            <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="peopleOutline" />
+            <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+              Status:
+              <IonChip
+                mode="md"
+                class="ion-no-margin"
+                :style="getStatusStyle(props.items.status)"
+              >
+                {{ getStatusLabel(props.items.status) }}
+              </IonChip>
             </IonText>
           </div>
 

@@ -27,4 +27,28 @@ export default class CourseService extends BaseService<Course> {
       errorHandler(error, 'Erro ao buscar cursos')
     }
   }
+
+  async loadCoursesByIds(courseIds: string[]): Promise<Record<string, any>> {
+    try {
+      const courseMap: Record<string, any> = {}
+
+      for (const courseId of courseIds) {
+        const { data, error } = await this.client
+          .from(table)
+          .select('*')
+          .eq('id', courseId)
+          .maybeSingle()
+
+        if (!error && data) {
+          courseMap[courseId] = data
+        }
+      }
+
+      return courseMap
+    }
+    catch (error) {
+      errorHandler(error, 'Erro ao carregar dados dos cursos')
+      return {}
+    }
+  }
 }

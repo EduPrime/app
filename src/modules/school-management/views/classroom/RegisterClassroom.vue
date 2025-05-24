@@ -148,8 +148,10 @@ const regimeTypeOptions = [
 ]
 
 const statusOptions = [
-  { value: 'ACTIVE', label: 'Ativo' },
-  { value: 'INACTIVE', label: 'Inativo' },
+  { value: 'ACTIVE', label: 'Ativa' },
+  { value: 'INACTIVE', label: 'Inativa' },
+  { value: 'GRADUATED', label: 'Formada' },
+  { value: 'SUSPENDED', label: 'Suspensa' },
 ]
 
 async function loadDependencies() {
@@ -191,16 +193,11 @@ async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
     return
   }
   try {
-    const series = await seriesService.getSeriesBySchoolAndCourse(schoolId, courseId)
+    const series = await seriesService.getSeriesByCourse(courseId)
 
     if (!series || series.length === 0) {
-      const allSchoolSeries = await seriesService.getSeriesBySchool(schoolId)
-      if (allSchoolSeries && allSchoolSeries.length > 0) {
-        seriesList.value = allSchoolSeries as Series[]
-      }
-      else {
-        seriesList.value = []
-      }
+      seriesList.value = []
+      showToast('Não há séries disponíveis para este curso', 'top', 'warning')
     }
     else {
       seriesList.value = series as Series[]
@@ -213,14 +210,7 @@ async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
   catch (error) {
     console.error('Erro ao carregar séries:', error)
     showToast('Erro ao carregar séries', 'top', 'danger')
-
-    try {
-      const fallbackSeries = await seriesService.getSeriesBySchool(schoolId)
-      seriesList.value = (fallbackSeries || []) as Series[]
-    }
-    catch {
-      seriesList.value = []
-    }
+    seriesList.value = []
   }
 }
 
@@ -647,13 +637,14 @@ function resetForm() {
 
           <IonRow>
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="room" label="Sala">
+              <Field v-slot="{ field }" name="room" label="Sala" rules="max:50">
                 <div class="floating-input">
                   <input
                     v-bind="field"
                     v-model="formValues.room"
                     type="text"
                     class="floating-native"
+                    maxlength="51"
                     placeholder=" "
                     @input="field.onInput"
                   >
@@ -712,13 +703,14 @@ function resetForm() {
 
           <IonRow>
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="maxStudents" label="Capacidade máxima" rules="required|checandoNumero|min:1">
+              <Field v-slot="{ field }" name="maxStudents" label="Capacidade máxima" rules="required|checandoNumero|valorMinimo:1|max:3">
                 <div class="floating-input">
                   <input
                     v-bind="field"
                     v-model="formValues.maxStudents"
                     type="text"
                     class="floating-native"
+                    maxlength="4"
                     placeholder=" "
                     @input="field.onInput"
                   >
@@ -733,15 +725,15 @@ function resetForm() {
             </IonCol>
 
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="totalStudents" label="Total de alunos" rules="checandoNumero|min:0">
+              <Field v-slot="{ field }" name="totalStudents" label="Total de alunos" rules="checandoNumero|min:0|max:3">
                 <div class="floating-input">
                   <input
                     v-bind="field"
                     v-model="formValues.totalStudents"
                     type="text"
                     class="floating-native"
+                    maxlength="4"
                     placeholder=" "
-                    :disabled="isEditing"
                     @input="field.onInput"
                   >
                   <label class="floating-label"><span>Total de alunos</span></label>
@@ -757,13 +749,14 @@ function resetForm() {
 
           <IonRow>
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="exceededStudents" label="Limite de excedentes" rules="checandoNumero|min:0">
+              <Field v-slot="{ field }" name="exceededStudents" label="Limite de excedentes" rules="checandoNumero|min:0|max:3">
                 <div class="floating-input">
                   <input
                     v-bind="field"
                     v-model="formValues.exceededStudents"
                     type="text"
                     class="floating-native"
+                    maxlength="4"
                     placeholder=" "
                     @input="field.onInput"
                   >
@@ -778,13 +771,14 @@ function resetForm() {
             </IonCol>
 
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="pcdStudents" label="Alunos PCD" rules="checandoNumero|min:0">
+              <Field v-slot="{ field }" name="pcdStudents" label="Alunos PCD" rules="checandoNumero|min:0|max:3">
                 <div class="floating-input">
                   <input
                     v-bind="field"
                     v-model="formValues.pcdStudents"
                     type="text"
                     class="floating-native"
+                    maxlength="4"
                     placeholder=" "
                     @input="field.onInput"
                   >

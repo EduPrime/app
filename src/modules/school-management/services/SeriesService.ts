@@ -30,22 +30,21 @@ export default class SeriesService extends BaseService<TabelaType> {
     }
   }
 
-  async getSeriesBySchoolAndCourse(schoolId: string, courseId: string) {
+  async getSeriesByCourse(courseId: string) {
     try {
       const { data: series, error: seriesError } = await this.client
         .from('series')
         .select('id, name')
-        .eq('schoolId', schoolId)
         .eq('courseId', courseId)
 
       if (seriesError) {
-        errorHandler(seriesError, 'Erro ao buscar séries por escola e curso')
+        errorHandler(seriesError, 'Erro ao buscar séries por curso')
       }
 
       return series
     }
     catch (error) {
-      errorHandler(error, 'Erro ao buscar séries por escola e curso')
+      errorHandler(error, 'Erro ao buscar séries por curso')
     }
   }
 }

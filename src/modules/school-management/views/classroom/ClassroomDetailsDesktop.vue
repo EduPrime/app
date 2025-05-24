@@ -5,15 +5,18 @@ import { IonButton, IonChip, IonCol, IonGrid, IonPage, IonRow } from '@ionic/vue
 import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ClassroomService from '../../services/ClassroomService'
+import CourseService from '../../services/CourseService'
 
 const route = useRoute()
 const router = useRouter()
 const classroomService = new ClassroomService()
+const courseService = new CourseService()
 const classroomDetails = ref<Classroom | null>(null)
 const loading = ref(true)
 
 const seriesData = ref<any>(null)
 const schoolData = ref<any>(null)
+const courseData = ref<any>(null)
 
 function formatTime(time: string | null | undefined): string {
   if (!time)
@@ -55,6 +58,61 @@ function getPeriodLabel(period: string | null | undefined): string {
   return periods[period] || period
 }
 
+function getStatusLabel(status: string | null | undefined): string {
+  if (!status)
+    return '-'
+
+  const statuses: Record<string, string> = {
+    ACTIVE: 'Ativa',
+    INACTIVE: 'Inativa',
+    GRADUATED: 'Formada',
+    SUSPENDED: 'Suspensa',
+    TRANSFERRED: 'Transferida',
+  }
+
+  return statuses[status] || status
+}
+
+function getStatusStyle(status: string | null | undefined): Record<string, string> {
+  if (!status)
+    return {}
+
+  switch (status) {
+    case 'ACTIVE':
+      return {
+        background: 'rgba(56, 142, 60, 0.15)',
+        color: '#388E3C',
+        fontWeight: 'bold',
+      }
+    case 'INACTIVE':
+      return {
+        background: 'rgba(211, 47, 47, 0.15)',
+        color: '#D32F2F',
+        fontWeight: 'bold',
+      }
+    case 'GRADUATED':
+      return {
+        background: 'rgba(79, 41, 116, 0.1)',
+        color: '#4F2974',
+        fontWeight: 'bold',
+      }
+    case 'SUSPENDED':
+      return {
+        background: 'rgba(255, 193, 7, 0.15)',
+        color: '#FFC107',
+        fontWeight: 'bold',
+      }
+    case 'TRANSFERRED':
+      return {
+        background: 'rgba(158, 158, 158, 0.15)',
+        color: '#9E9E9E',
+        fontWeight: 'bold',
+      }
+    default:
+      return {}
+  }
+}
+
 async function loadClassroomDetails() {
   try {
     loading.value = true
@@ -70,6 +128,16 @@ async function loadClassroomDetails() {
     if (data) {
       seriesData.value = (data as any).series
       schoolData.value = (data as any).school
+
+      try {
+        if (seriesData.value && seriesData.value.courseId) {
+          const courseMap = await courseService.loadCoursesByIds([seriesData.value.courseId])
+          courseData.value = courseMap[seriesData.value.courseId]
+        }
+      }
+      catch (error) {
+        console.error('Erro ao carregar dados do curso:', error)
+      }
     }
   }
   catch (error) {
@@ -152,19 +220,42 @@ watch(
             </IonRow>
 
             <IonRow>
-              <IonCol size="12" size-md="4">
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Curso</span>
+                  <span class="detail-value">{{ courseData?.name || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Status</span>
+                  <div class="detail-value">
+                    <IonChip
+                      mode="md"
+                      class="ion-no-margin"
+                      :style="getStatusStyle(classroomDetails.status)"
+                    >
+                      {{ getStatusLabel(classroomDetails.status) }}
+                    </IonChip>
+                  </div>
+                </div>
+              </IonCol>
+            </IonRow>
+
+            <IonRow>
+              <IonCol size="12" size-md="3">
                 <div class="detail-item">
                   <span class="detail-label">Ano</span>
                   <span class="detail-value">{{ classroomDetails.year || '-' }}</span>
                 </div>
               </IonCol>
-              <IonCol size="12" size-md="4">
+              <IonCol size="12" size-md="3">
                 <div class="detail-item">
                   <span class="detail-label">Período</span>
                   <span class="detail-value">{{ getPeriodLabel(classroomDetails.period) }}</span>
                 </div>
               </IonCol>
-              <IonCol size="12" size-md="4">
+              <IonCol size="12" size-md="6">
                 <div class="detail-item">
                   <span class="detail-label">Sala</span>
                   <span class="detail-value">{{ classroomDetails.room || '-' }}</span>

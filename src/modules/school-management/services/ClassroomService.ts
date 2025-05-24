@@ -1,5 +1,5 @@
-import BaseService from '@/services/BaseService'
 import type { Classroom } from '@prisma/client'
+import BaseService from '@/services/BaseService'
 import errorHandler from '@/utils/error-handler'
 
 interface ClassroomToSave {
@@ -47,14 +47,14 @@ export default class ClassroomService extends BaseService<Classroom> {
     }
 
     if (data && data.length > 0) {
-      data.forEach(classroom => {
+      data.forEach((classroom) => {
         if (classroom.series && classroom.series.courseId) {
           (classroom as any).courseId = classroom.series.courseId
         }
       })
     }
 
-    return data as (Classroom & { series: any; school: any; courseId?: string })[]
+    return data as (Classroom & { series: any, school: any, courseId?: string })[]
   }
 
   async getClassroomById(id: string) {
@@ -78,7 +78,7 @@ export default class ClassroomService extends BaseService<Classroom> {
       (data as any).courseId = data.series.courseId
     }
 
-    return data as (Classroom & { series: any; school: any; courseId?: string }) | null
+    return data as (Classroom & { series: any, school: any, courseId?: string }) | null
   }
 
   async getClassroomByName(name: string) {
@@ -102,8 +102,9 @@ export default class ClassroomService extends BaseService<Classroom> {
       (data as any).courseId = data.series.courseId
     }
 
-    return data as (Classroom & { series: any; school: any; courseId?: string }) | null
+    return data as (Classroom & { series: any, school: any, courseId?: string }) | null
   }
+
   async getClassroomByNameInsensitive(name: string, excludeId?: string) {
     if (!name) {
       return null
@@ -123,6 +124,7 @@ export default class ClassroomService extends BaseService<Classroom> {
     const filtered = excludeId ? data.filter(item => item.id !== excludeId) : data
     return filtered.length > 0 ? filtered[0] : null
   }
+
   async getClassroomsBySeriesId(seriesId: string) {
     if (!seriesId) {
       return []
@@ -141,15 +143,16 @@ export default class ClassroomService extends BaseService<Classroom> {
     }
 
     if (data && data.length > 0) {
-      data.forEach(classroom => {
+      data.forEach((classroom) => {
         if (classroom.series && classroom.series.courseId) {
           (classroom as any).courseId = classroom.series.courseId
         }
       })
     }
 
-    return data as (Classroom & { series: any; school: any; courseId?: string })[]
+    return data as (Classroom & { series: any, school: any, courseId?: string })[]
   }
+
   async getClassroomsBySchoolId(schoolId: string) {
     if (!schoolId) {
       return []
@@ -168,14 +171,14 @@ export default class ClassroomService extends BaseService<Classroom> {
     }
 
     if (data && data.length > 0) {
-      data.forEach(classroom => {
+      data.forEach((classroom) => {
         if (classroom.series && classroom.series.courseId) {
           (classroom as any).courseId = classroom.series.courseId
         }
       })
     }
 
-    return data as (Classroom & { series: any; school: any; courseId?: string })[]
+    return data as (Classroom & { series: any, school: any, courseId?: string })[]
   }
 
   async upsertClassroom(classroom: ClassroomToSave) {

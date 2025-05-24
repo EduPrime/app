@@ -120,11 +120,23 @@ defineRule('checandoNumero', (value: string) => {
   return true
 })
 
+defineRule('valorMinimo', (value: string, minValue: number) => {
+  if (!value)
+    return true
+
+  const num = Number(value)
+
+  if (num < minValue)
+    return `O valor deve ser maior ou igual a ${minValue}`
+
+  return true
+})
+
 defineRule('formatoHora', (value: string) => {
   if (!value)
     return true
 
-  const regex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
+  const regex = /^(?:[01]?\d|2[0-3]):[0-5]\d$/
   if (!regex.test(value))
     return 'Formato inválido. Use HH:MM (ex: 08:30)'
 

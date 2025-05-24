@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Course, School, Series } from '@prisma/client'
+import showToast from '@/utils/toast-alert'
 import {
   IonButton,
   IonCheckbox,
@@ -101,8 +102,10 @@ const regimeTypeOptions = [
 ]
 
 const statusOptions = [
-  { value: 'ACTIVE', label: 'Ativo' },
-  { value: 'INACTIVE', label: 'Inativo' },
+  { value: 'ACTIVE', label: 'Ativa' },
+  { value: 'INACTIVE', label: 'Inativa' },
+  { value: 'GRADUATED', label: 'Formada' },
+  { value: 'SUSPENDED', label: 'Suspensa' },
 ]
 
 const formValues = ref({
@@ -172,16 +175,11 @@ async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
     return
   }
   try {
-    const series = await seriesService.getSeriesBySchoolAndCourse(schoolId, courseId)
+    const series = await seriesService.getSeriesByCourse(courseId)
 
     if (!series || series.length === 0) {
-      const allSchoolSeries = await seriesService.getSeriesBySchool(schoolId)
-      if (allSchoolSeries && allSchoolSeries.length > 0) {
-        seriesList.value = allSchoolSeries as Series[]
-      }
-      else {
-        seriesList.value = []
-      }
+      seriesList.value = []
+      showToast('Não há séries disponíveis para este curso', 'top', 'warning')
     }
     else {
       seriesList.value = series as Series[]
@@ -193,13 +191,8 @@ async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
   }
   catch (error) {
     console.error('Erro ao carregar séries:', error)
-    try {
-      const fallbackSeries = await seriesService.getSeriesBySchool(schoolId)
-      seriesList.value = (fallbackSeries || []) as Series[]
-    }
-    catch {
-      seriesList.value = []
-    }
+    showToast('Erro ao carregar séries', 'top', 'danger')
+    seriesList.value = []
   }
 }
 
@@ -653,7 +646,7 @@ function handleSaved() {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="room" label="Sala">
+              <Field v-slot="{ field, errors }" name="room" label="Sala" rules="max:50">
                 <IonInput
                   v-bind="field"
                   v-model="formValues.room"
@@ -662,6 +655,7 @@ function handleSaved() {
                   fill="outline"
                   placeholder="Digite o número/nome da sala"
                   :class="{ 'has-error': errors.length > 0 }"
+                  :maxlength="51"
                   @ion-input="field.onInput"
                 />
                 <ErrorMessage v-slot="{ message }" name="room">
@@ -719,7 +713,7 @@ function handleSaved() {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="maxStudents" label="Capacidade máxima" rules="required|checandoNumero|min:1">
+              <Field v-slot="{ field, errors }" name="maxStudents" label="Capacidade máxima" rules="required|checandoNumero|valorMinimo:1|max:3">
                 <IonInput
                   v-bind="field"
                   v-model="formValues.maxStudents"
@@ -729,6 +723,7 @@ function handleSaved() {
                   fill="outline"
                   placeholder="Digite a capacidade máxima"
                   :class="{ 'has-error': errors.length > 0 }"
+                  :maxlength="4"
                   @ion-input="field.onInput"
                 >
                   <div slot="label" class="required-field">
@@ -746,7 +741,7 @@ function handleSaved() {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="totalStudents" label="Total de alunos" rules="checandoNumero|min:0">
+              <Field v-slot="{ field, errors }" name="totalStudents" label="Total de alunos" rules="checandoNumero|min:0|max:3">
                 <IonInput
                   v-bind="field"
                   v-model="formValues.totalStudents"
@@ -756,7 +751,7 @@ function handleSaved() {
                   fill="outline"
                   placeholder="Digite o total de alunos"
                   :class="{ 'has-error': errors.length > 0 }"
-                  :disabled="isEditing"
+                  :maxlength="4"
                   @ion-input="field.onInput"
                 />
                 <ErrorMessage v-slot="{ message }" name="totalStudents">
@@ -770,7 +765,7 @@ function handleSaved() {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="exceededStudents" label="Limite de excedentes" rules="checandoNumero|min:0">
+              <Field v-slot="{ field, errors }" name="exceededStudents" label="Limite de excedentes" rules="checandoNumero|min:0|max:3">
                 <IonInput
                   v-bind="field"
                   v-model="formValues.exceededStudents"
@@ -780,6 +775,7 @@ function handleSaved() {
                   fill="outline"
                   placeholder="Digite o número do limite de excedentes"
                   :class="{ 'has-error': errors.length > 0 }"
+                  :maxlength="4"
                   @ion-input="field.onInput"
                 />
                 <ErrorMessage v-slot="{ message }" name="exceededStudents">
@@ -793,7 +789,7 @@ function handleSaved() {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="pcdStudents" label="Alunos PCD" rules="checandoNumero|min:0">
+              <Field v-slot="{ field, errors }" name="pcdStudents" label="Alunos PCD" rules="checandoNumero|min:0|max:3">
                 <IonInput
                   v-bind="field"
                   v-model="formValues.pcdStudents"
@@ -803,6 +799,7 @@ function handleSaved() {
                   fill="outline"
                   placeholder="Digite o número de alunos PCD"
                   :class="{ 'has-error': errors.length > 0 }"
+                  :maxlength="4"
                   @ion-input="field.onInput"
                 />
                 <ErrorMessage v-slot="{ message }" name="pcdStudents">
