@@ -122,6 +122,7 @@ export default class ClassroomService extends BaseService<Classroom> {
     }
 
     const filtered = excludeId ? data.filter(item => item.id !== excludeId) : data
+
     return filtered.length > 0 ? filtered[0] : null
   }
 
@@ -184,6 +185,9 @@ export default class ClassroomService extends BaseService<Classroom> {
   async upsertClassroom(classroom: ClassroomToSave) {
     const now = new Date().toISOString()
 
+    console.log('classroom', classroom)
+    console.log('classroom.id', classroom.id)
+
     const existingWithSameName = await this.getClassroomByNameInsensitive(
       classroom.name,
       classroom.id,
@@ -191,7 +195,8 @@ export default class ClassroomService extends BaseService<Classroom> {
 
     if (existingWithSameName) {
       const sameClassroom = await this.getClassroomById(existingWithSameName.id)
-      if (sameClassroom && sameClassroom.seriesId === classroom.seriesId) {
+
+      if (sameClassroom && sameClassroom.id === classroom.id) {
         throw new Error('Nome de turma já existente para esta série')
       }
     }
