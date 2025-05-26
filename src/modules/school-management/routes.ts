@@ -1,12 +1,14 @@
-import { create, person, school, trailSign } from 'ionicons/icons'
+import { create, list, person, school, trailSign } from 'ionicons/icons'
 import CourseDetailsDesktop from './views/course/DetailsDesktop.vue'
 import RegisterCourse from './views/course/Register.vue'
 import DashboardCorses from './views/DashboardCourses.vue'
 import DashboardFunction from './views/DashboardFunction.vue'
 import DashboardSchools from './views/DashboardSchools.vue'
+import DashboardSeries from './views/DashboardSeries.vue'
 import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
 import RegisterFunction from './views/RegisterFunction.vue'
 import RegisterSchool from './views/RegisterSchool.vue'
+import SeriesDetailsDesktop from './views/series/DetailsDesktop.vue'
 
 const routes = [
   {
@@ -214,6 +216,19 @@ const routes = [
   },
 
   {
+    path: '/Series/details/:id',
+    name: 'SerieDetails',
+    component: SeriesDetailsDesktop,
+    meta: {
+      moduleName: 'Schools',
+      icon: person,
+      name: 'Detalhes da série',
+      order: 11,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+
+  {
     path: '/Course/details/:id',
     name: 'CourseDetails',
     component: CourseDetailsDesktop,
@@ -248,6 +263,20 @@ const routes = [
       icon: trailSign,
       name: 'Registrar curso',
       order: 16,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+
+  {
+    path: '/Series/list',
+    name: 'Series',
+    component: DashboardSeries,
+    meta: {
+      moduleName: 'Schools',
+      moduleIcon: school,
+      icon: list,
+      name: 'Registrar série',
+      order: 17,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },
   },

@@ -1,86 +1,87 @@
 <script setup lang="ts">
 import { IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon, IonItem, IonItemOption, IonItemOptions, IonItemSliding, IonLabel, IonList } from '@ionic/vue'
-import { apps, arrowBack, arrowForward, eye, pencilSharp, trashSharp } from 'ionicons/icons'
-import { ref } from 'vue'
+import { arrowBack, arrowForward, eye, pencilSharp, trashSharp } from 'ionicons/icons'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
-
-interface Props {
-  dataList: {
-    abbreviation?: string | null
-    active?: boolean
-    address?: string | null
-    course_id?: string | null
-    city?: string | null
-    createdAt?: string
-    deletedAt?: string | null
-    email?: string | null
-    id: string
-    institution_id?: string | null
-    logourl?: string | null
-    name: string
-    phone?: string | null
-    postalcode?: string | null
-    school_zone?: string | null
-    social_network?: string | null
-    state?: string | null
-    updatedAt?: string | null
-    user_created?: string | null
-    website?: string | null
-    serieDisciplines?: [
-      {
-        discipline?: string | null
-        workload?: number | null
-      },
-    ]
-  }[]
-}
 
 const props = defineProps<Props>()
 const emits = defineEmits(['update:see', 'update:edit', 'update:delete'])
-
 const route = useRoute()
+
+const metaIcon = computed(() => (route.meta.icon as string) || '')
+interface Props {
+  dataList: {
+    id: string
+    name: string
+    regimeType?: string | null
+    abbreviation?: string | null
+    description?: string | null
+    createdAt?: string
+    graduate?: string | null
+    updatedAt?: string | null
+    deletedAt?: string | null
+  }[]
+}
+
 const isOpen = ref<boolean[]>([])
 const itemSliding = ref<(InstanceType<typeof IonItemSliding> | null)[]>([])
 
-const innerWidth = window.innerWidth
+// Tornar innerWidth reativo para responder a mudanças na largura da tela
+const innerWidth = ref(window.innerWidth)
+
+function updateInnerWidth() {
+  innerWidth.value = window.innerWidth
+}
+
+function handleSwipeOpened(index: number) {
+  isOpen.value[index] = true
+}
+
+function handleSwipeClosed(index: number) {
+  isOpen.value[index] = false
+}
+
+onMounted(() => {
+  window.addEventListener('resize', updateInnerWidth)
+  isOpen.value = Array.from<boolean>({ length: props.dataList.length }).fill(false)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateInnerWidth)
+})
 </script>
 
 <template>
   <IonCard v-if="true">
     <IonCardHeader color="secondary">
       <div style="display: flex; align-items: center; height: 15px;">
-        <IonIcon :icon="route?.meta?.icon ?? apps" style="margin-right: 10px; font-size: 16pt;" />
+        <IonIcon :icon="metaIcon" style="margin-right: 10px; font-size: 16pt;" />
         <IonCardTitle style="font-size: medium;">
-          Lista de registros ({{ props.dataList.length }})
+          Lista de funções ({{ props.dataList.length }})
         </IonCardTitle>
       </div>
     </IonCardHeader>
 
     <div v-if="true">
       <IonCardContent class="ion-no-padding">
-        <!-- listando -->
-        <!-- <pre>
-          list: {{ list }}
-        </pre> -->
         <IonList>
           <div v-if="innerWidth < 992">
             <IonItemSliding
               v-for="(item, index) in props.dataList" :key="index" ref="itemSliding"
+              @ion-did-open="() => handleSwipeOpened(index)"
+              @ion-did-close="() => handleSwipeClosed(index)"
             >
-              <!-- @ion-drag="console.log('ion-drag')" -->
               <IonItem>
-                <IonLabel color="primary" class="ion-no-margin" style="margin-top: 5px; margin-bottom: 5px;">
-                  <h2>{{ item.name || 'Item sem nome' }}</h2>
-                  <p v-if="item.address" style="color: rgba(var(--ion-color-primary-rgb), 0.6);">
-                    {{ item.address || 'Sem endereço' }}
+                <IonLabel color="primary" class="ion-no-margin course-name" style="margin-top: 5px; margin-bottom: 5px;">
+                  <h2>{{ item.name || 'Função sem nome' }}</h2>
+                  <p v-if="item.regimeType">
+                    {{ item.regimeType }}
                   </p>
                 </IonLabel>
                 <IonIcon :icon="isOpen[index] ? arrowForward : arrowBack" style="font-size: 18pt;" />
               </IonItem>
 
               <IonItemOptions side="end" style="border-bottom: 1px solid rgba(var(--ion-color-primary-rgb), 0.2);">
-                <!-- @ion-swipe="handleOpened(index)" -->
-
                 <IonItemOption color="tertiary" @click="emits('update:see', { modal: true, data: item })">
                   <div style="width: 40px; display: flex; justify-content: center;">
                     <IonIcon :icon="eye" style="font-size: 18pt;" />
@@ -96,31 +97,15 @@ const innerWidth = window.innerWidth
                     <IonIcon :icon="trashSharp" style="font-size: 18pt;" />
                   </div>
                 </IonItemOption>
-
-                <!-- <IonItemOption style="background-color: white; border-left: 1px solid var(--ion-color-primary);" @click="emits('update:see', { modal: true, data: item })">
-                  <div style="width: 40px; display: flex; justify-content: center;">
-                    <IonIcon color="tertiary" :icon="eye" style="font-size: 18pt;" />
-                  </div>
-                </IonItemOption>
-                <IonItemOption style="background-color: white;" @click="emits('update:edit', { modal: true, data: item })">
-                  <div style="width: 40px; display: flex; justify-content: center;">
-                    <IonIcon color="primary" :icon="pencilSharp" style="font-size: 18pt;" />
-                  </div>
-                </IonItemOption>
-                <IonItemOption style="background-color: white;" @click="emits('update:delete', { modal: true, data: item })">
-                  <div style="width: 40px; display: flex; justify-content: center;">
-                    <IonIcon color="danger" :icon="trashSharp" style="font-size: 18pt;" />
-                  </div>
-                </IonItemOption> -->
               </IonItemOptions>
             </IonItemSliding>
           </div>
           <div v-else>
             <IonItem v-for="(item, index) in props.dataList" :key="index">
-              <IonLabel color="primary" class="ion-no-margin" style="margin-top: 5px; margin-bottom: 5px;">
-                <h2>{{ item.name || 'Item sem nome' }}</h2>
-                <p style="color: rgba(var(--ion-color-primary-rgb), 0.6);">
-                  {{ item.address || 'Sem endereço' }}
+              <IonLabel color="primary" class="ion-no-margin course-name" style="margin-top: 5px; margin-bottom: 5px;">
+                <h2>{{ item.name || 'Função sem nome' }}</h2>
+                <p v-if="item.regimeType">
+                  {{ item.regimeType }}
                 </p>
               </IonLabel>
               <div style="display: flex; min-height: 100%;">
@@ -149,5 +134,16 @@ const innerWidth = window.innerWidth
 </template>
 
 <style scoped>
+.course-name h2 {
+  text-align: left;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--ion-color-primary);
+  padding-bottom: 4px;
+}
 
+.course-name p {
+  font-size: 14px;
+  color: var(--ion-color-medium);
+}
 </style>
