@@ -12,7 +12,7 @@ import {
   IonToolbar,
 } from '@ionic/vue'
 import { ErrorMessage, Field, Form } from 'vee-validate'
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onActivated, onMounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import showToast from '@/utils/toast-alert'
 import InstitutionService from '../../services/InstitutionService'
@@ -36,12 +36,36 @@ const initialFormValues = {
 }
 
 const formValues = ref({ ...initialFormValues })
+const originalFormValues = ref({ ...initialFormValues })
+const hasChanges = ref(false)
 
 const form = ref<any>(null)
+
+watch(
+  () => ({ ...formValues.value }),
+  () => {
+    if (isEditing.value) {
+      checkForChanges()
+    }
+  },
+  { deep: true, immediate: true }
+)
 
 onMounted(async () => {
   if (isEditing.value) {
     await loadInstitution()
+  } else {
+    formValues.value = { ...initialFormValues }
+    originalFormValues.value = { ...initialFormValues }
+    hasChanges.value = false
+  }
+})
+
+onActivated(() => {
+  if (!isEditing.value) {
+    formValues.value = { ...initialFormValues }
+    originalFormValues.value = { ...initialFormValues }
+    hasChanges.value = false
   }
 })
 
@@ -59,20 +83,29 @@ async function buscarEndereco(cep: string) {
   }
 }
 
-// Watcher para o campo de CEP para autocompletar os campos de endereço
-watch(() => formValues.value.postalCode, async (novoCep) => {
+watch(() => formValues.value.postalCode, async (novoCep, antigoCep) => {
+  if (!novoCep || novoCep !== antigoCep) {
+    formValues.value.address = '';
+    formValues.value.city = '';
+    formValues.value.state = '';
+    
+    if (form.value) {
+      form.value.setFieldValue('address', '');
+      form.value.setFieldValue('city', '');
+      form.value.setFieldValue('state', '');
+    }
+  }
+  
   if (!novoCep) return;
   
   const cepLimpo = String(novoCep).replace(/\D/g, '');
   if (cepLimpo && cepLimpo.length === 8) {
     const endereco = await buscarEndereco(cepLimpo);
     if (endereco) {
-      // Atualiza os valores do formulário
       formValues.value.address = endereco.logradouro || '';
       formValues.value.city = endereco.localidade || '';
       formValues.value.state = endereco.uf || '';
       
-      // Atualiza os valores nos campos do formulário vee-validate
       if (form.value) {
         form.value.setFieldValue('address', endereco.logradouro || '');
         form.value.setFieldValue('city', endereco.localidade || '');
@@ -87,7 +120,7 @@ async function loadInstitution() {
     const id = route.params.id as string
     const institution = await institutionService.getInstitutionById(id)
     if (institution) {
-      formValues.value = {
+      const loadedValues = {
         id: institution.id || '',
         name: institution.name || '',
         address: institution.address || '',
@@ -97,6 +130,10 @@ async function loadInstitution() {
         phone: institution.phone || '',
         email: institution.email || ''
       }
+      
+      formValues.value = { ...loadedValues }
+      originalFormValues.value = { ...loadedValues }
+      hasChanges.value = false
     }
   } catch (error) {
     console.error('Erro ao carregar instituição:', error)
@@ -104,9 +141,32 @@ async function loadInstitution() {
   }
 }
 
+function checkForChanges() {
+  if (!isEditing.value) return
+
+  const hasNameChanged = formValues.value.name !== originalFormValues.value.name
+  const hasAddressChanged = formValues.value.address !== originalFormValues.value.address
+  const hasCityChanged = formValues.value.city !== originalFormValues.value.city
+  const hasStateChanged = formValues.value.state !== originalFormValues.value.state
+  const hasPostalCodeChanged = formValues.value.postalCode !== originalFormValues.value.postalCode
+  const hasPhoneChanged = formValues.value.phone !== originalFormValues.value.phone
+  const hasEmailChanged = formValues.value.email !== originalFormValues.value.email
+
+  hasChanges.value = hasNameChanged || hasAddressChanged || hasCityChanged || 
+                    hasStateChanged || hasPostalCodeChanged || hasPhoneChanged || 
+                    hasEmailChanged
+}
+
 const saveButtonEnabled = computed(() => {
-  // Habilita o botão se pelo menos o nome estiver preenchido
-  return !!formValues.value.name
+  if (!isEditing.value) {
+    const anyFieldFilled = !!formValues.value.name || !!formValues.value.address || 
+                         !!formValues.value.city || !!formValues.value.state || 
+                         !!formValues.value.postalCode || !!formValues.value.phone || 
+                         !!formValues.value.email
+    return anyFieldFilled
+  }
+  
+  return hasChanges.value
 })
 
 async function handleSubmit(values: any) {
@@ -119,7 +179,7 @@ async function handleSubmit(values: any) {
       address: values.address?.trim() || '',
       city: values.city?.trim() || '',
       state: values.state?.trim() || '',
-      postalCode: values.postalCode?.trim() || '', // Usando o nome padronizado postalCode
+      postalCode: values.postalCode?.trim() || '',
       phone: values.phone?.trim() || '',
       email: values.email?.trim() || '',
     }
@@ -132,7 +192,7 @@ async function handleSubmit(values: any) {
       'success'
     )
     
-    navigateBack(true)
+    resetForm()
   } catch (error) {
     console.error('Erro ao salvar instituição:', error)
     showToast('Erro ao salvar instituição', 'top', 'danger')
@@ -142,16 +202,10 @@ async function handleSubmit(values: any) {
 }
 
 function resetForm() {
-  formValues.value = { ...initialFormValues }
+  router.back()
 }
 
-function navigateBack(refresh = false) {
-  if (refresh) {
-    router.push({ name: 'DashboardInstitution', query: { refresh: 'true' } })
-  } else {
-    router.push({ name: 'DashboardInstitution' })
-  }
-}
+
 </script>
 
 <template>
@@ -347,7 +401,7 @@ function navigateBack(refresh = false) {
         <IonGrid>
           <IonRow class="action-buttons-fixed">
             <IonCol size="6">
-              <IonButton color="danger" expand="block" @click="navigateBack">Cancelar</IonButton>
+              <IonButton color="danger" expand="block" @click="resetForm">Cancelar</IonButton>
             </IonCol>
             <IonCol size="6">
               <IonButton expand="block" type="submit" form="institution-form" :disabled="!saveButtonEnabled">Salvar</IonButton>
