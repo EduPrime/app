@@ -9,6 +9,21 @@ export default class EvaluationRuleService extends BaseService<EvaluationRule> {
     super(table) // Passando o nome da tabela para a classe base
   }
 
+  async getAllRules() {
+    const { data, error } = await this.client
+      .from(table)
+      .select('name, id')
+
+    if (error) {
+      errorHandler(error, 'Erro ao buscar regras de avaliação')
+    }
+    if (!data) {
+      throw new Error('Nenhuma regra encontrada')
+    }
+
+    return data
+  }
+
   async getRulesFromCourse(courseId: string) {
     const { data, error } = await this.client
       .from(table)
