@@ -1,158 +1,18 @@
-<template>
-  <IonPage>
-    <ContentLayout>
-      <div class="ion-padding">
-        <IonRow class="ion-align-items-center ion-margin-bottom">
-          <IonCol size="8">
-            <IonTitle class="ion-no-padding">
-              {{ isEditing ? 'Editar Instituição' : 'Nova Instituição' }}
-            </IonTitle>
-          </IonCol>
-          <IonCol size="4" class="ion-text-end">
-            <IonButton color="medium" fill="outline" class="ion-margin-end" @click="navigateBack">
-              Cancelar
-            </IonButton>
-            <IonButton type="submit" :disabled="isSubmitting" @click="saveForm">
-              Salvar
-            </IonButton>
-          </IonCol>
-        </IonRow>
-
-        <IonCard>
-          <IonCardContent>
-            <form @submit.prevent="saveForm">
-              <IonGrid>
-                <IonRow>
-                  <IonCol size="12" size-md="8">
-                    <IonItem>
-                      <IonLabel position="stacked">Nome <IonText color="danger">*</IonText></IonLabel>
-                      <IonInput
-                        v-model="values.name"
-                        type="text"
-                        placeholder="Nome da instituição"
-                        :maxlength="100"
-                        required
-                        @ion-change="validateName"
-                      ></IonInput>
-                      <IonNote v-if="errors.name" color="danger">{{ errors.name }}</IonNote>
-                    </IonItem>
-                  </IonCol>
-                </IonRow>
-
-                <IonRow>
-                  <IonCol size="12">
-                    <IonItem>
-                      <IonLabel position="stacked">Endereço</IonLabel>
-                      <IonInput
-                        v-model="values.address"
-                        type="text"
-                        placeholder="Endereço da instituição"
-                        :maxlength="255"
-                      ></IonInput>
-                    </IonItem>
-                  </IonCol>
-                </IonRow>
-
-                <IonRow>
-                  <IonCol size="12" size-md="6">
-                    <IonItem>
-                      <IonLabel position="stacked">Cidade</IonLabel>
-                      <IonInput
-                        v-model="values.city"
-                        type="text"
-                        placeholder="Cidade"
-                        :maxlength="100"
-                      ></IonInput>
-                    </IonItem>
-                  </IonCol>
-                  <IonCol size="12" size-md="2">
-                    <IonItem>
-                      <IonLabel position="stacked">Estado</IonLabel>
-                      <IonInput
-                        v-model="values.state"
-                        type="text"
-                        placeholder="UF"
-                        :maxlength="2"
-                      ></IonInput>
-                    </IonItem>
-                  </IonCol>
-                  <IonCol size="12" size-md="4">
-                    <IonItem>
-                      <IonLabel position="stacked">CEP</IonLabel>
-                      <IonInput
-                        v-model="values.postalCode"
-                        type="text"
-                        placeholder="CEP"
-                        :maxlength="10"
-                      ></IonInput>
-                    </IonItem>
-                  </IonCol>
-                </IonRow>
-
-                <IonRow>
-                  <IonCol size="12" size-md="6">
-                    <IonItem>
-                      <IonLabel position="stacked">Telefone</IonLabel>
-                      <IonInput
-                        v-model="values.phone"
-                        type="tel"
-                        placeholder="Telefone de contato"
-                        :maxlength="15"
-                      ></IonInput>
-                    </IonItem>
-                  </IonCol>
-                  <IonCol size="12" size-md="6">
-                    <IonItem>
-                      <IonLabel position="stacked">E-mail</IonLabel>
-                      <IonInput
-                        v-model="values.email"
-                        type="email"
-                        placeholder="E-mail de contato"
-                        :maxlength="255"
-                        @ion-change="validateEmail"
-                      ></IonInput>
-                      <IonNote v-if="errors.email" color="danger">{{ errors.email }}</IonNote>
-                    </IonItem>
-                  </IonCol>
-                </IonRow>
-              </IonGrid>
-            </form>
-          </IonCardContent>
-        </IonCard>
-
-        <IonRow class="ion-margin-top">
-          <IonCol class="ion-text-end">
-            <IonButton color="medium" fill="outline" class="ion-margin-end" @click="navigateBack">
-              Cancelar
-            </IonButton>
-            <IonButton type="submit" :disabled="isSubmitting" @click="saveForm">
-              Salvar
-            </IonButton>
-          </IonCol>
-        </IonRow>
-      </div>
-    </ContentLayout>
-  </IonPage>
-</template>
-
 <script setup lang="ts">
 import {
   IonButton,
-  IonCard,
-  IonCardContent,
   IonCol,
+  IonContent,
+  IonFooter,
   IonGrid,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonNote,
+  IonHeader,
   IonPage,
   IonRow,
-  IonText,
   IonTitle,
+  IonToolbar,
 } from '@ionic/vue'
-import ContentLayout from '@/components/theme/ContentLayout.vue'
-import { onMounted, ref, computed } from 'vue'
+import { ErrorMessage, Field, Form } from 'vee-validate'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import showToast from '@/utils/toast-alert'
 import InstitutionService from '../../services/InstitutionService'
@@ -162,8 +22,10 @@ const route = useRoute()
 const institutionService = new InstitutionService()
 const isSubmitting = ref(false)
 const isEditing = computed(() => !!route.params.id)
+const pageTitle = computed(() => isEditing.value ? 'Editar Instituição' : 'Nova Instituição')
 
-const values = ref({
+const initialFormValues = {
+  id: '',
   name: '',
   address: '',
   city: '',
@@ -171,16 +33,52 @@ const values = ref({
   postalCode: '',
   phone: '',
   email: ''
-})
+}
 
-const errors = ref({
-  name: '',
-  email: ''
-})
+const formValues = ref({ ...initialFormValues })
+
+const form = ref<any>(null)
 
 onMounted(async () => {
   if (isEditing.value) {
     await loadInstitution()
+  }
+})
+
+async function buscarEndereco(cep: string) {
+  try {
+    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+    const data = await response.json();
+    if (data.erro) {
+      throw new Error('CEP não encontrado');
+    }
+    return data;
+  } catch (error) {
+    console.error(error);
+    return null;
+  }
+}
+
+// Watcher para o campo de CEP para autocompletar os campos de endereço
+watch(() => formValues.value.postalCode, async (novoCep) => {
+  if (!novoCep) return;
+  
+  const cepLimpo = String(novoCep).replace(/\D/g, '');
+  if (cepLimpo && cepLimpo.length === 8) {
+    const endereco = await buscarEndereco(cepLimpo);
+    if (endereco) {
+      // Atualiza os valores do formulário
+      formValues.value.address = endereco.logradouro || '';
+      formValues.value.city = endereco.localidade || '';
+      formValues.value.state = endereco.uf || '';
+      
+      // Atualiza os valores nos campos do formulário vee-validate
+      if (form.value) {
+        form.value.setFieldValue('address', endereco.logradouro || '');
+        form.value.setFieldValue('city', endereco.localidade || '');
+        form.value.setFieldValue('state', endereco.uf || '');
+      }
+    }
   }
 })
 
@@ -189,13 +87,16 @@ async function loadInstitution() {
     const id = route.params.id as string
     const institution = await institutionService.getInstitutionById(id)
     if (institution) {
-      values.value.name = institution.name || ''
-      values.value.address = institution.address || ''
-      values.value.city = institution.city || ''
-      values.value.state = institution.state || ''
-      values.value.postalCode = institution.postalCode || ''
-      values.value.phone = institution.phone || ''
-      values.value.email = institution.email || ''
+      formValues.value = {
+        id: institution.id || '',
+        name: institution.name || '',
+        address: institution.address || '',
+        city: institution.city || '',
+        state: institution.state || '',
+        postalCode: institution.postalCode || '',
+        phone: institution.phone || '',
+        email: institution.email || ''
+      }
     }
   } catch (error) {
     console.error('Erro ao carregar instituição:', error)
@@ -203,68 +104,45 @@ async function loadInstitution() {
   }
 }
 
-function validateName() {
-  if (!values.value.name.trim()) {
-    errors.value.name = 'Nome é obrigatório'
-    return false
-  }
-  errors.value.name = ''
-  return true
-}
+const saveButtonEnabled = computed(() => {
+  // Habilita o botão se pelo menos o nome estiver preenchido
+  return !!formValues.value.name
+})
 
-function validateEmail() {
-  if (!values.value.email) {
-    errors.value.email = ''
-    return true
-  }
-  
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  if (!emailRegex.test(values.value.email)) {
-    errors.value.email = 'E-mail inválido'
-    return false
-  }
-  
-  errors.value.email = ''
-  return true
-}
-
-function validateForm() {
-  const nameValid = validateName()
-  const emailValid = validateEmail()
-  return nameValid && emailValid
-}
-
-async function saveForm() {
-  if (!validateForm()) {
-    return
-  }
-
+async function handleSubmit(values: any) {
   isSubmitting.value = true
-
+  
   try {
-    const payload = {
+    const institutionData = {
       id: isEditing.value ? route.params.id as string : undefined,
-      name: values.value.name,
-      address: values.value.address,
-      city: values.value.city,
-      state: values.value.state,
-      postalCode: values.value.postalCode,
-      phone: values.value.phone,
-      email: values.value.email,
+      name: values.name.trim(),
+      address: values.address?.trim() || '',
+      city: values.city?.trim() || '',
+      state: values.state?.trim() || '',
+      postalCode: values.postalCode?.trim() || '', // Usando o nome padronizado postalCode
+      phone: values.phone?.trim() || '',
+      email: values.email?.trim() || '',
     }
 
-    const result = await institutionService.upsertInstitution(payload)
+    await institutionService.upsertInstitution(institutionData)
     
-    if (result) {
-      showToast(`Instituição ${isEditing.value ? 'atualizada' : 'cadastrada'} com sucesso`, 'top', 'success')
-      navigateBack(true)
-    }
-  } catch (error: any) {
+    showToast(
+      `Instituição ${isEditing.value ? 'atualizada' : 'cadastrada'} com sucesso!`,
+      'top',
+      'success'
+    )
+    
+    navigateBack(true)
+  } catch (error) {
     console.error('Erro ao salvar instituição:', error)
-    showToast(error.message || 'Erro ao salvar instituição', 'top', 'danger')
+    showToast('Erro ao salvar instituição', 'top', 'danger')
   } finally {
     isSubmitting.value = false
   }
+}
+
+function resetForm() {
+  formValues.value = { ...initialFormValues }
 }
 
 function navigateBack(refresh = false) {
@@ -276,8 +154,324 @@ function navigateBack(refresh = false) {
 }
 </script>
 
+<template>
+  <IonPage>
+    <IonHeader>
+      <IonToolbar>
+        <IonTitle class="page-title">
+          {{ pageTitle }}
+        </IonTitle>
+      </IonToolbar>
+      <div class="toolbar-accent" />
+    </IonHeader>
+
+    <IonContent :scroll-y="true" class="ion-padding content-with-footer">
+      <Form id="institution-form" ref="form" :key="formValues.id || 'new'" :initial-values="formValues" @submit="handleSubmit">
+        <IonGrid>
+          <div class="section-header">
+            <h2>Informações Básicas</h2>
+          </div>
+
+          <IonRow>
+            <IonCol size="12" size-md="6">
+              <Field v-slot="{ field }" name="name" label="Nome da instituição" rules="required|min:3|max:100">
+                <div class="floating-input">
+                  <input
+                    v-bind="field"
+                    v-model="formValues.name"
+                    type="text"
+                    class="floating-native"
+                    maxlength="101"
+                    placeholder=" "
+                    @input="field.onInput"
+                  >
+                  <label class="floating-label"><span>Nome da instituição </span><span class="required-text">(Obrigatório)</span></label>
+                </div>
+                <ErrorMessage v-slot="{ message }" name="name">
+                  <div class="error-message">
+                    {{ message }}
+                  </div>
+                </ErrorMessage>
+              </Field>
+            </IonCol>
+          </IonRow>
+
+          <div class="section-header">
+            <h2>Endereço</h2>
+          </div>
+
+          <IonRow>
+            <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="postalCode" label="CEP" rules="required|cep" >
+                  <div class="floating-input">
+                    <input 
+                      v-bind="field" 
+                      v-model="formValues.postalCode"
+                      v-imask="{ mask: '00000-000' }"
+                      type="text" 
+                      class="floating-native" 
+                      placeholder=" "
+                      @input="field.onInput"
+                    >
+                    <label class="floating-label"><span>CEP </span><span class="required-text">(Obrigatório)</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="postalCode">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+            </IonCol>
+            <IonCol size="12" size-md="6">
+              <Field v-slot="{ field }" name="address" label="Endereço" rules="max:255">
+                <div class="floating-input">
+                  <input
+                    v-bind="field"
+                    v-model="formValues.address"
+                    type="text"
+                    class="floating-native"
+                    maxlength="255"
+                    placeholder=" "
+                    @input="field.onInput"
+                  >
+                  <label class="floating-label"><span>Logradouro</span></label>
+                </div>
+                <ErrorMessage v-slot="{ message }" name="address">
+                  <div class="error-message">
+                    {{ message }}
+                  </div>
+                </ErrorMessage>
+              </Field>
+            </IonCol>
+          </IonRow>
+
+          <IonRow>
+            <IonCol size="12" size-md="6">
+              <Field v-slot="{ field }" name="city" label="Cidade" rules="max:100">
+                <div class="floating-input">
+                  <input
+                    v-bind="field"
+                    v-model="formValues.city"
+                    type="text"
+                    class="floating-native"
+                    maxlength="100"
+                    placeholder=" "
+                    @input="field.onInput"
+                  >
+                  <label class="floating-label"><span>Cidade</span></label>
+                </div>
+                <ErrorMessage v-slot="{ message }" name="city">
+                  <div class="error-message">
+                    {{ message }}
+                  </div>
+                </ErrorMessage>
+              </Field>
+            </IonCol>
+            <IonCol size="12" size-md="6">
+              <Field v-slot="{ field }" name="state" label="Estado" rules="max:2">
+                <div class="floating-input">
+                  <input
+                    v-bind="field"
+                    v-model="formValues.state"
+                    type="text"
+                    class="floating-native"
+                    maxlength="2"
+                    placeholder=" "
+                    @input="field.onInput"
+                  >
+                  <label class="floating-label"><span>UF</span></label>
+                </div>
+                <ErrorMessage v-slot="{ message }" name="state">
+                  <div class="error-message">
+                    {{ message }}
+                  </div>
+                </ErrorMessage>
+              </Field>
+            </IonCol>
+          </IonRow>
+
+          <div class="section-header">
+            <h2>Contato</h2>
+          </div>
+
+          <IonRow>
+            <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="phone" label="Telefone" rules="required|phone">
+                  <div class="floating-input">
+                    <input 
+                      v-bind="field" 
+                      v-model="formValues.phone"
+                      v-imask="{ mask: '(00) 00000-0000' }"
+                      type="tel" 
+                      class="floating-native" 
+                      placeholder=" "
+                      @input="field.onInput"
+                    >
+                    <label class="floating-label"><span>Telefone </span><span class="required-text">(Obrigatório)</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="phone">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            <IonCol size="12" size-md="6">
+              <Field v-slot="{ field }" name="email" label="E-mail" rules="email|max:255">
+                <div class="floating-input">
+                  <input
+                    v-bind="field"
+                    v-model="formValues.email"
+                    type="email"
+                    class="floating-native"
+                    maxlength="255"
+                    placeholder=" "
+                    @input="field.onInput"
+                  >
+                  <label class="floating-label"><span>E-mail</span></label>
+                </div>
+                <ErrorMessage v-slot="{ message }" name="email">
+                  <div class="error-message">
+                    {{ message }}
+                  </div>
+                </ErrorMessage>
+              </Field>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
+      </Form>
+    </IonContent>
+
+    <IonFooter>
+      <IonToolbar>
+        <IonGrid>
+          <IonRow class="action-buttons-fixed">
+            <IonCol size="6">
+              <IonButton color="danger" expand="block" @click="navigateBack">Cancelar</IonButton>
+            </IonCol>
+            <IonCol size="6">
+              <IonButton expand="block" type="submit" form="institution-form" :disabled="!saveButtonEnabled">Salvar</IonButton>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
+      </IonToolbar>
+    </IonFooter>
+  </IonPage>
+</template>
+
 <style scoped>
-ion-item {
-  --padding-start: 0;
+.page-title {
+  font-weight: bold; 
+  color: var(--ion-color-secondary);
+}
+
+.section-header {
+  margin: 16px 0 8px 0;
+}
+
+.section-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--ion-color-secondary);
+  margin: 0;
+  border-bottom: 1px solid var(--ion-color-medium-shade);
+  padding-bottom: 8px;
+}
+
+.floating-input {
+  position: relative;
+  margin-bottom: 16px;
+  border: 1px solid var(--ion-color-primary);
+  border-radius: 4px;
+  margin-top: 24px;
+  height: 56px;
+}
+
+.floating-native {
+  width: 100%;
+  height: 100%;
+  padding: 0 16px;
+  border: none;
+  border-radius: 4px;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--ion-color-dark-tint);
+  display: flex;
+  align-items: center;
+  transition: background-color 0.2s;
+}
+
+.floating-native:focus {
+  background-color: transparent;
+}
+
+.floating-input:focus-within {
+  border-color: var(--ion-color-secondary);
+  box-shadow: none;
+}
+
+.floating-label {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  background: white;
+  padding: 0 4px;
+  font-size: 1rem;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  color: var(--ion-color-medium-shade);
+}
+
+.top-label {
+  top: 8px;
+  transform: translateY(0);
+}
+
+.floating-native::placeholder {
+  color: transparent;
+}
+
+.floating-native:focus ~ .floating-label,
+.floating-native:not(:placeholder-shown) ~ .floating-label {
+  top: -10px;
+  transform: translateY(0);
+  font-size: 0.75rem;
+  color: var(--ion-color-primary);
+  background: white;
+  padding: 0 4px;
+  z-index: 1;
+}
+
+.required-text {
+  color: var(--ion-color-danger);
+  font-size: 12px;
+}
+
+.error-message {
+  color: var(--ion-color-danger);
+  font-size: 0.8rem;
+  margin-top: 4px;
+  padding-left: 16px;
+}
+
+.select-input {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+.content-with-footer {
+  --padding-bottom: 100px;
+}
+
+.toolbar-accent {
+  height: 4px;
+  background: var(--ion-color-primary);
+}
+
+.action-buttons-fixed {
+  padding: 8px;
 }
 </style>

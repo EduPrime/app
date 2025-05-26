@@ -110,12 +110,6 @@ watch(
                   <span class="detail-value">{{ institutionDetails.phone || '-' }}</span>
                 </div>
               </IonCol>
-              <IonCol size="12" size-md="6">
-                <div class="detail-item">
-                  <span class="detail-label">CEP</span>
-                  <span class="detail-value">{{ institutionDetails.postalCode || '-' }}</span>
-                </div>
-              </IonCol>
             </IonRow>
           </IonGrid>
         </div>
@@ -126,10 +120,31 @@ watch(
           </h2>
           <IonGrid>
             <IonRow>
-              <IonCol size="12">
+              <IonCol size="12" size-md="6">
                 <div class="detail-item">
-                  <span class="detail-label">Endereço completo</span>
+                  <span class="detail-label">CEP</span>
+                  <span class="detail-value">{{ institutionDetails.postalCode || '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Logradouro</span>
                   <span class="detail-value">{{ institutionDetails.address || '-' }}</span>
+                </div>
+              </IonCol>
+            </IonRow>
+
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Número</span>
+                  <span class="detail-value">{{ '-' }}</span>
+                </div>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <div class="detail-item">
+                  <span class="detail-label">Bairro</span>
+                  <span class="detail-value">{{ '-' }}</span>
                 </div>
               </IonCol>
             </IonRow>
@@ -145,28 +160,6 @@ watch(
                 <div class="detail-item">
                   <span class="detail-label">Estado</span>
                   <span class="detail-value">{{ institutionDetails.state || '-' }}</span>
-                </div>
-              </IonCol>
-            </IonRow>
-          </IonGrid>
-        </div>
-
-        <div class="detail-section">
-          <h2 class="section-title">
-            Informações do sistema
-          </h2>
-          <IonGrid>
-            <IonRow>
-              <IonCol size="12" size-md="6">
-                <div class="detail-item">
-                  <span class="detail-label">Data de criação</span>
-                  <span class="detail-value">{{ formatDate(institutionDetails.createdAt) }}</span>
-                </div>
-              </IonCol>
-              <IonCol size="12" size-md="6">
-                <div class="detail-item">
-                  <span class="detail-label">Última atualização</span>
-                  <span class="detail-value">{{ formatDate(institutionDetails.updatedAt) }}</span>
                 </div>
               </IonCol>
             </IonRow>
