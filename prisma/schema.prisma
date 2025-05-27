@@ -77,6 +77,7 @@ model Classroom {
   abbreviation      String?     @db.VarChar(100)
   year              Int
   isMultiSerialized Boolean?    @default(false)
+  altDisciplineList Boolean?    @default(false)
   userCreated       String?     @db.VarChar(255)
   createdAt         DateTime?   @default(now()) @db.Timestamp(6)
   deletedAt         DateTime?   @db.Timestamp(6)
@@ -87,18 +88,19 @@ model Classroom {
   tenantId          String?
 
   Attendance                                                        Attendance[]
-  school                                                            School?             @relation(fields: [schoolId], references: [id], onDelete: Restrict, map: "classroom_school_id_fkey")
-  series                                                            Series              @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroom_seriesid_fkey")
+  school                                                            School?               @relation(fields: [schoolId], references: [id], onDelete: Restrict, map: "classroom_school_id_fkey")
+  series                                                            Series                @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroom_seriesid_fkey")
   ConceptualGrade                                                   ConceptualGrade[]
   Content                                                           Content[]
   enrollment                                                        Enrollment[]
-  enrollmenthistory_enrollmenthistory_currentClassroomIdToclassroom EnrollmentHistory[] @relation("enrollmenthistory_currentClassroomIdToclassroom")
-  enrollmenthistory_enrollmenthistory_formerClassroomIdToclassroom  EnrollmentHistory[] @relation("enrollmenthistory_formerClassroomIdToclassroom")
+  enrollmenthistory_enrollmenthistory_currentClassroomIdToclassroom EnrollmentHistory[]   @relation("enrollmenthistory_currentClassroomIdToclassroom")
+  enrollmenthistory_enrollmenthistory_formerClassroomIdToclassroom  EnrollmentHistory[]   @relation("enrollmenthistory_formerClassroomIdToclassroom")
   NumericGrade                                                      NumericGrade[]
   RegisteredGrade                                                   RegisteredGrade[]
   Schedule                                                          Schedule[]
   TeacherAttendance                                                 TeacherAttendance[]
-  Teacher                                                           Teacher?            @relation(fields: [teacherId], references: [id], onDelete: NoAction, map: "classroom_teacher_id_fkey")
+  Teacher                                                           Teacher?              @relation(fields: [teacherId], references: [id], onDelete: NoAction, map: "classroom_teacher_id_fkey")
+  ClassroomDiscipline                                               ClassroomDiscipline[] @relation(map: "classroomdiscipline_classroom_id_fkey")
 
   @@map("classroom")
   @@schema("public")
@@ -168,6 +170,7 @@ model Discipline {
   thematicUnit         ThematicUnit[]
   SeriesDiscipline     SeriesDiscipline[]     @relation(map: "seriesdiscipline_discipline_id_fkey")
   TeacherDiscipline    TeacherDiscipline[]    @relation(map: "teacherdiscipline_discipline_id_fkey")
+  ClassroomDiscipline  ClassroomDiscipline[]  @relation(map: "classroomdiscipline_discipline_id_fkey")
 
   @@map("discipline")
   @@schema("public")
@@ -987,6 +990,25 @@ model SeriesDiscipline {
   @@schema("public")
 }
 
+model ClassroomDiscipline {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  classroomId  String    @db.Uuid
+  disciplineId String    @db.Uuid
+  year         Int
+  workload     Decimal   @db.Decimal
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime? @db.Timestamp(6)
+  updatedAt    DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy    String?   @db.Uuid
+  tenantId     String?
+
+  classroom  Classroom  @relation(fields: [classroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroomdiscipline_classroom_id_fkey")
+  discipline Discipline @relation(fields: [disciplineId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroomdiscipline_discipline_id_fkey")
+
+  @@map("classroomDiscipline")
+  @@schema("public")
+}
+
 model ServerAllocations {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   serverId    String    @db.Uuid
@@ -1155,6 +1177,7 @@ model Student {
 model Teacher {
   id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   schoolId          String              @db.Uuid
+  inepCode          String?             @db.VarChar(100)
   name              String              @db.VarChar(100)
   birthdate         DateTime            @db.Date
   email             String?             @db.VarChar(255)
