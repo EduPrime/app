@@ -10,11 +10,10 @@ export default class SeriesService extends BaseService<TabelaType> {
     super(table)
   }
 
-  // Método para obter séries baseadas no ID do school
   async getSeriesBySchool(schoolId: string) {
     try {
       const { data: series, error: seriesError } = await this.client
-        .from('series') // Tabela de séries
+        .from('series')
         .select('id, name')
         .eq('schoolId', schoolId)
 
@@ -22,7 +21,6 @@ export default class SeriesService extends BaseService<TabelaType> {
         errorHandler(seriesError, 'Erro ao buscar séries')
       }
 
-      // Retorna os dados das séries
       return series
     }
     catch (error) {
@@ -36,6 +34,7 @@ export default class SeriesService extends BaseService<TabelaType> {
         .from('series')
         .select('id, name')
         .eq('courseId', courseId)
+        .is('deletedAt', null)
 
       if (seriesError) {
         errorHandler(seriesError, 'Erro ao buscar séries por curso')

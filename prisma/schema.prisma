@@ -58,79 +58,86 @@ model AcademicYearTemplate {
 }
 
 model Classroom {
-  id                                                                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  seriesId                                                          String              @db.Uuid
-  maxStudents                                                       Int
-  exceededStudents                                                  Int                 @default(0)
-  totalStudents                                                     Int                 @default(0)
-  pcdStudents                                                       Int                 @default(0)
-  startTime                                                         DateTime?           @db.Timestamp(6)
-  startTimeInterval                                                 DateTime?           @db.Timestamp(6)
-  endTimeInterval                                                   DateTime?           @db.Timestamp(6)
-  endTime                                                           DateTime?           @db.Timestamp(6)
-  dayofweek                                                         dayofweek[]
-  room                                                              String?             @db.VarChar(100)
-  regimeType                                                        regimeType?         @default(Presencial)
-  name                                                              String              @db.VarChar(100)
-  period                                                            period?             @default(MORNING)
-  status                                                            status?             @default(ACTIVE)
-  abbreviation                                                      String?             @db.VarChar(100)
-  year                                                              Int
-  isMultiSerialized                                                 Boolean?            @default(false)
-  userCreated                                                       String?             @db.VarChar(255)
-  createdAt                                                         DateTime?           @default(now()) @db.Timestamp(6)
-  deletedAt                                                         DateTime?           @db.Timestamp(6)
-  updatedAt                                                         DateTime?           @updatedAt @db.Timestamp(6)
-  schoolId                                                          String?             @db.Uuid
-  updatedBy                                                         String?             @db.Uuid
-  tenantId                                                          String?
+  id                String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  seriesId          String      @db.Uuid
+  maxStudents       Int
+  exceededStudents  Int         @default(0)
+  totalStudents     Int         @default(0)
+  pcdStudents       Int         @default(0)
+  startTime         DateTime?   @db.Timestamp(6)
+  startTimeInterval DateTime?   @db.Timestamp(6)
+  endTimeInterval   DateTime?   @db.Timestamp(6)
+  endTime           DateTime?   @db.Timestamp(6)
+  dayofweek         dayofweek[]
+  room              String?     @db.VarChar(100)
+  regimeType        regimeType? @default(Presencial)
+  name              String      @db.VarChar(100)
+  period            period?     @default(MORNING)
+  status            status?     @default(ACTIVE)
+  abbreviation      String?     @db.VarChar(100)
+  year              Int
+  isMultiSerialized Boolean?    @default(false)
+  altDisciplineList Boolean?    @default(false)
+  userCreated       String?     @db.VarChar(255)
+  createdAt         DateTime?   @default(now()) @db.Timestamp(6)
+  deletedAt         DateTime?   @db.Timestamp(6)
+  updatedAt         DateTime?   @updatedAt @db.Timestamp(6)
+  schoolId          String?     @db.Uuid
+  teacherId         String?     @db.Uuid
+  updatedBy         String?     @db.Uuid
+  tenantId          String?
+
   Attendance                                                        Attendance[]
-  school                                                            School?             @relation(fields: [schoolId], references: [id], onDelete: Restrict, map: "classroom_school_id_fkey")
-  series                                                            Series              @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroom_seriesid_fkey")
+  school                                                            School?               @relation(fields: [schoolId], references: [id], onDelete: Restrict, map: "classroom_school_id_fkey")
+  series                                                            Series                @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroom_seriesid_fkey")
   ConceptualGrade                                                   ConceptualGrade[]
   Content                                                           Content[]
   enrollment                                                        Enrollment[]
-  enrollmenthistory_enrollmenthistory_currentClassroomIdToclassroom EnrollmentHistory[] @relation("enrollmenthistory_currentClassroomIdToclassroom")
-  enrollmenthistory_enrollmenthistory_formerClassroomIdToclassroom  EnrollmentHistory[] @relation("enrollmenthistory_formerClassroomIdToclassroom")
+  enrollmenthistory_enrollmenthistory_currentClassroomIdToclassroom EnrollmentHistory[]   @relation("enrollmenthistory_currentClassroomIdToclassroom")
+  enrollmenthistory_enrollmenthistory_formerClassroomIdToclassroom  EnrollmentHistory[]   @relation("enrollmenthistory_formerClassroomIdToclassroom")
   NumericGrade                                                      NumericGrade[]
   RegisteredGrade                                                   RegisteredGrade[]
   Schedule                                                          Schedule[]
   TeacherAttendance                                                 TeacherAttendance[]
+  Teacher                                                           Teacher?              @relation(fields: [teacherId], references: [id], onDelete: NoAction, map: "classroom_teacher_id_fkey")
+  ClassroomDiscipline                                               ClassroomDiscipline[] @relation(map: "classroomdiscipline_classroom_id_fkey")
 
   @@map("classroom")
   @@schema("public")
 }
 
 model Course {
-  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String           @db.VarChar(100)
-  abbreviation      String?          @db.VarChar(10)
-  description       String?          @db.VarChar(255)
+  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String          @db.VarChar(100)
+  abbreviation      String?         @db.VarChar(10)
+  description       String?         @db.VarChar(255)
   numberOfStages    Int?
-  status            status?          @default(ACTIVE)
+  status            status?         @default(ACTIVE)
   metadata          Json?
-  createdAt         DateTime?        @default(now()) @db.Timestamp(6)
-  deletedAt         DateTime?        @db.Timestamp(6)
-  updatedAt         DateTime?        @updatedAt @db.Timestamp(6)
-  userCreated       String?          @db.VarChar(255)
-  updatedBy         String?          @db.Uuid
+  createdAt         DateTime?       @default(now()) @db.Timestamp(6)
+  deletedAt         DateTime?       @db.Timestamp(6)
+  updatedAt         DateTime?       @updatedAt @db.Timestamp(6)
+  userCreated       String?         @db.VarChar(255)
+  updatedBy         String?         @db.Uuid
   tenantId          String?
   timeSerialization timeSerial?
   courseStage       Int?
   graduate          graduate?
-  workload          Decimal?         @db.Decimal
+  workload          Decimal?        @db.Decimal
   teachingType      teachingType?
   regimeType        regimeType?
   courseModality    courseModality?
-  institutionId     String           @db.Uuid
-  schoolId          String?          @db.Uuid
-  institution       Institution      @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_institutionId_fkey")
-  School            School?          @relation(fields: [schoolId], references: [id])
-  CourseSchool      CourseSchool[]
-  enrollment        Enrollment[]
-  EvaluationRule    EvaluationRule[]
-  preenrollment     PreEnrollment[]
-  series            Series[]
+  institutionId     String          @db.Uuid
+  schoolId          String?         @db.Uuid
+  evaluationRuleId  String?         @db.Uuid
+
+  institution    Institution     @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_institutionId_fkey")
+  School         School?         @relation(fields: [schoolId], references: [id])
+  CourseSchool   CourseSchool[]
+  enrollment     Enrollment[]
+  EvaluationRule EvaluationRule? @relation(fields: [evaluationRuleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_evaluationruleid_fkey")
+  preenrollment  PreEnrollment[]
+  series         Series[]
 
   @@map("course")
   @@schema("public")
@@ -162,6 +169,8 @@ model Discipline {
   TeacherAttendance    TeacherAttendance[]
   thematicUnit         ThematicUnit[]
   SeriesDiscipline     SeriesDiscipline[]     @relation(map: "seriesdiscipline_discipline_id_fkey")
+  TeacherDiscipline    TeacherDiscipline[]    @relation(map: "teacherdiscipline_discipline_id_fkey")
+  ClassroomDiscipline  ClassroomDiscipline[]  @relation(map: "classroomdiscipline_discipline_id_fkey")
 
   @@map("discipline")
   @@schema("public")
@@ -314,7 +323,7 @@ model TeacherAttendance {
   id           String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   date         DateTime       @db.Date
   totalClasses Int
-  type         attendanceType
+  type         frequencyType?
   teacherId    String         @db.Uuid
   classroomId  String         @db.Uuid
   disciplineId String?        @db.Uuid
@@ -792,7 +801,7 @@ model School {
   educationNetwork             Boolean?
   administrativeDependency     Organ?
   name                         String                 @db.VarChar(100)
-  cnpj                         Decimal?               @db.Decimal(14, 0)
+  cnpj                         String?                @db.VarChar(14)
   address                      String?                @db.VarChar(255)
   addressNumber                String?                @db.VarChar(10)
   additionalInfo               String?                @db.VarChar(255)
@@ -827,7 +836,7 @@ model School {
   accessibleClassrooms         Int?
   internetAvailable            Boolean?
   localNetworkAvailable        Boolean?
-  connectionTypes              ConnectionType?
+  connectionType               ConnectionType[]
   devicesUsedByStudents        Device[]
   availableDesktops            Int?
   availableLaptops             Int?
@@ -903,6 +912,7 @@ model School {
   teacher                      Teacher[]
   TeacherAttendance            TeacherAttendance[]
 
+  @@unique([INEPCode, name], map: "uq_school_inepcode_on_conflict")
   @@map("school")
   @@schema("public")
 }
@@ -947,7 +957,7 @@ model Series {
   userCreated        String?            @db.VarChar(255)
   institutionId      String             @db.Uuid
   workload           Decimal?           @db.Decimal
-  schoolDays         String
+  schoolDays         String?
   schoolId           String?            @db.Uuid
   classroom          Classroom[]
   enrollment         Enrollment[]
@@ -980,6 +990,25 @@ model SeriesDiscipline {
   @@schema("public")
 }
 
+model ClassroomDiscipline {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  classroomId  String    @db.Uuid
+  disciplineId String    @db.Uuid
+  year         Int
+  workload     Decimal   @db.Decimal
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime? @db.Timestamp(6)
+  updatedAt    DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy    String?   @db.Uuid
+  tenantId     String?
+
+  classroom  Classroom  @relation(fields: [classroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroomdiscipline_classroom_id_fkey")
+  discipline Discipline @relation(fields: [disciplineId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroomdiscipline_discipline_id_fkey")
+
+  @@map("classroomDiscipline")
+  @@schema("public")
+}
+
 model ServerAllocations {
   id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   serverId    String    @db.Uuid
@@ -1003,26 +1032,31 @@ model ServerAllocations {
 }
 
 model Servers {
-  id                 String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name               String              @db.VarChar(100)
-  email              String?             @unique @db.VarChar(255)
-  phone              String?             @db.VarChar(15)
-  cpf                String              @unique @db.VarChar(11)
-  address            String?             @db.VarChar(255)
-  position           String              @db.VarChar(255)
-  schoolId           String?             @db.Uuid
-  createdAt          DateTime?           @default(now()) @db.Timestamp(6)
-  deletedAt          DateTime?           @db.Timestamp(6)
-  updatedAt          DateTime?           @updatedAt @db.Timestamp(6)
-  updatedBy          String?             @db.Uuid
-  tenantId           String?
-  userCreated        String?             @db.VarChar(255)
-  userId             String?             @db.Uuid
-  functionId         String?             @db.Uuid
-  institutionId      String              @db.Uuid
-  codServidor        Int
-  contract           contractType?       @default(INDETERMINADO)
-  disability         disabilityType?
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name          String          @db.VarChar(100)
+  email         String?         @unique @db.VarChar(255)
+  phone         String?         @db.VarChar(15)
+  cpf           String          @unique @db.VarChar(11)
+  address       String?         @db.VarChar(255)
+  contract      contractType?
+  disability    disabilityType?
+  licenseType   licenseType?
+  scholarity    scholarity?
+  workingHours  Int?
+  inepCode      String?         @db.VarChar(100)
+  isAllocated   Boolean?        @default(false)
+  schoolId      String?         @db.Uuid
+  createdAt     DateTime?       @default(now()) @db.Timestamp(6)
+  deletedAt     DateTime?       @db.Timestamp(6)
+  updatedAt     DateTime?       @updatedAt @db.Timestamp(6)
+  updatedBy     String?         @db.Uuid
+  tenantId      String?
+  userCreated   String?         @db.VarChar(255)
+  userId        String?         @db.Uuid
+  functionId    String?         @db.Uuid
+  institutionId String          @db.Uuid
+  codServidor   Int
+
   server_allocations ServerAllocations[]
   institution        Institution         @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "server_institution_fkey")
   User               User?               @relation(fields: [userId], references: [id])
@@ -1143,6 +1177,7 @@ model Student {
 model Teacher {
   id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   schoolId          String              @db.Uuid
+  inepCode          String?             @db.VarChar(100)
   name              String              @db.VarChar(100)
   birthdate         DateTime            @db.Date
   email             String?             @db.VarChar(255)
@@ -1167,8 +1202,27 @@ model Teacher {
   school            School              @relation(fields: [schoolId], references: [id], map: "teacher_school_id_fkey")
   user              User?               @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "user_teacher_fkey")
   TeacherAttendance TeacherAttendance[]
+  TeacherDiscipline TeacherDiscipline[] @relation(map: "teacherdiscipline_teacher_id_fkey")
+  Classroom         Classroom[]         @relation(map: "classroom_teacher_id_fkey")
 
   @@map("teacher")
+  @@schema("public")
+}
+
+model TeacherDiscipline {
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  teacherId    String     @db.Uuid
+  disciplineId String     @db.Uuid
+  workload     Decimal    @db.Decimal
+  createdAt    DateTime   @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime?  @db.Timestamp(6)
+  updatedAt    DateTime?  @updatedAt @db.Timestamp(6)
+  updatedBy    String?    @db.Uuid
+  tenantId     String?
+  teacher      Teacher    @relation(fields: [teacherId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "teacherdiscipline_teacher_id_fkey")
+  discipline   Discipline @relation(fields: [disciplineId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "teacherdiscipline_discipline_id_fkey")
+
+  @@map("teacherDiscipline")
   @@schema("public")
 }
 
@@ -1195,10 +1249,11 @@ model EvaluationRule {
   frequencyReport        Json?
   createdAt              DateTime            @default(now()) @db.Timestamp(6)
   updatedAt              DateTime?           @updatedAt @db.Timestamp(6)
+  deletedAt              DateTime?           @db.Timestamp(6)
   updatedBy              String?             @db.Uuid
   tenantId               String?             @db.Uuid
-  courseId               String              @db.Uuid
-  course                 Course              @relation(fields: [courseId], references: [id], map: "rule_course_fkey")
+
+  Course Course[] @relation(map: "course_evaluationruleid_fkey")
 
   @@map("evaluationRule")
   @@schema("public")
@@ -1258,16 +1313,6 @@ enum period {
   @@schema("public")
 }
 
-enum position {
-  PROFESSOR
-  GESTOR
-  COORDENADOR
-  DIRETOR
-  VIGIA
-
-  @@schema("public")
-}
-
 enum residenceZoneType {
   URBANA
   RURAL
@@ -1319,12 +1364,12 @@ enum roleType {
 }
 
 enum contractType {
-  INDETERMINADO
-  CONTRATADO
-  PERMUTA
-  ESTAGIARIO
-  COMISSIONADO
-  EFETIVO
+  INDETERMINADO @map("Indeterminado")
+  CONTRATADO    @map("Contratado")
+  PERMUTA       @map("Permuta")
+  ESTAGIARIO    @map("Estagiário")
+  COMISSIONADO  @map("Comissionado")
+  EFETIVO       @map("Efetivo")
 
   @@schema("public")
 }
@@ -1399,9 +1444,27 @@ enum Lab {
 }
 
 enum Room {
-  CLASSROOM     @map("Sala de aula")
-  AUDITORIUM    @map("Auditório")
-  COMMON_PLACES @map("Espaços comuns")
+  CLASSROOM              @map("Sala de aula")
+  AUDITORIUM             @map("Auditório")
+  COMMON_PLACES          @map("Espaços comuns")
+  WAREHOUSE              @map("Almoxarifado")
+  LIBRARY                @map("Biblioteca")
+  TEACHER_ROOM           @map("Sala de professores")
+  BATHROOM               @map("Banheiro")
+  ACCESSIBILITY_BATHROOM @map("Banheiro acessível")
+  TEACHER_BATHROOM       @map("Banheiro de professores")
+  KITCHEN                @map("Cozinha")
+  STUDENT_DORMROOM       @map("Dormitório de alunos")
+  TEACHER_DORMROOM       @map("Dormitório de professores")
+  POOL                   @map("Piscina")
+  LUNCHROOM              @map("Refeitório")
+  OPEN_COURT             @map("Pátio aberto")
+  CLOSED_COURT           @map("Pátio fechado")
+  COVERED_FIELD          @map("Quadra coberta")
+  OPEN_FIELD             @map("Quadra descoberta")
+  SECRETARY              @map("Secretaria")
+  PARKING                @map("Estacionamento")
+  CAFETERIA              @map("Cantina")
 
   @@schema("public")
 }
@@ -1622,6 +1685,31 @@ enum averageFormula {
   MEDIA_ARITMETICA @map("Média aritmética")
   MEDIA_PONDERADA  @map("Média ponderada entre soma das atividades e exame")
   NAO_TEM_MEDIA    @map("Não tem média")
+
+  @@schema("public")
+}
+
+enum scholarity {
+  FUNDAMENTAL_INCOMPLETO @map("Fundamental incompleto")
+  FUNDAMENTAL_COMPLETO   @map("Fundamental completo")
+  MEDIO_INCOMPLETO       @map("Médio incompleto")
+  MEDIO_COMPLETO         @map("Médio completo")
+  SUPERIOR_INCOMPLETO    @map("Superior incompleto")
+  SUPERIOR_COMPLETO      @map("Superior completo")
+  ESPECIALIZACAO         @map("Especialização")
+  MESTRADO               @map("Mestrado")
+  DOUTORADO              @map("Doutorado")
+
+  @@schema("public")
+}
+
+enum licenseType {
+  LICENSA_PREMIO      @map("Licença Prêmio")
+  LICENCA_MATERNIDADE @map("Licença Maternidade")
+  LICENCA_PATERNIDADE @map("Licença Paternidade")
+  LICENCA_SAUDE       @map("Licença Saúde")
+  LICENCA_FERIAS      @map("Licença Férias")
+  LICENCA_AFASTAMENTO @map("Licença Afastamento")
 
   @@schema("public")
 }

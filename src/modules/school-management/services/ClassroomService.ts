@@ -16,6 +16,8 @@ interface ClassroomToSave {
   endTimeInterval?: Date | null
   endTime?: Date | null
   dayofweek?: string[]
+  disciplines?: string[]
+  altDisciplineList?: boolean
   room?: string | null
   regimeType?: string | null
   period?: string | null
@@ -28,6 +30,8 @@ interface ClassroomToSave {
 }
 
 const table = 'classroom' as const
+
+const now = new Date().toISOString()
 
 export default class ClassroomService extends BaseService<Classroom> {
   constructor() {
@@ -78,7 +82,63 @@ export default class ClassroomService extends BaseService<Classroom> {
       (data as any).courseId = data.series.courseId
     }
 
-    return data as (Classroom & { series: any, school: any, courseId?: string }) | null
+    return data as (Classroom & { series: any, school: any, courseId?: string, disciplines?: string[] }) | null
+  }
+
+  async checkClassroomCustomDisciplines(classroomId: string) {
+    try {
+      if (!classroomId) {
+        return { hasCustomDisciplines: false, altDisciplineList: false, classroom: null }
+      }
+
+      const classroom = await this.getClassroomById(classroomId)
+      if (!classroom) {
+        return { hasCustomDisciplines: false, altDisciplineList: false, classroom: null }
+      }
+
+      const altDisciplineList = !!(classroom as any).altDisciplineList
+
+      if (altDisciplineList) {
+        return {
+          hasCustomDisciplines: true,
+          altDisciplineList: true,
+          classroom,
+        }
+      }
+
+      // Verifica sempre a tabela classroomDiscipline, independente da flag
+      /*
+      const { data: classroomDisciplines, error } = await this.client
+        .from('classroomDiscipline')
+        .select('id, disciplineId')
+        .eq('classroomId', classroomId)
+        .is('deletedAt', null)
+
+      if (error) {
+        console.error('Erro ao verificar disciplinas customizadas:', error)
+        return { hasCustomDisciplines: false, altDisciplineList: false, classroom }
+      }
+
+      // Se existirem registros de disciplinas customizadas, retorna altDisciplineList como true
+      const hasCustomDisciplines = !!(classroomDisciplines && classroomDisciplines.length > 0)
+
+      return {
+        hasCustomDisciplines,
+        altDisciplineList: hasCustomDisciplines,
+        classroom
+      }
+      */
+
+      return {
+        hasCustomDisciplines: false,
+        altDisciplineList: false,
+        classroom,
+      }
+    }
+    catch (error) {
+      console.error('Erro ao verificar disciplinas customizadas da turma:', error)
+      return { hasCustomDisciplines: false, altDisciplineList: false, classroom: null }
+    }
   }
 
   async getClassroomByName(name: string) {
@@ -102,7 +162,7 @@ export default class ClassroomService extends BaseService<Classroom> {
       (data as any).courseId = data.series.courseId
     }
 
-    return data as (Classroom & { series: any, school: any, courseId?: string }) | null
+    return data as (Classroom & { series: any, school: any, courseId?: string, disciplines?: string[] }) | null
   }
 
   async getClassroomByNameInsensitive(name: string, excludeId?: string) {
@@ -151,7 +211,7 @@ export default class ClassroomService extends BaseService<Classroom> {
       })
     }
 
-    return data as (Classroom & { series: any, school: any, courseId?: string })[]
+    return data as (Classroom & { series: any, school: any, courseId?: string, disciplines?: string[] })[]
   }
 
   async getClassroomsBySchoolId(schoolId: string) {
@@ -183,11 +243,6 @@ export default class ClassroomService extends BaseService<Classroom> {
   }
 
   async upsertClassroom(classroom: ClassroomToSave) {
-    const now = new Date().toISOString()
-
-    console.log('classroom', classroom)
-    console.log('classroom.id', classroom.id)
-
     const existingWithSameName = await this.getClassroomByNameInsensitive(
       classroom.name,
       classroom.id,
@@ -196,7 +251,7 @@ export default class ClassroomService extends BaseService<Classroom> {
     if (existingWithSameName) {
       const sameClassroom = await this.getClassroomById(existingWithSameName.id)
 
-      if (sameClassroom && sameClassroom.id === classroom.id) {
+      if (sameClassroom && sameClassroom.id !== classroom.id) {
         throw new Error('Nome de turma já existente para esta série')
       }
     }
@@ -228,6 +283,7 @@ export default class ClassroomService extends BaseService<Classroom> {
       endTimeInterval: classroom.endTimeInterval || null,
       endTime: classroom.endTime || null,
       dayofweek: classroom.dayofweek || [],
+      altDisciplineList: classroom.disciplines ? classroom.disciplines.length > 0 : false,
       room: classroom.room || null,
       regimeType: classroom.regimeType || 'Presencial',
       period: classroom.period || 'MORNING',
@@ -247,8 +303,42 @@ export default class ClassroomService extends BaseService<Classroom> {
       .upsert(payload)
       .select()
 
-    if (error)
+    if (error) {
       errorHandler(error, 'Erro ao inserir/atualizar turma')
+      return []
+    }
+
+    if (data && data.length > 0 && classroom.disciplines && classroom.disciplines.length > 0) {
+      const classroomId = data[0].id
+
+      try {
+        await this.client
+          .from('classroomDiscipline')
+          .update({ deletedAt: now })
+          .eq('classroomId', classroomId)
+          .is('deletedAt', null)
+
+        const disciplineRecords = classroom.disciplines.map(disciplineId => ({
+          classroomId,
+          disciplineId,
+          year: classroom.year,
+          workload: 0,
+          createdAt: now,
+        }))
+
+        const { error: disciplineError } = await this.client
+          .from('classroomDiscipline')
+          .insert(disciplineRecords)
+
+        if (disciplineError) {
+          console.error('Erro ao salvar disciplinas da turma:', disciplineError)
+        }
+      }
+      catch (e) {
+        console.error('Erro ao processar disciplinas da turma:', e)
+      }
+    }
+
     return data as Classroom[]
   }
 
@@ -288,7 +378,6 @@ export default class ClassroomService extends BaseService<Classroom> {
       throw new Error('Não é possível excluir: existem horários associados a esta turma.')
     }
 
-    const now = new Date().toISOString()
     const updateFields: Record<string, any> = {
       deletedAt: now,
       updatedAt: now,

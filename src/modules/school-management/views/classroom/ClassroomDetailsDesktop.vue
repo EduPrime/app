@@ -6,17 +6,20 @@ import { onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ClassroomService from '../../services/ClassroomService'
 import CourseService from '../../services/CourseService'
+import DisciplineService from '../../services/DisciplineService'
 
 const route = useRoute()
 const router = useRouter()
 const classroomService = new ClassroomService()
 const courseService = new CourseService()
+const disciplineService = new DisciplineService()
 const classroomDetails = ref<Classroom | null>(null)
 const loading = ref(true)
 
 const seriesData = ref<any>(null)
 const schoolData = ref<any>(null)
 const courseData = ref<any>(null)
+const disciplineMap = ref<any>({})
 
 function formatTime(time: string | null | undefined): string {
   if (!time)
@@ -134,9 +137,39 @@ async function loadClassroomDetails() {
           const courseMap = await courseService.loadCoursesByIds([seriesData.value.courseId])
           courseData.value = courseMap[seriesData.value.courseId]
         }
+
+        if (data.id && data.seriesId) {
+          try {
+            const disciplines = await disciplineService.getDisciplinesByClassroom(
+              data.id,
+              !!(data as any).altDisciplineList,
+              data.seriesId,
+            )
+
+            const disciplinesById: any = {}
+
+            if (disciplines && disciplines.length) {
+              for (let i = 0; i < disciplines.length; i++) {
+                const discipline = disciplines[i]
+                if (discipline && discipline.id) {
+                  disciplinesById[discipline.id] = discipline
+                }
+              }
+            }
+
+            disciplineMap.value = disciplinesById
+
+            if (classroomDetails.value) {
+              (classroomDetails.value as any).disciplines = disciplines.map((d: any) => d.id)
+            }
+          }
+          catch (err) {
+            console.error('Erro ao processar disciplinas:', err)
+          }
+        }
       }
       catch (error) {
-        console.error('Erro ao carregar dados do curso:', error)
+        console.error('Erro ao carregar dados do curso ou disciplinas:', error)
       }
     }
   }
@@ -353,6 +386,26 @@ watch(
                   <div class="detail-value days-list">
                     <IonChip v-for="day in classroomDetails.dayofweek" :key="day" color="primary" class="day-chip">
                       {{ getDayOfWeekLabel(day) }}
+                    </IonChip>
+                  </div>
+                </div>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </div>
+
+        <div v-if="(classroomDetails as any).disciplines && (classroomDetails as any).disciplines.length > 0" class="detail-section">
+          <h2 class="section-title">
+            Disciplinas
+          </h2>
+          <IonGrid>
+            <IonRow>
+              <IonCol size="12">
+                <div class="detail-item">
+                  <span class="detail-label">Disciplinas da turma</span>
+                  <div class="detail-value days-list">
+                    <IonChip v-for="disciplineId in (classroomDetails as any).disciplines" :key="disciplineId" color="secondary" class="day-chip">
+                      {{ disciplineMap[disciplineId]?.name || disciplineId }}
                     </IonChip>
                   </div>
                 </div>
