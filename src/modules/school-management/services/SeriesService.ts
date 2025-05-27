@@ -201,6 +201,24 @@ export default class SeriesService extends BaseService<TabelaType> {
     }
   }
 
+  async getDisciplinesOfSeries(serieId: string) {
+    const { data: disciplines, error: disciplinesError } = await this.client
+      .from('seriesDiscipline')
+      .select(`
+                *,
+                discipline:disciplineId (name)
+              `)
+      .eq('seriesId', serieId)
+      .is('deletedAt', null)
+
+    if (disciplinesError) {
+      errorHandler(disciplinesError, 'Erro ao buscar disciplinas da série')
+      return []
+    }
+
+    return disciplines
+  }
+
   async getAllSeriesWithDetails() {
     try {
       const { data: seriesData, error: seriesError } = await this.client
@@ -208,6 +226,7 @@ export default class SeriesService extends BaseService<TabelaType> {
         .select(`
           *,
           course:courseId (name),
+          school:schoolId (name),
           institution:institutionId (name)
         `)
         .is('deletedAt', null)

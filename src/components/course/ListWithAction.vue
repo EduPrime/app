@@ -57,7 +57,7 @@ onUnmounted(() => {
       <div style="display: flex; align-items: center; height: 15px;">
         <IonIcon :icon="metaIcon" style="margin-right: 10px; font-size: 16pt;" />
         <IonCardTitle style="font-size: medium;">
-          Lista de funções ({{ props.dataList.length }})
+          Lista de cursos ({{ props.dataList.length }})
         </IonCardTitle>
       </div>
     </IonCardHeader>

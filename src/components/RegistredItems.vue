@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IonButton, IonCardHeader, IonCol, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText } from '@ionic/vue'
-import { apps, bookOutline, briefcaseOutline, business, businessOutline, calendarOutline, callOutline, checkmarkCircleOutline, documentOutline, fileTrayOutline, globeOutline, locationOutline, mailOutline, mapOutline, personOutline, pinOutline, schoolOutline, timeOutline } from 'ionicons/icons'
+import { apps, bookOutline, briefcaseOutline, business, businessOutline, calendarOutline, callOutline, checkmarkCircleOutline, documentOutline, fileTrayOutline, globeOutline, locationOutline, mailOutline, mapOutline, personOutline, pinOutline, school, schoolOutline, timeOutline } from 'ionicons/icons'
 
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -104,7 +104,15 @@ const metaIcon = ref((route.meta.icon as string) || '')
                 {{ props.items.institutionName }}
               </IonText>
             </div>
-
+            <div v-if="props.items.school" style="display: flex; align-items: center; padding: 6px;">
+              <IonIcon
+                slot="start" color="primary" style="padding-right: 10px;"
+                :icon="school"
+              />
+              <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
+                {{ props.items.school.name }}
+              </IonText>
+            </div>
             <div v-if="props.items.courseName" style="display: flex; align-items: center; padding: 6px;">
               <IonIcon
                 slot="start" color="primary" style="padding-right: 10px;"

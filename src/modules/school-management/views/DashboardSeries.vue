@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Tables } from '@/types/database.types'
-import ListSeriesWithAction from '@/components/course/ListWithAction.vue'
-
 import EduprimeRegistredItems from '@/components/RegistredItems.vue'
+
+import ListSeriesWithAction from '@/components/series/ListWithAction.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import showToast from '@/utils/toast-alert'
 import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCol, IonContent, IonIcon, IonModal, IonRow, IonText } from '@ionic/vue'
@@ -100,6 +100,7 @@ async function loadSeries() {
 // function navigateToRegister() {
 //   router.push({ name: 'RegisterSeries' })
 // }
+
 async function handleDelete() {
   if (deleteModal.value?.data?.id) {
     try {

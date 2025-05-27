@@ -28,13 +28,13 @@ export default class BaseService<T> {
     }
   }
 
-  async getById(id: string): Promise<T | null> {
+  async getById(id: string, fields: string = '*'): Promise<T | null> {
     if (!id)
       return null
 
     const { data, error } = await this.client
       .from(this.table)
-      .select('*')
+      .select(fields)
       .eq('id', id)
       .single()
 

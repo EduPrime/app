@@ -3,7 +3,6 @@
 import type { Course } from '@prisma/client'
 
 import ContentLayout from '@/components/theme/ContentLayout.vue'
-import BaseService from '@/services/BaseService'
 import { IonButton, IonCard, IonCol, IonGrid, IonPage, IonRow } from '@ionic/vue'
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -12,13 +11,11 @@ import SeriesService from '../../services/SeriesService'
 const route = useRoute()
 const router = useRouter()
 const seriesService = new SeriesService()
-const baseService = new BaseService('course')
-const courseDetails = ref<Course | null>(null)
+const seriesDetails = ref<Course | null>(null)
 const loading = ref(true)
-const institution = ref()
-const school = ref()
-const series = ref()
-const evaluationRule = ref()
+
+const disciplines = ref()
+
 // const tenantId = ref()
 
 async function loadDetails() {
@@ -29,22 +26,9 @@ async function loadDetails() {
       router.push({ name: 'RegisterSerie' })
       return
     }
-
-    const data: any = await seriesService.getById(id)
-    courseDetails.value = data
-    if (data && data.institutionId) {
-      institution.value = await baseService.getByInCustomTable('institution', data.institutionId)
-    }
-
-    if (data && data.schoolId) {
-      school.value = await baseService.getByInCustomTable('school', data.schoolId)
-    }
-
-    if (data && data.evaluationRuleId) {
-      evaluationRule.value = await baseService.getByInCustomTable('evaluationRule', data.evaluationRuleId)
-    }
-
-    series.value = await baseService.getByRelationalId('series', 'courseId', route.params.id, 'name, schoolDays')
+    // series:seriesId(id, name)
+    seriesDetails.value = await seriesService.getById(id, '*, course:courseId (name), institution:institutionId (name), school:schoolId (name)')
+    disciplines.value = await seriesService.getDisciplinesOfSeries(id)
   }
   catch (error) {
     console.error('Erro ao carregar detalhes do curso:', error)
@@ -55,8 +39,8 @@ async function loadDetails() {
 }
 
 function navigateToEdit() {
-  if (courseDetails.value?.id) {
-    router.push({ name: 'RegisterSerie', params: { id: courseDetails.value.id } })
+  if (seriesDetails.value?.id) {
+    router.push({ name: 'RegisterSerie', params: { id: seriesDetails.value.id } })
   }
 }
 
@@ -75,9 +59,9 @@ onMounted(() => {
       <div v-if="loading" class="ion-text-center ion-padding">
         <p>Carregando detalhes do curso...</p>
       </div>
-      <div v-else-if="courseDetails" class="details-container">
+      <div v-else-if="seriesDetails" class="details-container">
         <h1 class="item-title">
-          {{ courseDetails.name }}
+          {{ seriesDetails?.name }}
         </h1>
 
         <div class="detail-section">
@@ -86,130 +70,80 @@ onMounted(() => {
           </h2>
           <IonGrid>
             <IonRow>
-              <IonCol v-if="institution && institution.name" size="12" size-md="12">
+              <IonCol v-if="seriesDetails && seriesDetails?.institution" size="12" size-md="12">
                 <div class="detail-item">
                   <span class="detail-label">Instituição</span>
-                  <span class="detail-value">{{ institution.name || '-' }}</span>
+                  <span class="detail-value">{{ seriesDetails.institution?.name || '-' }}</span>
                 </div>
               </IonCol>
-              <IonCol v-if="school && school.name" size="12" size-md="12">
+              <IonCol v-if="seriesDetails && seriesDetails?.school" size="12" size-md="12">
                 <div class="detail-item">
                   <span class="detail-label">Escola</span>
-                  <span class="detail-value">{{ school.name || '-' }}</span>
+                  <span class="detail-value">{{ seriesDetails.school?.name || '-' }}</span>
                 </div>
               </IonCol>
-              <IonCol v-if="evaluationRule && evaluationRule.name" size="12" size-md="12">
-                <div class="detail-item">
-                  <span class="detail-label">Regra de avaliação</span>
-                  <span class="detail-value">{{ evaluationRule.name || '-' }}</span>
-                </div>
-              </IonCol>
-              <IonCol size="12" size-md="6">
+
+              <IonCol size="12" size-md="12">
                 <div class="detail-item">
                   <span class="detail-label">Nome</span>
-                  <span class="detail-value">{{ courseDetails.name || '-' }}</span>
-                </div>
-              </IonCol>
-              <IonCol size="12" size-md="6">
-                <div class="detail-item">
-                  <span class="detail-label">Abreviação</span>
-                  <div class="detail-value">
-                    <!-- @TODO: Ajuste a abreviação -->
-                    <span v-if="courseDetails.abbreviation" class="abbreviation-tag">{{ courseDetails.abbreviation
-                    }}</span>
-                    <span v-else>-</span>
-                  </div>
+                  <span class="detail-value">{{ seriesDetails?.name || '-' }}</span>
                 </div>
               </IonCol>
             </IonRow>
 
             <IonRow>
-              <IonCol size="12">
-                <div class="detail-item">
-                  <span class="detail-label">Descrição</span>
-                  <!-- @TODO: Ajuste a descrição -->
-                  <span class="detail-value description">{{ courseDetails.description || '-' }}</span>
-                </div>
-              </IonCol>
               <IonCol size="12" size-md="12">
                 <h2 class="section-title">
                   Informações administrativas
                 </h2>
               </IonCol>
-              <IonCol size="12" size-md="6">
+
+              <IonCol v-if="seriesDetails?.course" size="12" size-md="12">
                 <div class="detail-item">
-                  <span class="detail-label">Nível de ensino</span>
-                  <span class="detail-value">{{ courseDetails.graduate || '-' }}</span>
-                </div>
-              </IonCol>
-              <IonCol size="12" size-md="6">
-                <div class="detail-item">
-                  <span class="detail-label">Tipo de ensino</span>
-                  <span class="detail-value">{{ courseDetails.teachingType || '-' }}</span>
-                </div>
-              </IonCol>
-              <IonCol size="12" size-md="6">
-                <div class="detail-item">
-                  <span class="detail-label">Modalidade do curso</span>
-                  <span class="detail-value">{{ courseDetails.courseModality || '-' }}</span>
-                </div>
-              </IonCol>
-              <IonCol size="12" size-md="6">
-                <div class="detail-item">
-                  <span class="detail-label">Tipo de regime</span>
-                  <span class="detail-value">{{ courseDetails.regimeType || '-' }}</span>
-                </div>
-              </IonCol>
-              <IonCol size="12" size-md="6">
-                <div class="detail-item">
-                  <span class="detail-label">Serialização de tempo</span>
-                  <span class="detail-value">{{ courseDetails.timeSerialization || '-' }}</span>
-                </div>
-              </IonCol>
-              <IonCol size="12" size-md="6">
-                <div class="detail-item">
-                  <span class="detail-label">Carga horária</span>
-                  <span class="detail-value">{{ courseDetails.workload ? `${courseDetails.workload} Horas` : '-' }}</span>
+                  <span class="detail-label">Curso</span>
+                  <span class="detail-value">{{ seriesDetails.course?.name || '-' }}</span>
                 </div>
               </IonCol>
 
               <IonCol size="12" size-md="6">
                 <div class="detail-item">
-                  <span class="detail-label">Número de etapas</span>
-                  <span class="detail-value">{{ courseDetails.numberOfStages || '-' }}</span>
+                  <span class="detail-label">Dias letivos</span>
+                  <span class="detail-value">{{ seriesDetails?.schoolDays || '-' }}</span>
                 </div>
               </IonCol>
+
               <IonCol size="12" size-md="6">
                 <div class="detail-item">
-                  <span class="detail-label">Etapa do curso</span>
-                  <span class="detail-value">{{ courseDetails.courseStage || '-' }}</span>
+                  <span class="detail-label">Carga horária</span>
+                  <span class="detail-value">{{ seriesDetails.workload ? `${seriesDetails.workload} Horas` : '-' }}</span>
                 </div>
               </IonCol>
-              <IonCol size="12" size-md="12">
-                <div v-if="series && series.length > 0" style=" align-items: center; ">
-                  <IonCard>
+
+              <IonCol size="12" size-md="12" class="ion-no-padding ion-no-margin">
+                <div v-if="disciplines && disciplines.length > 0" class="shadow-card" style=" align-items: center;">
+                  <IonCard class=" ion-no-margin ">
                     <IonGrid>
                       <IonRow>
                         <IonCol size="6">
                           <IonText color="primary" style="font-weight: bold; font-size: 10pt">
-                            Série
+                            Disciplina
                           </IonText>
                         </IonCol>
                         <IonCol size="6">
                           <IonText color="primary" style="font-weight: bold; font-size: 10pt">
-                            Dias letivos
+                            Carga Horária
                           </IonText>
                         </IonCol>
                       </IonRow>
-                      <IonRow v-for="(d, index) in series" :key="index">
+                      <IonRow v-for="(d, index) in disciplines" :key="index">
                         <IonCol size="6">
                           <IonText color="primary" style="font-size: 10pt; padding-top: 2px;">
-                            {{ d.name }}
+                            {{ d.discipline.name }}
                           </IonText>
                         </IonCol>
                         <IonCol size="6">
                           <IonText color="primary" style="font-size: 10pt; padding-top: 2px;">
-                            {{ d.schoolDays || '-' }}
+                            {{ d.workload || '-' }}
                           </IonText>
                         </IonCol>
                       </IonRow>
