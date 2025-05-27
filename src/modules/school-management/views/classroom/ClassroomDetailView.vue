@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { IonButton, IonChip, IonCol, IonContent, IonGrid, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText } from '@ionic/vue'
-import { businessOutline, calendarOutline, locationOutline, peopleOutline, schoolOutline, timeOutline } from 'ionicons/icons'
+import { bookOutline, businessOutline, calendarOutline, locationOutline, peopleOutline, schoolOutline, timeOutline } from 'ionicons/icons'
+import { onMounted, ref } from 'vue'
+import ClassroomService from '../../services/ClassroomService'
+import DisciplineService from '../../services/DisciplineService'
 
 interface Props {
   items: {
@@ -26,12 +29,68 @@ interface Props {
     regimeType?: string | null
     isMultiSerialized?: boolean | null
     updatedAt?: string
+    seriesId?: string
+    disciplines?: string[]
+    altDisciplineList?: boolean
   }
   name?: string
 }
 
 const props = defineProps<Props>()
 const emits = defineEmits(['close', 'edit'])
+
+const disciplineService = new DisciplineService()
+const disciplineList = ref<any[]>([])
+const loadingDisciplines = ref(false)
+
+async function loadDisciplines() {
+  try {
+    loadingDisciplines.value = true
+
+    if (props.items.id) {
+      if (props.items.altDisciplineList === undefined) {
+        const classroomService = new ClassroomService()
+        const classroom = await classroomService.getClassroomById(props.items.id)
+
+        if (classroom) {
+          (props.items as any).altDisciplineList = !!(classroom as any).altDisciplineList
+          if (!props.items.seriesId && classroom.seriesId) {
+            (props.items as any).seriesId = classroom.seriesId
+          }
+        }
+      }
+
+      if (props.items.seriesId) {
+        const disciplines = await disciplineService.getDisciplinesByClassroom(
+          props.items.id,
+          !!(props.items as any).altDisciplineList,
+          props.items.seriesId,
+        )
+
+        disciplineList.value = disciplines || []
+
+        if (disciplines && disciplines.length > 0) {
+          const disciplineIds = disciplines.map((d: any) => d.id)
+          ;(props.items as any).disciplines = disciplineIds
+        }
+      }
+    }
+    else {
+      disciplineList.value = []
+    }
+  }
+  catch (error) {
+    console.error('Erro ao carregar disciplinas:', error)
+    disciplineList.value = []
+  }
+  finally {
+    loadingDisciplines.value = false
+  }
+}
+
+onMounted(() => {
+  loadDisciplines()
+})
 
 function formatTime(time: string | null | undefined): string {
   if (!time)
@@ -293,6 +352,35 @@ function getStatusStyle(status: string | null | undefined): Record<string, strin
             </IonText>
           </div>
         </IonList>
+
+        <div v-if="disciplineList.length > 0">
+          <IonItemDivider
+            style="border-color: rgba(var(--ion-color-primary-rgb), 0.25);"
+            class="ion-no-padding ion-margin-top"
+          >
+            <IonLabel color="primary" class="ion-no-margin">
+              Disciplinas
+            </IonLabel>
+          </IonItemDivider>
+
+          <IonList>
+            <div style="padding: 10px;">
+              <div class="chip-container">
+                <IonChip
+                  v-for="discipline in disciplineList"
+                  :key="discipline.id"
+                  color="secondary"
+                  class="discipline-chip"
+                >
+                  <div style="display: flex; align-items: center;">
+                    <IonIcon :icon="bookOutline" style="margin-right: 5px;" />
+                    {{ discipline.name }}
+                  </div>
+                </IonChip>
+              </div>
+            </div>
+          </IonList>
+        </div>
       </div>
     </IonContent>
 
@@ -337,5 +425,18 @@ function getStatusStyle(status: string | null | undefined): Record<string, strin
 .day-item {
   margin-left: 12px;
   margin-top: 4px;
+}
+
+.chip-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 5px 0;
+}
+
+.discipline-chip {
+  margin: 0;
+  --background: rgba(var(--ion-color-secondary-rgb), 0.15);
+  --color: var(--ion-color-secondary);
 }
 </style>

@@ -21,6 +21,7 @@ import { ErrorMessage, Field, Form } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
 import ClassroomService from '../../services/ClassroomService'
 import CourseService from '../../services/CourseService'
+import DisciplineService from '../../services/DisciplineService'
 import SchoolService from '../../services/SchoolService'
 import SeriesService from '../../services/SeriesService'
 
@@ -39,10 +40,19 @@ const classroomService = new ClassroomService()
 const seriesService = new SeriesService()
 const schoolService = new SchoolService()
 const courseService = new CourseService()
+const disciplineService = new DisciplineService()
 
 const seriesList = ref<Series[]>([])
 const schoolList = ref<School[]>([])
 const courseList = ref<Course[]>([])
+
+interface SeriesDiscipline {
+  id: string
+  name: string
+  seriesDisciplineId: string | null
+}
+
+const disciplineList = ref<SeriesDiscipline[]>([])
 
 const dayOfWeekOptions = [
   { value: 'MONDAY', label: 'Segunda-feira' },
@@ -122,6 +132,7 @@ const formValues = ref({
   endTimeInterval: '',
   endTime: '',
   dayofweek: [] as string[],
+  disciplines: [] as string[],
   room: '',
   regimeType: '',
   period: '',
@@ -130,6 +141,7 @@ const formValues = ref({
   isMultiSerialized: false,
   schoolId: '',
   courseId: '',
+  altDisciplineList: false,
 })
 
 const originalFormValues = ref({ ...formValues.value })
@@ -172,6 +184,7 @@ async function loadCoursesBySchool(schoolId: string) {
 async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
   if (!schoolId || !courseId) {
     seriesList.value = []
+    disciplineList.value = []
     return
   }
   try {
@@ -179,6 +192,7 @@ async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
 
     if (!series || series.length === 0) {
       seriesList.value = []
+      disciplineList.value = []
       showToast('Não há séries disponíveis para este curso', 'top', 'warning')
     }
     else {
@@ -193,6 +207,59 @@ async function loadSeriesByCourseAndSchool(schoolId: string, courseId: string) {
     console.error('Erro ao carregar séries:', error)
     showToast('Erro ao carregar séries', 'top', 'danger')
     seriesList.value = []
+    disciplineList.value = []
+  }
+}
+
+async function loadDisciplinesBySeries(seriesId: string) {
+  if (!seriesId) {
+    disciplineList.value = []
+    return
+  }
+
+  try {
+    const seriesDisciplines = await disciplineService.getDisciplinesBySeries(seriesId)
+    disciplineList.value = seriesDisciplines || []
+
+    if (!isEditing.value) {
+      formValues.value.disciplines = seriesDisciplines.map(d => d.id)
+      return
+    }
+
+    if (props.editId && formValues.value.seriesId) {
+      try {
+        const { altDisciplineList } = await classroomService.checkClassroomCustomDisciplines(props.editId)
+
+        formValues.value.altDisciplineList = altDisciplineList
+
+        const selectedDisciplines = await disciplineService.getDisciplinesByClassroom(
+          props.editId,
+          !!formValues.value.altDisciplineList,
+          formValues.value.seriesId,
+        )
+
+        if (selectedDisciplines && selectedDisciplines.length > 0) {
+          formValues.value.disciplines = selectedDisciplines.map(d => d.id)
+          originalFormValues.value.disciplines = [...formValues.value.disciplines]
+        }
+        else {
+          formValues.value.disciplines = []
+          originalFormValues.value.disciplines = []
+        }
+
+        checkForChanges()
+      }
+      catch (err) {
+        console.error('Erro ao carregar disciplinas da turma:', err)
+        formValues.value.disciplines = []
+        originalFormValues.value.disciplines = []
+      }
+    }
+  }
+  catch (error) {
+    console.error('Erro ao carregar disciplinas por série:', error)
+    showToast('Erro ao carregar disciplinas', 'top', 'danger')
+    disciplineList.value = []
   }
 }
 
@@ -250,6 +317,14 @@ watch(() => formValues.value.courseId, (newCourseId) => {
 })
 
 watch(() => formValues.value.seriesId, (newSeriesId) => {
+  if (newSeriesId) {
+    loadDisciplinesBySeries(newSeriesId)
+  }
+  else {
+    disciplineList.value = []
+    formValues.value.disciplines = []
+  }
+
   if (newSeriesId && !isEditing.value && !formValues.value.name) {
     const selectedSeries = seriesList.value.find(s => s.id === newSeriesId)
     if (selectedSeries) {
@@ -303,6 +378,7 @@ onMounted(async () => {
         endTimeInterval: formatTime(classroom.endTimeInterval),
         endTime: formatTime(classroom.endTime),
         dayofweek: classroom.dayofweek || [],
+        disciplines: ((classroom as any).disciplines || []) as string[],
         room: classroom.room || '',
         regimeType: classroom.regimeType || '',
         period: classroom.period || '',
@@ -311,6 +387,7 @@ onMounted(async () => {
         isMultiSerialized: classroom.isMultiSerialized || false,
         schoolId: classroom.schoolId || '',
         courseId: (classroom as any).courseId || '',
+        altDisciplineList: (classroom as any).altDisciplineList || false,
       }
 
       formValues.value = { ...loadedValues }
@@ -334,6 +411,7 @@ onMounted(async () => {
       endTimeInterval: '',
       endTime: '',
       dayofweek: [],
+      disciplines: [],
       room: '',
       regimeType: '',
       period: '',
@@ -342,6 +420,7 @@ onMounted(async () => {
       isMultiSerialized: false,
       schoolId: '',
       courseId: '',
+      altDisciplineList: false,
     }
     originalFormValues.value = { ...formValues.value }
     hasChanges.value = false
@@ -374,6 +453,10 @@ async function handleSubmit(values: any) {
   const endTimeInterval = convertTimeStringToTimestamp(values.endTimeInterval)
   const endTime = convertTimeStringToTimestamp(values.endTime)
 
+  const disciplines = Array.isArray(values.disciplines)
+    ? values.disciplines.map((discipline: string) => discipline.toUpperCase())
+    : values.disciplines
+
   const payload = {
     id: isEditing.value ? props.editId : undefined,
     name: values.name,
@@ -388,6 +471,7 @@ async function handleSubmit(values: any) {
     endTimeInterval,
     endTime,
     dayofweek: values.dayofweek,
+    disciplines,
     room: values.room,
     regimeType: values.regimeType,
     period: values.period,
@@ -961,6 +1045,38 @@ function handleSaved() {
                         }"
                       >
                         {{ day.label }}
+                      </IonCheckbox>
+                    </IonItem>
+                  </div>
+                </div>
+              </Field>
+            </IonCol>
+          </IonRow>
+
+          <IonRow v-if="formValues.seriesId && disciplineList.length > 0">
+            <IonCol size="12">
+              <Field v-slot="{ field }" name="disciplines" label="Disciplinas">
+                <div class="days-selection">
+                  <IonLabel class="ion-padding-start">
+                    Disciplinas
+                  </IonLabel>
+                  <div class="days-grid">
+                    <IonItem v-for="discipline in disciplineList" :key="discipline.id" lines="none" class="checkbox-item">
+                      <IonCheckbox
+                        :value="discipline.id"
+                        :checked="formValues.disciplines.includes(discipline.id)"
+                        label-placement="end"
+                        @ion-change="(e) => {
+                          if (e.detail.checked) {
+                            formValues.disciplines.push(discipline.id);
+                          }
+                          else {
+                            formValues.disciplines = formValues.disciplines.filter(d => d !== discipline.id);
+                          }
+                          field.onChange(formValues.disciplines);
+                        }"
+                      >
+                        {{ discipline.name }}
                       </IonCheckbox>
                     </IonItem>
                   </div>
