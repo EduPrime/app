@@ -257,14 +257,19 @@ async function loadDisciplinesBySeries(seriesId: string) {
 
         if (selectedDisciplines && selectedDisciplines.length > 0) {
           formValues.value.disciplines = selectedDisciplines.map(d => d.id)
+          originalFormValues.value.disciplines = [...formValues.value.disciplines]
         }
         else {
           formValues.value.disciplines = []
+          originalFormValues.value.disciplines = []
         }
+
+        checkForChanges()
       }
       catch (err) {
         console.error('Erro ao carregar disciplinas da turma:', err)
         formValues.value.disciplines = []
+        originalFormValues.value.disciplines = []
       }
     }
   }
@@ -279,19 +284,94 @@ function checkForChanges() {
   if (!isEditing.value)
     return
 
-  const currentValues = JSON.stringify(formValues.value)
-  const originalValues = JSON.stringify(originalFormValues.value)
+  if (!formValues.value || !originalFormValues.value) {
+    hasChanges.value = false
+    return
+  }
+
+  const currentObj = JSON.parse(JSON.stringify(formValues.value))
+  const originalObj = JSON.parse(JSON.stringify(originalFormValues.value))
+
+  if (Array.isArray(currentObj.disciplines)) {
+    currentObj.disciplines.sort()
+  }
+  if (Array.isArray(originalObj.disciplines)) {
+    originalObj.disciplines.sort()
+  }
+
+  if (Array.isArray(currentObj.dayofweek)) {
+    currentObj.dayofweek.sort()
+  }
+  if (Array.isArray(originalObj.dayofweek)) {
+    originalObj.dayofweek.sort()
+  }
+
+  const currentValues = JSON.stringify(currentObj)
+  const originalValues = JSON.stringify(originalObj)
+
   hasChanges.value = currentValues !== originalValues
 }
 
+const initialEmptyState = ref({
+  name: '',
+  abbreviation: '',
+  seriesId: '',
+  schoolId: '',
+  courseId: '',
+  maxStudents: '',
+  exceededStudents: '',
+  totalStudents: '',
+  pcdStudents: '',
+  startTime: '',
+  startTimeInterval: '',
+  endTimeInterval: '',
+  endTime: '',
+  dayofweek: [],
+  disciplines: [],
+  room: '',
+  regimeType: '',
+  period: '',
+  status: 'ACTIVE',
+  year: '',
+  isMultiSerialized: false,
+  altDisciplineList: false,
+})
+
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
-    const enabled = !!formValues.value.name || !!formValues.value.abbreviation
-      || !!formValues.value.seriesId || !!formValues.value.schoolId
-      || !!formValues.value.courseId || !!formValues.value.maxStudents
-      || !!formValues.value.year || !!formValues.value.period
-      || !!formValues.value.regimeType || formValues.value.dayofweek.length > 0
-    return enabled
+    let hasFieldChanges = false
+
+    const fieldsToCheck = [
+      'name',
+      'abbreviation',
+      'seriesId',
+      'schoolId',
+      'courseId',
+      'maxStudents',
+      'regimeType',
+      'period',
+      'room',
+      'startTime',
+      'endTime',
+    ]
+
+    for (const field of fieldsToCheck) {
+      if (formValues.value[field as keyof typeof formValues.value]
+        && formValues.value[field as keyof typeof formValues.value] !== initialEmptyState.value[field as keyof typeof initialEmptyState.value]) {
+        hasFieldChanges = true
+        break
+      }
+    }
+
+    if (!hasFieldChanges && Array.isArray(formValues.value.dayofweek) && formValues.value.dayofweek.length > 0) {
+      hasFieldChanges = true
+    }
+
+    if (!hasFieldChanges && Array.isArray(formValues.value.disciplines) && formValues.value.disciplines.length > 0) {
+      hasFieldChanges = true
+    }
+
+    return hasFieldChanges
   }
 
   return hasChanges.value
@@ -398,8 +478,8 @@ onMounted(async () => {
         altDisciplineList: (classroom as any).altDisciplineList || false,
       }
 
-      formValues.value = { ...loadedValues }
-      originalFormValues.value = { ...loadedValues }
+      formValues.value = JSON.parse(JSON.stringify(loadedValues))
+      originalFormValues.value = JSON.parse(JSON.stringify(loadedValues))
       hasChanges.value = false
 
       if (formValues.value.seriesId) {
@@ -415,6 +495,11 @@ onMounted(async () => {
     }
     originalFormValues.value = { ...formValues.value }
     hasChanges.value = false
+
+    initialEmptyState.value = {
+      ...initialEmptyState.value,
+      year: currentYear,
+    }
   }
 })
 
