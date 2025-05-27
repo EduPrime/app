@@ -69,7 +69,7 @@ function navigateToRegister() {
     setModalAddSeries(true)
   }
   else {
-    router.push({ name: 'RegisterSeries' })
+    router.push({ name: 'NewSerie' })
   }
 }
 
@@ -98,7 +98,7 @@ async function loadSeries() {
 }
 
 // function navigateToRegister() {
-//   router.push({ name: 'RegisterSeries' })
+//   router.push({ name: 'NewSerie' })
 // }
 
 async function handleDelete() {
@@ -145,7 +145,7 @@ watch(
           <ion-searchbar v-model="searchQuery" placeholder="Buscar séries" />
         </IonCol>
         <IonCol size="2" class="ion-text-end">
-          <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister()">
+          <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
             <IonIcon slot="icon-only" :icon="add" class="ion-hide-sm-up" />
             <IonIcon slot="start" :icon="add" class="ion-hide-sm-down" />
             <span class="ion-hide-sm-down">Novo</span>

@@ -73,7 +73,7 @@ onUnmounted(() => {
             >
               <IonItem>
                 <IonLabel color="primary" class="ion-no-margin course-name" style="margin-top: 5px; margin-bottom: 5px;">
-                  <h2>{{ item.name || 'Função sem nome' }}</h2>
+                  <h2>{{ item.name || 'Curso sem nome' }}</h2>
                   <p v-if="item.regimeType">
                     {{ item.regimeType }}
                   </p>

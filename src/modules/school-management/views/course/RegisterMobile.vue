@@ -63,8 +63,15 @@ function checkForChanges() {
   const hasNameChanged = formValues.value.name !== originalFormValues.value.name
   const hasAbbreviationChanged = formValues.value.abbreviation !== originalFormValues.value.abbreviation
   const hasDescriptionChanged = formValues.value.description !== originalFormValues.value.description
+  const hasSerializationChanged = formValues.value.timeSerialization !== originalFormValues.value.timeSerialization
+  const hasRegimeTypeChanged = formValues.value.regimeType !== originalFormValues.value.regimeType
+  const hasTeachingTypeChanged = formValues.value.teachingType !== originalFormValues.value.teachingType
+  const hasGraduateChanged = formValues.value.graduate !== originalFormValues.value.graduate
+  const hasInstitutionIdChanged = formValues.value.institutionId !== originalFormValues.value.institutionId
+  const hasCourseModalityChanged = formValues.value.courseModality !== originalFormValues.value.courseModality
+  const hasEvaluationRuleIdChanged = formValues.value.evaluationRuleId !== originalFormValues.value.evaluationRuleId
 
-  hasChanges.value = hasNameChanged || hasAbbreviationChanged || hasDescriptionChanged
+  hasChanges.value = hasNameChanged || hasTeachingTypeChanged || hasGraduateChanged || hasInstitutionIdChanged || hasCourseModalityChanged || hasEvaluationRuleIdChanged || hasAbbreviationChanged || hasDescriptionChanged || hasSerializationChanged || hasRegimeTypeChanged
 }
 
 watchEffect(() => {

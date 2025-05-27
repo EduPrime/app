@@ -9,6 +9,7 @@ import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
 import RegisterFunction from './views/RegisterFunction.vue'
 import RegisterSchool from './views/RegisterSchool.vue'
 import SeriesDetailsDesktop from './views/series/DetailsDesktop.vue'
+import RegisterSeries from './views/series/Register.vue'
 
 const routes = [
   {
@@ -203,6 +204,19 @@ const routes = [
   },
 
   {
+    path: '/Series/register/:id?',
+    name: 'NewSerie',
+    component: RegisterSeries,
+    meta: {
+      moduleName: 'Schools',
+      icon: create, // @TODO: Change icon
+      name: 'Registrar série',
+      order: 14,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+
+  {
     path: '/Function/details/:id',
     name: 'FunctionDetails',
     component: FunctionDetailsDesktop,
@@ -221,7 +235,7 @@ const routes = [
     component: SeriesDetailsDesktop,
     meta: {
       moduleName: 'Schools',
-      icon: person,
+      icon: list,
       name: 'Detalhes da série',
       order: 11,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
