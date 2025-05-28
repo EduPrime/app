@@ -1,7 +1,9 @@
 <script setup lang="ts">
+import type { Series } from '@prisma/client'
 import type { Institutions } from '../../types/types'
+
 import BaseService from '@/services/BaseService'
-import EvaluationRuleService from '@/services/EvaluationRuleService'
+import SeriesService from '@/services/SeriesService'
 import showToast from '@/utils/toast-alert'
 import {
   IonButton,
@@ -11,6 +13,7 @@ import {
   IonHeader,
   IonInput,
   IonItem,
+  IonList,
   IonPage,
   IonRow,
   IonSegment,
@@ -26,23 +29,37 @@ import {
 import { ErrorMessage, Field, Form } from 'vee-validate'
 import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import CourseService from '../../services/CourseService'
 import InstitutionService from '../../services/InstitutionService'
-import SchoolService from '../../services/SchoolService'
+// import SchoolService from '../../services/SchoolService'
 
 interface Props {
   editId?: string
 }
 
+// interface Discipline {
+//   id: number | null
+//   disciplineId: string
+//   seriesId: string
+//   name: string
+//   workload: number | null
+//   year: number | null
+//   createdAt: Date
+//   deletedAt: Date | null
+//   updatedAt: Date | null
+//   updatedBy: string | null
+//   tenantId: string
+// }
+
 const props = defineProps<Props>()
 const emits = defineEmits(['close', 'saved'])
 const route = useRoute()
 const router = useRouter()
-const courseService = new CourseService()
 const institutionService = new InstitutionService()
-const schoolService = new SchoolService()
-const evaluationRuleService = new EvaluationRuleService()
-const baseService = new BaseService()
+// const schoolService = new SchoolService()
+const seriesService = new SeriesService()
+const baseService = new BaseService('series')
+const courseList = ref()
+const currentDisciplines = ref()
 
 const initialFormValues = {
   id: '',
@@ -55,40 +72,41 @@ const initialFormValues = {
   standardAge: null,
   schoolDays: null,
   workload: null,
-}
+} as Series
 
-const formValues = ref({ ...initialFormValues })
-const originalFormValues = ref({ ...initialFormValues })
+const formValues = ref<Series>({ ...initialFormValues })
+const originalFormValues = ref<Series>({ ...initialFormValues })
 const isEditing = ref(!!props.editId)
 const itemId = computed(() => props.editId ?? route.params.id as string | undefined)
 const pageTitle = computed(() => isEditing.value ? 'Editar série' : 'Nova série')
 const descriptionRef = ref<HTMLTextAreaElement | null>(null)
 const hasChanges = ref(false)
 const institutions = ref<Institutions[]>({} as Institutions[])
-const evaluationRules = ref()
-const schools = ref()
+// const schools = ref()
 const disciplines = ref()
+const disciplineList = ref()
+const selectedSegment = ref()
 
-// Curso para verificar se houve mudanças nos campos
 function checkForChanges() {
   if (!isEditing.value)
     return
 
   const hasNameChanged = formValues.value.name !== originalFormValues.value.name
   const hasDescriptionChanged = formValues.value.description !== originalFormValues.value.description
-  const hasInstitutionChanged = formValues.value.institution !== originalFormValues.value.institution
+  const hasInstitutionChanged = formValues.value.institutionId !== originalFormValues.value.institutionId
   const hasAgeMaxChanged = formValues.value.ageRangeMax !== originalFormValues.value.ageRangeMax
   const hasAgeMinChanged = formValues.value.ageRangeMin !== originalFormValues.value.ageRangeMin
   const hasStandardAgeChanged = formValues.value.standardAge !== originalFormValues.value.standardAge
   const hasSchoolDaysChanged = formValues.value.schoolDays !== originalFormValues.value.schoolDays
   const hasWorkloadChanged = formValues.value.workload !== originalFormValues.value.workload
+  const hasCourseChanged = formValues.value.courseId !== originalFormValues.value.courseId
 
-  hasChanges.value = hasNameChanged || hasDescriptionChanged || hasInstitutionChanged || hasAgeMaxChanged || hasAgeMinChanged || hasStandardAgeChanged || hasSchoolDaysChanged || hasWorkloadChanged
+  hasChanges.value = hasNameChanged || hasCourseChanged || hasDescriptionChanged || hasInstitutionChanged || hasAgeMaxChanged || hasAgeMinChanged || hasStandardAgeChanged || hasSchoolDaysChanged || hasWorkloadChanged
 }
 
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
-    const enabled = !!formValues.value.name || !!formValues.value.abbreviation || !!formValues.value.description || !!formValues.value.timeSerialization || !!formValues.value.regimeType || !!formValues.value.teachingType || !!formValues.value.graduate || !!formValues.value.institutionId || !!formValues.value.evaluationRuleId || !!formValues.value.courseModality
+    const enabled = !!formValues.value.name || !!formValues.value.description || !!formValues.value.institutionId || !!formValues.value.ageRangeMax || !!formValues.value.ageRangeMin || !!formValues.value.standardAge || !!formValues.value.schoolDays || !!formValues.value.workload
     return enabled
   }
 
@@ -114,29 +132,39 @@ watch(
 )
 
 onMounted(async () => {
+  disciplineList.value = []
+  disciplines.value = await baseService.getListByCustomTable('discipline')
+
   if (itemId.value) {
     isEditing.value = true
-    const item: any = await courseService.getById(itemId.value)
+
+    currentDisciplines.value = await baseService.getListByCustomTable('seriesDiscipline', '*, discipline:disciplineId(name)')
+    const item: any = await seriesService.getById(itemId.value)
+
+    disciplineList.value = currentDisciplines.value
+      .filter((discipline: { seriesId: string }) => discipline.seriesId === itemId.value)
+      .map((discipline: { id: string, discipline: { name: string }, workload: number, year: number }) => (
+        {
+          id: discipline.id,
+          name: discipline.discipline.name,
+          workload: discipline.workload,
+          year: discipline.year,
+        }))
 
     if (item) {
       // Armazena os valores originais
       const loadedValues = {
         id: item.id,
         name: item.name,
-        abbreviation: item.abbreviation || '', // @TODO: verificar do que se trata
-        description: (item as any).description ?? '',
-        regimeType: item.regimeType,
-        graduate: item.graduate,
-        teachingType: item.teachingType,
-        courseModality: item.courseModality,
+        description: item.description,
         institutionId: item.institutionId,
-        numberOfStages: item.numberOfStages,
-        timeSerialization: item.timeSerialization,
-        courseStage: item.courseStage,
-        // schoolId: item.schoolId,
-        evaluationRuleId: item.evaluationRuleId,
-        workerId: item.workerId,
-      }
+        courseId: item.courseId,
+        ageRangeMin: item.ageRangeMin,
+        ageRangeMax: item.ageRangeMax,
+        standardAge: item.standardAge,
+        schoolDays: item.schoolDays,
+        workload: item.workload,
+      } as Series
 
       formValues.value = { ...loadedValues }
       originalFormValues.value = { ...loadedValues }
@@ -153,47 +181,110 @@ onMounted(async () => {
   }
 })
 
-async function handleSubmit(values: any) {
+async function handleSubmit() {
+  console.log('entrou na função de criar\editar')
+
+  // const payload = {
+  //   ...values,
+  //   institutionId: institutions.value.at(0)?.id,
+  //   id: isEditing.value ? itemId.value : undefined,
+  // }
+
   const payload = {
-    ...values,
-    institutionId: institutions.value.at(0)?.id,
+    ...formValues.value,
     id: isEditing.value ? itemId.value : undefined,
+    createdAt: isEditing.value ? null : new Date().toISOString(),
+    updatedAt: isEditing.value ? new Date().toISOString() : null,
+    deletedAt: null, // Add default value for deletedAt
+    updatedBy: null, // Add default value for updatedBy
+    institutionId: institutions.value.at(0)?.id,
+
+    workload: formValues.value.workload ?? undefined, // Ensure workload is undefined if null
+    schoolDays: formValues.value.schoolDays ?? 0, // Garante que schoolDays seja um número
   }
 
-  console.log('Payload', payload)
+  const disciplinesToSave = disciplineList.value.map((discipline: any) => {
+    const selectedDiscipline = disciplines.value.find((d: any) => d.name === discipline.name)
+
+    if (!selectedDiscipline) {
+      showToast('Disciplina não encontrada', 'top', 'danger')
+
+      throw new Error(`Disciplina "${discipline.name}" não encontrada na lista de disciplinas disponíveis.`)
+    }
+
+    return {
+      disciplineId: selectedDiscipline.id, // Garante que `disciplineId` seja preenchido
+      seriesId: itemId.value, // Vincula o ID da série
+      year: discipline.year ?? 0, // Default to 0 if null
+      workload: discipline.workload ?? 0, // Default to 0 if null
+      createdAt: (discipline.createdAt || new Date()).toISOString(), // Ensure string format
+      updatedAt: isEditing.value ? new Date().toISOString() : null, // Ensure null if not editing
+      deletedAt: discipline.deletedAt || null,
+      tenantId: discipline.tenantId,
+      updatedBy: null, // Add default value for updatedBy
+    }
+  })
+
+  // showToast(successMessage, 'top', 'success')
+
+  console.log('disciplinesToSave##:', disciplinesToSave)
 
   try {
-    await courseService.upsertItem(payload)
+    await seriesService.upsertSeriesWithDisciplines(payload, disciplinesToSave)
 
     const successMessage = isEditing.value
-      ? 'Curso atualizado com sucesso'
-      : 'Novo curso cadastrado com sucesso'
+      ? 'Série atualizada com sucesso'
+      : 'Nova série cadastrado com sucesso'
 
     showToast(successMessage, 'top', 'success')
     emits('saved', true)
     router.push({
-      name: 'RegisterCourse',
+      name: 'Series',
       query: { refresh: Date.now().toString() },
     })
   }
   catch (error: any) {
-    console.error('Erro ao salvar curso:', error)
+    console.error('Erro ao salvar série:', error)
 
     // Exibe mensagem específica dependendo do tipo de erro
     if (error.message) {
-      if (error.message.includes('Nome do curso já existente')) {
-        showToast('Não foi possível salvar o novo curso: Nome do curso já existente', 'top', 'warning')
-      }
-      else if (error.message.includes('Abreviação de curso já existente')) {
-        showToast('Não foi possível salvar novo curso: Abreviação do curso já existente', 'top', 'warning')
+      if (error.message.includes('Nome da série já existente')) {
+        showToast('Não foi possível salvar o nova série: Nome da série já existente', 'top', 'warning')
       }
       else {
-        showToast(`Erro ao salvar curso: ${error.message}`, 'top', 'danger')
+        showToast(`Erro ao salvar série: ${error.message}`, 'top', 'danger')
       }
     }
     else {
-      showToast('Erro ao salvar curso', 'top', 'danger')
+      showToast('Erro ao salvar série', 'top', 'danger')
     }
+  }
+}
+
+function addDiscipline() {
+  disciplineList.value.push({
+    id: null,
+    disciplineId: '',
+    seriesId: '',
+    name: '',
+    workload: null,
+    year: null,
+    createdAt: new Date(),
+    deletedAt: null,
+    updatedAt: null,
+    updatedBy: null,
+    tenantId: '',
+  })
+}
+
+function removeDiscipline(index: number) {
+  disciplineList.value.splice(index, 1)
+}
+
+function updateWorkload(index: number, value: string) {
+  const selectedDiscipline = disciplines.value.find((d: { name: string, workload: number, id: string }) => d.name === value)
+  if (selectedDiscipline) {
+    disciplineList.value[index].workload = selectedDiscipline.workload
   }
 }
 
@@ -223,11 +314,10 @@ async function presetFirstInstitutionOnIonSelect() {
 }
 
 onMounted(async () => {
-  disciplines.value = await baseService.getListByCustomTable('discipline')
+  courseList.value = await baseService.getListByCustomTable('course')
   formValues.value.institutionId = await presetFirstInstitutionOnIonSelect()
-  evaluationRules.value = await evaluationRuleService.getAllRules()
 
-  schools.value = await schoolService.getAllSchools()
+  // schools.value = await schoolService.getAllSchools()
 })
 </script>
 
@@ -244,13 +334,13 @@ onMounted(async () => {
 
     <IonContent :scroll-y="true" class="ion-padding content-with-footer">
       <Form
-        id="course-form" :key="formValues.id || 'new'" class="ion-margin-horizontal" :initial-values="formValues"
+        id="series-form" :key="formValues.id || 'new'" class="ion-margin-horizontal" :initial-values="formValues"
         @submit="handleSubmit"
       >
-        <div class="ion-margin style-purple-lane" style="display: flex; align-items: center;">
+        <!-- <div class="ion-margin style-purple-lane" style="display: flex; align-items: center;">
           <IonIcon :icon="listSharp" style="margin-right: 10px;" />
           {{ modalTitle }}
-        </div>
+        </div> -->
         <IonSegment
           v-model="selectedSegment" mode="ios" :scrollable="false"
           style="margin: 20px 0 0 0; padding: 3px 0 3px 0; font-size: 10px;" :style="{}"
@@ -271,8 +361,8 @@ onMounted(async () => {
                 <Field v-slot="{ field }" name="name" label="Nome da série" rules="min:2|max:120">
                   <div class="floating-input">
                     <input
-                      v-bind="field" v-model="formValues.name" type="text" class="floating-native" placeholder=" "
-                      :maxlength="7" @input="field.onInput"
+                      v-bind="field" v-model="formValues.name" type="text" class="floating-native"
+                      :maxlength="120" @input="field.onInput"
                     >
                     <label class="floating-label"><span>Nome da série</span></label>
                   </div>
@@ -291,7 +381,7 @@ onMounted(async () => {
                   <div class="description-input">
                     <textarea
                       v-bind="field" ref="descriptionRef" v-model="formValues.description"
-                      class="description-native" placeholder=" " maxlength="181" @input="(event) => {
+                      class="description-native" maxlength="181" @input="(event) => {
                         field.onInput(event);
                         trimDescription(event);
                         autoResizeTextarea();
@@ -337,7 +427,7 @@ onMounted(async () => {
                       {{ course.name }}
                     </IonSelectOption>
                   </IonSelect>
-                  <ErrorMessage v-slot="{ message }" name="name">
+                  <ErrorMessage v-slot="{ message }" name="courseId">
                     <div class="error-message">
                       {{ message }}
                     </div>
@@ -349,7 +439,7 @@ onMounted(async () => {
 
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field, errors }" name="workload" label="Carga horária">
+                <Field v-slot="{ field, errors }" name="workload" label="Carga horária" rules="required">
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.workload" type="text" class="floating-native"
@@ -357,7 +447,7 @@ onMounted(async () => {
                     >
                     <label class="floating-label"><span>Carga horária </span></label>
                   </div>
-                  <ErrorMessage v-slot="{ message }" name="name">
+                  <ErrorMessage v-slot="{ message }" name="workload">
                     <div class="error-message">
                       {{ message }}
                     </div>
@@ -376,7 +466,7 @@ onMounted(async () => {
                     >
                     <label class="floating-label"><span>Dias letivos </span> </label>
                   </div>
-                  <ErrorMessage v-slot="{ message }" name="name">
+                  <ErrorMessage v-slot="{ message }" name="schoolDays">
                     <div class="error-message">
                       {{ message }}
                     </div>
@@ -391,11 +481,11 @@ onMounted(async () => {
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.standardAge" type="text" class="floating-native"
-                      :maxlength="7" @input="field.onInput"
+                      :maxlength="3" @input="field.onInput"
                     >
                     <label class="floating-label"><span>Idade padrão </span></label>
                   </div>
-                  <ErrorMessage v-slot="{ message }" name="name">
+                  <ErrorMessage v-slot="{ message }" name="standardAge">
                     <div class="error-message">
                       {{ message }}
                     </div>
@@ -410,11 +500,11 @@ onMounted(async () => {
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.ageRangeMin" type="text" class="floating-native"
-                      :maxlength="7" @input="field.onInput"
+                      :maxlength="3" @input="field.onInput"
                     >
                     <label class="floating-label"><span>Idade mínima </span></label>
                   </div>
-                  <ErrorMessage v-slot="{ message }" name="name">
+                  <ErrorMessage v-slot="{ message }" name="ageRangeMin">
                     <div class="error-message">
                       {{ message }}
                     </div>
@@ -425,15 +515,15 @@ onMounted(async () => {
               </IonCol>
 
               <IonCol size="12" size-lg="6">
-                <Field v-slot="{ field, errors }" name="ageRangeMin" label="Idade mínima">
+                <Field v-slot="{ field, errors }" name="ageRangeMax" label="Idade máxima">
                   <div class="floating-input">
                     <input
-                      v-bind="field" v-model="formValues.ageRangeMin" type="text" class="floating-native"
-                      :maxlength="7" @input="field.onInput"
+                      v-bind="field" v-model="formValues.ageRangeMax" type="text" class="floating-native"
+                      :maxlength="3" @input="field.onInput"
                     >
-                    <label class="floating-label"><span>Idade mínima </span></label>
+                    <label class="floating-label"><span>Idade máxima </span></label>
                   </div>
-                  <ErrorMessage v-slot="{ message }" name="name">
+                  <ErrorMessage v-slot="{ message }" name="ageRangeMax">
                     <div class="error-message">
                       {{ message }}
                     </div>
@@ -446,17 +536,22 @@ onMounted(async () => {
           </IonSegmentContent>
           <IonSegmentContent id="discipline-info">
             <IonList>
-              <IonItem v-for="(discipline, index) in disciplines" :key="index">
+              <IonItem v-for="(discipline, index) in disciplineList" :key="index">
                 <IonGrid>
                   <IonRow>
                     <IonCol size="12">
                       <Field v-slot="{ field, errors }" name="discipline.name" label="Disciplina" rules="required">
                         <IonSelect
-                          v-model="discipline.name" v-bind="field" label="Disciplina" label-placement="stacked"
-                          placeholder="Selecione uma disciplina" cancel-text="Cancelar" fill="outline"
+                          v-model="discipline.name"
+                          v-bind="field"
+                          label="Disciplina"
+                          label-placement="floating"
+
+                          cancel-text="Cancelar"
+                          fill="outline"
                           @ion-change="(e) => updateWorkload(index, e.detail.value)"
                         >
-                          <IonSelectOption v-for="option in disciplineList" :key="option.id" :value="option.name">
+                          <IonSelectOption v-for="option in disciplines" :key="option.id" :value="option.name">
                             {{ option.name }}
                           </IonSelectOption>
                         </IonSelect>
@@ -468,8 +563,12 @@ onMounted(async () => {
                     <IonCol size="6">
                       <Field v-slot="{ field, errors }" name="workload" label="Carga horária" rules="required">
                         <IonInput
-                          v-model="discipline.workload" v-bind="field" label-placement="stacked"
-                          label="Carga horária" placeholder="Digite a carga horária" fill="outline"
+                          v-model="discipline.workload"
+                          v-bind="field"
+                          label-placement="floating"
+                          label="Carga horária"
+
+                          fill="outline"
                         />
                         <span class="error-message">{{ errors[0] }}</span>
                       </Field>
@@ -477,8 +576,12 @@ onMounted(async () => {
                     <IonCol size="6">
                       <Field v-slot="{ field, errors }" name="year" label="Ano" rules="required">
                         <IonInput
-                          v-model="discipline.year" v-bind="field" label-placement="stacked" label="Ano"
-                          placeholder="Digite o ano" fill="outline"
+                          v-model="discipline.year"
+                          v-bind="field"
+                          label-placement="floating"
+                          label="Ano"
+
+                          fill="outline"
                         />
                         <span class="error-message">{{ errors[0] }}</span>
                       </Field>
@@ -530,7 +633,7 @@ onMounted(async () => {
             </IonButton>
           </IonCol>
           <IonCol size="6">
-            <IonButton color="secondary" expand="full" :disabled="!saveButtonEnabled" type="submit" form="course-form">
+            <IonButton color="secondary" expand="full" :disabled="!saveButtonEnabled" type="submit" form="series-form">
               Salvar
             </IonButton>
           </IonCol>

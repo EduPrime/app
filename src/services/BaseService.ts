@@ -59,6 +59,22 @@ export default class BaseService<T> {
     return data
   }
 
+  // async getListBySeriesDiscipline(id: string): Promise<any[] | null> {
+  //   const { data, error } = await this.client
+  //     .from('seriesDiscipline')
+  //     .select('*')
+  //     .is('deletedAt', null)
+
+  //   console.log('Data:', data)
+
+  //   if (error) {
+  //     errorHandler(error, 'Failed to get record by ID')
+  //     console.info(error)
+  //   }
+
+  //   return data
+  // }
+
   async getByRelationalId(customTable: string, relationshipName: string, id: string | string[], fields?: string): Promise<any[] | null> {
     if (!id)
       return null
