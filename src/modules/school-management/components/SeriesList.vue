@@ -2,7 +2,7 @@
 import type { Tables } from '@/types/database.types'
 import showToast from '@/utils/toast-alert'
 import { IonAlert } from '@ionic/vue'
-import { pencil, trash } from 'ionicons/icons'
+import { eye, pencil, trash } from 'ionicons/icons'
 import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import SeriesService from '../services/SeriesService'
@@ -14,13 +14,12 @@ const props = defineProps<{
 // Instanciando o serviço da tabela
 const service = new SeriesService()
 
-const series = ref< Tables<'series'> | []>([])
+// const series = ref< Tables<'series'> | []>([])
 const dataList = ref()
 watch(
   () => props.dataList,
   (newValue) => {
     dataList.value = newValue
-    console.log('dataList foi atualizado:', { dataList })
   },
   { immediate: true },
 )
@@ -41,12 +40,12 @@ onMounted(async () => {
 })
 
 // Funções para editar, excluir e detalhes
-function toggleDetails(index: number) {
-  dataList.value[index] = {
-    ...dataList.value[index],
-    showDetails: !dataList.value[index].showDetails,
-  }
-}
+// function toggleDetails(index: number) {
+//   dataList.value[index] = {
+//     ...dataList.value[index],
+//     showDetails: !dataList.value[index].showDetails,
+//   }
+// }
 
 function editItem(item: any) {
   // Exemplo de navegação para a página de edição
@@ -115,26 +114,20 @@ const alertButtons = [
   />
   <ion-list>
     <ion-item-sliding v-for="(item, index) in dataList" :key="index">
-      <ion-item button @click="toggleDetails(index)">
+      <ion-item button>
         <ion-label>
           <h2>{{ item.name || 'Item sem nome' }}</h2>
-          <p>{{ item.address || 'Sem endereço' }}</p>
         </ion-label>
-        <ion-buttons slot="end">
-          <ion-button @click.stop="editItem(item)">
-            <ion-icon id="present-alert" slot="icon-only" :icon="pencil" />
-          </ion-button>
-          <ion-button color="danger" @click.stop="openDeleteAlert(item)">
-            <ion-icon slot="icon-only" :icon="trash" />
-          </ion-button>
-        </ion-buttons>
       </ion-item>
       <ion-item-options side="end">
+        <ion-item-option color="tertiary" @click="editItem(item)">
+          <ion-icon slot="icon-only" :icon="eye" />
+        </ion-item-option>
         <ion-item-option @click="editItem(item)">
-          Editar
+          <ion-icon slot="icon-only" :icon="pencil" />
         </ion-item-option>
         <ion-item-option color="danger" @click="openDeleteAlert(item)">
-          Excluir
+          <ion-icon slot="icon-only" :icon="trash" />
         </ion-item-option>
       </ion-item-options>
       <ion-item v-if="item.showDetails">

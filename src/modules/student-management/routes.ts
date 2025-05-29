@@ -1,17 +1,19 @@
+import { create } from 'ionicons/icons'
 // import DashboardStudent from './views/DashboardStudent.vue'
 // import EditStudent from './views/EditStudent.vue'
 /* import MoveStudent from './views/MoveStudent.vue' */
 /* import RegisterPre_enrollment from './views/RegisterPre_enrollment.vue' */
 // import RegisterStudent from './views/RegisterStudent.vue'
+import DashboardEnrollment from './views/DashboardEnrollment.vue'
 
 const routes = [
-  {
-    path: '',
-    redirect: '/student',
-    meta: {
-      requiredRole: ['GESTORESCOLAR'],
-    },
-  },
+  // {
+  //  path: '',
+  //  redirect: '/student',
+  //  meta: {
+  //    requiredRole: ['GESTORESCOLAR'],
+  //  },
+  // },
   // {
   //   path: '/student',
   //   name: 'StudentList',
@@ -49,19 +51,19 @@ const routes = [
   //     requiredRole: ['ADMIN', 'GESTORESCOLAR'],
   //   },
   // },
-  // {
-  //   path: '/student/enrollment',
-  //   name: 'EnrollmentList',
-  //   component: DashboardEnrollment,
-  //   meta: {
-  //     moduleName: 'Student',
-  //     moduleIcon: create,
-  //     icon: create,
-  //     name: 'Solicitações de matrícula',
-  //     order: 2,
-  //     requiredRole: ['ADMIN', 'GESTORESCOLAR'],
-  //   },
-  // },
+  {
+    path: '/student/enrollment',
+    name: 'EnrollmentList',
+    component: DashboardEnrollment,
+    meta: {
+      moduleName: 'Student',
+      moduleIcon: create,
+      icon: create,
+      name: 'Solicitações de matrícula',
+      order: 2,
+      requiredRole: ['ADMIN', 'GESTORESCOLAR'],
+    },
+  },
   // {
   //   path: '/student/enrollment/register',
   //   name: 'EnrollmentRegister',
