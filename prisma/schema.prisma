@@ -60,6 +60,7 @@ model AcademicYearTemplate {
 model Classroom {
   id                String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   seriesId          String      @db.Uuid
+  inepCode          String?     @db.VarChar(100)
   maxStudents       Int
   exceededStudents  Int         @default(0)
   totalStudents     Int         @default(0)
