@@ -142,7 +142,7 @@ watch(
             class="ion-no-padding ion-padding-top"
           >
             <IonLabel color="primary" class="ion-no-margin">
-              Informações administrativass
+              Informações administrativas
             </IonLabel>
           </IonItemDivider>
 

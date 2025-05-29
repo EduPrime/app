@@ -8,13 +8,14 @@ import {
   IonContent,
   IonGrid,
   IonHeader,
+  IonItemDivider,
+  IonLabel,
   IonPage,
   IonRow,
   IonSelect,
   IonSelectOption,
   IonTitle,
   IonToolbar,
-
 } from '@ionic/vue'
 import { ErrorMessage, Field, Form } from 'vee-validate'
 import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue'
@@ -243,6 +244,16 @@ onMounted(async () => {
         <IonGrid>
           <IonRow>
             <IonCol size="12">
+              <IonItemDivider
+                style="border-color: rgba(var(--ion-color-primary-rgb), 0.25);"
+                class="ion-no-padding"
+              >
+                <IonLabel color="primary" class="ion-no-margin">
+                  Informações gerais
+                </IonLabel>
+              </IonItemDivider>
+            </IonCol>
+            <IonCol size="12">
               <Field v-slot="{ field }" name="name" label="Nome do curso" rules="required|min:3|max:180">
                 <div class="floating-input">
                   <input
@@ -265,6 +276,60 @@ onMounted(async () => {
           </IonRow>
 
           <IonRow>
+            <IonCol size="12" class="ion-margin-vertical">
+              <Field v-slot="{ field, errors }" name="institutionId" rules="">
+                <IonSelect
+                  v-model="formValues.institutionId"
+                  v-bind="field"
+                  label="Instituição"
+                  label-placement="floating"
+                  fill="outline"
+                  disabled
+                  :items="institutions"
+                >
+                  <IonSelectOption
+                    v-for="(institution, index) in institutions"
+                    :key="index"
+                    :value="institution.id"
+                  >
+                    {{ institution.name }}
+                  </IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0] }}</span>
+              </Field>
+            </IonCol>
+          </IonRow>
+
+          <!-- @TODO: Adicionar regra de avaliação ( está estático ) -->
+          <IonRow>
+            <IonCol size="12">
+              <Field v-slot="{ field, errors }" name="evaluationRuleId" rules="required">
+                <IonSelect
+
+                  v-model="formValues.evaluationRuleId"
+                  v-bind="field"
+                  label-placement="floating"
+                  fill="outline"
+                  :items="evaluationRules"
+                >
+                  <label slot="label"><span>Regra de avaliação </span><span class="required-text">(Obrigatório)</span></label>
+
+                  <IonSelectOption
+                    v-for="(rule, index) in evaluationRules"
+                    :key="index"
+                    :value="rule.id"
+                  >
+                    <span>
+                      {{ rule.name?.replace('Regra de avaliação ', '').charAt(0).toUpperCase() + rule.name?.replace('Regra de avaliação ', '').slice(1) }}
+                    </span>
+                  </IonSelectOption>
+                </IonSelect>
+                <span class="error-message">{{ errors[0]?.replace('evaluationRuleId', 'Regra de avaliação') }}</span>
+              </Field>
+            </IonCol>
+          </IonRow>
+
+          <IonRow>
             <IonCol size="12">
               <Field v-slot="{ field }" name="abbreviation" label="Abreviação" rules="min:2|max:8">
                 <div class="floating-input">
@@ -274,7 +339,7 @@ onMounted(async () => {
                     type="text"
                     class="floating-native"
                     placeholder=" "
-                    :maxlength="7"
+                    :maxlength="9"
                     @input="field.onInput"
                   >
                   <label class="floating-label"><span>Abreviação</span></label>
@@ -290,11 +355,20 @@ onMounted(async () => {
 
           <IonRow>
             <IonCol size="12" class="ion-margin-top">
+              <IonItemDivider
+                style="border-color: rgba(var(--ion-color-primary-rgb), 0.25);"
+                class="ion-no-padding"
+              >
+                <IonLabel color="primary" class="ion-no-margin">
+                  Informações administrativas
+                </IonLabel>
+              </IonItemDivider>
+            </IonCol>
+            <IonCol size="12" class="ion-margin-top">
               <Field v-slot="{ field, errors }" name="timeSerialization" rules="required">
                 <IonSelect
                   v-model="formValues.timeSerialization"
                   v-bind="field"
-
                   label-placement="floating"
                   fill="outline"
                   :items="[
@@ -421,7 +495,7 @@ onMounted(async () => {
 
           <IonRow>
             <IonCol size="12">
-              <Field v-slot="{ field }" name="description" label="Descrição do curso" rules="max:240">
+              <Field v-slot="{ field }" name="description" label="Descrição do curso" rules="max:180">
                 <div class="description-input">
                   <textarea
                     v-bind="field"
@@ -447,57 +521,6 @@ onMounted(async () => {
             </IonCol>
           </IonRow>
 
-          <IonRow>
-            <IonCol size="12" class="ion-margin-vertical">
-              <Field v-slot="{ field, errors }" name="institutionId" rules="">
-                <IonSelect
-                  v-model="formValues.institutionId"
-                  v-bind="field"
-                  label="Instituição"
-                  label-placement="floating"
-                  fill="outline"
-                  disabled
-                  :items="institutions"
-                >
-                  <IonSelectOption
-                    v-for="(institution, index) in institutions"
-                    :key="index"
-                    :value="institution.id"
-                  >
-                    {{ institution.name }}
-                  </IonSelectOption>
-                </IonSelect>
-                <span class="error-message">{{ errors[0] }}</span>
-              </Field>
-            </IonCol>
-          </IonRow>
-
-          <!-- @TODO: Adicionar regra de avaliação ( está estático ) -->
-          <IonRow>
-            <IonCol size="12">
-              <Field v-slot="{ field, errors }" name="evaluationRuleId" rules="required">
-                <IonSelect
-
-                  v-model="formValues.evaluationRuleId"
-                  v-bind="field"
-                  label-placement="floating"
-                  fill="outline"
-                  :items="evaluationRules"
-                >
-                  <label slot="label"><span>Regra de avaliação </span><span class="required-text">(Obrigatório)</span></label>
-
-                  <IonSelectOption
-                    v-for="(rule, index) in evaluationRules"
-                    :key="index"
-                    :value="rule.id"
-                  >
-                    {{ rule.name }}
-                  </IonSelectOption>
-                </IonSelect>
-                <span class="error-message">{{ errors[0]?.replace('evaluationRuleId', 'Regra de avaliação') }}</span>
-              </Field>
-            </IonCol>
-          </IonRow>
           <!-- @TODO: Adicionar regra de avaliação ( está estático ) -->
 
           <!-- <IonRow class="ion-margin-vertical">
