@@ -206,6 +206,7 @@ async function handleSubmit() {
   //   institutionId: institutions.value.at(0)?.id,
   //   id: isEditing.value ? itemId.value : undefined,
   // }
+  console.log('entrou')
 
   const payload = {
     ...formValues.value,
@@ -376,8 +377,8 @@ onMounted(async () => {
                 <Field v-slot="{ field }" name="name" label="Nome da série" rules="min:2|max:120">
                   <div class="floating-input">
                     <input
-                      v-bind="field" v-model="formValues.name" type="text" class="floating-native"
-                      :maxlength="120" @input="field.onInput"
+                      v-bind="field" v-model="formValues.name" placeholder=" " type="text" class="floating-native" :maxlength="120"
+                      @input="field.onInput"
                     >
                     <label class="floating-label"><span>Nome da série</span></label>
                   </div>
@@ -395,7 +396,7 @@ onMounted(async () => {
                 <Field v-slot="{ field }" name="description" label="Descrição da série" rules="max:240">
                   <div class="description-input">
                     <textarea
-                      v-bind="field" ref="descriptionRef" v-model="formValues.description"
+                      v-bind="field" ref="descriptionRef" v-model="formValues.description" placeholder=" "
                       class="description-native" maxlength="181" @input="(event) => {
                         field.onInput(event);
                         trimDescription(event);
@@ -431,7 +432,7 @@ onMounted(async () => {
 
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field, errors }" name="courseId" rules="required">
+                <Field v-slot="{ field }" name="Curso" rules="required">
                   <IonSelect
                     v-model="formValues.courseId" v-bind="field" label-placement="floating" fill="outline"
                     :items="courseList"
@@ -442,23 +443,22 @@ onMounted(async () => {
                       {{ course.name }}
                     </IonSelectOption>
                   </IonSelect>
-                  <ErrorMessage v-slot="{ message }" name="courseId">
+                  <ErrorMessage v-slot="{ message }" name="Curso">
                     <div class="error-message">
                       {{ message }}
                     </div>
                   </ErrorMessage>
-                  <span class="error-message">{{ errors[0]?.replace('courseId', 'Curso') }}</span>
                 </Field>
               </IonCol>
             </IonRow>
 
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field, errors }" name="workload" label="Carga horária" rules="required">
+                <Field v-slot="{ field }" name="workload" label="Carga horária" rules="required">
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.workload" type="text" class="floating-native"
-                      :maxlength="7" @input="field.onInput"
+                      placeholder=" " :maxlength="7" @input="field.onInput"
                     >
                     <label class="floating-label"><span>Carga horária </span></label>
                   </div>
@@ -467,8 +467,6 @@ onMounted(async () => {
                       {{ message }}
                     </div>
                   </ErrorMessage>
-
-                  <span class="error-message">{{ errors[0] }}</span>
                 </Field>
               </IonCol>
 
@@ -477,7 +475,7 @@ onMounted(async () => {
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.schoolDays" type="text" class="floating-native"
-                      :maxlength="7" @input="field.onInput"
+                      placeholder=" " :maxlength="7" @input="field.onInput"
                     >
                     <label class="floating-label"><span>Dias letivos </span> </label>
                   </div>
@@ -496,7 +494,7 @@ onMounted(async () => {
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.standardAge" type="text" class="floating-native"
-                      :maxlength="3" @input="field.onInput"
+                      placeholder=" " :maxlength="3" @input="field.onInput"
                     >
                     <label class="floating-label"><span>Idade padrão </span></label>
                   </div>
@@ -515,7 +513,7 @@ onMounted(async () => {
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.ageRangeMin" type="text" class="floating-native"
-                      :maxlength="3" @input="field.onInput"
+                      placeholder=" " :maxlength="3" @input="field.onInput"
                     >
                     <label class="floating-label"><span>Idade mínima </span></label>
                   </div>
@@ -533,7 +531,9 @@ onMounted(async () => {
                 <Field v-slot="{ field, errors }" name="ageRangeMax" label="Idade máxima">
                   <div class="floating-input">
                     <input
-                      v-bind="field" v-model="formValues.ageRangeMax" type="text" class="floating-native"
+                      v-bind="field" v-model="formValues.ageRangeMax"
+                      placeholder=" "
+                      type="text" class="floating-native"
                       :maxlength="3" @input="field.onInput"
                     >
                     <label class="floating-label"><span>Idade máxima </span></label>
@@ -557,13 +557,8 @@ onMounted(async () => {
                     <IonCol size="12">
                       <Field v-slot="{ field, errors }" name="discipline.name" label="Disciplina">
                         <IonSelect
-                          v-model="discipline.name"
-                          v-bind="field"
-                          label="Disciplina"
-                          label-placement="floating"
-
-                          cancel-text="Cancelar"
-                          fill="outline"
+                          v-model="discipline.name" v-bind="field" label="Disciplina"
+                          label-placement="floating" cancel-text="Cancelar" fill="outline"
                           @ion-change="(e) => updateWorkload(index, e.detail.value)"
                         >
                           <IonSelectOption v-for="option in disciplines" :key="option.id" :value="option.name">
@@ -578,12 +573,8 @@ onMounted(async () => {
                     <IonCol size="6">
                       <Field v-slot="{ field, errors }" name="workload" label="Carga horária">
                         <IonInput
-                          v-model="discipline.workload"
-                          v-bind="field"
-                          label-placement="floating"
-                          label="Carga horária"
-
-                          fill="outline"
+                          v-model="discipline.workload" v-bind="field" label-placement="floating"
+                          label="Carga horária" fill="outline"
                         />
                         <span class="error-message">{{ errors[0] }}</span>
                       </Field>
@@ -591,11 +582,7 @@ onMounted(async () => {
                     <IonCol size="6">
                       <Field v-slot="{ field, errors }" name="year" label="Ano">
                         <IonInput
-                          v-model="discipline.year"
-                          v-bind="field"
-                          label-placement="floating"
-                          label="Ano"
-
+                          v-model="discipline.year" v-bind="field" label-placement="floating" label="Ano"
                           fill="outline"
                         />
                         <span class="error-message">{{ errors[0] }}</span>
@@ -659,6 +646,139 @@ onMounted(async () => {
 </template>
 
 <style scoped>
+.page-title {
+  font-weight: bold;
+  color: var(--ion-color-secondary);
+}
+
+.toolbar-accent {
+  height: 4px;
+  background-color: var(--ion-color-primary);
+}
+
+.content-with-footer {
+  padding-bottom: 80px;
+}
+
+.floating-input {
+  position: relative;
+  border: 1px solid var(--ion-color-primary);
+  border-radius: 4px;
+  margin-top: 16px;
+  height: 56px;
+}
+
+.floating-native {
+  width: 100%;
+  height: 100%;
+  padding: 0 16px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--ion-color-dark-tint);
+  display: flex;
+  align-items: center;
+}
+
+.floating-native::placeholder {
+  color: transparent;
+}
+
+.description-input {
+  position: relative;
+  border: 1px solid var(--ion-color-primary);
+  border-radius: 4px;
+  margin-top: 16px;
+  min-height: 80px;
+}
+
+.description-native {
+  width: 100%;
+  height: auto;
+  padding: 8px 16px 6px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--ion-color-dark-tint);
+  overflow: hidden;
+  resize: none;
+}
+
+.description-native::placeholder {
+  color: transparent;
+}
+
+.floating-label {
+  position: absolute;
+  top: 50%;
+  left: 16px;
+  transform: translateY(-50%);
+  background: white;
+  padding: 0 4px;
+  font-size: 1rem;
+  pointer-events: none;
+  transition: 0.2s ease all;
+  color: var(--ion-color-medium-shade);
+}
+
+.top-label {
+  top: 8px;
+  transform: translateY(0);
+}
+
+.floating-native:focus+.floating-label,
+.floating-native:not(:placeholder-shown)+.floating-label,
+.description-native:focus+.floating-label,
+.description-native:not(:placeholder-shown)+.floating-label {
+  top: -8px;
+  transform: translateY(0);
+  font-size: 0.75rem;
+  color: var(--ion-color-primary);
+}
+
+.required-text {
+  color: var(--ion-color-danger);
+}
+
+.error-message {
+  color: var(--ion-color-danger);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.action-buttons-fixed {
+  margin: 0;
+  padding: 8px;
+}
+
+ion-select {
+  /* --label-color: var(--ion-color-primary); */
+  /* --placeholder-opacity: 1; */
+  /* width: 100%; */
+  /* justify-content: center; */
+  --border-color: var(--ion-color-secondary);
+}
+
+/*
+  ion-select::part(placeholder),
+  ion-select::part(text) {
+    flex: 0 0 auto;
+  } */
+
+/* ion-select::part(text) {
+    color: var(--ion-color-secondary);
+  } */
+/* ion-select::part(label) {
+    color: var(--ion-color-primary);
+  } */
+
+ion-select::part(icon) {
+  color: var(--ion-color-secondary);
+  opacity: 1;
+}
+
 .page-title {
   font-weight: bold;
   color: var(--ion-color-secondary);

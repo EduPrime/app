@@ -289,7 +289,7 @@ const routes = [
       moduleName: 'Schools',
       moduleIcon: school,
       icon: list,
-      name: 'Registrar série',
+      name: 'Cadastrar série',
       order: 17,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },

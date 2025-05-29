@@ -20,6 +20,9 @@ interface Props {
     graduate?: string | null
     updatedAt?: string | null
     deletedAt?: string | null
+    course?: {
+      name: string
+    }
   }[]
 }
 
@@ -74,8 +77,8 @@ onUnmounted(() => {
               <IonItem>
                 <IonLabel color="primary" class="ion-no-margin course-name" style="margin-top: 5px; margin-bottom: 5px;">
                   <h2>{{ item.name || 'Série sem nome' }}</h2>
-                  <p v-if="item.regimeType">
-                    {{ item.regimeType }}
+                  <p>
+                    {{ item?.course?.name || 'Sem curso vinculado' }}
                   </p>
                 </IonLabel>
                 <IonIcon :icon="isOpen[index] ? arrowForward : arrowBack" style="font-size: 18pt;" />
@@ -104,8 +107,8 @@ onUnmounted(() => {
             <IonItem v-for="(item, index) in props.dataList" :key="index">
               <IonLabel color="primary" class="ion-no-margin course-name" style="margin-top: 5px; margin-bottom: 5px;">
                 <h2>{{ item.name || 'Função sem nome' }}</h2>
-                <p v-if="item.regimeType">
-                  {{ item.regimeType }}
+                <p>
+                  {{ item?.course?.name || 'Sem curso vinculado' }}
                 </p>
               </IonLabel>
               <div style="display: flex; min-height: 100%;">
