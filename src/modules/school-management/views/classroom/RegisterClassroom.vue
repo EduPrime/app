@@ -89,6 +89,31 @@ const dayOfWeekOptions = [
   { value: 'SUNDAY', label: 'Domingo' },
 ]
 
+const initialEmptyState = ref({
+  name: '',
+  abbreviation: '',
+  seriesId: '',
+  schoolId: '',
+  courseId: '',
+  maxStudents: '',
+  exceededStudents: '',
+  totalStudents: '',
+  pcdStudents: '',
+  startTime: '',
+  startTimeInterval: '',
+  endTimeInterval: '',
+  endTime: '',
+  dayofweek: [],
+  disciplines: [],
+  room: '',
+  regimeType: '',
+  period: '',
+  status: 'ACTIVE',
+  year: '',
+  isMultiSerialized: false,
+  altDisciplineList: false,
+})
+
 function formatTimeInput(value: string): string {
   const cleanValue = value.replace(/\D/g, '')
 
@@ -312,31 +337,6 @@ function checkForChanges() {
   hasChanges.value = currentValues !== originalValues
 }
 
-const initialEmptyState = ref({
-  name: '',
-  abbreviation: '',
-  seriesId: '',
-  schoolId: '',
-  courseId: '',
-  maxStudents: '',
-  exceededStudents: '',
-  totalStudents: '',
-  pcdStudents: '',
-  startTime: '',
-  startTimeInterval: '',
-  endTimeInterval: '',
-  endTime: '',
-  dayofweek: [],
-  disciplines: [],
-  room: '',
-  regimeType: '',
-  period: '',
-  status: 'ACTIVE',
-  year: '',
-  isMultiSerialized: false,
-  altDisciplineList: false,
-})
-
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
     let hasFieldChanges = false
@@ -377,6 +377,123 @@ const saveButtonEnabled = computed(() => {
   return hasChanges.value
 })
 
+function formatTime(time: any): string {
+  if (!time)
+    return ''
+
+  if (typeof time === 'string' && time.match(/^\d{1,2}:\d{2}$/)) {
+    return time
+  }
+
+  try {
+    const timeDate = new Date(time)
+    if (!Number.isNaN(timeDate.getTime())) {
+      const hours = timeDate.getHours().toString().padStart(2, '0')
+      const minutes = timeDate.getMinutes().toString().padStart(2, '0')
+      return `${hours}:${minutes}`
+    }
+  }
+  catch (e) {
+    console.error('Erro ao formatar horário:', e)
+  }
+
+  return ''
+}
+
+async function resetFormState() {
+  // Reset all form-related state with fresh copies to break references
+  const currentYear = new Date().getFullYear().toString()
+
+  // Deep clone to ensure no references are shared
+  formValues.value = JSON.parse(JSON.stringify({
+    ...initialFormValues,
+    year: currentYear,
+  }))
+
+  originalFormValues.value = JSON.parse(JSON.stringify(formValues.value))
+  isEditing.value = false
+  hasChanges.value = false
+
+  // Reset dependency lists
+  seriesList.value = []
+  disciplineList.value = []
+
+  // Reset initialEmptyState year
+  initialEmptyState.value = {
+    ...initialEmptyState.value,
+    year: currentYear,
+  }
+}
+
+async function initialize() {
+  // Reset all state first
+  await resetFormState()
+
+  // Load common dependencies
+  await loadDependencies()
+
+  // Get ID from route params directly to avoid any reactivity issues
+  const id = route.params.id as string | undefined
+
+  if (id) {
+    // Edit mode
+    isEditing.value = true
+    try {
+      const classroom = await classroomService.getClassroomById(id)
+
+      if (classroom) {
+        const loadedValues = {
+          id: classroom.id,
+          name: classroom.name,
+          abbreviation: classroom.abbreviation || '',
+          seriesId: classroom.seriesId,
+          maxStudents: classroom.maxStudents?.toString() || '',
+          exceededStudents: classroom.exceededStudents?.toString() || '',
+          totalStudents: classroom.totalStudents?.toString() || '',
+          pcdStudents: classroom.pcdStudents?.toString() || '',
+          startTime: formatTime(classroom.startTime),
+          startTimeInterval: formatTime(classroom.startTimeInterval),
+          endTimeInterval: formatTime(classroom.endTimeInterval),
+          endTime: formatTime(classroom.endTime),
+          dayofweek: (classroom.dayofweek || []) as string[],
+          disciplines: ((classroom as any).disciplines || []) as string[],
+          room: classroom.room || '',
+          regimeType: classroom.regimeType || '',
+          period: classroom.period || '',
+          status: (classroom.status || 'ACTIVE') as string,
+          year: classroom.year?.toString() || '',
+          isMultiSerialized: classroom.isMultiSerialized || false,
+          schoolId: classroom.schoolId || '',
+          courseId: ((classroom as any).courseId || '') as string,
+          altDisciplineList: (classroom as any).altDisciplineList || false,
+        }
+
+        formValues.value = JSON.parse(JSON.stringify(loadedValues))
+        originalFormValues.value = JSON.parse(JSON.stringify(loadedValues))
+        hasChanges.value = false
+
+        // Load dependent dropdowns based on selected values
+        if (formValues.value.schoolId) {
+          await loadCoursesBySchool(formValues.value.schoolId)
+
+          if (formValues.value.courseId) {
+            await loadSeriesByCourseAndSchool(formValues.value.schoolId, formValues.value.courseId)
+
+            if (formValues.value.seriesId) {
+              await loadDisciplinesBySeries(formValues.value.seriesId)
+            }
+          }
+        }
+      }
+    }
+    catch (error) {
+      console.error('Erro ao carregar turma:', error)
+      showToast('Erro ao carregar dados da turma', 'top', 'danger')
+    }
+  }
+}
+
+// Watch for changes in school, course, and series to load dependent data
 watch(() => formValues.value.schoolId, (newSchoolId) => {
   if (newSchoolId) {
     loadCoursesBySchool(newSchoolId)
@@ -421,85 +538,19 @@ watch(
   { deep: true, immediate: true },
 )
 
-onMounted(async () => {
-  await loadDependencies()
-
-  if (classroomId.value) {
-    isEditing.value = true
-    const classroom = await classroomService.getClassroomById(classroomId.value)
-
-    if (classroom) {
-      const formatTime = (time: any) => {
-        if (!time)
-          return ''
-
-        if (typeof time === 'string' && time.match(/^\d{1,2}:\d{2}$/)) {
-          return time
-        }
-
-        try {
-          const timeDate = new Date(time)
-          if (!Number.isNaN(timeDate.getTime())) {
-            const hours = timeDate.getHours().toString().padStart(2, '0')
-            const minutes = timeDate.getMinutes().toString().padStart(2, '0')
-            return `${hours}:${minutes}`
-          }
-        }
-        catch (e) {
-          console.error('Erro ao formatar horário:', e)
-        }
-
-        return ''
-      }
-
-      const loadedValues = {
-        id: classroom.id,
-        name: classroom.name,
-        abbreviation: classroom.abbreviation || '',
-        seriesId: classroom.seriesId,
-        maxStudents: classroom.maxStudents?.toString() || '',
-        exceededStudents: classroom.exceededStudents?.toString() || '',
-        totalStudents: classroom.totalStudents?.toString() || '',
-        pcdStudents: classroom.pcdStudents?.toString() || '',
-        startTime: formatTime(classroom.startTime),
-        startTimeInterval: formatTime(classroom.startTimeInterval),
-        endTimeInterval: formatTime(classroom.endTimeInterval),
-        endTime: formatTime(classroom.endTime),
-        dayofweek: (classroom.dayofweek || []) as string[],
-        disciplines: ((classroom as any).disciplines || []) as string[],
-        room: classroom.room || '',
-        regimeType: classroom.regimeType || '',
-        period: classroom.period || '',
-        status: (classroom.status || 'ACTIVE') as string,
-        year: classroom.year?.toString() || '',
-        isMultiSerialized: classroom.isMultiSerialized || false,
-        schoolId: classroom.schoolId || '',
-        courseId: ((classroom as any).courseId || '') as string,
-        altDisciplineList: (classroom as any).altDisciplineList || false,
-      }
-
-      formValues.value = JSON.parse(JSON.stringify(loadedValues))
-      originalFormValues.value = JSON.parse(JSON.stringify(loadedValues))
-      hasChanges.value = false
-
-      if (formValues.value.seriesId) {
-        await loadDisciplinesBySeries(formValues.value.seriesId)
-      }
-    }
+const previousId = ref<string | undefined>()
+watch(() => route.params.id, (newId) => {
+  if (newId !== previousId.value) {
+    previousId.value = newId as string | undefined
+    initialize()
   }
-  else {
-    const currentYear = new Date().getFullYear().toString()
-    formValues.value = {
-      ...initialFormValues,
-      year: currentYear,
-    }
-    originalFormValues.value = { ...formValues.value }
-    hasChanges.value = false
+}, { immediate: true })
 
-    initialEmptyState.value = {
-      ...initialEmptyState.value,
-      year: currentYear,
-    }
+// Garantir que a inicialização ocorra tanto no mounted quanto no watcher
+onMounted(() => {
+  // Garantimos que as escolas sejam carregadas mesmo sem ID (modo criação)
+  if (schoolList.value.length === 0) {
+    loadDependencies()
   }
 })
 
@@ -594,6 +645,11 @@ async function handleSubmit(values: any) {
 function resetForm() {
   router.back()
 }
+
+function handleManualSubmit() {
+  if (saveButtonEnabled.value)
+    handleSubmit(formValues.value)
+}
 </script>
 
 <template>
@@ -608,7 +664,7 @@ function resetForm() {
     </IonHeader>
 
     <IonContent :scroll-y="true" class="ion-padding content-with-footer">
-      <Form id="classroom-form" :key="formValues.id || 'new'" :initial-values="formValues" @submit="handleSubmit">
+      <Form id="classroom-form" :key="formValues.id || `new-${Date.now()}`" :initial-values="formValues" @submit="handleSubmit">
         <IonGrid>
           <div class="section-header">
             <h2>Informações Básicas</h2>
@@ -1187,12 +1243,17 @@ function resetForm() {
         <IonGrid>
           <IonRow class="action-buttons-fixed">
             <IonCol size="6">
-              <IonButton color="danger" expand="block" @click="resetForm">
+              <IonButton type="button" color="danger" expand="block" @click="resetForm()">
                 Cancelar
               </IonButton>
             </IonCol>
             <IonCol size="6">
-              <IonButton expand="block" type="submit" form="classroom-form" :disabled="!saveButtonEnabled">
+              <IonButton
+                expand="block"
+                type="button"
+                :disabled="!saveButtonEnabled"
+                @click="handleManualSubmit"
+              >
                 Salvar
               </IonButton>
             </IonCol>
