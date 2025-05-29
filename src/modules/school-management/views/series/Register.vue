@@ -36,6 +36,25 @@ interface Props {
   editId?: string
 }
 
+interface SeriesToSave {
+  id?: string
+  name: string
+  courseId: string
+  description?: string
+  workload?: number
+  ageRangeMin: number | null
+  ageRangeMax: number | null
+  standardAge: number | null
+  schoolDays: number
+  tenantId?: string | null
+  userCreated?: string | null
+  createdAt: string | null
+  deletedAt: string | null
+  updatedAt: string | null
+  updatedBy: string | null
+  institutionId: string
+}
+
 // interface Discipline {
 //   id: number | null
 //   disciplineId: string
@@ -182,8 +201,6 @@ onMounted(async () => {
 })
 
 async function handleSubmit() {
-  console.log('entrou na função de criar\editar')
-
   // const payload = {
   //   ...values,
   //   institutionId: institutions.value.at(0)?.id,
@@ -201,7 +218,7 @@ async function handleSubmit() {
 
     workload: formValues.value.workload ?? undefined, // Ensure workload is undefined if null
     schoolDays: formValues.value.schoolDays ?? 0, // Garante que schoolDays seja um número
-  }
+  } as SeriesToSave
 
   const disciplinesToSave = disciplineList.value.map((discipline: any) => {
     const selectedDiscipline = disciplines.value.find((d: any) => d.name === discipline.name)
@@ -226,8 +243,6 @@ async function handleSubmit() {
   })
 
   // showToast(successMessage, 'top', 'success')
-
-  console.log('disciplinesToSave##:', disciplinesToSave)
 
   try {
     await seriesService.upsertSeriesWithDisciplines(payload, disciplinesToSave)

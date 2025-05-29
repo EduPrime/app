@@ -1,6 +1,5 @@
 <script setup lang="ts">
 // import type { ServerFunction } from '@prisma/client'
-import type { Course } from '@prisma/client'
 
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import { IonButton, IonCard, IonCol, IonGrid, IonPage, IonRow } from '@ionic/vue'
@@ -11,7 +10,7 @@ import SeriesService from '../../services/SeriesService'
 const route = useRoute()
 const router = useRouter()
 const seriesService = new SeriesService()
-const seriesDetails = ref<Course | null>(null)
+const seriesDetails = ref()
 const loading = ref(true)
 
 const disciplines = ref()

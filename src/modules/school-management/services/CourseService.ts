@@ -9,6 +9,23 @@ export default class CourseService extends BaseService<Course> {
     super(table)
   }
 
+  async getAllCourses() {
+    try {
+      const { data: course, error: courseError } = await this.client
+        .from(table)
+        .select('*')
+
+      if (courseError) {
+        errorHandler(courseError, 'Erro ao buscar séries')
+      }
+
+      return course
+    }
+    catch (error) {
+      errorHandler(error, 'Erro ao buscar séries')
+    }
+  }
+
   async getById(id: string) {
     if (!id) {
       return null

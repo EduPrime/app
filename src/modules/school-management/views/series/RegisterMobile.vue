@@ -4,10 +4,10 @@ import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonInput, IonItem, Ion
 import { listSharp } from 'ionicons/icons'
 import { Field, Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
-import InstitutionService from '../../institution/services/InstitutionService'
-import CourseService from '../services/CourseService'
-import DisciplineService from '../services/DisciplineService'
-import SeriesService from '../services/SeriesService'
+import InstitutionService from '../../../institution/services/InstitutionService'
+import CourseService from '../../services/CourseService'
+import DisciplineService from '../../services/DisciplineService'
+import SeriesService from '../../services/SeriesService'
 
 const props = defineProps<{
   closeModal: (status: boolean) => void

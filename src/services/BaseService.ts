@@ -40,7 +40,7 @@ export default class BaseService<T> {
 
     if (error)
       errorHandler(error, 'Failed to get record by ID')
-    return data
+    return data as T
   }
 
   async getListByCustomTable(customTable: string, fields: string = '*'): Promise<any[] | null> {
@@ -49,11 +49,8 @@ export default class BaseService<T> {
       .select(fields)
       .is('deletedAt', null)
 
-    console.log('Data:', data)
-
     if (error) {
       errorHandler(error, 'Failed to get record by ID')
-      console.info(error)
     }
 
     return data

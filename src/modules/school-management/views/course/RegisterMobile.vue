@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Course } from '@prisma/client'
 import {
   IonButton,
   IonCol,
@@ -29,18 +30,32 @@ const emits = defineEmits<{
 const courseService = new CourseService()
 
 const descriptionRef = ref<HTMLTextAreaElement | null>(null)
-const formValues = ref({
+const formValues = ref<Course | any>({
   id: '',
   name: '',
   abbreviation: '',
   description: '',
+  timeSerialization: null,
+  institutionId: '',
+  graduate: null,
+  teachingType: null,
+  regimeType: null,
+  courseModality: null,
+  evaluationRuleId: null,
 })
 
-const originalFormValues = ref({
+const originalFormValues = ref<Course | any>({
   id: '',
   name: '',
   abbreviation: '',
   description: '',
+  timeSerialization: null,
+  institutionId: '',
+  graduate: null,
+  teachingType: null,
+  regimeType: null,
+  courseModality: null,
+  evaluationRuleId: null,
 })
 
 const hasChanges = ref(false)

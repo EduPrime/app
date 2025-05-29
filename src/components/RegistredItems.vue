@@ -25,6 +25,9 @@ interface Props {
     state?: string
     postalCode?: string
     neighborhood?: string
+    school?: {
+      name?: string
+    }
     disciplines?: [
       {
         disciplineName?: string
