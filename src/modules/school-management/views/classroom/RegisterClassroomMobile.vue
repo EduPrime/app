@@ -65,6 +65,14 @@ const dayOfWeekOptions = [
 ]
 
 function formatTimeInput(value: string): string {
+  if (value.match(/^\d{2}:$/)) {
+    return value.substring(0, 2)
+  }
+
+  if (value.match(/^\d{2}:\d?$/)) {
+    return value
+  }
+
   const cleanValue = value.replace(/\D/g, '')
 
   if (cleanValue.length >= 2) {

@@ -115,6 +115,13 @@ const initialEmptyState = ref({
 })
 
 function formatTimeInput(value: string): string {
+  if (value.match(/^\d{2}:$/)) {
+    return value.substring(0, 2)
+  }
+  if (value.match(/^\d{2}:\d?$/)) {
+    return value
+  }
+
   const cleanValue = value.replace(/\D/g, '')
 
   if (cleanValue.length >= 2) {
@@ -401,10 +408,8 @@ function formatTime(time: any): string {
 }
 
 async function resetFormState() {
-  // Reset all form-related state with fresh copies to break references
   const currentYear = new Date().getFullYear().toString()
 
-  // Deep clone to ensure no references are shared
   formValues.value = JSON.parse(JSON.stringify({
     ...initialFormValues,
     year: currentYear,
@@ -414,11 +419,9 @@ async function resetFormState() {
   isEditing.value = false
   hasChanges.value = false
 
-  // Reset dependency lists
   seriesList.value = []
   disciplineList.value = []
 
-  // Reset initialEmptyState year
   initialEmptyState.value = {
     ...initialEmptyState.value,
     year: currentYear,
@@ -426,17 +429,13 @@ async function resetFormState() {
 }
 
 async function initialize() {
-  // Reset all state first
   await resetFormState()
 
-  // Load common dependencies
   await loadDependencies()
 
-  // Get ID from route params directly to avoid any reactivity issues
   const id = route.params.id as string | undefined
 
   if (id) {
-    // Edit mode
     isEditing.value = true
     try {
       const classroom = await classroomService.getClassroomById(id)
@@ -472,7 +471,6 @@ async function initialize() {
         originalFormValues.value = JSON.parse(JSON.stringify(loadedValues))
         hasChanges.value = false
 
-        // Load dependent dropdowns based on selected values
         if (formValues.value.schoolId) {
           await loadCoursesBySchool(formValues.value.schoolId)
 
@@ -493,7 +491,6 @@ async function initialize() {
   }
 }
 
-// Watch for changes in school, course, and series to load dependent data
 watch(() => formValues.value.schoolId, (newSchoolId) => {
   if (newSchoolId) {
     loadCoursesBySchool(newSchoolId)
@@ -546,9 +543,7 @@ watch(() => route.params.id, (newId) => {
   }
 }, { immediate: true })
 
-// Garantir que a inicialização ocorra tanto no mounted quanto no watcher
 onMounted(() => {
-  // Garantimos que as escolas sejam carregadas mesmo sem ID (modo criação)
   if (schoolList.value.length === 0) {
     loadDependencies()
   }
