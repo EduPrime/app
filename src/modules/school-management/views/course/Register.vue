@@ -157,8 +157,6 @@ async function handleSubmit(values: any) {
     id: isEditing.value ? itemId.value : undefined,
   }
 
-  console.log('Payload', payload)
-
   try {
     await courseService.upsertItem(payload)
 

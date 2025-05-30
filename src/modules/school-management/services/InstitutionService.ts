@@ -1,4 +1,3 @@
-import type { Institution } from '@prisma/client'
 import BaseService from '@/services/BaseService'
 import errorHandler from '@/utils/error-handler'
 

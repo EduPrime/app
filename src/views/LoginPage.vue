@@ -48,7 +48,6 @@ async function signIn() {
       else if (localUserRole === 'GESTORESCOLAR') {
         router.push('/teachers/manage')
         window.location.reload()
-        console.log('Gestor Escolar')
       }
       else {
         router.push('/dashboard/Home')

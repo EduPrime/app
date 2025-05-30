@@ -1,126 +1,16 @@
 <script setup lang="ts">
 import type { MaskitoElement } from '@maskito/core'
 import type { SubmissionHandler } from 'vee-validate'
-import { IonAccordion, IonAccordionGroup, IonButton, IonToolbar, IonGrid, IonCol, IonRow, IonIcon, IonInput, IonItem, IonLabel, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonSelect, IonSelectOption, IonPage, IonFooter } from '@ionic/vue'
+import type { Institutions, SchoolFormValues } from '../types/types'
+import showToast from '@/utils/toast-alert'
+import { IonAccordion, IonAccordionGroup, IonButton, IonCol, IonGrid, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonSelect, IonSelectOption } from '@ionic/vue'
 import { maskito as vMaskito } from '@maskito/vue'
 import { schoolSharp } from 'ionicons/icons'
-import { SchoolFormValues, Institutions } from '../types/types'
-import showToast from '@/utils/toast-alert'
-import SchoolRegistrationService from '../services/SchoolRegistrationService'
-import InstitutionService from '../services/InstitutionService'
-import { ref, watch, nextTick, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 // eslint-disable-next-line no-duplicate-imports
 import { Field, Form } from 'vee-validate'
+import { nextTick, onMounted, ref, watch } from 'vue'
+import InstitutionService from '../services/InstitutionService'
 
-const schoolService = new SchoolRegistrationService()
-const institutionService = new InstitutionService()
-
-const router = useRouter()
-const formRef = ref<any>(null)
-let institutions = ref<Institutions[]>({} as Institutions[])
-
-const formValues = ref<SchoolFormValues>({
-  id: undefined,
-  idpes: null,
-  INEPCode: '12343',
-  name: 'Escola Primeiro de Maio',
-  corporateName: 'Sociedade Educacional Primeiro de Maio',
-  cnpj: '73.819.874/0001-49',
-  educationNetwork: 'false',
-  phone: '(91) 98010-1212',
-  phone2: '(92) 99010-1212',
-  email: 'contato@primeirodemaio.com',
-  website: 'www.escolaprimeirodemaio.com.br',
-  abbreviation: 'EPM',
-  blockJournalEntries: 'false',
-  operationalStatus: 'true',
-  usesAlternativeRules: 'true',
-  administrativeDependency: 'Privada',
-  address: 'Rua Primeiro de Maio',
-  addressNumber: '105',
-  additionalInfo: 'Esquina da rua',
-  neighborhood: 'Sacramenta',
-  city: 'Belém',
-  state: 'PA',
-  postalCode: '66123200',
-  unusualLocation: "false",
-  acronym: '',
-  operatingLocation: 'Própria',
-  buildingUsage: 'Exclusiva',
-  sharedSchool: 'true',
-  sharedSchoolINEPCode: '54321',
-  potableWaterAvailable: 'true',
-  electricityAvailable: 'true',
-  sewageAvailable: 'true',
-  wasteDisposal: 'Aterro',
-  wasteTreatmentBySchool: 'false',
-  foodServiceAvailable: 'true',
-  communitySharedSpaces: 'false',
-  usesSurroundingSpaces: 'true',
-  specificFacilities: 'true',
-  generalUseRooms: ['Sala de aula', 'Espaços comuns'],
-  labsAndFunctionalAreas: ['Informática', 'Ciências', 'Multimídia'],
-  supportFacilities: ['Banheiros', 'Acessibilidade'],
-  insideClassrooms: 1,
-  outsideClassrooms: 2,
-  refrigeratedClassrooms: 2,
-  accessibleClassrooms: 2,
-  internetAvailable: 'true',
-  localNetworkAvailable: 'true',
-  devicesUsedByStudents: ['Smartphone'],
-  connectionType: ['Fibra ótica'],
-  availableDesktops: 3,
-  availableLaptops: 3,
-  availableTablets: 0,
-  teachingEquipments: ['DVD/Blu-ray', 'TV multimídia'],
-  administrativeStaffNumber: 10,
-  teachingStaffNumber: 10,
-  generalServicesStaffNumber: 10,
-  securityStaffNumber: 10,
-  healthcareStaffNumber: 1,
-  socialAssistanceStaffNumber: 1,
-  schoolManagementStaffNumber: 1,
-  specializedAssistance: 'true',
-  elementaryEducationModel: 'Série',
-  wasPedagogicalProjectUpdated: 'true',
-  indigenousEducationAvailable: 'true',
-  linkedWithSuperiorEducation: 'true',
-  collegiateBodies: ['Associação de Pais', 'Grêmio Estudantil'],
-  studentSelectionCriteria: ['Análise curricular'],
-  indigenousEducationLanguages: ['Português', 'Ticuna'],
-  pedagogicalMaterials: ['Arquivo multimídia', 'Brinquedos'],
-  headSchoolCode: 12345657,
-  IESCode: 123456,
-  institutionId: null,
-  // active: null,
-  // longitude: '',
-  // latitude: '',
-  // totalArea: '',
-  // builtArea: '',
-  // availableArea: '',
-  // blockDiaryEntries: null,
-  // regulation: null,
-  // logoUrl: '',
-  // access: null,
-  // managerid: '',
-  // managerPosition: '',
-  // operationLocation: '',
-  // condition: null,
-  // sharedSchooLinePCode: null,
-  // creationDecree: '',
-  // numberOfFloors: null,
-  // floorType: null,
-  // energyMeter: null,
-  // hasExternalArea: null,
-  // metadata: null,
-  // createdAt: new Date(),
-  // deletedAt: null,
-  // updatedAt: null,
-  updatedBy: localStorage.getItem('userLocal') ? JSON.parse(localStorage.getItem('userLocal')!).id : '',
-  tenantId: '',
-  userCreated: '',
-})
 // const ORIGINALformValues = ref<SchoolFormValues>({
 //   id: '',
 //   idpes: null,
@@ -224,9 +114,116 @@ const formValues = ref<SchoolFormValues>({
 // })
 
 defineProps<{
-  closeModal: (status: boolean) => void;
+  closeModal: (status: boolean) => void
 }>()
 
+// const schoolService = new SchoolRegistrationService()
+const institutionService = new InstitutionService()
+
+const formRef = ref<any>(null)
+const institutions = ref<Institutions[]>({} as Institutions[])
+
+const formValues = ref<SchoolFormValues>({
+  id: undefined,
+  idpes: null,
+  INEPCode: '12343',
+  name: 'Escola Primeiro de Maio',
+  corporateName: 'Sociedade Educacional Primeiro de Maio',
+  cnpj: '73.819.874/0001-49',
+  educationNetwork: 'false',
+  phone: '(91) 98010-1212',
+  phone2: '(92) 99010-1212',
+  email: 'contato@primeirodemaio.com',
+  website: 'www.escolaprimeirodemaio.com.br',
+  abbreviation: 'EPM',
+  blockJournalEntries: 'false',
+  operationalStatus: 'true',
+  usesAlternativeRules: 'true',
+  administrativeDependency: 'Privada',
+  address: 'Rua Primeiro de Maio',
+  addressNumber: '105',
+  additionalInfo: 'Esquina da rua',
+  neighborhood: 'Sacramenta',
+  city: 'Belém',
+  state: 'PA',
+  postalCode: '66123200',
+  unusualLocation: 'false',
+  acronym: '',
+  operatingLocation: 'Própria',
+  buildingUsage: 'Exclusiva',
+  sharedSchool: 'true',
+  sharedSchoolINEPCode: '54321',
+  potableWaterAvailable: 'true',
+  electricityAvailable: 'true',
+  sewageAvailable: 'true',
+  wasteDisposal: 'Aterro',
+  wasteTreatmentBySchool: 'false',
+  foodServiceAvailable: 'true',
+  communitySharedSpaces: 'false',
+  usesSurroundingSpaces: 'true',
+  specificFacilities: 'true',
+  generalUseRooms: ['Sala de aula', 'Espaços comuns'],
+  labsAndFunctionalAreas: ['Informática', 'Ciências', 'Multimídia'],
+  supportFacilities: ['Banheiros', 'Acessibilidade'],
+  insideClassrooms: 1,
+  outsideClassrooms: 2,
+  refrigeratedClassrooms: 2,
+  accessibleClassrooms: 2,
+  internetAvailable: 'true',
+  localNetworkAvailable: 'true',
+  devicesUsedByStudents: ['Smartphone'],
+  connectionType: ['Fibra ótica'],
+  availableDesktops: 3,
+  availableLaptops: 3,
+  availableTablets: 0,
+  teachingEquipments: ['DVD/Blu-ray', 'TV multimídia'],
+  administrativeStaffNumber: 10,
+  teachingStaffNumber: 10,
+  generalServicesStaffNumber: 10,
+  securityStaffNumber: 10,
+  healthcareStaffNumber: 1,
+  socialAssistanceStaffNumber: 1,
+  schoolManagementStaffNumber: 1,
+  specializedAssistance: 'true',
+  elementaryEducationModel: 'Série',
+  wasPedagogicalProjectUpdated: 'true',
+  indigenousEducationAvailable: 'true',
+  linkedWithSuperiorEducation: 'true',
+  collegiateBodies: ['Associação de Pais', 'Grêmio Estudantil'],
+  studentSelectionCriteria: ['Análise curricular'],
+  indigenousEducationLanguages: ['Português', 'Ticuna'],
+  pedagogicalMaterials: ['Arquivo multimídia', 'Brinquedos'],
+  headSchoolCode: 12345657,
+  IESCode: 123456,
+  institutionId: null,
+  // active: null,
+  // longitude: '',
+  // latitude: '',
+  // totalArea: '',
+  // builtArea: '',
+  // availableArea: '',
+  // blockDiaryEntries: null,
+  // regulation: null,
+  // logoUrl: '',
+  // access: null,
+  // managerid: '',
+  // managerPosition: '',
+  // operationLocation: '',
+  // condition: null,
+  // sharedSchooLinePCode: null,
+  // creationDecree: '',
+  // numberOfFloors: null,
+  // floorType: null,
+  // energyMeter: null,
+  // hasExternalArea: null,
+  // metadata: null,
+  // createdAt: new Date(),
+  // deletedAt: null,
+  // updatedAt: null,
+  updatedBy: localStorage.getItem('userLocal') ? JSON.parse(localStorage.getItem('userLocal')!).id : '',
+  tenantId: '',
+  userCreated: '',
+})
 // Máscara para CNPJ
 const cnpjOptions = {
   mask: [/\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/],
@@ -256,21 +253,6 @@ const phoneOptions = {
   },
 }
 
-// Máscara para CEP
-const postalCodeOptions = {
-  mask: [/\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/],
-
-  elementPredicate: (el: HTMLElement): Promise<MaskitoElement> => {
-    return new Promise((resolve) => {
-      requestAnimationFrame(async () => {
-        // eslint-disable-next-line no-undef
-        const input = await (el as HTMLIonInputElement).getInputElement()
-        resolve(input as MaskitoElement)
-      })
-    })
-  },
-}
-
 async function presetFirstInstitutionOnIonSelect() {
   // Carregar instituições e preencher o input de instituição(IonSelect) com o primeiro elemento da consulta
   const result = await institutionService.getInstitutions()
@@ -281,23 +263,25 @@ async function presetFirstInstitutionOnIonSelect() {
 async function saveSchool() {
   try {
     // const savedSchool = await schoolService.upsertSchoolRegistration(formValues.value)
-    const savedSchool = await schoolService.upsertUPDATINGSchoolRegistration(formValues.value)
-    console.log('Escola salva com sucesso:', savedSchool)
+    // const savedSchool = await schoolService.upsertUPDATINGSchoolRegistration(formValues.value)
     // closeModal(false)
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao salvar a escola:', error)
   }
 }
 
-const handleSubmit: SubmissionHandler<typeof formValues.value> = async (values) => {
+const handleSubmit: SubmissionHandler<typeof formValues.value> = async () => {
   if (formRef.value) {
     const result = await formRef.value.validate()
     if (result.valid) {
       saveSchool()
-    } else {
+    }
+    else {
       showToast('Verifique os campos obrigatórios', 'top', 'danger')
     }
-  } else {
+  }
+  else {
     showToast('Verifique os campos obrigatórios', 'top', 'danger')
   }
 }
@@ -414,8 +398,12 @@ onMounted(async () => {
 
             <Field v-slot="{ field, errors }" name="educationNetwork" rules="">
               <IonSelect v-model="formValues.educationNetwork" v-bind="field" label="Rede de Ensino" label-placement="stacked" fill="outline" placeholder="Selecione a rede de ensino">
-                <IonSelectOption value="true">Pública</IonSelectOption>
-                <IonSelectOption value="false">Privada</IonSelectOption>
+                <IonSelectOption value="true">
+                  Pública
+                </IonSelectOption>
+                <IonSelectOption value="false">
+                  Privada
+                </IonSelectOption>
               </IonSelect>
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
@@ -431,33 +419,87 @@ onMounted(async () => {
 
             <Field v-slot="{ field, errors }" name="state" rules="">
               <IonSelect v-model="formValues.state" v-bind="field" label="Estado" label-placement="stacked" fill="outline" placeholder="Selecione o estado">
-                <IonSelectOption value="AC">Acre</IonSelectOption>
-                <IonSelectOption value="AL">Alagoas</IonSelectOption>
-                <IonSelectOption value="AP">Amapá</IonSelectOption>
-                <IonSelectOption value="AM">Amazonas</IonSelectOption>
-                <IonSelectOption value="BA">Bahia</IonSelectOption>
-                <IonSelectOption value="CE">Ceará</IonSelectOption>
-                <IonSelectOption value="DF">Distrito Federal</IonSelectOption>
-                <IonSelectOption value="ES">Espírito Santo</IonSelectOption>
-                <IonSelectOption value="GO">Goiás</IonSelectOption>
-                <IonSelectOption value="MA">Maranhão</IonSelectOption>
-                <IonSelectOption value="MT">Mato Grosso</IonSelectOption>
-                <IonSelectOption value="MS">Mato Grosso do Sul</IonSelectOption>
-                <IonSelectOption value="MG">Minas Gerais</IonSelectOption>
-                <IonSelectOption value="PA">Pará</IonSelectOption>
-                <IonSelectOption value="PB">Paraíba</IonSelectOption>
-                <IonSelectOption value="PR">Paraná</IonSelectOption>
-                <IonSelectOption value="PE">Pernambuco</IonSelectOption>
-                <IonSelectOption value="PI">Piauí</IonSelectOption>
-                <IonSelectOption value="RJ">Rio de Janeiro</IonSelectOption>
-                <IonSelectOption value="RN">Rio Grande do Norte</IonSelectOption>
-                <IonSelectOption value="RS">Rio Grande do Sul</IonSelectOption>
-                <IonSelectOption value="RO">Rondônia</IonSelectOption>
-                <IonSelectOption value="RR">Roraima</IonSelectOption>
-                <IonSelectOption value="SC">Santa Catarina</IonSelectOption>
-                <IonSelectOption value="SP">São Paulo</IonSelectOption>
-                <IonSelectOption value="SE">Sergipe</IonSelectOption>
-                <IonSelectOption value="TO">Tocantins</IonSelectOption>
+                <IonSelectOption value="AC">
+                  Acre
+                </IonSelectOption>
+                <IonSelectOption value="AL">
+                  Alagoas
+                </IonSelectOption>
+                <IonSelectOption value="AP">
+                  Amapá
+                </IonSelectOption>
+                <IonSelectOption value="AM">
+                  Amazonas
+                </IonSelectOption>
+                <IonSelectOption value="BA">
+                  Bahia
+                </IonSelectOption>
+                <IonSelectOption value="CE">
+                  Ceará
+                </IonSelectOption>
+                <IonSelectOption value="DF">
+                  Distrito Federal
+                </IonSelectOption>
+                <IonSelectOption value="ES">
+                  Espírito Santo
+                </IonSelectOption>
+                <IonSelectOption value="GO">
+                  Goiás
+                </IonSelectOption>
+                <IonSelectOption value="MA">
+                  Maranhão
+                </IonSelectOption>
+                <IonSelectOption value="MT">
+                  Mato Grosso
+                </IonSelectOption>
+                <IonSelectOption value="MS">
+                  Mato Grosso do Sul
+                </IonSelectOption>
+                <IonSelectOption value="MG">
+                  Minas Gerais
+                </IonSelectOption>
+                <IonSelectOption value="PA">
+                  Pará
+                </IonSelectOption>
+                <IonSelectOption value="PB">
+                  Paraíba
+                </IonSelectOption>
+                <IonSelectOption value="PR">
+                  Paraná
+                </IonSelectOption>
+                <IonSelectOption value="PE">
+                  Pernambuco
+                </IonSelectOption>
+                <IonSelectOption value="PI">
+                  Piauí
+                </IonSelectOption>
+                <IonSelectOption value="RJ">
+                  Rio de Janeiro
+                </IonSelectOption>
+                <IonSelectOption value="RN">
+                  Rio Grande do Norte
+                </IonSelectOption>
+                <IonSelectOption value="RS">
+                  Rio Grande do Sul
+                </IonSelectOption>
+                <IonSelectOption value="RO">
+                  Rondônia
+                </IonSelectOption>
+                <IonSelectOption value="RR">
+                  Roraima
+                </IonSelectOption>
+                <IonSelectOption value="SC">
+                  Santa Catarina
+                </IonSelectOption>
+                <IonSelectOption value="SP">
+                  São Paulo
+                </IonSelectOption>
+                <IonSelectOption value="SE">
+                  Sergipe
+                </IonSelectOption>
+                <IonSelectOption value="TO">
+                  Tocantins
+                </IonSelectOption>
               </IonSelect>
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
@@ -489,8 +531,12 @@ onMounted(async () => {
 
             <Field v-slot="{ field, errors }" name="unusualLocation" rules="">
               <IonSelect v-model="formValues.unusualLocation" v-bind="field" label="Localização diferenciada da escola" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                <IonSelectOption value="true">Sim</IonSelectOption>
-                <IonSelectOption value="false">Não</IonSelectOption>
+                <IonSelectOption value="true">
+                  Sim
+                </IonSelectOption>
+                <IonSelectOption value="false">
+                  Não
+                </IonSelectOption>
               </IonSelect>
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
@@ -530,50 +576,68 @@ onMounted(async () => {
 
             <Field v-slot="{ field, errors }" name="blockJournalEntries" rules="">
               <IonSelect v-model="formValues.blockJournalEntries" v-bind="field" label="Bloquear lançamento no diário para anos letivos encerrados" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                <IonSelectOption value="true">Sim</IonSelectOption>
-                <IonSelectOption value="false">Não</IonSelectOption>
+                <IonSelectOption value="true">
+                  Sim
+                </IonSelectOption>
+                <IonSelectOption value="false">
+                  Não
+                </IonSelectOption>
               </IonSelect>
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
 
             <Field v-slot="{ field, errors }" name="usesAlternativeRules" rules="">
               <IonSelect v-model="formValues.usesAlternativeRules" v-bind="field" label="Utiliza regra alternativa de avaliação" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                <IonSelectOption value="true">Sim</IonSelectOption>
-                <IonSelectOption value="false">Não</IonSelectOption>
+                <IonSelectOption value="true">
+                  Sim
+                </IonSelectOption>
+                <IonSelectOption value="false">
+                  Não
+                </IonSelectOption>
               </IonSelect>
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
 
             <Field v-slot="{ field, errors }" name="operationalStatus" rules="">
               <IonSelect v-model="formValues.operationalStatus" v-bind="field" label="Situação de Funcionamento" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                <IonSelectOption value="true">Ativa</IonSelectOption>
-                <IonSelectOption value="false">Inativa</IonSelectOption>
+                <IonSelectOption value="true">
+                  Ativa
+                </IonSelectOption>
+                <IonSelectOption value="false">
+                  Inativa
+                </IonSelectOption>
               </IonSelect>
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
 
             <Field v-slot="{ field, errors }" name="administrativeDependency" rules="">
               <IonSelect v-model="formValues.administrativeDependency" v-bind="field" label="Dependência Administrativa" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                <IonSelectOption value="Federal">Federal</IonSelectOption>
-                <IonSelectOption value="Estadual">Estadual</IonSelectOption>
-                <IonSelectOption value="Municipal">Municipal</IonSelectOption>
-                <IonSelectOption value="Privada">Privada</IonSelectOption>
+                <IonSelectOption value="Federal">
+                  Federal
+                </IonSelectOption>
+                <IonSelectOption value="Estadual">
+                  Estadual
+                </IonSelectOption>
+                <IonSelectOption value="Municipal">
+                  Municipal
+                </IonSelectOption>
+                <IonSelectOption value="Privada">
+                  Privada
+                </IonSelectOption>
               </IonSelect>
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
-
           </IonSegmentContent>
           <IonSegmentContent id="complementary">
-
             <IonAccordionGroup>
-
               <IonAccordion value="infrastructure">
                 <IonItem slot="header" class="accordion-header-color">
-                  <IonLabel  color="dark">Infraestrutura</IonLabel>
+                  <IonLabel color="dark">
+                    Infraestrutura
+                  </IonLabel>
                 </IonItem>
 
                 <div slot="content" class="ion-padding">
-
                   <Field v-slot="{ field, errors }" name="operatingLocation">
                     <IonSelect v-model="formValues.operatingLocation" v-bind="field" label="Local de Funcionamento" label-placement="stacked" fill="outline" placeholder="Selecione o local de funcionamento">
                       <IonSelectOption value="Própria">
@@ -660,11 +724,21 @@ onMounted(async () => {
                       fill="outline"
                       placeholder="Selecione uma opção"
                     >
-                      <IonSelectOption value="Incineração">Incineração</IonSelectOption>
-                      <IonSelectOption value="Aterro">Aterro</IonSelectOption>
-                      <IonSelectOption value="Compostagem">Compostagem</IonSelectOption>
-                      <IonSelectOption value="Reciclagem">Reciclagem</IonSelectOption>
-                      <IonSelectOption value="Outro">Outro</IonSelectOption>
+                      <IonSelectOption value="Incineração">
+                        Incineração
+                      </IonSelectOption>
+                      <IonSelectOption value="Aterro">
+                        Aterro
+                      </IonSelectOption>
+                      <IonSelectOption value="Compostagem">
+                        Compostagem
+                      </IonSelectOption>
+                      <IonSelectOption value="Reciclagem">
+                        Reciclagem
+                      </IonSelectOption>
+                      <IonSelectOption value="Outro">
+                        Outro
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
@@ -716,19 +790,24 @@ onMounted(async () => {
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
-
                 </div>
               </IonAccordion>
 
               <IonAccordion value="facilities">
                 <IonItem slot="header" class="accordion-header-color">
-                  <IonLabel  color="dark">Dependências</IonLabel>
+                  <IonLabel color="dark">
+                    Dependências
+                  </IonLabel>
                 </IonItem>
                 <div slot="content" class="ion-padding">
                   <Field v-slot="{ field, errors }" name="specificFacilities">
                     <IonSelect v-model="formValues.specificFacilities" v-bind="field" label="A escola possui dependências específicas?" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                      <IonSelectOption value="true">Sim</IonSelectOption>
-                      <IonSelectOption value="false">Não</IonSelectOption>
+                      <IonSelectOption value="true">
+                        Sim
+                      </IonSelectOption>
+                      <IonSelectOption value="false">
+                        Não
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
@@ -743,27 +822,45 @@ onMounted(async () => {
 
                   <Field v-slot="{ field, errors }" name="generalUseRooms">
                     <IonSelect v-model="formValues.generalUseRooms" v-bind="field" label="Salas de Uso Geral" label-placement="stacked" fill="outline" multiple placeholder="Selecione as opções">
-                      <IonSelectOption value="Sala de aula">Salas de Aula</IonSelectOption>
-                      <IonSelectOption value="Auditório">Auditório</IonSelectOption>
-                      <IonSelectOption value="Espaços comuns">Espaços comuns</IonSelectOption>
+                      <IonSelectOption value="Sala de aula">
+                        Salas de Aula
+                      </IonSelectOption>
+                      <IonSelectOption value="Auditório">
+                        Auditório
+                      </IonSelectOption>
+                      <IonSelectOption value="Espaços comuns">
+                        Espaços comuns
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="labsAndFunctionalAreas">
                     <IonSelect v-model="formValues.labsAndFunctionalAreas" v-bind="field" label="Laboratórios e Áreas Funcionais" label-placement="stacked" fill="outline" multiple placeholder="Selecione as opções">
-                      <IonSelectOption value="Informática">Informática</IonSelectOption>
-                      <IonSelectOption value="Ciências">Ciências</IonSelectOption>
-                      <IonSelectOption value="Multimídia">Multimídia</IonSelectOption>
+                      <IonSelectOption value="Informática">
+                        Informática
+                      </IonSelectOption>
+                      <IonSelectOption value="Ciências">
+                        Ciências
+                      </IonSelectOption>
+                      <IonSelectOption value="Multimídia">
+                        Multimídia
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="supportFacilities">
                     <IonSelect v-model="formValues.supportFacilities" v-bind="field" label="Instalações de Apoio" label-placement="stacked" fill="outline" multiple placeholder="Selecione as opções">
-                      <IonSelectOption value="Banheiros">Banheiros</IonSelectOption>
-                      <IonSelectOption value="Acessibilidade">Acessibilidade</IonSelectOption>
-                      <IonSelectOption value="Áreas externas">Áreas externas</IonSelectOption>
+                      <IonSelectOption value="Banheiros">
+                        Banheiros
+                      </IonSelectOption>
+                      <IonSelectOption value="Acessibilidade">
+                        Acessibilidade
+                      </IonSelectOption>
+                      <IonSelectOption value="Áreas externas">
+                        Áreas externas
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
@@ -792,40 +889,64 @@ onMounted(async () => {
 
               <IonAccordion value="equipments">
                 <IonItem slot="header" class="accordion-header-color">
-                  <IonLabel  color="dark">Equipamentos</IonLabel>
+                  <IonLabel color="dark">
+                    Equipamentos
+                  </IonLabel>
                 </IonItem>
                 <div slot="content" class="ion-padding">
                   <Field v-slot="{ field, errors }" name="internetAvailable">
                     <IonSelect v-model="formValues.internetAvailable" v-bind="field" label="A escola tem internet?" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                      <IonSelectOption value="true">Sim</IonSelectOption>
-                      <IonSelectOption value="false">Não</IonSelectOption>
+                      <IonSelectOption value="true">
+                        Sim
+                      </IonSelectOption>
+                      <IonSelectOption value="false">
+                        Não
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="connectionType">
                     <IonSelect v-model="formValues.connectionType" v-bind="field" label="Tipos de Conexão Disponíveis" label-placement="stacked" fill="outline" multiple placeholder="Selecione as opções">
-                      <IonSelectOption value="Fibra ótica">Fibra ótica</IonSelectOption>
-                      <IonSelectOption value="Banda larga">Banda larga</IonSelectOption>
-                      <IonSelectOption value="Satélite">Satélite</IonSelectOption>
-                      <IonSelectOption value="Outro">Outro</IonSelectOption>
+                      <IonSelectOption value="Fibra ótica">
+                        Fibra ótica
+                      </IonSelectOption>
+                      <IonSelectOption value="Banda larga">
+                        Banda larga
+                      </IonSelectOption>
+                      <IonSelectOption value="Satélite">
+                        Satélite
+                      </IonSelectOption>
+                      <IonSelectOption value="Outro">
+                        Outro
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="localNetworkAvailable">
                     <IonSelect v-model="formValues.localNetworkAvailable" v-bind="field" label="Rede local disponível?" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                      <IonSelectOption value="true">Sim</IonSelectOption>
-                      <IonSelectOption value="false">Não</IonSelectOption>
+                      <IonSelectOption value="true">
+                        Sim
+                      </IonSelectOption>
+                      <IonSelectOption value="false">
+                        Não
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="devicesUsedByStudents">
                     <IonSelect v-model="formValues.devicesUsedByStudents" v-bind="field" label="Equipamentos acessados pelos alunos" label-placement="stacked" fill="outline" multiple placeholder="Selecione os dispositivos">
-                      <IonSelectOption value="Computador">Computador</IonSelectOption>
-                      <IonSelectOption value="Tablet">Tablet</IonSelectOption>
-                      <IonSelectOption value="Smartphone">Smartphone</IonSelectOption>
+                      <IonSelectOption value="Computador">
+                        Computador
+                      </IonSelectOption>
+                      <IonSelectOption value="Tablet">
+                        Tablet
+                      </IonSelectOption>
+                      <IonSelectOption value="Smartphone">
+                        Smartphone
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
@@ -847,24 +968,34 @@ onMounted(async () => {
 
                   <Field v-slot="{ field, errors }" name="teachingEquipments">
                     <IonSelect v-model="formValues.teachingEquipments" v-bind="field" label="Equipamentos para ensino/aprendizagem" label-placement="stacked" fill="outline" multiple placeholder="Selecione os equipamentos">
-                      <IonSelectOption value="Projetor">Projetor</IonSelectOption>
-                      <IonSelectOption value="DVD/Blu-ray">DVD/Blu-ray</IonSelectOption>
-                      <IonSelectOption value="TV multimídia">TV multimídia</IonSelectOption>
-                      <IonSelectOption value="Lousa digital">Lousa digital</IonSelectOption>
-                      <IonSelectOption value="Sistema de som">Sistema de som</IonSelectOption>
+                      <IonSelectOption value="Projetor">
+                        Projetor
+                      </IonSelectOption>
+                      <IonSelectOption value="DVD/Blu-ray">
+                        DVD/Blu-ray
+                      </IonSelectOption>
+                      <IonSelectOption value="TV multimídia">
+                        TV multimídia
+                      </IonSelectOption>
+                      <IonSelectOption value="Lousa digital">
+                        Lousa digital
+                      </IonSelectOption>
+                      <IonSelectOption value="Sistema de som">
+                        Sistema de som
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
-
                 </div>
               </IonAccordion>
 
               <IonAccordion value="humanResources">
                 <IonItem slot="header" class="accordion-header-color">
-                  <IonLabel  color="dark">Recursos Humanos</IonLabel>
+                  <IonLabel color="dark">
+                    Recursos Humanos
+                  </IonLabel>
                 </IonItem>
                 <div slot="content" class="ion-padding">
-
                   <Field v-slot="{ field, errors }" name="administrativeStaffNumber">
                     <IonInput v-model.number="formValues.administrativeStaffNumber" v-bind="field" label="Administração e suporte pedagógico" label-placement="stacked" fill="outline" placeholder="Digite o número de profissionais" />
                     <span class="error-message">{{ errors[0] }}</span>
@@ -894,103 +1025,180 @@ onMounted(async () => {
                     <IonInput v-model.number="formValues.schoolManagementStaffNumber" v-bind="field" label="Gestão escolar" label-placement="stacked" fill="outline" placeholder="Digite o número de profissionais" />
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
-
                 </div>
               </IonAccordion>
 
               <IonAccordion value="teachingAndPedagogicalPractices">
                 <IonItem slot="header" class="accordion-header-color">
-                  <IonLabel  color="dark">Ensino e Práticas Pedagógicas</IonLabel>
+                  <IonLabel color="dark">
+                    Ensino e Práticas Pedagógicas
+                  </IonLabel>
                 </IonItem>
                 <div slot="content" class="ion-padding">
                   <Field v-slot="{ field, errors }" name="specializedAssistance">
                     <IonSelect v-model="formValues.specializedAssistance" v-bind="field" label="Atendimento Educacional Especializado (AEE)" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                      <IonSelectOption value="true">Sim</IonSelectOption>
-                      <IonSelectOption value="false">Não</IonSelectOption>
+                      <IonSelectOption value="true">
+                        Sim
+                      </IonSelectOption>
+                      <IonSelectOption value="false">
+                        Não
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="elementaryEducationModel">
                     <IonSelect v-model="formValues.elementaryEducationModel" v-bind="field" label="Modelo de Ensino Fundamental" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                      <IonSelectOption value="Ciclo">Ciclo</IonSelectOption>
-                      <IonSelectOption value="Série">Série</IonSelectOption>
+                      <IonSelectOption value="Ciclo">
+                        Ciclo
+                      </IonSelectOption>
+                      <IonSelectOption value="Série">
+                        Série
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="pedagogicalMaterials">
                     <IonSelect v-model="formValues.pedagogicalMaterials" v-bind="field" label="Materiais pedagógicos utilizados" label-placement="stacked" fill="outline" multiple placeholder="Selecione os materiais">
-                      <IonSelectOption value="Arquivo multimídia">Arquivo multimídia</IonSelectOption>
-                      <IonSelectOption value="Brinquedos">Brinquedos</IonSelectOption>
-                      <IonSelectOption value="Jogos educativos">Jogos educativos</IonSelectOption>
-                      <IonSelectOption value="Materiais científicos">Materiais científicos</IonSelectOption>
-                      <IonSelectOption value="Equipamentos de áudio">Equipamentos de áudio</IonSelectOption>
-                      <IonSelectOption value="Instrumentos musicais">Instrumentos musicais</IonSelectOption>
-                      <IonSelectOption value="Materiais culturais/artísticos">Materiais culturais/artísticos</IonSelectOption>
-                      <IonSelectOption value="Materiais de educação profissional">Materiais de educação profissional</IonSelectOption>
-                      <IonSelectOption value="Materiais esportivos">Materiais esportivos</IonSelectOption>
-                      <IonSelectOption value="Materiais educacionais indígenas">Materiais educacionais indígenas</IonSelectOption>
-                      <IonSelectOption value="Materiais étnicos">Materiais étnicos</IonSelectOption>
-                      <IonSelectOption value="Materiais educacionais do campo">Materiais educacionais do campo</IonSelectOption>
-                      <IonSelectOption value="Nenhum dos anteriores">Nenhum dos anteriores</IonSelectOption>
+                      <IonSelectOption value="Arquivo multimídia">
+                        Arquivo multimídia
+                      </IonSelectOption>
+                      <IonSelectOption value="Brinquedos">
+                        Brinquedos
+                      </IonSelectOption>
+                      <IonSelectOption value="Jogos educativos">
+                        Jogos educativos
+                      </IonSelectOption>
+                      <IonSelectOption value="Materiais científicos">
+                        Materiais científicos
+                      </IonSelectOption>
+                      <IonSelectOption value="Equipamentos de áudio">
+                        Equipamentos de áudio
+                      </IonSelectOption>
+                      <IonSelectOption value="Instrumentos musicais">
+                        Instrumentos musicais
+                      </IonSelectOption>
+                      <IonSelectOption value="Materiais culturais/artísticos">
+                        Materiais culturais/artísticos
+                      </IonSelectOption>
+                      <IonSelectOption value="Materiais de educação profissional">
+                        Materiais de educação profissional
+                      </IonSelectOption>
+                      <IonSelectOption value="Materiais esportivos">
+                        Materiais esportivos
+                      </IonSelectOption>
+                      <IonSelectOption value="Materiais educacionais indígenas">
+                        Materiais educacionais indígenas
+                      </IonSelectOption>
+                      <IonSelectOption value="Materiais étnicos">
+                        Materiais étnicos
+                      </IonSelectOption>
+                      <IonSelectOption value="Materiais educacionais do campo">
+                        Materiais educacionais do campo
+                      </IonSelectOption>
+                      <IonSelectOption value="Nenhum dos anteriores">
+                        Nenhum dos anteriores
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="collegiateBodies">
                     <IonSelect v-model="formValues.collegiateBodies" v-bind="field" label="Órgãos colegiados em funcionamento" label-placement="stacked" fill="outline" multiple placeholder="Selecione os órgãos">
-                      <IonSelectOption value="Associação de Pais">Associação de Pais</IonSelectOption>
-                      <IonSelectOption value="Associação de Pais e Mestres">Associação de Pais e Mestres</IonSelectOption>
-                      <IonSelectOption value="Grêmio Estudantil">Grêmio Estudantil</IonSelectOption>
-                      <IonSelectOption value="Conselho Escolar">Conselho Escolar</IonSelectOption>
-                      <IonSelectOption value="Não há órgãos colegiados">Não há órgãos colegiados</IonSelectOption>
+                      <IonSelectOption value="Associação de Pais">
+                        Associação de Pais
+                      </IonSelectOption>
+                      <IonSelectOption value="Associação de Pais e Mestres">
+                        Associação de Pais e Mestres
+                      </IonSelectOption>
+                      <IonSelectOption value="Grêmio Estudantil">
+                        Grêmio Estudantil
+                      </IonSelectOption>
+                      <IonSelectOption value="Conselho Escolar">
+                        Conselho Escolar
+                      </IonSelectOption>
+                      <IonSelectOption value="Não há órgãos colegiados">
+                        Não há órgãos colegiados
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="studentSelectionCriteria">
                     <IonSelect v-model="formValues.studentSelectionCriteria" v-bind="field" label="Critérios de seleção para alunos" label-placement="stacked" fill="outline" multiple placeholder="Selecione os critérios">
-                      <IonSelectOption value="Análise curricular">Análise curricular</IonSelectOption>
-                      <IonSelectOption value="Exame de seleção">Exame de seleção</IonSelectOption>
-                      <IonSelectOption value="Cotas">Cotas</IonSelectOption>
+                      <IonSelectOption value="Análise curricular">
+                        Análise curricular
+                      </IonSelectOption>
+                      <IonSelectOption value="Exame de seleção">
+                        Exame de seleção
+                      </IonSelectOption>
+                      <IonSelectOption value="Cotas">
+                        Cotas
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="wasPedagogicalProjectUpdated">
                     <IonSelect v-model="formValues.wasPedagogicalProjectUpdated" v-bind="field" label="Projeto Político-Pedagógico atualizado nos últimos 12 meses?" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                      <IonSelectOption value="true">Sim</IonSelectOption>
-                      <IonSelectOption value="false">Não</IonSelectOption>
+                      <IonSelectOption value="true">
+                        Sim
+                      </IonSelectOption>
+                      <IonSelectOption value="false">
+                        Não
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="indigenousEducationAvailable">
                     <IonSelect v-model="formValues.indigenousEducationAvailable" v-bind="field" label="Educação Escolar Indígena disponível?" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                      <IonSelectOption value="true">Sim</IonSelectOption>
-                      <IonSelectOption value="false">Não</IonSelectOption>
+                      <IonSelectOption value="true">
+                        Sim
+                      </IonSelectOption>
+                      <IonSelectOption value="false">
+                        Não
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="indigenousEducationLanguages">
                     <IonSelect v-model="formValues.indigenousEducationLanguages" v-bind="field" label="Língua de ensino" label-placement="stacked" fill="outline" multiple placeholder="Selecione as línguas">
-                      <IonSelectOption value="Português">Português</IonSelectOption>
-                      <IonSelectOption value="Ticuna">Ticuna</IonSelectOption>
-                      <IonSelectOption value="Guarani Kaiowá">Guarani Kaiowá</IonSelectOption>
-                      <IonSelectOption value="Kaingang">Kaingang</IonSelectOption>
-                      <IonSelectOption value="Xavante">Xavante</IonSelectOption>
-                      <IonSelectOption value="Yanomami">Yanomami</IonSelectOption>
-                      <IonSelectOption value="Outro">Outro</IonSelectOption>
+                      <IonSelectOption value="Português">
+                        Português
+                      </IonSelectOption>
+                      <IonSelectOption value="Ticuna">
+                        Ticuna
+                      </IonSelectOption>
+                      <IonSelectOption value="Guarani Kaiowá">
+                        Guarani Kaiowá
+                      </IonSelectOption>
+                      <IonSelectOption value="Kaingang">
+                        Kaingang
+                      </IonSelectOption>
+                      <IonSelectOption value="Xavante">
+                        Xavante
+                      </IonSelectOption>
+                      <IonSelectOption value="Yanomami">
+                        Yanomami
+                      </IonSelectOption>
+                      <IonSelectOption value="Outro">
+                        Outro
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
 
                   <Field v-slot="{ field, errors }" name="linkedWithSuperiorEducation">
                     <IonSelect v-model="formValues.linkedWithSuperiorEducation" v-bind="field" label="Vínculo com unidades de ensino superior" label-placement="stacked" fill="outline" placeholder="Selecione uma opção">
-                      <IonSelectOption value="true">Sim</IonSelectOption>
-                      <IonSelectOption value="false">Não</IonSelectOption>
+                      <IonSelectOption value="true">
+                        Sim
+                      </IonSelectOption>
+                      <IonSelectOption value="false">
+                        Não
+                      </IonSelectOption>
                     </IonSelect>
                     <span class="error-message">{{ errors[0] }}</span>
                   </Field>
@@ -1006,7 +1214,6 @@ onMounted(async () => {
                   </Field>
                 </div>
               </IonAccordion>
-
             </IonAccordionGroup>
           </IonSegmentContent>
         </IonSegmentView>

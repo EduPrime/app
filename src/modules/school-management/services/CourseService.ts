@@ -178,4 +178,47 @@ export default class CourseService extends BaseService<Course> {
       errorHandler(error, 'Erro ao inserir/atualizar item')
     return data as any[] // @TODO: Definir tipagem
   }
+
+  // Método para obter cursos baseados no ID da escola
+  async getCoursesBySchool(schoolId: string) {
+    try {
+      const { data: courses, error: coursesError } = await this.client
+        .from(table)
+        .select('id, name')
+        .eq('schoolId', schoolId)
+
+      if (coursesError) {
+        errorHandler(coursesError, 'Erro ao buscar cursos')
+      }
+
+      return courses
+    }
+    catch (error) {
+      errorHandler(error, 'Erro ao buscar cursos')
+    }
+  }
+
+  async loadCoursesByIds(courseIds: string[]): Promise<Record<string, any>> {
+    try {
+      const courseMap: Record<string, any> = {}
+
+      for (const courseId of courseIds) {
+        const { data, error } = await this.client
+          .from(table)
+          .select('*')
+          .eq('id', courseId)
+          .maybeSingle()
+
+        if (!error && data) {
+          courseMap[courseId] = data
+        }
+      }
+
+      return courseMap
+    }
+    catch (error) {
+      errorHandler(error, 'Erro ao carregar dados dos cursos')
+      return {}
+    }
+  }
 }

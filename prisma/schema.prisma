@@ -77,6 +77,7 @@ model Classroom {
   abbreviation      String?     @db.VarChar(100)
   year              Int
   isMultiSerialized Boolean?    @default(false)
+  altDisciplineList Boolean?    @default(false)
   userCreated       String?     @db.VarChar(255)
   createdAt         DateTime?   @default(now()) @db.Timestamp(6)
   deletedAt         DateTime?   @db.Timestamp(6)
@@ -87,53 +88,56 @@ model Classroom {
   tenantId          String?
 
   Attendance                                                        Attendance[]
-  school                                                            School?             @relation(fields: [schoolId], references: [id], onDelete: Restrict, map: "classroom_school_id_fkey")
-  series                                                            Series              @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroom_seriesid_fkey")
+  school                                                            School?               @relation(fields: [schoolId], references: [id], onDelete: Restrict, map: "classroom_school_id_fkey")
+  series                                                            Series                @relation(fields: [seriesId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroom_seriesid_fkey")
   ConceptualGrade                                                   ConceptualGrade[]
   Content                                                           Content[]
   enrollment                                                        Enrollment[]
-  enrollmenthistory_enrollmenthistory_currentClassroomIdToclassroom EnrollmentHistory[] @relation("enrollmenthistory_currentClassroomIdToclassroom")
-  enrollmenthistory_enrollmenthistory_formerClassroomIdToclassroom  EnrollmentHistory[] @relation("enrollmenthistory_formerClassroomIdToclassroom")
+  enrollmenthistory_enrollmenthistory_currentClassroomIdToclassroom EnrollmentHistory[]   @relation("enrollmenthistory_currentClassroomIdToclassroom")
+  enrollmenthistory_enrollmenthistory_formerClassroomIdToclassroom  EnrollmentHistory[]   @relation("enrollmenthistory_formerClassroomIdToclassroom")
   NumericGrade                                                      NumericGrade[]
   RegisteredGrade                                                   RegisteredGrade[]
   Schedule                                                          Schedule[]
   TeacherAttendance                                                 TeacherAttendance[]
-  Teacher                                                           Teacher?            @relation(fields: [teacherId], references: [id], onDelete: NoAction, map: "classroom_teacher_id_fkey")
+  Teacher                                                           Teacher?              @relation(fields: [teacherId], references: [id], onDelete: NoAction, map: "classroom_teacher_id_fkey")
+  ClassroomDiscipline                                               ClassroomDiscipline[] @relation(map: "classroomdiscipline_classroom_id_fkey")
 
   @@map("classroom")
   @@schema("public")
 }
 
 model Course {
-  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  name              String           @db.VarChar(100)
-  abbreviation      String?          @db.VarChar(10)
-  description       String?          @db.VarChar(255)
+  id                String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name              String          @db.VarChar(100)
+  abbreviation      String?         @db.VarChar(10)
+  description       String?         @db.VarChar(255)
   numberOfStages    Int?
-  status            status?          @default(ACTIVE)
+  status            status?         @default(ACTIVE)
   metadata          Json?
-  createdAt         DateTime?        @default(now()) @db.Timestamp(6)
-  deletedAt         DateTime?        @db.Timestamp(6)
-  updatedAt         DateTime?        @updatedAt @db.Timestamp(6)
-  userCreated       String?          @db.VarChar(255)
-  updatedBy         String?          @db.Uuid
+  createdAt         DateTime?       @default(now()) @db.Timestamp(6)
+  deletedAt         DateTime?       @db.Timestamp(6)
+  updatedAt         DateTime?       @updatedAt @db.Timestamp(6)
+  userCreated       String?         @db.VarChar(255)
+  updatedBy         String?         @db.Uuid
   tenantId          String?
   timeSerialization timeSerial?
   courseStage       Int?
   graduate          graduate?
-  workload          Decimal?         @db.Decimal
+  workload          Decimal?        @db.Decimal
   teachingType      teachingType?
   regimeType        regimeType?
   courseModality    courseModality?
-  institutionId     String           @db.Uuid
-  schoolId          String?          @db.Uuid
-  institution       Institution      @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_institutionId_fkey")
-  School            School?          @relation(fields: [schoolId], references: [id])
-  CourseSchool      CourseSchool[]
-  enrollment        Enrollment[]
-  EvaluationRule    EvaluationRule[]
-  preenrollment     PreEnrollment[]
-  series            Series[]
+  institutionId     String          @db.Uuid
+  schoolId          String?         @db.Uuid
+  evaluationRuleId  String?         @db.Uuid
+
+  institution    Institution     @relation(fields: [institutionId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_institutionId_fkey")
+  School         School?         @relation(fields: [schoolId], references: [id])
+  CourseSchool   CourseSchool[]
+  enrollment     Enrollment[]
+  EvaluationRule EvaluationRule? @relation(fields: [evaluationRuleId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "course_evaluationruleid_fkey")
+  preenrollment  PreEnrollment[]
+  series         Series[]
 
   @@map("course")
   @@schema("public")
@@ -166,6 +170,7 @@ model Discipline {
   thematicUnit         ThematicUnit[]
   SeriesDiscipline     SeriesDiscipline[]     @relation(map: "seriesdiscipline_discipline_id_fkey")
   TeacherDiscipline    TeacherDiscipline[]    @relation(map: "teacherdiscipline_discipline_id_fkey")
+  ClassroomDiscipline  ClassroomDiscipline[]  @relation(map: "classroomdiscipline_discipline_id_fkey")
 
   @@map("discipline")
   @@schema("public")
@@ -796,7 +801,7 @@ model School {
   educationNetwork             Boolean?
   administrativeDependency     Organ?
   name                         String                 @db.VarChar(100)
-  cnpj                         String?                @db.VarChar(18)
+  cnpj                         String?                @db.VarChar(14)
   address                      String?                @db.VarChar(255)
   addressNumber                String?                @db.VarChar(10)
   additionalInfo               String?                @db.VarChar(255)
@@ -831,7 +836,7 @@ model School {
   accessibleClassrooms         Int?
   internetAvailable            Boolean?
   localNetworkAvailable        Boolean?
-  connectionTypes              ConnectionType?
+  connectionType               ConnectionType[]
   devicesUsedByStudents        Device[]
   availableDesktops            Int?
   availableLaptops             Int?
@@ -907,6 +912,7 @@ model School {
   teacher                      Teacher[]
   TeacherAttendance            TeacherAttendance[]
 
+  @@unique([INEPCode, name], map: "uq_school_inepcode_on_conflict")
   @@map("school")
   @@schema("public")
 }
@@ -981,6 +987,25 @@ model SeriesDiscipline {
   discipline   Discipline @relation(fields: [disciplineId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "seriesdiscipline_discipline_id_fkey")
 
   @@map("seriesDiscipline")
+  @@schema("public")
+}
+
+model ClassroomDiscipline {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  classroomId  String    @db.Uuid
+  disciplineId String    @db.Uuid
+  year         Int
+  workload     Decimal   @db.Decimal
+  createdAt    DateTime  @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime? @db.Timestamp(6)
+  updatedAt    DateTime? @updatedAt @db.Timestamp(6)
+  updatedBy    String?   @db.Uuid
+  tenantId     String?
+
+  classroom  Classroom  @relation(fields: [classroomId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroomdiscipline_classroom_id_fkey")
+  discipline Discipline @relation(fields: [disciplineId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "classroomdiscipline_discipline_id_fkey")
+
+  @@map("classroomDiscipline")
   @@schema("public")
 }
 
@@ -1152,6 +1177,7 @@ model Student {
 model Teacher {
   id                String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   schoolId          String              @db.Uuid
+  inepCode          String?             @db.VarChar(100)
   name              String              @db.VarChar(100)
   birthdate         DateTime            @db.Date
   email             String?             @db.VarChar(255)
@@ -1223,10 +1249,11 @@ model EvaluationRule {
   frequencyReport        Json?
   createdAt              DateTime            @default(now()) @db.Timestamp(6)
   updatedAt              DateTime?           @updatedAt @db.Timestamp(6)
+  deletedAt              DateTime?           @db.Timestamp(6)
   updatedBy              String?             @db.Uuid
   tenantId               String?             @db.Uuid
-  courseId               String              @db.Uuid
-  course                 Course              @relation(fields: [courseId], references: [id], map: "rule_course_fkey")
+
+  Course Course[] @relation(map: "course_evaluationruleid_fkey")
 
   @@map("evaluationRule")
   @@schema("public")
@@ -1417,9 +1444,27 @@ enum Lab {
 }
 
 enum Room {
-  CLASSROOM     @map("Sala de aula")
-  AUDITORIUM    @map("Auditório")
-  COMMON_PLACES @map("Espaços comuns")
+  CLASSROOM              @map("Sala de aula")
+  AUDITORIUM             @map("Auditório")
+  COMMON_PLACES          @map("Espaços comuns")
+  WAREHOUSE              @map("Almoxarifado")
+  LIBRARY                @map("Biblioteca")
+  TEACHER_ROOM           @map("Sala de professores")
+  BATHROOM               @map("Banheiro")
+  ACCESSIBILITY_BATHROOM @map("Banheiro acessível")
+  TEACHER_BATHROOM       @map("Banheiro de professores")
+  KITCHEN                @map("Cozinha")
+  STUDENT_DORMROOM       @map("Dormitório de alunos")
+  TEACHER_DORMROOM       @map("Dormitório de professores")
+  POOL                   @map("Piscina")
+  LUNCHROOM              @map("Refeitório")
+  OPEN_COURT             @map("Pátio aberto")
+  CLOSED_COURT           @map("Pátio fechado")
+  COVERED_FIELD          @map("Quadra coberta")
+  OPEN_FIELD             @map("Quadra descoberta")
+  SECRETARY              @map("Secretaria")
+  PARKING                @map("Estacionamento")
+  CAFETERIA              @map("Cantina")
 
   @@schema("public")
 }

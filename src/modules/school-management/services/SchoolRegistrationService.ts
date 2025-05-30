@@ -1,7 +1,7 @@
 import type { School } from '@prisma/client'
+import type { SchoolFormValues } from '../types/types'
 import BaseService from '@/services/BaseService'
 import errorHandler from '@/utils/error-handler'
-import { SchoolFormValues } from '../types/types'
 
 // interface SchoolRegistrationData {
 //   id?: string
@@ -105,7 +105,6 @@ import { SchoolFormValues } from '../types/types'
 const table = 'school' as const
 
 export default class SchoolRegistrationService extends BaseService<School> {
-
   constructor() {
     super(table)
   }
@@ -127,7 +126,6 @@ export default class SchoolRegistrationService extends BaseService<School> {
   }
 
   async getSchoolRegistrations(institutionId: string): Promise<School[]> {
-
     const { data, error } = await this.client
       .from(table)
       .select('*')
@@ -143,7 +141,6 @@ export default class SchoolRegistrationService extends BaseService<School> {
   }
 
   async schoolExistsByName(name: string, institutionId: string, exceptId?: string): Promise<boolean> {
-    console.log('schoolExistsByName', name, institutionId, exceptId)
     let query = this.client
       .from(table)
       .select('id')
@@ -166,7 +163,8 @@ export default class SchoolRegistrationService extends BaseService<School> {
   }
 
   async schoolExistsByINEPCode(inepCode: string, exceptId?: string): Promise<boolean> {
-    if (!inepCode) return false
+    if (!inepCode)
+      return false
 
     let query = this.client
       .from(table)
@@ -256,7 +254,6 @@ export default class SchoolRegistrationService extends BaseService<School> {
   // }
 
   async upsertUPDATINGSchoolRegistration(schoolData: SchoolFormValues): Promise<School> {
-
     const { data, error } = await this.client
       .from(table)
       .upsert(schoolData, { onConflict: 'id' })
@@ -271,16 +268,15 @@ export default class SchoolRegistrationService extends BaseService<School> {
   }
 
   async softDeleteSchoolRegistration(id: string, userId: string): Promise<boolean> {
-
     const now = new Date().toISOString()
 
-    const { data, error } = await this.client
+    const { error } = await this.client
       .from(table)
       .update({
         deletedAt: now,
         updatedAt: now,
         updatedBy: userId,
-        active: false
+        active: false,
       })
       .eq('id', id)
 

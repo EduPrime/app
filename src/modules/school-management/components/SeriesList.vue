@@ -20,7 +20,6 @@ watch(
   () => props.dataList,
   (newValue) => {
     dataList.value = newValue
-    console.log('dataList foi atualizado:', { dataList })
   },
   { immediate: true },
 )

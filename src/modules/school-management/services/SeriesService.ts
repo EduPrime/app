@@ -52,11 +52,47 @@ export default class SeriesService extends BaseService<TabelaType> {
         errorHandler(seriesError, 'Erro ao buscar séries')
       }
 
-      // Retorna os dados das séries
       return series
     }
     catch (error) {
       errorHandler(error, 'Erro ao buscar séries')
+    }
+  }
+
+  async getSeriesBySchool(schoolId: string) {
+    try {
+      const { data: series, error: seriesError } = await this.client
+        .from('series')
+        .select('id, name')
+        .eq('schoolId', schoolId)
+
+      if (seriesError) {
+        errorHandler(seriesError, 'Erro ao buscar séries')
+      }
+
+      return series
+    }
+    catch (error) {
+      errorHandler(error, 'Erro ao buscar séries')
+    }
+  }
+
+  async getSeriesByCourse(courseId: string) {
+    try {
+      const { data: series, error: seriesError } = await this.client
+        .from('series')
+        .select('id, name')
+        .eq('courseId', courseId)
+        .is('deletedAt', null)
+
+      if (seriesError) {
+        errorHandler(seriesError, 'Erro ao buscar séries por curso')
+      }
+
+      return series
+    }
+    catch (error) {
+      errorHandler(error, 'Erro ao buscar séries por curso')
     }
   }
 
@@ -125,7 +161,7 @@ export default class SeriesService extends BaseService<TabelaType> {
         )
 
         if (existingDiscipline) {
-        // Atualizar disciplina existente
+          // Atualizar disciplina existente
           disciplinesToUpdate.push({
             id: existingDiscipline.id,
             seriesId,
@@ -136,7 +172,7 @@ export default class SeriesService extends BaseService<TabelaType> {
           })
         }
         else {
-        // Criar nova linha se não existir
+          // Criar nova linha se não existir
           disciplinesToInsert.push({
             ...discipline,
             seriesId,

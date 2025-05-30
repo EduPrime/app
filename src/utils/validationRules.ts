@@ -104,3 +104,41 @@ defineRule('somaAtividades', (_value: string, _, context) => {
     return 'A soma das atividades não pode ultrapassar 10'
   return true
 })
+
+defineRule('checandoNumero', (value: string) => {
+  if (!value)
+    return true
+
+  const num = Number(value)
+
+  if (Number.isNaN(num))
+    return 'Deve ser um número válido'
+
+  if (num < 0)
+    return 'O número deve ser maior ou igual a 0'
+
+  return true
+})
+
+defineRule('valorMinimo', (value: string, minValue: number) => {
+  if (!value)
+    return true
+
+  const num = Number(value)
+
+  if (num < minValue)
+    return `O valor deve ser maior ou igual a ${minValue}`
+
+  return true
+})
+
+defineRule('formatoHora', (value: string) => {
+  if (!value)
+    return true
+
+  const regex = /^(?:[01]?\d|2[0-3]):[0-5]\d$/
+  if (!regex.test(value))
+    return 'Formato inválido. Use HH:MM (ex: 08:30)'
+
+  return true
+})
