@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import showToast from '@/utils/toast-alert'
+/* import showToast from '@/utils/toast-alert'
 import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPage, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonSelect, IonSelectOption } from '@ionic/vue'
 import { listSharp } from 'ionicons/icons'
 import { Field, Form, useForm } from 'vee-validate'
@@ -262,9 +262,12 @@ onMounted(async () => {
     formValues.value.institutionId = institutionList.value.length > 0 ? institutionList.value[0].id : ''
   }
 })
+  */
 </script>
 
 <template>
+  <div style="display: none" />
+  <!--
   <IonPage>
     <IonContent class="ion-no-padding ion-no-margin">
       <Form class="ion-margin-horizontal" :initial-values="formValues" @submit="saveSeriesAndDisciplines">
@@ -508,8 +511,10 @@ onMounted(async () => {
       </IonGrid>
     </div>
   </IonPage>
+  -->
 </template>
 
+<!--
 <style scoped>
 .error-message {
   color: red;
@@ -548,3 +553,4 @@ ion-segment-content#complementary ion-input, ion-select {
   border-radius: 0px;
 }
 </style>
+-->
