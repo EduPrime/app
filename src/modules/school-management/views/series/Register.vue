@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { Series } from '@prisma/client'
-import type { Institutions } from '../../types/types'
 
+import type { Institutions } from '../../types/types'
 import BaseService from '@/services/BaseService'
 import SeriesService from '@/services/SeriesService'
 import showToast from '@/utils/toast-alert'
+
 import {
   IonButton,
   IonCol,
@@ -26,6 +27,7 @@ import {
   IonToolbar,
 
 } from '@ionic/vue'
+
 import { ErrorMessage, Field, Form } from 'vee-validate'
 import { computed, nextTick, onMounted, ref, watch, watchEffect } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -374,10 +376,10 @@ onMounted(async () => {
           <IonSegmentContent id="general">
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field }" name="name" label="Nome da série" rules="required|min:2|max:120">
+                <Field v-slot="{ field }" name="name" label="Nome da série" rules="required|min:2|max:80">
                   <div class="floating-input">
                     <input
-                      v-bind="field" v-model="formValues.name" placeholder=" " type="text" class="floating-native" :maxlength="120"
+                      v-bind="field" v-model="formValues.name" placeholder=" " type="text" class="floating-native" :maxlength="81"
                       @input="field.onInput"
                     >
                     <label class="floating-label"><span>Nome da série</span></label>
@@ -393,7 +395,7 @@ onMounted(async () => {
 
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field }" name="description" label="Descrição da série" rules="max:240">
+                <Field v-slot="{ field }" name="description" label="Descrição da série" rules="max:180">
                   <div class="description-input">
                     <textarea
                       v-bind="field" ref="descriptionRef" v-model="formValues.description" placeholder=" "
@@ -454,11 +456,11 @@ onMounted(async () => {
 
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field }" name="workload" label="Carga horária" rules="required">
+                <Field v-slot="{ field }" name="workload" label="Carga horária" rules="required|min:2|max:4">
                   <div class="floating-input">
                     <input
-                      v-bind="field" v-model="formValues.workload" type="text" class="floating-native"
-                      placeholder=" " :maxlength="7" @input="field.onInput"
+                      v-bind="field" v-model="formValues.workload" type="text"
+                      class="floating-native" placeholder=" " :maxlength="5" @input="field.onInput"
                     >
                     <label class="floating-label"><span>Carga horária </span></label>
                   </div>
@@ -471,11 +473,11 @@ onMounted(async () => {
               </IonCol>
 
               <IonCol size="12" size-lg="6">
-                <Field v-slot="{ field }" name="schoolDays" label="Dias letivos" rules="required">
+                <Field v-slot="{ field }" name="schoolDays" label="Dias letivos" rules="required|min:2|max:3">
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.schoolDays" type="text" class="floating-native"
-                      placeholder=" " :maxlength="7" @input="field.onInput"
+                      placeholder=" " :maxlength="4" @input="field.onInput"
                     >
                     <label class="floating-label"><span>Dias letivos </span> </label>
                   </div>
@@ -488,7 +490,7 @@ onMounted(async () => {
               </IonCol>
 
               <IonCol size="12" size-lg="6">
-                <Field v-slot="{ field, errors }" name="standardAge" label="Idade padrão">
+                <Field v-slot="{ field }" name="standardAge" label="Idade padrão" rules="min:1|max:2">
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.standardAge" type="text" class="floating-native"
@@ -501,13 +503,11 @@ onMounted(async () => {
                       {{ message }}
                     </div>
                   </ErrorMessage>
-
-                  <span class="error-message">{{ errors[0] }}</span>
                 </Field>
               </IonCol>
 
               <IonCol size="12" size-lg="6">
-                <Field v-slot="{ field, errors }" name="ageRangeMin" label="Idade mínima">
+                <Field v-slot="{ field }" name="ageRangeMin" label="Idade mínima" rules="required|min:1|max:2">
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.ageRangeMin" type="text" class="floating-native"
@@ -520,13 +520,11 @@ onMounted(async () => {
                       {{ message }}
                     </div>
                   </ErrorMessage>
-
-                  <span class="error-message">{{ errors[0] }}</span>
                 </Field>
               </IonCol>
 
               <IonCol size="12" size-lg="6">
-                <Field v-slot="{ field, errors }" name="ageRangeMax" label="Idade máxima">
+                <Field v-slot="{ field }" name="ageRangeMax" label="Idade máxima" rules="required|min:1|max:2">
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.ageRangeMax"
@@ -541,8 +539,6 @@ onMounted(async () => {
                       {{ message }}
                     </div>
                   </ErrorMessage>
-
-                  <span class="error-message">{{ errors[0] }}</span>
                 </Field>
               </IonCol>
             </IonRow>

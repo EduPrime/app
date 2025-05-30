@@ -2,7 +2,8 @@
 import showToast from '@/utils/toast-alert'
 import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonSelect, IonSelectOption } from '@ionic/vue'
 import { listSharp } from 'ionicons/icons'
-import { Field, Form, useForm } from 'vee-validate'
+import { ErrorMessage, Field, Form, useForm } from 'vee-validate'
+
 import { computed, onMounted, ref, watch } from 'vue'
 import InstitutionService from '../../institution/services/InstitutionService'
 import CourseService from '../services/CourseService'
@@ -287,15 +288,20 @@ onMounted(async () => {
         </IonSegment>
         <IonSegmentView>
           <IonSegmentContent id="general">
-            <Field v-slot="{ field, errors }" name="name" label="Nome" rules="required">
+            <Field v-slot="{ field }" name="name" label="Nome" rules="required|min:2|max:80">
               <IonInput
                 v-model="formValues.name"
                 v-bind="field"
                 label="Nome"
                 label-placement="floating"
                 fill="outline"
+                :maxlength="81"
               />
-              <span class="error-message">{{ errors[0] }}</span>
+              <ErrorMessage v-slot="{ message }" name="name">
+                <div class="error-message">
+                  {{ message?.replace('campo', '') }}
+                </div>
+              </ErrorMessage>
             </Field>
 
             <Field v-slot="{ field, errors }" name="institutionId">
@@ -316,7 +322,7 @@ onMounted(async () => {
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
 
-            <Field v-slot="{ field, errors }" name="courseId" label="Curso" rules="required">
+            <Field v-slot="{ field }" name="curso" label="Curso" rules="required">
               <IonSelect
                 v-model="formValues.courseId"
                 v-bind="field"
@@ -331,43 +337,62 @@ onMounted(async () => {
                   {{ course.name }}
                 </IonSelectOption>
               </IonSelect>
-              <span class="error-message">{{ errors[0] }}</span>
+              <ErrorMessage v-slot="{ message }" name="curso">
+                <div class="error-message">
+                  {{ message?.replace('campo', '') }}
+                </div>
+              </ErrorMessage>
             </Field>
 
-            <Field v-slot="{ field, errors }" name="workload" label="Carga horária" rules="required">
+            <Field v-slot="{ field }" name="workload" label="Carga horária" rules="required|min:2|max:4">
               <IonInput
                 v-model="formValues.workload"
                 v-bind="field"
                 label="Carga horária"
                 label-placement="floating"
                 fill="outline"
+                :maxlength="5"
               />
-              <span class="error-message">{{ errors[0] }}</span>
+              <ErrorMessage v-slot="{ message }" name="workload">
+                <div class="error-message">
+                  {{ message }}
+                </div>
+              </ErrorMessage>
             </Field>
 
             <IonRow>
               <IonCol size="6">
-                <Field v-slot="{ field, errors }" name="schoolDays" label="Dias letivos" rules="required">
+                <Field v-slot="{ field }" name="schoolDays" label="Dias letivos" rules="required|min:2|max:3">
                   <IonInput
                     v-model="formValues.schoolDays"
                     v-bind="field"
                     label="Dias letivos"
                     label-placement="floating"
                     fill="outline"
+                    :maxlength="4"
                   />
-                  <span class="error-message">{{ errors[0] }}</span>
+                  <ErrorMessage v-slot="{ message }" name="schoolDays">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
                 </Field>
               </IonCol>
               <IonCol size="6">
-                <Field v-slot="{ field, errors }" name="standardAge">
+                <Field v-slot="{ field }" name="standardAge" rules="min:1|max:2">
                   <IonInput
                     v-model="formValues.standardAge"
                     v-bind="field"
                     label="Idade padrão"
                     label-placement="floating"
                     fill="outline"
+                    :maxlength="3"
                   />
-                  <span class="error-message">{{ errors[0] }}</span>
+                  <ErrorMessage v-slot="{ message }" name="standardAge">
+                    <div class="error-message">
+                      {{ message?.replace('standardAge', 'Idade padrão') }}
+                    </div>
+                  </ErrorMessage>
                 </Field>
               </IonCol>
             </IonRow>
@@ -381,40 +406,55 @@ onMounted(async () => {
             </IonItemDivider>
             <IonRow>
               <IonCol size="6">
-                <Field v-slot="{ field, errors }" name="ageRangeMin" rules="required">
+                <Field v-slot="{ field }" name="ageRangeMin" rules="required|min:1|max:2">
                   <IonInput
                     v-model="formValues.ageRangeMin"
                     v-bind="field"
                     label="Mínima"
                     label-placement="floating"
                     fill="outline"
+                    :maxlength="3"
                   />
-                  <span class="error-message">{{ errors[0] }}</span>
+                  <ErrorMessage v-slot="{ message }" name="ageRangeMin">
+                    <div class="error-message">
+                      {{ message?.replace('ageRangeMin', 'Idade mínima') }}
+                    </div>
+                  </ErrorMessage>
                 </Field>
               </IonCol>
               <IonCol size="6">
-                <Field v-slot="{ field, errors }" name="ageRangeMax">
+                <Field v-slot="{ field }" name="ageRangeMax" rules="min:1|max:2">
                   <IonInput
                     v-model="formValues.ageRangeMax"
                     v-bind="field"
                     label="Máxima"
                     label-placement="floating"
                     fill="outline"
+                    :maxlength="3"
                   />
-                  <span class="error-message">{{ errors[0] }}</span>
+                  <ErrorMessage v-slot="{ message }" name="ageRangeMax">
+                    <div class="error-message">
+                      {{ message?.replace('ageRangeMax', 'Idade máxima') }}
+                    </div>
+                  </ErrorMessage>
                 </Field>
               </IonCol>
             </IonRow>
 
-            <Field v-slot="{ field, errors }" name="description">
+            <Field v-slot="{ field }" name="description" rules="max:180">
               <IonInput
                 v-model="formValues.description"
                 v-bind="field"
                 label="Descrição"
                 label-placement="floating"
                 fill="outline"
+                :maxlength="181"
               />
-              <span class="error-message">{{ errors[0] }}</span>
+              <ErrorMessage v-slot="{ message }" name="description">
+                <div class="error-message">
+                  {{ message?.replace('description', 'Descrição') }}
+                </div>
+              </ErrorMessage>
             </Field>
           </IonSegmentContent>
           <IonSegmentContent id="discipline-info">
