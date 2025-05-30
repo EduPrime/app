@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import showToast from '@/utils/toast-alert'
 import {
   IonButton,
   IonCol,
@@ -13,8 +14,7 @@ import {
 } from '@ionic/vue'
 import { ErrorMessage, Field, Form } from 'vee-validate'
 import { computed, onActivated, onMounted, ref, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
-import showToast from '@/utils/toast-alert'
+import { useRoute, useRouter } from 'vue-router'
 import InstitutionService from '../../services/InstitutionService'
 
 const router = useRouter()
@@ -32,7 +32,7 @@ const initialFormValues = {
   state: '',
   postalCode: '',
   phone: '',
-  email: ''
+  email: '',
 }
 
 const formValues = ref({ ...initialFormValues })
@@ -48,13 +48,14 @@ watch(
       checkForChanges()
     }
   },
-  { deep: true, immediate: true }
+  { deep: true, immediate: true },
 )
 
 onMounted(async () => {
   if (isEditing.value) {
     await loadInstitution()
-  } else {
+  }
+  else {
     formValues.value = { ...initialFormValues }
     originalFormValues.value = { ...initialFormValues }
     hasChanges.value = false
@@ -71,45 +72,47 @@ onActivated(() => {
 
 async function buscarEndereco(cep: string) {
   try {
-    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-    const data = await response.json();
+    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
+    const data = await response.json()
     if (data.erro) {
-      throw new Error('CEP não encontrado');
+      throw new Error('CEP não encontrado')
     }
-    return data;
-  } catch (error) {
-    console.error(error);
-    return null;
+    return data
+  }
+  catch (error) {
+    console.error(error)
+    return null
   }
 }
 
 watch(() => formValues.value.postalCode, async (novoCep, antigoCep) => {
   if (!novoCep || novoCep !== antigoCep) {
-    formValues.value.address = '';
-    formValues.value.city = '';
-    formValues.value.state = '';
-    
+    formValues.value.address = ''
+    formValues.value.city = ''
+    formValues.value.state = ''
+
     if (form.value) {
-      form.value.setFieldValue('address', '');
-      form.value.setFieldValue('city', '');
-      form.value.setFieldValue('state', '');
+      form.value.setFieldValue('address', '')
+      form.value.setFieldValue('city', '')
+      form.value.setFieldValue('state', '')
     }
   }
-  
-  if (!novoCep) return;
-  
-  const cepLimpo = String(novoCep).replace(/\D/g, '');
+
+  if (!novoCep)
+    return
+
+  const cepLimpo = String(novoCep).replace(/\D/g, '')
   if (cepLimpo && cepLimpo.length === 8) {
-    const endereco = await buscarEndereco(cepLimpo);
+    const endereco = await buscarEndereco(cepLimpo)
     if (endereco) {
-      formValues.value.address = endereco.logradouro || '';
-      formValues.value.city = endereco.localidade || '';
-      formValues.value.state = endereco.uf || '';
-      
+      formValues.value.address = endereco.logradouro || ''
+      formValues.value.city = endereco.localidade || ''
+      formValues.value.state = endereco.uf || ''
+
       if (form.value) {
-        form.value.setFieldValue('address', endereco.logradouro || '');
-        form.value.setFieldValue('city', endereco.localidade || '');
-        form.value.setFieldValue('state', endereco.uf || '');
+        form.value.setFieldValue('address', endereco.logradouro || '')
+        form.value.setFieldValue('city', endereco.localidade || '')
+        form.value.setFieldValue('state', endereco.uf || '')
       }
     }
   }
@@ -128,21 +131,23 @@ async function loadInstitution() {
         state: institution.state || '',
         postalCode: institution.postalCode || '',
         phone: institution.phone || '',
-        email: institution.email || ''
+        email: institution.email || '',
       }
-      
+
       formValues.value = { ...loadedValues }
       originalFormValues.value = { ...loadedValues }
       hasChanges.value = false
     }
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao carregar instituição:', error)
     showToast('Erro ao carregar instituição', 'top', 'danger')
   }
 }
 
 function checkForChanges() {
-  if (!isEditing.value) return
+  if (!isEditing.value)
+    return
 
   const hasNameChanged = formValues.value.name !== originalFormValues.value.name
   const hasAddressChanged = formValues.value.address !== originalFormValues.value.address
@@ -152,26 +157,26 @@ function checkForChanges() {
   const hasPhoneChanged = formValues.value.phone !== originalFormValues.value.phone
   const hasEmailChanged = formValues.value.email !== originalFormValues.value.email
 
-  hasChanges.value = hasNameChanged || hasAddressChanged || hasCityChanged || 
-                    hasStateChanged || hasPostalCodeChanged || hasPhoneChanged || 
-                    hasEmailChanged
+  hasChanges.value = hasNameChanged || hasAddressChanged || hasCityChanged
+    || hasStateChanged || hasPostalCodeChanged || hasPhoneChanged
+    || hasEmailChanged
 }
 
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
-    const anyFieldFilled = !!formValues.value.name || !!formValues.value.address || 
-                         !!formValues.value.city || !!formValues.value.state || 
-                         !!formValues.value.postalCode || !!formValues.value.phone || 
-                         !!formValues.value.email
+    const anyFieldFilled = !!formValues.value.name || !!formValues.value.address
+      || !!formValues.value.city || !!formValues.value.state
+      || !!formValues.value.postalCode || !!formValues.value.phone
+      || !!formValues.value.email
     return anyFieldFilled
   }
-  
+
   return hasChanges.value
 })
 
 async function handleSubmit(values: any) {
   isSubmitting.value = true
-  
+
   try {
     const institutionData = {
       id: isEditing.value ? route.params.id as string : undefined,
@@ -185,27 +190,30 @@ async function handleSubmit(values: any) {
     }
 
     await institutionService.upsertInstitution(institutionData)
-    
+
     showToast(
       `Instituição ${isEditing.value ? 'atualizada' : 'cadastrada'} com sucesso!`,
       'top',
-      'success'
+      'success',
     )
-    
+
     resetForm()
-  } catch (error) {
+  }
+  catch (error) {
     console.error('Erro ao salvar instituição:', error)
     showToast('Erro ao salvar instituição', 'top', 'danger')
-  } finally {
+  }
+  finally {
     isSubmitting.value = false
   }
 }
 
 function resetForm() {
-  router.back()
+  router.push({
+    name: 'DashboardInstitution',
+    query: { refresh: Date.now().toString() },
+  })
 }
-
-
 </script>
 
 <template>
@@ -256,25 +264,25 @@ function resetForm() {
 
           <IonRow>
             <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="postalCode" label="CEP" rules="required|cep" >
-                  <div class="floating-input">
-                    <input 
-                      v-bind="field" 
-                      v-model="formValues.postalCode"
-                      v-imask="{ mask: '00000-000' }"
-                      type="text" 
-                      class="floating-native" 
-                      placeholder=" "
-                      @input="field.onInput"
-                    >
-                    <label class="floating-label"><span>CEP </span><span class="required-text">(Obrigatório)</span></label>
+              <Field v-slot="{ field }" name="postalCode" label="CEP" rules="required|cep">
+                <div class="floating-input">
+                  <input
+                    v-bind="field"
+                    v-model="formValues.postalCode"
+                    v-imask="{ mask: '00000-000' }"
+                    type="text"
+                    class="floating-native"
+                    placeholder=" "
+                    @input="field.onInput"
+                  >
+                  <label class="floating-label"><span>CEP </span><span class="required-text">(Obrigatório)</span></label>
+                </div>
+                <ErrorMessage v-slot="{ message }" name="postalCode">
+                  <div class="error-message">
+                    {{ message }}
                   </div>
-                  <ErrorMessage v-slot="{ message }" name="postalCode">
-                    <div class="error-message">
-                      {{ message }}
-                    </div>
-                  </ErrorMessage>
-                </Field>
+                </ErrorMessage>
+              </Field>
             </IonCol>
             <IonCol size="12" size-md="6">
               <Field v-slot="{ field }" name="address" label="Endereço" rules="max:255">
@@ -350,28 +358,28 @@ function resetForm() {
 
           <IonRow>
             <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="phone" label="Telefone" rules="required|phone">
-                  <div class="floating-input">
-                    <input 
-                      v-bind="field" 
-                      v-model="formValues.phone"
-                      v-imask="{ mask: '(00) 00000-0000' }"
-                      type="tel" 
-                      class="floating-native" 
-                      placeholder=" "
-                      @input="field.onInput"
-                    >
-                    <label class="floating-label"><span>Telefone </span><span class="required-text">(Obrigatório)</span></label>
+              <Field v-slot="{ field }" name="phone" label="Telefone" rules="required|phone">
+                <div class="floating-input">
+                  <input
+                    v-bind="field"
+                    v-model="formValues.phone"
+                    v-imask="{ mask: '(00) 00000-0000' }"
+                    type="tel"
+                    class="floating-native"
+                    placeholder=" "
+                    @input="field.onInput"
+                  >
+                  <label class="floating-label"><span>Telefone </span><span class="required-text">(Obrigatório)</span></label>
+                </div>
+                <ErrorMessage v-slot="{ message }" name="phone">
+                  <div class="error-message">
+                    {{ message }}
                   </div>
-                  <ErrorMessage v-slot="{ message }" name="phone">
-                    <div class="error-message">
-                      {{ message }}
-                    </div>
-                  </ErrorMessage>
-                </Field>
-              </IonCol>
+                </ErrorMessage>
+              </Field>
+            </IonCol>
             <IonCol size="12" size-md="6">
-              <Field v-slot="{ field }" name="email" label="E-mail" rules="email|max:255">
+              <Field v-slot="{ field }" name="email" label="E-mail" rules="email|max:100">
                 <div class="floating-input">
                   <input
                     v-bind="field"
@@ -401,10 +409,14 @@ function resetForm() {
         <IonGrid>
           <IonRow class="action-buttons-fixed">
             <IonCol size="6">
-              <IonButton color="danger" expand="block" @click="resetForm">Cancelar</IonButton>
+              <IonButton color="danger" expand="block" @click="resetForm">
+                Cancelar
+              </IonButton>
             </IonCol>
             <IonCol size="6">
-              <IonButton expand="block" type="submit" form="institution-form" :disabled="!saveButtonEnabled">Salvar</IonButton>
+              <IonButton expand="block" type="submit" form="institution-form" :disabled="!saveButtonEnabled">
+                Salvar
+              </IonButton>
             </IonCol>
           </IonRow>
         </IonGrid>
@@ -415,7 +427,7 @@ function resetForm() {
 
 <style scoped>
 .page-title {
-  font-weight: bold; 
+  font-weight: bold;
   color: var(--ion-color-secondary);
 }
 

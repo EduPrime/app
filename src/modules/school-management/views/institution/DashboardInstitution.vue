@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import type { Institution } from '@prisma/client'
-import InstitutionDetailView from './InstitutionDetailView.vue'
-import ListWithActionInstitution from './ListWithActionInstitution.vue'
-import RegisterInstitutionMobile from './RegisterInstitutionMobile.vue'
 import ContentLayout from '@/components/theme/ContentLayout.vue'
 import showToast from '@/utils/toast-alert'
 import { IonButton, IonCard, IonCardHeader, IonCardTitle, IonCol, IonContent, IonIcon, IonModal, IonPage, IonRow, IonSearchbar, IonText } from '@ionic/vue'
-import { add, business } from 'ionicons/icons'
+import { add } from 'ionicons/icons'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import InstitutionService from '../../services/InstitutionService'
+import InstitutionDetailView from './InstitutionDetailView.vue'
+import ListWithActionInstitution from './ListWithActionInstitution.vue'
+import RegisterInstitutionMobile from './RegisterInstitutionMobile.vue'
 
 const router = useRouter()
 const route = router.currentRoute
@@ -61,8 +61,10 @@ const filteredDataList = computed(() => {
 
 function setModalAddInstitution(open: boolean) {
   if (open) {
-    delayModalOpen({ modal: isModalAddInstitution })
-  } else {
+    isModalAddInstitution.value = false
+    setTimeout(() => (isModalAddInstitution.value = true), 10)
+  }
+  else {
     isModalAddInstitution.value = open
   }
 }
@@ -80,7 +82,8 @@ function navigateToRegister() {
 function setSeeModal(open: boolean) {
   if (open) {
     delayModalOpen(seeModal.value)
-  } else {
+  }
+  else {
     seeModal.value.modal = open
   }
 }
@@ -88,7 +91,8 @@ function setSeeModal(open: boolean) {
 function setEditModal(open: boolean) {
   if (open) {
     delayModalOpen(editModal.value)
-  } else {
+  }
+  else {
     editModal.value.modal = open
     loadInstitutions()
   }
@@ -97,7 +101,8 @@ function setEditModal(open: boolean) {
 function setDeleteModal(open: boolean) {
   if (open) {
     delayModalOpen(deleteModal.value)
-  } else {
+  }
+  else {
     deleteModal.value.modal = open
   }
 }
@@ -130,12 +135,15 @@ async function handleDelete() {
       if (error.message) {
         if (error.message.includes('escolas vinculadas')) {
           showToast('Não é possível excluir: Existem escolas vinculadas a essa instituição', 'top', 'warning')
-        } else if (error.message.includes('cursos vinculados')) {
-          showToast('Não é possível excluir: Existem cursos vinculados a essa instituição', 'top', 'warning')
-        } else {
-          showToast('Erro ao excluir: ' + error.message, 'top', 'danger')
         }
-      } else {
+        else if (error.message.includes('cursos vinculados')) {
+          showToast('Não é possível excluir: Existem cursos vinculados a essa instituição', 'top', 'warning')
+        }
+        else {
+          showToast(`Erro ao excluir: ${error.message}`, 'top', 'danger')
+        }
+      }
+      else {
         showToast('Erro desconhecido ao excluir instituição', 'top', 'danger')
       }
     }
