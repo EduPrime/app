@@ -374,7 +374,7 @@ onMounted(async () => {
           <IonSegmentContent id="general">
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field }" name="name" label="Nome da série" rules="min:2|max:120">
+                <Field v-slot="{ field }" name="name" label="Nome da série" rules="required|min:2|max:120">
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.name" placeholder=" " type="text" class="floating-native" :maxlength="120"
@@ -384,7 +384,7 @@ onMounted(async () => {
                   </div>
                   <ErrorMessage v-slot="{ message }" name="name">
                     <div class="error-message">
-                      {{ message }}
+                      {{ message?.replace('campo', '') }}
                     </div>
                   </ErrorMessage>
                 </Field>
@@ -471,7 +471,7 @@ onMounted(async () => {
               </IonCol>
 
               <IonCol size="12" size-lg="6">
-                <Field v-slot="{ field, errors }" name="schoolDays" label="Dias letivos">
+                <Field v-slot="{ field }" name="schoolDays" label="Dias letivos" rules="required">
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.schoolDays" type="text" class="floating-native"
@@ -484,8 +484,6 @@ onMounted(async () => {
                       {{ message }}
                     </div>
                   </ErrorMessage>
-
-                  <span class="error-message">{{ errors[0] }}</span>
                 </Field>
               </IonCol>
 

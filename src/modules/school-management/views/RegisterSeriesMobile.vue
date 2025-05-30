@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import showToast from '@/utils/toast-alert'
-import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonInput, IonItem, IonLabel, IonList, IonPage, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonSelect, IonSelectOption } from '@ionic/vue'
+import { IonButton, IonCol, IonContent, IonGrid, IonIcon, IonInput, IonItem, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonSegment, IonSegmentButton, IonSegmentContent, IonSegmentView, IonSelect, IonSelectOption } from '@ionic/vue'
 import { listSharp } from 'ionicons/icons'
 import { Field, Form, useForm } from 'vee-validate'
 import { computed, onMounted, ref, watch } from 'vue'
@@ -292,9 +292,8 @@ onMounted(async () => {
                 v-model="formValues.name"
                 v-bind="field"
                 label="Nome"
-                label-placement="stacked"
+                label-placement="floating"
                 fill="outline"
-                placeholder="Digite o nome da série"
               />
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
@@ -305,9 +304,8 @@ onMounted(async () => {
                 :disabled="true"
                 v-bind="field"
                 label="Instituição"
-                label-placement="stacked"
+                label-placement="floating"
                 fill="outline"
-                placeholder="Selecione"
                 cancel-text="Cancelar"
                 justify="space-between"
               >
@@ -323,9 +321,8 @@ onMounted(async () => {
                 v-model="formValues.courseId"
                 v-bind="field"
                 label="Curso"
-                label-placement="stacked"
+                label-placement="floating"
                 fill="outline"
-                placeholder="Selecione"
                 cancel-text="Cancelar"
                 justify="space-between"
                 aria-label="Curso"
@@ -342,9 +339,8 @@ onMounted(async () => {
                 v-model="formValues.workload"
                 v-bind="field"
                 label="Carga horária"
-                label-placement="stacked"
+                label-placement="floating"
                 fill="outline"
-                placeholder="Digite a carga horária"
               />
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
@@ -356,9 +352,8 @@ onMounted(async () => {
                     v-model="formValues.schoolDays"
                     v-bind="field"
                     label="Dias letivos"
-                    label-placement="stacked"
+                    label-placement="floating"
                     fill="outline"
-                    placeholder="Digite os dias letivos"
                   />
                   <span class="error-message">{{ errors[0] }}</span>
                 </Field>
@@ -369,27 +364,30 @@ onMounted(async () => {
                     v-model="formValues.standardAge"
                     v-bind="field"
                     label="Idade padrão"
-                    label-placement="stacked"
+                    label-placement="floating"
                     fill="outline"
-                    placeholder="Digite a idade padrão"
                   />
                   <span class="error-message">{{ errors[0] }}</span>
                 </Field>
               </IonCol>
             </IonRow>
-            <IonLabel color="primary" class="ion-no-margin">
-              Faixa etária
-            </IonLabel>
+            <IonItemDivider
+              style="border-color: rgba(var(--ion-color-primary-rgb), 0.25);"
+              class="ion-no-padding"
+            >
+              <IonLabel color="primary" class="ion-no-margin">
+                Faixa etária
+              </IonLabel>
+            </IonItemDivider>
             <IonRow>
               <IonCol size="6">
-                <Field v-slot="{ field, errors }" name="ageRangeMin">
+                <Field v-slot="{ field, errors }" name="ageRangeMin" rules="required">
                   <IonInput
                     v-model="formValues.ageRangeMin"
                     v-bind="field"
                     label="Mínima"
-                    label-placement="stacked"
+                    label-placement="floating"
                     fill="outline"
-                    placeholder="Digite a idade mínima"
                   />
                   <span class="error-message">{{ errors[0] }}</span>
                 </Field>
@@ -400,9 +398,8 @@ onMounted(async () => {
                     v-model="formValues.ageRangeMax"
                     v-bind="field"
                     label="Máxima"
-                    label-placement="stacked"
+                    label-placement="floating"
                     fill="outline"
-                    placeholder="Digite a idade máxima"
                   />
                   <span class="error-message">{{ errors[0] }}</span>
                 </Field>
@@ -414,9 +411,8 @@ onMounted(async () => {
                 v-model="formValues.description"
                 v-bind="field"
                 label="Descrição"
-                label-placement="stacked"
+                label-placement="floating"
                 fill="outline"
-                placeholder="Digite uma descrição"
               />
               <span class="error-message">{{ errors[0] }}</span>
             </Field>
@@ -432,8 +428,7 @@ onMounted(async () => {
                           v-model="discipline.name"
                           v-bind="field"
                           label="Disciplina"
-                          label-placement="stacked"
-                          placeholder="Selecione uma disciplina"
+                          label-placement="floating"
                           cancel-text="Cancelar"
                           fill="outline"
                           @ion-change="(e) => updateWorkload(index, e.detail.value)"
@@ -452,9 +447,8 @@ onMounted(async () => {
                         <IonInput
                           v-model="discipline.workload"
                           v-bind="field"
-                          label-placement="stacked"
+                          label-placement="floating"
                           label="Carga horária"
-                          placeholder="Digite a carga horária"
                           fill="outline"
                         />
                         <span class="error-message">{{ errors[0] }}</span>
@@ -465,9 +459,8 @@ onMounted(async () => {
                         <IonInput
                           v-model="discipline.year"
                           v-bind="field"
-                          label-placement="stacked"
+                          label-placement="floating"
                           label="Ano"
-                          placeholder="Digite o ano"
                           fill="outline"
                         />
                         <span class="error-message">{{ errors[0] }}</span>
