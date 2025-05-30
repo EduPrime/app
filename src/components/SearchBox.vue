@@ -77,6 +77,12 @@ watch(searchQuery, async (newValue) => {
   }
 })
 
+watch(() => [selectedFilterItem.value, selectedAltFilter.value], async (newValue) => {
+  if (newValue.at(0)) {
+    await searchByQuery(' ')
+  }
+})
+
 onMounted(async () => {
   data.value = await searchByQuery(' ')
 })
@@ -84,12 +90,11 @@ onMounted(async () => {
 
 <template>
   <IonRow>
-    <IonCol v-if="props.filterType === 'list' && props.filterAreas" size="12" style="background-color: black;">
+    <IonCol v-if="props.filterType === 'list' && props.filterAreas" size="12">
       <IonRow>
         <IonCol v-for="(item, index) in props.filterAreas" :key="index" size="12" :size-md="`${props.filterAreas.length === 1 ? 12 : 6}`">
           <div v-if="index === 0" style="padding-left: 6px; padding-right: 6px;">
             <IonSelect v-model="selectedFilterItem" class="select" :label="item.placeholder">
-              <!-- dataFilter errado: [{ name: 'Errado', id: 'bd14f407-3758-4656-a299-e4cf3859dd29x' }] -->
               <IonSelectOption v-for="f in dataFilter" :key="f" :value="f.id">
                 {{ f.name }}
               </IonSelectOption>
@@ -146,4 +151,25 @@ onMounted(async () => {
 .my-auto {
   margin: auto 0
 }
+
+  ion-select {
+    --border-color: var(--ion-color-secondary);
+  }
+
+  ion-select::part(placeholder),
+  ion-select::part(text) {
+    flex: 0 0 auto;
+  }
+
+ ion-select::part(text) {
+    color: var(--ion-color-secondary);
+  }
+    ion-select::part(label) {
+    color: var(--ion-color-primary);
+  }
+
+  ion-select::part(icon) {
+    color: var(--ion-color-secondary);
+    opacity: 1;
+  }
 </style>

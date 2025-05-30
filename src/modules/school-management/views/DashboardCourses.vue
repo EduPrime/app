@@ -180,7 +180,8 @@ watch(
           table="course"
           placeholder="Busque o curso"
           :search-areas="['name']"
-          filter-type="text"
+          :filter-areas=" [{ table: 'institution', relationship: 'institutionId', placeholder: 'Instituição' }]"
+          filter-type="list"
           @update:search-result="loadCourses($event)"
         >
           <IonButton id="add-btn" expand="block" class="ion-text-uppercase" @click="navigateToRegister">
