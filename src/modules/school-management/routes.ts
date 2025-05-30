@@ -6,18 +6,19 @@ import CourseDetailsDesktop from './views/course/DetailsDesktop.vue'
 import RegisterCourse from './views/course/Register.vue'
 import DashboardCorses from './views/DashboardCourses.vue'
 import DashboardFunction from './views/DashboardFunction.vue'
-import DashboardSchools from './views/DashboardSchools.vue'
 import DashboardSeries from './views/DashboardSeries.vue'
 import FunctionDetailsDesktop from './views/FunctionDetailsDesktop.vue'
 import RegisterFunction from './views/RegisterFunction.vue'
-import RegisterSchool from './views/RegisterSchool.vue'
 import SeriesDetailsDesktop from './views/series/DetailsDesktop.vue'
+import DashboardSchool from './views/school/DashboardSchool.vue'
+import RegisterSchool from './views/school/RegisterSchool.vue'
+import SchoolDetailsDesktop from './views/school/SchoolDetailsDesktop.vue'
 
 const routes = [
   {
-    path: '/Schools/list',
-    name: 'InstitutionListInstitutions',
-    component: DashboardSchools,
+    path: '/School/list',
+    name: 'SchoolListSchool',
+    component: DashboardSchool,
     meta: {
       moduleName: 'Schools',
       moduleIcon: school,
@@ -28,13 +29,25 @@ const routes = [
     },
   },
   {
-    path: '/Schools/register',
+    path: '/School/register/:id?',
     name: 'RegisterSchool',
     component: RegisterSchool,
     meta: {
       moduleName: 'Schools',
       icon: create,
       name: 'Registrar escola',
+      order: 2,
+      requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
+    },
+  },
+  {
+    path: '/School/details/:id',
+    name: 'SchoolDetails',
+    component: SchoolDetailsDesktop,
+    meta: {
+      moduleName: 'Schools',
+      icon: school,
+      name: 'Detalhes da escola',
       order: 3,
       requiredRole: ['ADMIN', 'GESTORMUNICIPAL', 'GESTORESCOLAR'],
     },

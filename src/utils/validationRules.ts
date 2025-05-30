@@ -32,7 +32,11 @@ defineRule('cep', (value: string) => {
 })
 
 defineRule('phone', (value: string) => {
-  if (!value || !validatePhone(value)) {
+  if (!value) {
+    return true
+  }
+
+  if (!validatePhone(value)) {
     return 'Telefone inválido'
   }
   return true
