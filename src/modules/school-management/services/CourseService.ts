@@ -14,6 +14,7 @@ export default class CourseService extends BaseService<Course> {
       const { data: course, error: courseError } = await this.client
         .from(table)
         .select('*')
+        .is('deletedAt', null)
 
       if (courseError) {
         errorHandler(courseError, 'Erro ao buscar séries')

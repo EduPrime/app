@@ -75,12 +75,12 @@ onMounted(() => {
                   <span class="detail-value">{{ seriesDetails.institution?.name || '-' }}</span>
                 </div>
               </IonCol>
-              <IonCol v-if="seriesDetails && seriesDetails?.school" size="12" size-md="12">
+              <!-- <IonCol v-if="seriesDetails && seriesDetails?.school" size="12" size-md="12">
                 <div class="detail-item">
                   <span class="detail-label">Escola</span>
                   <span class="detail-value">{{ seriesDetails.school?.name || '-' }}</span>
                 </div>
-              </IonCol>
+              </IonCol> -->
 
               <IonCol size="12" size-md="12">
                 <div class="detail-item">

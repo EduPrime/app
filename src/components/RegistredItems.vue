@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IonButton, IonCardHeader, IonCol, IonIcon, IonItemDivider, IonLabel, IonList, IonPage, IonRow, IonText } from '@ionic/vue'
-import { apps, bookOutline, briefcaseOutline, business, businessOutline, calendarOutline, callOutline, checkmarkCircleOutline, documentOutline, fileTrayOutline, globeOutline, locationOutline, mailOutline, mapOutline, personOutline, pinOutline, school, schoolOutline, timeOutline } from 'ionicons/icons'
+import { apps, bookOutline, briefcaseOutline, business, businessOutline, calendarOutline, callOutline, checkmarkCircleOutline, documentOutline, fileTrayOutline, globeOutline, locationOutline, mailOutline, mapOutline, personOutline, pinOutline, schoolOutline, timeOutline } from 'ionicons/icons'
 
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -82,7 +82,7 @@ const metaIcon = ref((route.meta.icon as string) || '')
                 :icon="checkmarkCircleOutline"
               />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.status }}
+                Status: {{ props.items.status }}
               </IonText>
             </div>
 
@@ -94,7 +94,7 @@ const metaIcon = ref((route.meta.icon as string) || '')
                   : business"
               />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.name }}
+                Nome:  {{ props.items.name }}
               </IonText>
             </div>
 
@@ -104,10 +104,10 @@ const metaIcon = ref((route.meta.icon as string) || '')
                 :icon="business"
               />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.institutionName }}
+                Instituição:   {{ props.items.institutionName }}
               </IonText>
             </div>
-            <div v-if="props.items.school" style="display: flex; align-items: center; padding: 6px;">
+            <!-- <div v-if="props.items.school" style="display: flex; align-items: center; padding: 6px;">
               <IonIcon
                 slot="start" color="primary" style="padding-right: 10px;"
                 :icon="school"
@@ -115,14 +115,14 @@ const metaIcon = ref((route.meta.icon as string) || '')
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
                 {{ props.items.school.name }}
               </IonText>
-            </div>
+            </div> -->
             <div v-if="props.items.courseName" style="display: flex; align-items: center; padding: 6px;">
               <IonIcon
                 slot="start" color="primary" style="padding-right: 10px;"
                 :icon="briefcaseOutline"
               />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.courseName }}
+                Curso: {{ props.items.courseName }}
               </IonText>
             </div>
 
@@ -132,7 +132,7 @@ const metaIcon = ref((route.meta.icon as string) || '')
                 :icon="timeOutline"
               />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.workload }} horas
+                Carga horária: {{ props.items.workload }} horas
               </IonText>
             </div>
 
@@ -142,7 +142,7 @@ const metaIcon = ref((route.meta.icon as string) || '')
                 :icon="calendarOutline"
               />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.schoolDays }} dias letivos
+                Dias letivos: {{ props.items.schoolDays }} dias letivos
               </IonText>
             </div>
 
@@ -152,26 +152,26 @@ const metaIcon = ref((route.meta.icon as string) || '')
                 :icon="fileTrayOutline"
               />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.cnpj }}
+                CNPJ: {{ props.items.cnpj }}
               </IonText>
             </div>
             <div v-if="props.items.phone" style="display: flex; align-items: center; padding: 6px;">
               <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="callOutline" />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.phone }}
+                Telefone: {{ props.items.phone }}
               </IonText>
             </div>
 
             <div v-if="props.items.email" style="display: flex; align-items: center; padding: 6px;">
               <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="mailOutline" />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.email }}
+                E-Mail: {{ props.items.email }}
               </IonText>
             </div>
             <div v-if="props.items.website" style="display: flex; align-items: center; padding: 6px;">
               <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="globeOutline" />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.website }}
+                Site: {{ props.items.website }}
               </IonText>
             </div>
 
@@ -181,21 +181,21 @@ const metaIcon = ref((route.meta.icon as string) || '')
                 :icon="documentOutline"
               />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.regulation }}
+                Regulação: {{ props.items.regulation }}
               </IonText>
             </div>
 
             <div v-if="props.items.INEPCode" style="display: flex; align-items: center; padding: 6px;">
               <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="schoolOutline" />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.INEPCode }}
+                Código INEP:  {{ props.items.INEPCode }}
               </IonText>
             </div>
 
             <div v-if="props.items.IESCode" style="display: flex; align-items: center; padding: 6px;">
               <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="bookOutline" />
               <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-                {{ props.items.IESCode }}
+                Código IES: {{ props.items.IESCode }}
               </IonText>
             </div>
           </IonList>
