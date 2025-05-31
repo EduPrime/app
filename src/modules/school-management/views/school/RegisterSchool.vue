@@ -103,6 +103,15 @@ const initialFormValues = {
   foodServiceAvailable: false,
   communitySharedSpaces: false,
   usesSurroundingSpaces: false,
+  // Campos de dependências
+  specificFacilities: false,
+  generalUseRooms: [],
+  labsAndFunctionalAreas: [],
+  supportFacilities: [],
+  insideClassrooms: 0,
+  outsideClassrooms: 0,
+  refrigeratedClassrooms: 0,
+  accessibleClassrooms: 0,
   tenantId: null,
   userCreated: null,
 }
@@ -1063,10 +1072,209 @@ onMounted(() => {
           
           <!-- Aba 3: Dependências -->
           <div v-show="activeTab === 'dependencias'">
-            <h4 class="section-title">Dependências</h4>
+            <h4 class="section-title">Dependências da Escola</h4>
+            
+            <!-- Checkbox para dependências específicas -->
             <IonRow>
               <IonCol size="12">
-                <p class="placeholder-message">Configurações de dependências serão implementadas em breve.</p>
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.specificFacilities" labelPlacement="end">A escola possui dependências específicas</IonCheckbox>
+                </IonItem>
+              </IonCol>
+            </IonRow>
+
+            <!-- Salas de uso geral (Room enum) -->
+            <IonRow>
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="generalUseRooms" label="Salas de uso geral">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.generalUseRooms"
+                      interface="alert"
+                      placeholder="Selecione as salas"
+                      class="select-native"
+                      :multiple="true"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="CLASSROOM">Sala de aula</IonSelectOption>
+                      <IonSelectOption value="AUDITORIUM">Auditório</IonSelectOption>
+                      <IonSelectOption value="COMMON_PLACES">Espaços comuns</IonSelectOption>
+                      <IonSelectOption value="WAREHOUSE">Almoxarifado</IonSelectOption>
+                      <IonSelectOption value="LIBRARY">Biblioteca</IonSelectOption>
+                      <IonSelectOption value="TEACHER_ROOM">Sala de professores</IonSelectOption>
+                      <IonSelectOption value="BATHROOM">Banheiro</IonSelectOption>
+                      <IonSelectOption value="ACCESSIBILITY_BATHROOM">Banheiro acessível</IonSelectOption>
+                      <IonSelectOption value="TEACHER_BATHROOM">Banheiro de professores</IonSelectOption>
+                      <IonSelectOption value="KITCHEN">Cozinha</IonSelectOption>
+                      <IonSelectOption value="STUDENT_DORMROOM">Dormitório de alunos</IonSelectOption>
+                      <IonSelectOption value="TEACHER_DORMROOM">Dormitório de professores</IonSelectOption>
+                      <IonSelectOption value="POOL">Piscina</IonSelectOption>
+                      <IonSelectOption value="LUNCHROOM">Refeitório</IonSelectOption>
+                      <IonSelectOption value="OPEN_COURT">Pátio aberto</IonSelectOption>
+                      <IonSelectOption value="CLOSED_COURT">Pátio fechado</IonSelectOption>
+                      <IonSelectOption value="COVERED_FIELD">Quadra coberta</IonSelectOption>
+                      <IonSelectOption value="OPEN_FIELD">Quadra descoberta</IonSelectOption>
+                      <IonSelectOption value="SECRETARY">Secretaria</IonSelectOption>
+                      <IonSelectOption value="PARKING">Estacionamento</IonSelectOption>
+                      <IonSelectOption value="CAFETERIA">Cantina</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Salas de uso geral</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="generalUseRooms">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Laboratórios e áreas funcionais (Lab enum) -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="labsAndFunctionalAreas" label="Laboratórios e áreas funcionais">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.labsAndFunctionalAreas"
+                      interface="alert"
+                      placeholder="Selecione os laboratórios"
+                      class="select-native"
+                      :multiple="true"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="COMPUTER_SCIENCE">Informática</IonSelectOption>
+                      <IonSelectOption value="SCIENCE">Ciências</IonSelectOption>
+                      <IonSelectOption value="MULTIMEDIA">Multimídia</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Laboratórios e áreas funcionais</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="labsAndFunctionalAreas">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Instalações de apoio (Facility enum) -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="supportFacilities" label="Instalações de apoio">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.supportFacilities"
+                      interface="alert"
+                      placeholder="Selecione as instalações"
+                      class="select-native"
+                      :multiple="true"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="RESTROOMS">Banheiros</IonSelectOption>
+                      <IonSelectOption value="ACCESSIBILITY">Acessibilidade</IonSelectOption>
+                      <IonSelectOption value="EXTERNAL_AREAS">Áreas externas</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Instalações de apoio</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="supportFacilities">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
+
+            <h4 class="section-title">Salas de Aula</h4>
+            
+            <IonRow>
+              <!-- Salas de aula dentro do prédio -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="insideClassrooms" label="Salas de aula dentro do prédio" rules="numeric">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.insideClassrooms"
+                      type="number"
+                      min="0"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Salas de aula dentro do prédio</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="insideClassrooms">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Salas de aula fora do prédio -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="outsideClassrooms" label="Salas de aula fora do prédio" rules="numeric">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.outsideClassrooms"
+                      type="number"
+                      min="0"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Salas de aula fora do prédio</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="outsideClassrooms">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <!-- Salas de aula climatizadas -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="refrigeratedClassrooms" label="Salas de aula climatizadas" rules="numeric">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.refrigeratedClassrooms"
+                      type="number"
+                      min="0"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Salas de aula climatizadas</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="refrigeratedClassrooms">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Salas de aula adaptadas para acessibilidade -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="accessibleClassrooms" label="Salas de aula adaptadas para acessibilidade" rules="numeric">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.accessibleClassrooms"
+                      type="number"
+                      min="0"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Salas de aula adaptadas para acessibilidade</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="accessibleClassrooms">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
               </IonCol>
             </IonRow>
           </div>
