@@ -90,6 +90,19 @@ const initialFormValues = {
   phone: '',
   phone2: '',
   zone: '',
+  // Campos de infraestrutura
+  operatingLocation: null,
+  buildingUsage: null,
+  sharedSchool: false,
+  sharedSchoolINEPCode: '',
+  potableWaterAvailable: false,
+  sewageAvailable: false,
+  electricityAvailable: false,
+  wasteDisposal: null,
+  wasteTreatmentBySchool: false,
+  foodServiceAvailable: false,
+  communitySharedSpaces: false,
+  usesSurroundingSpaces: false,
   tenantId: null,
   userCreated: null,
 }
@@ -885,23 +898,167 @@ onMounted(() => {
           </div>
           
           <!-- Aba 2: Infraestrutura -->
-          <div v-if="activeTab === 'infraestrutura'">
-            <h4 class="section-title">Infraestrutura</h4>
-            <IonRow>
-              <IonCol size="12">
-                <p class="placeholder-message">Configurações de infraestrutura serão implementadas em breve.</p>
-              </IonCol>
-            </IonRow>
-          </div>
-          
-          <!-- Aba 2: Infraestrutura -->
           <div v-show="activeTab === 'infraestrutura'">
             <h4 class="section-title">Infraestrutura</h4>
+            
+            <!-- Local de funcionamento -->
             <IonRow>
-              <IonCol size="12">
-                <p class="placeholder-message">Configurações de infraestrutura serão implementadas em breve.</p>
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="operatingLocation" label="Local de funcionamento">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.operatingLocation"
+                      interface="alert"
+                      placeholder="Selecione o local"
+                      class="select-native"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="OWNED">Própria</IonSelectOption>
+                      <IonSelectOption value="RENTED">Alugada</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Local de funcionamento</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="operatingLocation">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Forma de ocupação do prédio -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="buildingUsage" label="Forma de ocupação do prédio">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.buildingUsage"
+                      interface="alert"
+                      placeholder="Selecione a ocupação"
+                      class="select-native"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="EXCLUSIVE">Exclusiva</IonSelectOption>
+                      <IonSelectOption value="SHARED">Compartilhada</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Forma de ocupação do prédio</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="buildingUsage">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Destinação do lixo -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="wasteDisposal" label="Destinação do lixo">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.wasteDisposal"
+                      interface="alert"
+                      placeholder="Selecione a destinação"
+                      class="select-native"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="INCINERATION">Incineração</IonSelectOption>
+                      <IonSelectOption value="LANDFILL">Aterro</IonSelectOption>
+                      <IonSelectOption value="COMPOSTING">Compostagem</IonSelectOption>
+                      <IonSelectOption value="RECYCLING">Reciclagem</IonSelectOption>
+                      <IonSelectOption value="OTHER">Outro</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Destinação do lixo</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="wasteDisposal">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
               </IonCol>
             </IonRow>
+            
+            <h4 class="section-title">Recursos e Funcionalidades</h4>
+            
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.sharedSchool" labelPlacement="end">Escola compartilhada</IonCheckbox>
+                </IonItem>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.potableWaterAvailable" labelPlacement="end">Água potável disponível</IonCheckbox>
+                </IonItem>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.electricityAvailable" labelPlacement="end">Fonte de energia elétrica</IonCheckbox>
+                </IonItem>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.sewageAvailable" labelPlacement="end">Esgotamento sanitário adequado</IonCheckbox>
+                </IonItem>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.wasteTreatmentBySchool" labelPlacement="end">Tratamento de resíduos realizado pela escola</IonCheckbox>
+                </IonItem>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.foodServiceAvailable" labelPlacement="end">Oferece alimentação escolar aos alunos</IonCheckbox>
+                </IonItem>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.communitySharedSpaces" labelPlacement="end">Compartilha espaços com a comunidade</IonCheckbox>
+                </IonItem>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.usesSurroundingSpaces" labelPlacement="end">Utiliza equipamentos do entorno escolar para atividades educacionais</IonCheckbox>
+                </IonItem>
+              </IonCol>
+            </IonRow>
+            
+            <!-- Campo para código INEP da escola compartilhada -->
+            <IonRow v-if="formValues.sharedSchool">
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="sharedSchoolINEPCode" label="Código INEP da escola compartilhada" rules="max:100">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.sharedSchoolINEPCode"
+                      type="text"
+                      class="floating-native"
+                      maxlength="100"
+                      placeholder="Código INEP da escola compartilhada"
+                    />
+                    <label class="floating-label"><span>Código INEP da escola compartilhada</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="sharedSchoolINEPCode">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
+
           </div>
           
           <!-- Aba 3: Dependências -->
