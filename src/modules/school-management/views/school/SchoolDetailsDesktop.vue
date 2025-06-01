@@ -319,24 +319,6 @@ watch(
               </IonRow>
             </IonGrid>
           </div>
-        </div>
-
-        <div class="fixed-footer">
-          <IonGrid>
-            <IonRow>
-              <IonCol size="6">
-                <IonButton color="danger" expand="full" @click="goBack()">
-                  Fechar
-                </IonButton>
-              </IonCol>
-              <IonCol size="6">
-                <IonButton color="secondary" expand="full" @click="navigateToEdit()">
-                  Editar
-                </IonButton>
-              </IonCol>
-            </IonRow>
-          </IonGrid>
-        </div>
       </div>
 
       <!-- Aba 2: Infraestrutura -->
@@ -723,6 +705,24 @@ watch(
           </IonGrid>
         </div>
       </div>
+
+      <div class="fixed-footer">
+          <IonGrid>
+            <IonRow>
+              <IonCol size="6">
+                <IonButton color="danger" expand="full" @click="goBack()">
+                  Fechar
+                </IonButton>
+              </IonCol>
+              <IonCol size="6">
+                <IonButton color="secondary" expand="full" @click="navigateToEdit()">
+                  Editar
+                </IonButton>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </div>
+    </div>
     </ContentLayout>
   </IonPage>
 </template>
@@ -739,6 +739,17 @@ watch(
   border-radius: 8px;
   padding: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.fixed-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  padding: 12px 16px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
 .section-title {
@@ -830,9 +841,9 @@ watch(
   .detail-section {
     padding: 12px;
   }
-
+  
   .school-details-container {
-    padding-bottom: 90px; /* Mais espaço no mobile */
+    padding-bottom: 100px; /* Mais espaço no mobile para o footer fixo */
   }
 }
 </style>
