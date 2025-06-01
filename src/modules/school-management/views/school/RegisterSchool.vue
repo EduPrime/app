@@ -112,6 +112,34 @@ const initialFormValues = {
   outsideClassrooms: 0,
   refrigeratedClassrooms: 0,
   accessibleClassrooms: 0,
+  // Campos de equipamentos
+  hasInternet: false,
+  hasLocalNetwork: false,
+  connectionTypes: [],
+  studentAccessDevices: [],
+  teachingEquipments: [],
+  desktopComputers: 0,
+  laptopComputers: 0,
+  tabletsAvailable: 0,
+  // Campos de recursos humanos (RH)
+  administrationStaff: 0,
+  teachingStaff: 0,
+  supportAndSecurityStaff: 0,
+  healthAndNutritionStaff: 0,
+  psychologyAndSocialStaff: 0,
+  schoolManagementStaff: 0,
+  // Campos de dados do ensino
+  hasSpecializedEducation: false,
+  hasPoliticalPedagogicalProject: false,
+  hasIndigenousEducation: false,
+  hasHigherEducationLink: false,
+  elementarySchoolModel: null,
+  teachingLanguage: null,
+  teachingMaterials: [],
+  collegiateBodies: [],
+  studentSelectionCriteria: [],
+  headquartersSchoolCode: '',
+  higherEducationInstitutionCode: '',
   tenantId: null,
   userCreated: null,
 }
@@ -1189,13 +1217,13 @@ onMounted(() => {
             <IonRow>
               <!-- Salas de aula dentro do prédio -->
               <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="insideClassrooms" label="Salas de aula dentro do prédio" rules="numeric">
+                <Field v-slot="{ field }" name="insideClassrooms" label="Salas de aula dentro do prédio" rules="checandoNumero|valorMinimo:0|max:3">
                   <div class="floating-input">
                     <input
                       v-bind="field"
                       v-model="formValues.insideClassrooms"
-                      type="number"
-                      min="0"
+                      type="text"
+                      maxlength="4"
                       class="floating-native"
                       placeholder="Quantidade"
                     />
@@ -1211,12 +1239,13 @@ onMounted(() => {
               
               <!-- Salas de aula fora do prédio -->
               <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="outsideClassrooms" label="Salas de aula fora do prédio" rules="numeric">
+                <Field v-slot="{ field }" name="outsideClassrooms" label="Salas de aula fora do prédio" rules="checandoNumero|valorMinimo:0|max:3">
                   <div class="floating-input">
                     <input
                       v-bind="field"
                       v-model="formValues.outsideClassrooms"
-                      type="number"
+                      type="text"
+                      maxlength="4"
                       min="0"
                       class="floating-native"
                       placeholder="Quantidade"
@@ -1235,12 +1264,13 @@ onMounted(() => {
             <IonRow>
               <!-- Salas de aula climatizadas -->
               <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="refrigeratedClassrooms" label="Salas de aula climatizadas" rules="numeric">
+                <Field v-slot="{ field }" name="refrigeratedClassrooms" label="Salas de aula climatizadas" rules="checandoNumero|valorMinimo:0|max:3">
                   <div class="floating-input">
                     <input
                       v-bind="field"
                       v-model="formValues.refrigeratedClassrooms"
-                      type="number"
+                      type="text"
+                      maxlength="4"
                       min="0"
                       class="floating-native"
                       placeholder="Quantidade"
@@ -1257,12 +1287,13 @@ onMounted(() => {
               
               <!-- Salas de aula adaptadas para acessibilidade -->
               <IonCol size="12" size-md="6">
-                <Field v-slot="{ field }" name="accessibleClassrooms" label="Salas de aula adaptadas para acessibilidade" rules="numeric">
+                <Field v-slot="{ field }" name="accessibleClassrooms" label="Salas de aula adaptadas para acessibilidade" rules="checandoNumero|valorMinimo:0|max:3">
                   <div class="floating-input">
                     <input
                       v-bind="field"
                       v-model="formValues.accessibleClassrooms"
-                      type="number"
+                      type="text"
+                      maxlength="4"
                       min="0"
                       class="floating-native"
                       placeholder="Quantidade"
@@ -1281,10 +1312,178 @@ onMounted(() => {
           
           <!-- Aba 4: Equipamentos -->
           <div v-show="activeTab === 'equipamentos'">
-            <h4 class="section-title">Equipamentos</h4>
+            <h4 class="section-title">Recursos Tecnológicos</h4>
+            
+            <!-- Checkboxes para internet e rede local -->
             <IonRow>
-              <IonCol size="12">
-                <p class="placeholder-message">Configurações de equipamentos serão implementadas em breve.</p>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.hasInternet" labelPlacement="end">A escola tem internet</IonCheckbox>
+                </IonItem>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.hasLocalNetwork" labelPlacement="end">Rede local disponível</IonCheckbox>
+                </IonItem>
+              </IonCol>
+            </IonRow>
+
+            <!-- Tipos de conexão disponíveis (ConnectionType enum) -->
+            <IonRow>
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="connectionTypes" label="Tipos de conexão disponíveis">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.connectionTypes"
+                      interface="alert"
+                      placeholder="Selecione os tipos de conexão"
+                      class="select-native"
+                      :multiple="true"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="OPTIC_FIBER">Fibra ótica</IonSelectOption>
+                      <IonSelectOption value="BROAD_BAND">Banda larga</IonSelectOption>
+                      <IonSelectOption value="SATELLITE">Satélite</IonSelectOption>
+                      <IonSelectOption value="OTHER">Outro</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Tipos de conexão disponíveis</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="connectionTypes">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Equipamentos acessados pelos alunos (Device enum) -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="studentAccessDevices" label="Equipamentos acessados pelos alunos">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.studentAccessDevices"
+                      interface="alert"
+                      placeholder="Selecione os equipamentos"
+                      class="select-native"
+                      :multiple="true"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="COMPUTER">Computador</IonSelectOption>
+                      <IonSelectOption value="TABLET">Tablet</IonSelectOption>
+                      <IonSelectOption value="SMARTPHONE">Smartphone</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Equipamentos acessados pelos alunos</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="studentAccessDevices">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Equipamentos para ensino/aprendizagem (TeachingEquipment enum) -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="teachingEquipments" label="Equipamentos para ensino/aprendizagem">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.teachingEquipments"
+                      interface="alert"
+                      placeholder="Selecione os equipamentos"
+                      class="select-native"
+                      :multiple="true"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="PROJECTOR">Projetor</IonSelectOption>
+                      <IonSelectOption value="DVD_BLU_RAY">DVD/Blu-ray</IonSelectOption>
+                      <IonSelectOption value="MULTIMEDIA_TV">TV multimídia</IonSelectOption>
+                      <IonSelectOption value="DIGITAL_WHITEBOARD">Lousa digital</IonSelectOption>
+                      <IonSelectOption value="SOUND_SYSTEM">Sistema de som</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Equipamentos para ensino/aprendizagem</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="teachingEquipments">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
+
+            <h4 class="section-title">Quantidade de Equipamentos</h4>
+            
+            <IonRow>
+              <!-- Computadores disponíveis (Desktop) -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="desktopComputers" label="Computadores disponíveis (Desktop)" rules="checandoNumero|valorMinimo:0|max:3">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.desktopComputers"
+                      type="text"
+                      maxlength="4"
+                      min="0"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Computadores disponíveis (Desktop)</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="desktopComputers">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Computadores disponíveis (Notebooks) -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="laptopComputers" label="Computadores disponíveis (Notebooks)" rules="checandoNumero|valorMinimo:0|max:3">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.laptopComputers"
+                      type="text"
+                      maxlength="4"
+                      min="0"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Computadores disponíveis (Notebooks)</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="laptopComputers">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Tablets disponíveis -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="tabletsAvailable" label="Tablets disponíveis" rules="checandoNumero|valorMinimo:0|max:3">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.tabletsAvailable"
+                      type="text"
+                      maxlength="4"
+                      min="0"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Tablets disponíveis</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="tabletsAvailable">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
               </IonCol>
             </IonRow>
           </div>
@@ -1292,9 +1491,143 @@ onMounted(() => {
           <!-- Aba 5: RH -->
           <div v-show="activeTab === 'rh'">
             <h4 class="section-title">Recursos Humanos</h4>
+            <p class="section-subtitle">Informe a quantidade de profissionais por categoria</p>
+            
             <IonRow>
-              <IonCol size="12">
-                <p class="placeholder-message">Configurações de recursos humanos serão implementadas em breve.</p>
+              <!-- Administração e suporte pedagógico -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="administrationStaff" label="Administração e suporte pedagógico" rules="checandoNumero|valorMinimo:0|max:3">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.administrationStaff"
+                      type="text"
+                      maxlength="4"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Administração e suporte pedagógico</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="administrationStaff">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Docentes e suporte direto ao ensino -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="teachingStaff" label="Docentes e suporte direto ao ensino" rules="checandoNumero|valorMinimo:0|max:3">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.teachingStaff"
+                      type="text"
+                      maxlength="4"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Docentes e suporte direto ao ensino</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="teachingStaff">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <!-- Serviços de apoio e segurança -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="supportAndSecurityStaff" label="Serviços de apoio e segurança" rules="checandoNumero|valorMinimo:0|max:3">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.supportAndSecurityStaff"
+                      type="text"
+                      maxlength="4"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Serviços de apoio e segurança</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="supportAndSecurityStaff">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Saúde e nutrição -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="healthAndNutritionStaff" label="Saúde e nutrição" rules="checandoNumero|valorMinimo:0|max:3">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.healthAndNutritionStaff"
+                      type="text"
+                      maxlength="4"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Saúde e nutrição</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="healthAndNutritionStaff">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <!-- Psicologia e assistência social -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="psychologyAndSocialStaff" label="Psicologia e assistência social" rules="checandoNumero|valorMinimo:0|max:3">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.psychologyAndSocialStaff"
+                      type="text"
+                      maxlength="4"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Psicologia e assistência social</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="psychologyAndSocialStaff">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Gestão escolar -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="schoolManagementStaff" label="Gestão escolar" rules="checandoNumero|valorMinimo:0|max:3">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.schoolManagementStaff"
+                      type="text"
+                      maxlength="4"
+                      class="floating-native"
+                      placeholder="Quantidade"
+                    />
+                    <label class="floating-label"><span>Gestão escolar</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="schoolManagementStaff">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
               </IonCol>
             </IonRow>
           </div>
@@ -1302,9 +1635,229 @@ onMounted(() => {
           <!-- Aba 6: Dados do ensino -->
           <div v-show="activeTab === 'dadosEnsino'">
             <h4 class="section-title">Dados do Ensino</h4>
+            
+            <!-- Checkboxes -->
             <IonRow>
-              <IonCol size="12">
-                <p class="placeholder-message">Configurações de dados do ensino serão implementadas em breve.</p>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.hasSpecializedEducation" labelPlacement="end">Atendimento educacional especializado (AEE)</IonCheckbox>
+                </IonItem>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.hasPoliticalPedagogicalProject" labelPlacement="end">Projeto político-Pedagógico atualizado nos últimos 12 meses</IonCheckbox>
+                </IonItem>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.hasIndigenousEducation" labelPlacement="end">Educação escolar indígena disponível</IonCheckbox>
+                </IonItem>
+              </IonCol>
+              <IonCol size="12" size-md="6">
+                <IonItem class="checkbox-item">
+                  <IonCheckbox v-model="formValues.hasHigherEducationLink" labelPlacement="end">Vínculo com unidades de ensino superior</IonCheckbox>
+                </IonItem>
+              </IonCol>
+            </IonRow>
+            
+            <!-- IonSelects -->
+            <IonRow>
+              <!-- Modelo de ensino fundamental -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="elementarySchoolModel" label="Modelo de ensino fundamental">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.elementarySchoolModel"
+                      interface="alert"
+                      placeholder="Selecione o modelo"
+                      class="select-native"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="CYCLE">Ciclo</IonSelectOption>
+                      <IonSelectOption value="GRADE">Série</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Modelo de ensino fundamental</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="elementarySchoolModel">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Língua de ensino -->
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="teachingLanguage" label="Língua de ensino">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.teachingLanguage"
+                      interface="alert"
+                      placeholder="Selecione a língua"
+                      class="select-native"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="PORTUGUES">Português</IonSelectOption>
+                      <IonSelectOption value="TIKUNA">Ticuna</IonSelectOption>
+                      <IonSelectOption value="GUARANI_KAIOWA">Guarani Kaiowá</IonSelectOption>
+                      <IonSelectOption value="KAINGANG">Kaingang</IonSelectOption>
+                      <IonSelectOption value="XAVANTE">Xavante</IonSelectOption>
+                      <IonSelectOption value="YANOMAMI">Yanomami</IonSelectOption>
+                      <IonSelectOption value="OUTRO">Outro</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Língua de ensino</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="teachingLanguage">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
+            
+            <IonRow>
+              <!-- Materiais pedagógicos utilizados -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="teachingMaterials" label="Materiais pedagógicos utilizados">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.teachingMaterials"
+                      interface="alert"
+                      placeholder="Selecione os materiais"
+                      class="select-native"
+                      :multiple="true"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="MULTIMEDIA_ARCHIVE">Arquivo multimídia</IonSelectOption>
+                      <IonSelectOption value="TOYS">Brinquedos</IonSelectOption>
+                      <IonSelectOption value="EDUCATIONAL_GAMES">Jogos educativos</IonSelectOption>
+                      <IonSelectOption value="SCIENTIFICAL_MATERIALS">Materiais científicos</IonSelectOption>
+                      <IonSelectOption value="AUDIO_EQUIPMENT">Equipamentos de áudio</IonSelectOption>
+                      <IonSelectOption value="MUSICAL_INSTRUMENTS">Instrumentos musicais</IonSelectOption>
+                      <IonSelectOption value="ARTISTIC_MATERIALS">Materiais culturais/artísticos</IonSelectOption>
+                      <IonSelectOption value="PROFESSIONAL_EDUCATION_MATERIALS">Materiais de educação profissional</IonSelectOption>
+                      <IonSelectOption value="SPORT_MATERIALS">Materiais esportivos</IonSelectOption>
+                      <IonSelectOption value="INDIGENOUS_MATERIALS">Materiais educacionais indígenas</IonSelectOption>
+                      <IonSelectOption value="ETHNIC_MATERIALS">Materiais étnicos</IonSelectOption>
+                      <IonSelectOption value="RURAL_MATERIALS">Materiais educacionais do campo</IonSelectOption>
+                      <IonSelectOption value="NONE_OF_THE_ABOVE">Nenhum dos anteriores</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Materiais pedagógicos utilizados</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="teachingMaterials">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Órgãos colegiados em funcionamento -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="collegiateBodies" label="Órgãos colegiados em funcionamento">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.collegiateBodies"
+                      interface="alert"
+                      placeholder="Selecione os órgãos"
+                      class="select-native"
+                      :multiple="true"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="ASSOCIACAO_DE_PAIS">Associação de Pais</IonSelectOption>
+                      <IonSelectOption value="ASSOCIACAO_DE_PAIS_E_MESTRES">Associação de Pais e Mestres</IonSelectOption>
+                      <IonSelectOption value="GREMIO_ESTUDANTIL">Grêmio Estudantil</IonSelectOption>
+                      <IonSelectOption value="CONSELHO_ESCOLAR">Conselho Escolar</IonSelectOption>
+                      <IonSelectOption value="NAO_HA_ORGAOS_COLEGIADOS">Não há órgãos colegiados</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Órgãos colegiados em funcionamento</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="collegiateBodies">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <!-- Critérios de seleção para alunos -->
+              <IonCol size="12" size-md="4">
+                <Field v-slot="{ field }" name="studentSelectionCriteria" label="Critérios de seleção para alunos">
+                  <div class="floating-input select-input">
+                    <IonSelect
+                      v-bind="field"
+                      v-model="formValues.studentSelectionCriteria"
+                      interface="alert"
+                      placeholder="Selecione os critérios"
+                      class="select-native"
+                      :multiple="true"
+                      @ion-change="(e) => { field.onChange(e.detail.value) }"
+                    >
+                      <IonSelectOption value="ANALISE_CURRICULAR">Análise curricular</IonSelectOption>
+                      <IonSelectOption value="EXAME_DE_SELECAO">Exame de seleção</IonSelectOption>
+                      <IonSelectOption value="COTAS">Cotas</IonSelectOption>
+                    </IonSelect>
+                    <label class="floating-label"><span>Critérios de seleção para alunos</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="studentSelectionCriteria">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+            </IonRow>
+            
+            <!-- Inputs condicionais -->
+            <IonRow v-if="formValues.hasHigherEducationLink">
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="headquartersSchoolCode" label="Código da escola sede" rules="checandoNumero">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.headquartersSchoolCode"
+                      type="text"
+                      maxlength="10"
+                      class="floating-native"
+                      placeholder="Código da escola sede"
+                    />
+                    <label class="floating-label"><span>Código da escola sede</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="headquartersSchoolCode">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
+              </IonCol>
+              
+              <IonCol size="12" size-md="6">
+                <Field v-slot="{ field }" name="higherEducationInstitutionCode" label="Código da instituição de ensino superior" rules="checandoNumero">
+                  <div class="floating-input">
+                    <input
+                      v-bind="field"
+                      v-model="formValues.higherEducationInstitutionCode"
+                      type="text"
+                      maxlength="10"
+                      class="floating-native"
+                      placeholder="Código da instituição de ensino superior"
+                    />
+                    <label class="floating-label"><span>Código da instituição de ensino superior</span></label>
+                  </div>
+                  <ErrorMessage v-slot="{ message }" name="higherEducationInstitutionCode">
+                    <div class="error-message">
+                      {{ message }}
+                    </div>
+                  </ErrorMessage>
+                </Field>
               </IonCol>
             </IonRow>
           </div>
