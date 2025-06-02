@@ -1,6 +1,7 @@
 import type { Series } from '@prisma/client'
 import BaseService from '@/services/BaseService'
 import errorHandler from '@/utils/error-handler'
+import showToast from '@/utils/toast-alert'
 
 interface SeriesToSave {
   id?: string
@@ -45,7 +46,20 @@ export default class SeriesService extends BaseService<Series> {
       if (series.id === '') {
         delete series.id // Remove o campo `id` se for uma string vazia
       }
+      if (!series.id) {
+        const { data: alreadyExists } = await this.client
+          .from('series')
+          .select('id')
+          .eq('name', series.name)
+          .eq('courseId', series.courseId)
+          .is('deletedAt', null)
+          .single()
 
+        if (alreadyExists) {
+          showToast(`"${series.name}" já existe vinculada ao curso selecionado.`, 'top', 'danger')
+          throw new Error(`"${series.name}" já existe vinculada ao curso selecionado.`)
+        }
+      }
       // 2. Inserir ou atualizar a série
       const { data: seriesData, error: seriesError } = await this.client
         .from('series')
@@ -53,15 +67,18 @@ export default class SeriesService extends BaseService<Series> {
         .select('*')
 
       if (seriesError) {
+        showToast(`Erro ao salvar ou atualizar a série: ${seriesError.message}`, 'top', 'danger')
         throw new Error(`Erro ao inserir ou atualizar a série: ${seriesError.message}`)
       }
 
       if (!seriesData || seriesData.length === 0) {
+        showToast(`Erro ao obter os dados da série após salvar/atualizar`, 'top', 'danger')
         throw new Error('Erro ao obter os dados da série após o upsert')
       }
 
       const seriesId = seriesData[0]?.id
       if (!seriesId) {
+        showToast(`Erro ao obter o ID da série após salvar/atualizar`, 'top', 'danger')
         throw new Error('Erro ao obter o ID da série após o upsert')
       }
       // 3. Buscar disciplinas existentes para a série
@@ -72,6 +89,7 @@ export default class SeriesService extends BaseService<Series> {
         .is('deletedAt', null)
 
       if (fetchError) {
+        showToast(`Erro ao buscar disciplinas existentes da série`, 'top', 'danger')
         throw new Error(`Erro ao buscar disciplinas existentes da série: ${fetchError.message}`)
       }
 

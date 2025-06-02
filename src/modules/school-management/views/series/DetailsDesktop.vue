@@ -39,7 +39,7 @@ async function loadDetails() {
 
 function navigateToEdit() {
   if (seriesDetails.value?.id) {
-    router.push({ name: 'RegisterSerie', params: { id: seriesDetails.value.id } })
+    router.push({ name: 'NewSerie', params: { id: seriesDetails.value.id } })
   }
 }
 

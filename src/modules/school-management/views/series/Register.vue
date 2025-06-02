@@ -127,7 +127,7 @@ function checkForChanges() {
 
 const saveButtonEnabled = computed(() => {
   if (!isEditing.value) {
-    const enabled = !!formValues.value.name || !!formValues.value.description || !!formValues.value.institutionId || !!formValues.value.ageRangeMax || !!formValues.value.ageRangeMin || !!formValues.value.standardAge || !!formValues.value.schoolDays || !!formValues.value.workload
+    const enabled = (!!formValues.value.name || !!formValues.value.description || !!formValues.value.institutionId || !!formValues.value.ageRangeMax || !!formValues.value.ageRangeMin || !!formValues.value.standardAge || !!formValues.value.schoolDays || !!formValues.value.workload) && (disciplineList.value.length > 0 && isDisciplineListValid(disciplineList.value))
     return enabled
   }
 
@@ -202,13 +202,18 @@ onMounted(async () => {
   }
 })
 
+function isDisciplineListValid(dList: any[]) {
+  return dList.every((discipline) => {
+    return !!discipline.name && !!discipline.year && !!discipline.workload
+  })
+}
+
 async function handleSubmit() {
   // const payload = {
   //   ...values,
   //   institutionId: institutions.value.at(0)?.id,
   //   id: isEditing.value ? itemId.value : undefined,
   // }
-  console.log('entrou')
 
   const payload = {
     ...formValues.value,
@@ -218,6 +223,7 @@ async function handleSubmit() {
     deletedAt: null, // Add default value for deletedAt
     updatedBy: null, // Add default value for updatedBy
     institutionId: institutions.value.at(0)?.id,
+    courseId: formValues.value.courseId,
 
     workload: formValues.value.workload ?? undefined, // Ensure workload is undefined if null
     schoolDays: formValues.value.schoolDays ?? 0, // Garante que schoolDays seja um número
@@ -228,8 +234,8 @@ async function handleSubmit() {
 
     if (!selectedDiscipline) {
       showToast('Disciplina não encontrada', 'top', 'danger')
-
-      throw new Error(`Disciplina "${discipline.name}" não encontrada na lista de disciplinas disponíveis.`)
+      console.error(`Disciplina não encontrada na lista de disciplinas disponíveis.`)
+      // throw new Error(`Disciplina "${discipline.name}" não encontrada na lista de disciplinas disponíveis.`)
     }
 
     return {
@@ -270,6 +276,8 @@ async function handleSubmit() {
         showToast('Não foi possível salvar o nova série: Nome da série já existente', 'top', 'warning')
       }
       else {
+        console.log('Erro:', error)
+
         showToast(`Erro ao salvar série: ${error.message}`, 'top', 'danger')
       }
     }
@@ -359,6 +367,7 @@ onMounted(async () => {
           <IonIcon :icon="listSharp" style="margin-right: 10px;" />
           {{ modalTitle }}
         </div> -->
+
         <IonSegment
           v-model="selectedSegment" mode="ios" :scrollable="false"
           style="margin: 20px 0 0 0; padding: 3px 0 3px 0; font-size: 10px;" :style="{}"
@@ -434,10 +443,9 @@ onMounted(async () => {
 
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field }" name="Curso" rules="required">
+                <Field v-slot="{ field, errors }" v-model="formValues.courseId" name="curso" rules="required">
                   <IonSelect
-                    v-model="formValues.courseId" v-bind="field" label-placement="floating" fill="outline"
-                    :items="courseList"
+                    v-bind="field" label-placement="floating" fill="outline"
                   >
                     <label slot="label"><span>Curso </span><span class="required-text">(Obrigatório)</span></label>
 
@@ -445,18 +453,19 @@ onMounted(async () => {
                       {{ course.name }}
                     </IonSelectOption>
                   </IonSelect>
-                  <ErrorMessage v-slot="{ message }" name="Curso">
+                  <!-- <ErrorMessage v-slot="{ message }" name="curso">
                     <div class="error-message">
                       {{ message }}
                     </div>
-                  </ErrorMessage>
+                  </ErrorMessage> -->
+                  <span class="error-message">{{ errors[0] }}</span>
                 </Field>
               </IonCol>
             </IonRow>
 
             <IonRow>
               <IonCol size="12">
-                <Field v-slot="{ field }" name="workload" label="Carga horária" rules="required|min:2|max:4">
+                <Field v-slot="{ field, errors }" name="workload" label="Carga horária" rules="required|min:2|max:4">
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.workload" type="text"
@@ -464,11 +473,12 @@ onMounted(async () => {
                     >
                     <label class="floating-label"><span>Carga horária </span></label>
                   </div>
-                  <ErrorMessage v-slot="{ message }" name="workload">
+                  <!-- <ErrorMessage v-slot="{ message }" name="workload">
                     <div class="error-message">
                       {{ message }}
                     </div>
-                  </ErrorMessage>
+                  </ErrorMessage> -->
+                  <span class="error-message">{{ errors[0] }}</span>
                 </Field>
               </IonCol>
 
@@ -507,7 +517,7 @@ onMounted(async () => {
               </IonCol>
 
               <IonCol size="12" size-lg="6">
-                <Field v-slot="{ field }" name="ageRangeMin" label="Idade mínima" rules="required|min:1|max:2">
+                <Field v-slot="{ field, errors }" name="ageRangeMin" label="Idade mínima" rules="required|min:1|max:2">
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.ageRangeMin" type="text" class="floating-native"
@@ -515,16 +525,18 @@ onMounted(async () => {
                     >
                     <label class="floating-label"><span>Idade mínima </span></label>
                   </div>
-                  <ErrorMessage v-slot="{ message }" name="ageRangeMin">
+                  <span class="error-message">{{ errors[0] }}</span>
+
+                  <!-- <ErrorMessage v-slot="{ message }" name="ageRangeMin">
                     <div class="error-message">
                       {{ message }}
                     </div>
-                  </ErrorMessage>
+                  </ErrorMessage> -->
                 </Field>
               </IonCol>
 
               <IonCol size="12" size-lg="6">
-                <Field v-slot="{ field }" name="ageRangeMax" label="Idade máxima" rules="required|min:1|max:2">
+                <Field v-slot="{ field, errors }" name="ageRangeMax" label="Idade máxima" rules="required|min:1|max:2">
                   <div class="floating-input">
                     <input
                       v-bind="field" v-model="formValues.ageRangeMax"
@@ -534,11 +546,13 @@ onMounted(async () => {
                     >
                     <label class="floating-label"><span>Idade máxima </span></label>
                   </div>
-                  <ErrorMessage v-slot="{ message }" name="ageRangeMax">
+
+                  <span class="error-message">{{ errors[0] }}</span>
+                  <!-- <ErrorMessage v-slot="{ message }" name="ageRangeMax">
                     <div class="error-message">
                       {{ message }}
                     </div>
-                  </ErrorMessage>
+                  </ErrorMessage> -->
                 </Field>
               </IonCol>
             </IonRow>
@@ -549,9 +563,9 @@ onMounted(async () => {
                 <IonGrid>
                   <IonRow>
                     <IonCol size="12">
-                      <Field v-slot="{ field, errors }" name="discipline.name" label="Disciplina">
+                      <Field v-slot="{ field, errors }" v-model="discipline.name" name="discipline.name" label="Disciplina" rules="required">
                         <IonSelect
-                          v-model="discipline.name" v-bind="field" label="Disciplina"
+                          v-bind="field" label="Disciplina"
                           label-placement="floating" cancel-text="Cancelar" fill="outline"
                           @ion-change="(e) => updateWorkload(index, e.detail.value)"
                         >
@@ -565,9 +579,9 @@ onMounted(async () => {
                   </IonRow>
                   <IonRow>
                     <IonCol size="6">
-                      <Field v-slot="{ field, errors }" name="workload" label="Carga horária">
+                      <Field v-slot="{ field, errors }" v-model="discipline.workload" name="workload" rules="required" label="Carga horária">
                         <IonInput
-                          v-model="discipline.workload" v-bind="field" label-placement="floating"
+                          v-bind="field" label-placement="floating"
                           label="Carga horária" fill="outline"
                         />
                         <span class="error-message">{{ errors[0] }}</span>
