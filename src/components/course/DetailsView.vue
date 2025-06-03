@@ -90,14 +90,14 @@ watch(
           <div style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="trailSign" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-              {{ props.items.name }}
+              Curso: {{ props.items.name }}
             </IonText>
           </div>
 
           <div v-if="institution" style="display: flex; align-items: center; padding: 6px;">
             <IonIcon slot="start" color="primary" style="padding-right: 10px;" :icon="businessOutline" />
             <IonText color="primary" style="font-size: 11pt; padding-top: 2px;">
-              {{ institution.name }}
+              Instituição: {{ institution.name }}
             </IonText>
           </div>
 
@@ -132,7 +132,7 @@ watch(
             <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="documentTextOutline" />
             <IonText color="primary" style="font-size: 11pt;">
               <div class="description-text">
-                {{ props.items.description }}
+                Descrição:  {{ props.items.description }}
               </div>
             </IonText>
           </div>
@@ -142,7 +142,7 @@ watch(
             class="ion-no-padding ion-padding-top"
           >
             <IonLabel color="primary" class="ion-no-margin">
-              Informações administrativass
+              Informações administrativas
             </IonLabel>
           </IonItemDivider>
 
@@ -151,7 +151,7 @@ watch(
             <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="ribbonOutline" />
             <IonText color="primary" style="font-size: 11pt;">
               <div class="description-text">
-                {{ props.items.graduate }}
+                Nível de ensino: {{ props.items.graduate }}
               </div>
             </IonText>
           </div>
@@ -161,7 +161,7 @@ watch(
             <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="peopleOutline" />
             <IonText color="primary" style="font-size: 11pt;">
               <div class="description-text">
-                {{ props.items.teachingType }}
+                Tipo de ensino:  {{ props.items.teachingType }}
               </div>
             </IonText>
           </div>
@@ -169,7 +169,7 @@ watch(
             <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="desktopOutline" />
             <IonText color="primary" style="font-size: 11pt;">
               <div class="description-text">
-                {{ props.items.courseModality }}
+                Modalidade do curso:  {{ props.items.courseModality }}
               </div>
             </IonText>
           </div>
@@ -178,7 +178,7 @@ watch(
             <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="settingsOutline" />
             <IonText color="primary" style="font-size: 11pt;">
               <div class="description-text">
-                {{ props.items.regimeType }}
+                Tipo de regime: {{ props.items.regimeType }}
               </div>
             </IonText>
           </div>
@@ -187,7 +187,7 @@ watch(
             <IonIcon slot="start" color="primary" style="padding-right: 10px; margin-top: 3px;" :icon="calendarOutline" />
             <IonText color="primary" style="font-size: 11pt;">
               <div class="description-text">
-                {{ props.items.timeSerialization }}
+                Serialização: {{ props.items.timeSerialization }}
               </div>
             </IonText>
           </div>
